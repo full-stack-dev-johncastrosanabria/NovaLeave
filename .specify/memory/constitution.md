@@ -10,7 +10,8 @@ Modified principles:
   other clients in the future; reinforced inward-only dependencies and
   "no business logic in Presentation."
 - II. SOLID & Simplicity → split: the general-purpose "prefer simple,
-  non-clever solutions" guidance moved to the new Principle II below;
+  non-clever solutions" guidan
+ ce moved to the new Principle II below;
   this principle is retained (renumbered III) and narrowed to SOLID +
   single source of truth for business logic.
 - IV. CQRS with MediatR (renamed "V. CQRS — Preferred, Not Mandated") →
@@ -137,6 +138,15 @@ orchestrate domain objects and infrastructure calls; they MUST NOT
 re-implement or duplicate business rules (e.g., leave-balance calculations,
 overlap checks, approval-eligibility rules — see the Domain Invariants
 section for concrete examples).
+
+When domain entities or aggregates are introduced or materially changed, a
+UML class diagram or equivalent visual model describing entities, value
+objects, aggregates, key invariants, and relationships SHOULD be produced
+and committed to `docs/diagrams` or `.specify/diagrams`. Where diagram
+generation tools are available (PlantUML, Mermaid or model-first generators),
+use them and include generated artifacts in the PR. Diagrams are required
+for all entities when available and MUST be updated as part of the same PR
+that modifies the domain model to aid design reviews and onboarding.
 
 **Rationale**: Centralizing rules in Domain guarantees a single, testable
 source of truth for what constitutes a valid leave request, balance, or
@@ -316,6 +326,23 @@ Architecture · Dependency Injection.
 **Infrastructure**: Docker · GitHub Actions · Azure-ready deployment.
 
 **API standards**:
+- API versioning: public APIs MUST publish OpenAPI (Swagger) definitions and follow semantic versioning for breaking changes. Backward-incompatible API changes require a deprecation plan and a migration window (recommended minimum: 90 days) with communicated client upgrade guidance.
+
+## Non-Functional Requirements (NFRs)
+
+The system MUST meet the following non-functional expectations. These are baseline requirements and MUST be testable and enforced in CI/CD and operational runbooks.
+
+- Performance: typical read/query endpoints SHOULD achieve p95 latency < 300ms under expected production load for the service tier; complex queries may be slower but documented. Performance tests for critical endpoints MUST be included before release.
+- Throughput: capacity planning targets (RPS/concurrent users) MUST be documented per release and validated via load tests for major changes.
+- Availability / SLA: target availability for production is 99.9% (monthly), with RTO (Recovery Time Objective) <= 1 hour for critical workflows and RPO (Recovery Point Objective) <= 15 minutes for transactional data. These targets MUST be reviewed and approved by product/ops.
+- Backup & Recovery: automated backups for primary databases MUST run daily with tested restore procedures. Backups and restore runbooks MUST be documented and exercised at least annually.
+- Scalability: the system MUST support horizontal scaling of stateless components and document stateful scaling strategies for databases.
+- Rate limiting: public-facing endpoints MUST enforce rate limits. Default policy: 100 requests/min per client for non-privileged APIs, adjustable by environment and endpoint sensitivity; critical endpoints (auth, payroll) MAY use stricter limits.
+- Security & Compliance: cryptographic defaults and key management are in the Security section. Non-functional security controls (encryption, key rotation, auditability) MUST be tested in pre-production.
+- Observability & Alerting: metrics, traces, and logs (see Observability) MUST be collected, retained per policy, and connected to alerting rules that notify on-call for degraded conditions.
+- Data retention: default retention windows and tenant-specific rules MUST be defined in Data Governance and enforced by tooling where possible.
+
+These NFRs are normative: any exception requires explicit justification in a PR and a documented mitigation plan. Devices, integrations, or third-party services that affect these NFRs must be considered in the plan and validated in staging prior to production rollout.
 - Entity Framework Core is the only supported ORM; SQL Server is the primary
   and only supported production database. Repository/DbContext access is
   confined to the Infrastructure layer.
@@ -333,31 +360,36 @@ Architecture · Dependency Injection.
 - Authentication: JWT Bearer tokens.
 - Authorization: role-based by default; policy-based authorization where a
   role alone cannot express the rule (e.g., "manager of this employee").
-- Rate limiting MUST be applied to public-facing endpoints.
-- CORS MUST be explicitly configured — no wildcard origins in production.
-- Configuration secrets MUST be sourced from environment variables or a
-  secret manager (e.g., Azure Key Vault, .NET User Secrets in development)
-  — secrets MUST NEVER be committed to source control.
-- Access to infrastructure, data, and deployment environments follows the
-  Principle of Least Privilege.
-- Security is enforced on the server; it MUST NEVER be trusted to the
-  client — client-side checks are a UX convenience only.
+- Rate limiting: public-facing endpoints MUST apply rate limiting (see Non-Functional Requirements). Abuse protection and throttling MUST be part of the security review for any public endpoint.
+- CORS: explicit origin allowlists only in production; no wildcard origins.
+- Secrets & Keys: all secrets and signing keys MUST be stored in a managed secret store (e.g., Azure Key Vault). Key/certificate rotation MUST be supported and exercised; rotation procedures MUST be documented.
+- Encryption: data in transit MUST use TLS 1.2+; sensitive data at rest MUST be encrypted using platform-supported encryption (transparent data encryption for SQL Server or equivalent). Field-level encryption MUST be used for sensitive PII where required by law or policy.
+- Audit logging: every change to business data or status transitions MUST emit an audit record with the following minimum fields: timestamp (UTC), actor_id, actor_role, action, entity_type, entity_id, before (redacted if sensitive), after (redacted if sensitive), correlation_id, request_id. Audit logs MUST be stored in an append-only store or use write-once retention (where available). Retention policy: audit records MUST be retained per Data Governance (default retention: 7 years) and be searchable by authorized roles.
+- Diagram/document access: architecture or domain diagrams that contain sensitive business rules or PII MUST be stored in a controlled location (e.g., `docs/diagrams`) and access-limited per repository/team policies; if diagrams embed PII they MUST be redacted or access-restricted.
+- Least privilege: access to infrastructure, data, and deployment environments MUST follow the Principle of Least Privilege and be reviewed periodically.
+- Security testing: static analysis, dependency vulnerability scans, and automated security tests (SCA, SAST) MUST run in CI. High/critical findings MUST block merges until addressed or mitigated with an approved exception and mitigation plan.
 
 ## Observability
 
-- Structured logging via Serilog is mandatory for all layers that can fail
-  or make a decision worth auditing.
-- Every request MUST carry a correlation ID, propagated through logs and, if
-  present, downstream calls, so a single request can be traced end-to-end.
-- Request logging (method, path, status, duration) MUST be enabled for all
-  Presentation entry points.
-- A global exception-handling middleware MUST translate unhandled
-  exceptions into RFC 7807 Problem Details responses and log the underlying
-  exception.
-- Health checks MUST be exposed for the application and its critical
-  dependencies (database, external services).
-- Logging MUST NEVER expose sensitive information (passwords, tokens, full
-  payroll/medical leave details) — log identifiers and outcomes, not payloads.
+- Structured logging via Serilog is mandatory for all layers that can fail or make a decision worth auditing. Logs MUST include structured fields for correlation_id, request_id, actor_id (if available), and environment.
+- Every request MUST carry a correlation ID, propagated through logs and, if present, downstream calls, so a single request can be traced end-to-end.
+- Request logging (method, path, status, duration) MUST be enabled for all Presentation entry points; sensitive payloads must be redacted from logs.
+- Metrics and tracing: key business metrics (requests, errors, approvals, critical queue lengths) and distributed tracing MUST be emitted for critical workflows. Traces must be sampleable and include span and trace IDs correlated to logs.
+- Alerting & SLOs: SLOs for key user-facing flows and critical endpoints (e.g., leave submission, approval, balance query) MUST be documented. Alerting rules (e.g., error rate, latency, queue depth) MUST notify on-call and include runbook links.
+- Retention & access controls: logs and traces retention windows MUST be defined in Data Governance. Access to raw logs and audit trails MUST be limited to authorized roles and be auditable.
+- A global exception-handling middleware MUST translate unhandled exceptions into RFC 7807 Problem Details responses and log the underlying exception without leaking sensitive data.
+- Health checks MUST be exposed for the application and its critical dependencies (database, external services). Health endpoints MAY expose basic status but MUST NOT return PII or internal configuration.
+- Logging MUST NEVER expose sensitive information (passwords, tokens, full payroll/medical leave details) — log identifiers and outcomes, not payloads.
+
+## Data Governance
+
+- Data classification: define data classes (Public, Internal, Sensitive/PII, Regulated) and document examples for each class in `docs/data-governance.md`.
+- Data retention & deletion: the default retention for business records and audit logs is 7 years unless legal or regulatory requirements specify otherwise. Data subject requests (export, deletion, rectification) MUST be supported via documented processes.
+- Data minimization & anonymization: store the minimal personal data necessary for business operations. Where historical analytics are required, consider anonymization or pseudonymization.
+- Export & portability: provide mechanisms to export an employee's data in a machine-readable format within a documented SLA for requests (e.g., 30 days).
+- Access & approvals: accessing Sensitive/PII data outside normal workflows (e.g., ad-hoc debugging) MUST require justification, approval, and be logged.
+- Data residency & compliance: if deployment spans regions with different data residency requirements, flows that create or store regulated data MUST honor regional policies and be documented in release plans.
+- Data governance ownership: product/ops/security MUST jointly own data retention and access policies; changes MUST be reflected in `docs/data-governance.md`.
 
 ## Code Quality
 
@@ -394,23 +426,45 @@ of which Presentation technology issues the request:
 - HR administrators can review any request.
 - Every status transition MUST generate an audit record.
 - Overlapping leave requests are prohibited.
-- Requests cannot be created for past dates.
+- Requests cannot be created for past dates. "Past" is evaluated against the employee's primary timezone at 00:00 (local date); the system MUST store all datetimes in UTC and translate display/validation using the employee's timezone. Requests for dates strictly earlier than the current local date are disallowed via the standard UI/API. Retroactive requests or corrections are allowed only via a designated HR adjustment workflow that records the reason, approver, and an immutable audit record.
 - A request's start date must not be after its end date.
 - Business rules belong exclusively to the Domain layer (Principle IV).
 
+## Edge Cases & Concurrency
+
+- Concurrency control: updates that change balances or status MUST be protected by transactional semantics (database transactions or unit-of-work) and optimistic concurrency controls (row versioning) where appropriate to avoid double-applies and lost updates. Compensating actions and idempotency keys SHOULD be used for external integrations.
+- Overlap & race conditions: overlap checks MUST be atomic with balance deductions/approvals to prevent race conditions when multiple requests are created or approved concurrently.
+- Time zones & DST: dates and times MUST be stored in UTC; employee local timezone metadata MUST be used for display and validation. The system MUST handle DST transitions, leap days, and cross-midnight requests. Partial-day/half-day requests MUST be supported and represented by a time range or fraction with clear semantics documented.
+- Manager changes & delegation: if a manager changes or leaves while a request is pending, delegation rules MUST be defined (e.g., delegate to new manager, escalate to HR) and captured in the audit trail. Approvals once completed SHOULD remain effective unless reversed by a defined HR process.
+- Retroactive adjustments & payroll corrections: retroactive changes that affect payroll MUST use a controlled HR adjustment workflow, require approvals, and generate audit records and, where relevant, downstream compensation/notification workflows.
+- Bulk imports/migrations: imports of historic leave data MUST include conflict resolution rules (e.g., prefer newer authoritative source, map managers) and be tested in staging. Import processes MUST emit audit events for each migrated record.
+
 ## Testing Philosophy
 
-- Business rules require unit tests that validate behavior, not
-  implementation details — tests MUST survive a refactor that preserves
-  behavior.
-- Critical workflows (see Principle VII) require integration tests
-  exercising the full request pipeline.
-- Acceptance criteria MUST exist and be agreed upon before implementation
-  begins.
-- Automated tests are part of the Definition of Done: a pull request
-  introducing or modifying a Domain business rule MUST include unit tests
-  for that rule, and one introducing or modifying a critical endpoint MUST
-  include integration tests. A PR failing this gate MUST NOT be merged.
+- Business rules require unit tests that validate behavior, not implementation details — tests MUST survive a refactor that preserves behavior. Every domain rule implemented in code MUST have unit tests covering the positive and negative cases.
+- Critical workflows (see Principle VII) require integration tests exercising the full request pipeline (Presentation → Application → Infrastructure). End-to-end tests that include database and messaging interactions are REQUIRED for payroll-relevant flows.
+- Acceptance criteria MUST exist and be agreed upon before implementation begins, and MUST map directly to automated tests when possible.
+- Automated tests are part of the Definition of Done: a pull request introducing or modifying a Domain business rule MUST include unit tests for that rule, and one introducing or modifying a critical endpoint MUST include integration tests. A PR failing this gate MUST NOT be merged.
+- CI gating: unit and integration tests for changed features MUST run in CI; high-severity test regressions MUST block merges. Security scans, static analysis, and license checks MUST run in CI and block on high/critical findings.
+- Performance & load testing: changes that affect critical paths (submission, approval, balance calculation) MUST include performance benchmarks. Major releases MUST include load tests validating capacity planning targets.
+- UML & documentation acceptance: when domain entities or aggregates are added or materially changed, a UML class diagram (PlantUML or Mermaid) or equivalent visual model MUST be produced and committed to `docs/diagrams` or `.specify/diagrams`. The PR that changes the model MUST include the updated diagram and a short summary of the model change as part of its description. Where diagram-generation tooling is available, diagrams SHOULD be generated automatically.
+
+Acceptance criteria checklist (minimum) for a Domain change PR:
+- Unit tests covering the rule(s) added/changed (pass in CI).
+- Integration test(s) for any changed critical endpoint (pass in CI).
+- Updated UML diagram(s) in `docs/diagrams` or `.specify/diagrams` when entities/aggregates change.
+- OpenAPI/Swagger updates if public API surface changes.
+- Security scan results (no high/critical findings) or an approved mitigation plan.
+- Performance benchmark if the change affects a critical path.
+
+These items are the minimum; product owners and reviewers may add additional acceptance checks as needed for regulatory, payroll, or customer-impacting changes.
+## Business Risks & Mitigations
+
+- Payroll & compliance exposure: incorrect balances or missing audit trails can cause legal and payroll errors. Mitigation: require automated tests, audit logs, and integration tests for payroll flows; require pre-production validation with realistic data.
+- Vendor lock-in: reliance on EF Core + SQL Server may complicate migrations. Mitigation: abstract data access behind repository/DbContext boundaries, maintain migration and export tools, and evaluate cloud-native alternatives when necessary.
+- Observability gaps: insufficient alerts or visibility may delay detection of failures. Mitigation: define SLOs, instrument critical paths, and test alerting during drills.
+- Documentation & onboarding risk: incomplete diagrams or stale docs increase onboarding time and design errors. Mitigation: require updated UML diagrams in PRs when domain models change; maintain `docs/diagrams`.
+- Sensitive data leakage in docs: architectural diagrams may expose PII or business rules. Mitigation: store sensitive diagrams in controlled locations with access controls and redaction policies.
 
 ## Future Evolution
 
@@ -424,6 +478,14 @@ of future extensibility MUST NOT justify unnecessary complexity today
 not preclude these directions.
 
 ## Governance
+
+- Operational runbooks: runbooks for common operational tasks (restores, failovers, scaling, critical-dependency outages) MUST be maintained under `docs/runbooks/` and linked from alerting rules. Runbooks MUST include step-by-step recovery steps, verification checks, and communication templates.
+- Incident response & on-call: an incident response plan and on-call rotation MUST exist. Severity definitions (SEV0/SEV1/SEV2) and responder responsibilities MUST be documented; the playbook must include escalation paths, customer communication templates, and post-incident review requirements.
+- Backups & DR exercises: backup and restore procedures MUST be documented and exercised at least annually; DR exercises MUST include timeboxed recovery verification against RTO/RPO targets.
+- Change approvals: changes that materially affect architecture, data handling, or SLAs MUST be approved by product and ops and documented in the PR description.
+- Audit & compliance reviews: regular audits of RBAC, secrets access, and data retention policies MUST occur (frequency defined in `docs/data-governance.md`).
+
+This constitution supersedes all other engineering conventions, style guides, and prior informal practices for NovaLeave. All pull requests and code reviews MUST verify compliance with the principles above; the Git Workflow and Testing Philosophy sections define the day-to-day enforcement mechanism.
 
 This constitution supersedes all other engineering conventions, style
 guides, and prior informal practices for NovaLeave. All pull requests and
