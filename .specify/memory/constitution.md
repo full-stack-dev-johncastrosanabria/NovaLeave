@@ -1,54 +1,60 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 2.0.0 → 2.1.0
-
-Modified principles:
-- IX. Security by Design → materially expanded to mandate OWASP Top 10:2025
-  categories A01 (Broken Access Control), A06 (Insecure Design), and A09
-  (Security Logging and Alerting Failures) as normative engineering
-  requirements; now explicitly references the new OWASP Top 10:2025
-  Security Baseline subsection for detailed controls.
+Version change: 2.1.0 → 2.2.0
 
 Added sections:
-- OWASP Top 10:2025 Security Baseline (under Security section) with three
-  subsections:
-  - A01:2025 — Broken Access Control
-  - A06:2025 — Insecure Design
-  - A09:2025 — Security Logging and Alerting Failures
+- Knowledge, Context, and Diagram Tooling (new section after Data Governance)
+  with comprehensive governance rules for:
+  - Authoritative sources and authority order (constitution → specs → ADRs/plans
+    → source code/tests → derived artifacts)
+  - Graphify governance (code analysis, derived context, stale-graph prevention,
+    no runtime dependency)
+  - Open Knowledge Format governance (curated knowledge layer with source
+    provenance, no silent introduction of new rules)
+  - Mermaid governance (preferred text-based diagram format with specific
+    diagram types per purpose)
+  - AI context-efficiency rules (focused retrieval, source verification)
+  - Security and privacy rules (no credentials, sensitive information handling)
+  - Derived-artifact consistency rules (contradictions must be reported)
+  - Tooling scope (development/documentation tools only, not runtime
+    dependencies)
 
-Modified sections:
-- Testing Philosophy → expanded to require automated security tests for
-  access control, abuse cases, invalid state transitions, and security
-  audit events; added security testing as part of Definition of Done for
-  PRs affecting authentication, authorization, leave balances, request
-  state transitions, HR access, or auditing.
+Updated sections:
+- Governance → added amendment procedure for rules governing Graphify, OKF, or
+  Mermaid; clarified that use of these tools requires justified value and
+  remains proportional to change size/risk.
 
 Preserved sections:
-- All existing principles (I–X) remain unchanged except IX.
-- All existing architecture, naming, technology, governance, and NFR sections
+- All existing principles (I–X) remain unchanged.
+- All existing architecture, naming, technology, security, NFR, and operational
+  sections unchanged.
+- Core Principles, Clean Architecture, CQRS, DDD, SOLID, observability, OWASP
+  baseline, testing, and all prior amendments remain in effect.
+- Security, Data Governance, Code Quality, Git Workflow, Domain Invariants,
+  Edge Cases, Testing Philosophy, Business Risks, and Future Evolution
   unchanged.
-- Clean Architecture, CQRS, DDD, Vertical Slice Architecture, SOLID, and
-  observability remain as stated.
-- JWT authentication, role-based and policy-based authorization, server-side
-  enforcement, and Serilog structured logging remain unchanged.
 
-Templates requiring updates:
-- ⚠ .specify/templates/spec-template.md — review for security acceptance
-  criteria alignment with A01, A06, A09 categories (recommend adding
-  security acceptance criteria section for sensitive features).
-- ⚠ .specify/templates/plan-template.md — review Constitution Check gate to
-  confirm OWASP baseline is included in threat modeling for critical features
-  (Phase 1 design).
-- ⚠ .specify/templates/tasks-template.md — recommend adding security-test
-  task type for features touching authentication, authorization, or state
-  transitions.
-- ✅ Command/skill files (.claude/skills/speckit-*) — reviewed, no updates
-  needed.
+Architecture & Application:
+- No runtime dependencies added (Graphify, OKF, Mermaid are tooling only).
+- No MVP functionality changed.
+- No business rules added or modified.
+- No technology stack decisions affected.
+- No application feature scope changes.
 
-Follow-up TODOs: None. All OWASP requirements integrated. Version bumped to
-2.1.0 per semantic versioning (MINOR: materially expanded Security section
-and principle).
+Templates & Skills:
+- ⚠ .specify/templates/spec-template.md — review for consistency with new
+  governance rules (optional; no mandatory changes).
+- ⚠ .specify/templates/plan-template.md — review for consistency with new
+  governance rules (optional; no mandatory changes).
+- ⚠ .specify/templates/tasks-template.md — review for consistency with new
+  governance rules (optional; no mandatory changes).
+- ✅ Spec Kit command/skill files (.claude/skills/speckit-*) — reviewed, no
+  updates needed.
+
+Follow-up TODOs: None. All governance rules for Graphify, OKF, and Mermaid
+integrated. Version bumped to 2.2.0 per semantic versioning (MINOR: new
+expanded governance section for derived tooling artifacts added).
 -->
 
 # NovaLeave Constitution
@@ -560,6 +566,157 @@ Automated tests MUST verify:
 - Data residency & compliance: if deployment spans regions with different data residency requirements, flows that create or store regulated data MUST honor regional policies and be documented in release plans.
 - Data governance ownership: product/ops/security MUST jointly own data retention and access policies; changes MUST be reflected in `docs/data-governance.md`.
 
+## Knowledge, Context, and Diagram Tooling
+
+This section establishes governance rules for Graphify, Open Knowledge Format (OKF), and Mermaid as development, documentation, and context-management tools. These tools are **NOT** runtime dependencies, **NOT** core architectural principles, and their use is **optional** unless explicitly required by an approved feature plan or architecture decision.
+
+### Authoritative Sources and Authority Order
+
+Approved feature specifications, architectural decisions, the current constitution, approved plans, and source code remain the authoritative sources for NovaLeave. The authority order for decision-making and implementation is:
+
+1. **The current constitution** — for project-wide governance, principles, and compliance rules.
+2. **Approved feature specifications** — for functional behavior, acceptance criteria, and scope.
+3. **Approved architecture decision records (ADRs) and technical plans** — for architectural choices, implementation strategy, and design trade-offs.
+4. **Source code and automated tests** — for the currently implemented behavior, business rules, and constraints as they actually execute.
+5. **OKF knowledge pages, Mermaid diagrams, and Graphify outputs** — as derived supporting artifacts that aid understanding and context.
+
+**Critical rule**: Derived tooling artifacts (Graphify outputs, OKF knowledge entries, Mermaid diagrams) **MUST NOT** override an authoritative source. If authoritative sources conflict with each other, the conflict **MUST** be explicitly reported and resolved before implementation continues. Derived artifacts that contradict approved sources MUST be corrected, marked stale, or re-evaluated for accuracy.
+
+### Graphify Governance
+
+Graphify MAY be used to analyze code structure, dependencies, relationships, impact areas, and documentation connections as a derived code-analysis and context-discovery tool.
+
+**Use and limitations**:
+- Graphify output MUST be treated as derived context for exploration and understanding rather than as an independent source of truth.
+- Before modifying code based on Graphify results, engineers or AI agents MUST verify the relevant source files, tests, and specifications.
+- Graphify-generated information MUST NOT silently introduce: new business rules, new actors, new request states, new permissions, new dependencies, new architectural decisions, or new MVP functionality. Any such change requires specification and approval.
+- A Graphify graph MAY become stale after source-code or documentation changes. Any decision or code change based on the graph MUST verify that the graph reflects the repository version being analyzed and the changes being implemented.
+- Code-only local analysis via grep, codebase navigation, and static imports/exports SHOULD be preferred when it provides sufficient context and avoids external tool overhead.
+- Semantic processing of documentation through an external model or API MUST remain optional and requires organizational approval if project-sensitive information may be transmitted outside approved boundaries.
+- API keys, tokens, credentials, or secrets used by Graphify MUST NEVER be committed to the repository.
+- Graphify failures, missing graphs, stale graphs, or unavailable semantic backends MUST NOT block the NovaLeave application from building, testing, running, or deploying.
+
+### Open Knowledge Format Governance
+
+Open Knowledge Format (OKF) MAY be used as a curated project-knowledge and navigation layer to summarize, link to, and contextualize authoritative sources.
+
+**Content and provenance**:
+- OKF content MUST summarize and link to authoritative sources (specifications, plans, ADRs, source files, tests) rather than duplicate entire documents.
+- Every OKF knowledge entry MUST preserve source provenance by identifying the authoritative files or decisions from which it was derived (e.g., "based on spec#123" or "references src/domain/LeaveRequest.cs").
+- OKF content MUST clearly distinguish: confirmed facts, approved decisions, assumptions, open questions, and deprecated information.
+- OKF content MUST NOT silently introduce: new business requirements, new authorization rules, new request states, new actors, new architectural dependencies, new security controls, or new MVP functionality. Any such addition requires specification and approval.
+- When OKF content conflicts with an authoritative source, the authoritative source takes precedence and the knowledge entry MUST be corrected or marked as stale with a reference to the authoritative source.
+- OKF knowledge retrieval SHOULD use focused queries and bounded context where supported, so AI agents and engineers do not read broad portions of the repository unnecessarily.
+- The unavailability or failure of OKF tooling MUST NOT block application execution, builds, tests, or deployment.
+
+### Mermaid Governance
+
+Mermaid is the preferred text-based format for version-controlled architecture, workflow, state, sequence, domain, and data-model diagrams when diagrams are required. Mermaid files MUST be committed to the repository for version control and design review.
+
+**Diagram representation and accuracy**:
+- Mermaid diagrams MUST represent information already supported by approved specifications, plans, architecture decisions, data models, or source code.
+- Mermaid diagrams MUST NOT invent: actors, states, state transitions, relationships, cardinalities, endpoints, database tables, dependencies, business rules, or authorization permissions.
+- When source information is incomplete or contradictory, the diagram MUST identify assumptions or unresolved questions instead of guessing.
+
+**Diagram types and scope**:
+The following Mermaid diagram types SHOULD be used according to their purpose:
+- **flowchart** — for workflows, decisions, and high-level architecture flows.
+- **stateDiagram-v2** — for request states and state transitions (e.g., leave request lifecycle).
+- **sequenceDiagram** — for interactions between actors and system components.
+- **classDiagram** — for domain entities and their relationships.
+- **erDiagram** — for persistence models and database schema.
+
+Mermaid diagrams MUST remain focused and readable. Large diagrams SHOULD be divided into smaller diagrams representing separate concerns (e.g., one diagram per aggregate or request state machine).
+
+**Authority and maintenance**:
+- Approved specifications and architecture decisions always take precedence over Mermaid diagrams.
+- When an approved source changes, affected diagrams SHOULD be reviewed and updated as part of the same feature or pull request when practical.
+- A diagram-rendering or validation failure MUST NOT block application execution. However, invalid Mermaid syntax in a diagram modified by a pull request SHOULD be corrected before merge when validation tooling is available.
+
+### AI Context-Efficiency Rules
+
+When AI agents or engineers need to understand or modify NovaLeave code, architecture, or specifications, the following context-efficiency rules guide retrieval and verification:
+
+- AI agents SHOULD retrieve focused context before broadly reading the repository. The preferred context order is:
+  1. Search focused, source-linked OKF knowledge (if available) for high-level overviews and navigation.
+  2. Query Graphify for relevant files, dependencies, and impact areas (if available and accurate).
+  3. Read the authoritative specification, plan, decision, test, or source files identified by those tools.
+  4. Use Mermaid diagrams to visualize confirmed information and relationships.
+  5. Expand repository exploration only when focused retrieval is insufficient.
+
+- AI agents MUST state when:
+  - A Graphify graph may be stale or reflect an older repository version.
+  - An OKF knowledge entry may be incomplete or out-of-date.
+  - A Mermaid diagram may be provisional or based on incomplete information.
+  - An authoritative source could not be located.
+  - Sources conflict and require manual reconciliation.
+  - No guaranteed token-saving percentage may be claimed (these tools are intended to reduce unnecessary context retrieval, not to replace source verification).
+
+### Security and Privacy Rules
+
+Graphify outputs, OKF knowledge pages, and Mermaid diagrams may expose source-code structure, architectural decisions, security controls, and business rules. They MUST be handled according to the same repository-access and confidentiality policies as the underlying project.
+
+**Prohibited content**:
+These artifacts MUST NOT contain:
+- API keys, access tokens, refresh tokens, or signing keys.
+- Passwords or password hashes.
+- Secret configuration values or environment-specific credentials.
+- Real employee personal information (use anonymized or pseudonymous identifiers in examples).
+- Complete medical or sensitive leave reasons (redact or anonymize sensitive PII).
+- Production data or Personally Identifiable Information (PII) not already approved for repository storage.
+- Confidential information not already approved for repository storage.
+
+**Transmission and storage**:
+- Sensitive information MUST NOT be transmitted to an external semantic-processing provider (e.g., for semantic analysis of documentation) without explicit organizational approval and data handling agreements.
+- Generated graphs, knowledge exports, and rendered diagrams MUST remain within approved storage and repository boundaries.
+
+### Derived-Artifact Consistency
+
+Graphify outputs, OKF knowledge entries, and Mermaid diagrams are derived artifacts created from or about authoritative sources. When they contradict:
+- The current constitution.
+- An approved specification.
+- An approved architecture decision.
+- An approved plan.
+- Source code.
+- Automated tests.
+
+The contradiction MUST be reported explicitly to the team or PR reviewers. The team MUST determine whether:
+- The derived artifact is stale and requires update.
+- The implementation is incorrect and needs fixing.
+- The specification is outdated and needs amendment.
+- An architectural decision has changed and requires an ADR update.
+- A formal amendment to the constitution or governance rules is required.
+
+Contradictions MUST NOT be silently resolved by an AI agent without human review and approval.
+
+### Tooling Scope
+
+Graphify, OKF, and Mermaid are development, documentation, analysis, and context-management tools. They MUST NOT become runtime dependencies of:
+- **Domain** business logic or entities.
+- **Application** use cases or services.
+- **Infrastructure** data access or external integrations.
+- **Presentation** endpoints or controllers.
+
+Their availability MUST NOT be required for:
+- Application startup or initialization.
+- Request processing or handling.
+- Business-rule execution.
+- Database access or transactions.
+- Authentication or authorization.
+- Production operations or deployment.
+
+If any of these tools becomes temporarily unavailable, the application MUST remain fully functional.
+
+### Amendment Procedure for Tooling Governance
+
+Changes to the rules governing Graphify, OKF, or Mermaid follow the normal constitution amendment procedure (see Governance section below). Their use is **NOT mandatory** for every feature. Use of Graphify, OKF, or Mermaid MAY be required by:
+- An approved feature plan (e.g., "this complex refactor requires impact analysis via Graphify").
+- An architecture decision or ADR (e.g., "all domain-model changes MUST include a Mermaid class diagram").
+- A specific pull-request requirement (e.g., "add a state diagram for this new state machine").
+- A documentation task (e.g., "create an OKF knowledge summary for the leave-approval workflow").
+
+Any required use MUST remain proportional to the size and risk of the change and MUST respect the constitution's simplicity principle (Principle II).
+
 ## Code Quality
 
 - Nullable Reference Types MUST be enabled solution-wide.
@@ -676,17 +833,14 @@ not preclude these directions.
 
 This constitution supersedes all other engineering conventions, style guides, and prior informal practices for NovaLeave. All pull requests and code reviews MUST verify compliance with the principles above; the Git Workflow and Testing Philosophy sections define the day-to-day enforcement mechanism.
 
-This constitution supersedes all other engineering conventions, style
-guides, and prior informal practices for NovaLeave. All pull requests and
-code reviews MUST verify compliance with the principles above; the Git
-Workflow and Testing Philosophy sections define the day-to-day enforcement
-mechanism.
-
 **Amendment procedure**: Amendments are proposed via PR modifying this file,
 must include an updated Sync Impact Report (prepended as an HTML comment),
 and require review/approval before merge. Dependent templates
 (`plan-template.md`, `spec-template.md`, `tasks-template.md`, and Spec Kit
 command/skill files) MUST be checked for consistency as part of the same PR.
+Changes to rules governing Graphify, OKF, or Mermaid also follow this
+procedure and MUST include impact analysis on team workflows and tooling
+adoption.
 
 **Versioning policy**: This constitution follows semantic versioning:
 - **MAJOR** — backward-incompatible governance changes or removal/
@@ -704,4 +858,4 @@ are not permitted.
 Constitution Check gate against the current version of this file before
 Phase 0 research begins, and MUST be re-checked after Phase 1 design.
 
-**Version**: 2.1.0 | **Ratified**: 2026-07-13 | **Last Amended**: 2026-07-14
+**Version**: 2.2.0 | **Ratified**: 2026-07-13 | **Last Amended**: 2026-07-14
