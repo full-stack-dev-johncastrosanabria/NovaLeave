@@ -1,68 +1,54 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.0.0 → 2.0.0
+Version change: 2.0.0 → 2.1.0
 
 Modified principles:
-- I. Clean Architecture → renamed "API" layer to "Presentation" throughout;
-  clarified Presentation currently exposes an ASP.NET Core Web API but is
-  intentionally designed to also host Blazor, SignalR, gRPC, Workers, or
-  other clients in the future; reinforced inward-only dependencies and
-  "no business logic in Presentation."
-- II. SOLID & Simplicity → split: the general-purpose "prefer simple,
-  non-clever solutions" guidan
- ce moved to the new Principle II below;
-  this principle is retained (renumbered III) and narrowed to SOLID +
-  single source of truth for business logic.
-- IV. CQRS with MediatR (renamed "V. CQRS — Preferred, Not Mandated") →
-  redefined: MediatR is now OPTIONAL rather than mandatory; native
-  ASP.NET Core patterns are explicitly permitted; this is a
-  backward-incompatible redefinition of a prior MUST rule, hence the
-  MAJOR version bump.
-- VII. Asynchronous Execution & Observability (renumbered VIII) → trimmed
-  to the async/observability baseline; expanded operational detail moved
-  to the new dedicated "Observability" section.
-- VIII. Security by Design (renumbered IX) → retained, now points to the
-  expanded "Security" section for concrete controls.
-
-Added principles:
-- II. Simplicity Over Unnecessary Abstraction (NEW)
-- X. Architecture Exists to Support the Business (NEW, capstone principle)
+- IX. Security by Design → materially expanded to mandate OWASP Top 10:2025
+  categories A01 (Broken Access Control), A06 (Insecure Design), and A09
+  (Security Logging and Alerting Failures) as normative engineering
+  requirements; now explicitly references the new OWASP Top 10:2025
+  Security Baseline subsection for detailed controls.
 
 Added sections:
-- Project Structure
-- Vertical Slice Architecture
-- Naming Conventions
-- Technology Decisions (absorbs prior "Technology Stack & API Standards")
-- Security (expanded from principle-level detail)
-- Observability (expanded from principle-level detail)
-- Code Quality
-- Git Workflow
-- Domain Invariants
-- Testing Philosophy (absorbs testing-gate detail from prior "Development
-  Workflow & Quality Gates")
-- Future Evolution
+- OWASP Top 10:2025 Security Baseline (under Security section) with three
+  subsections:
+  - A01:2025 — Broken Access Control
+  - A06:2025 — Insecure Design
+  - A09:2025 — Security Logging and Alerting Failures
 
-Removed sections:
-- Technology Stack & API Standards → superseded by "Technology Decisions"
-- Development Workflow & Quality Gates → split into "Git Workflow" (process/
-  review bullets) and "Testing Philosophy" (testing-gate bullets); the
-  complexity-justification bullet moved into Governance.
+Modified sections:
+- Testing Philosophy → expanded to require automated security tests for
+  access control, abuse cases, invalid state transitions, and security
+  audit events; added security testing as part of Definition of Done for
+  PRs affecting authentication, authorization, leave balances, request
+  state transitions, HR access, or auditing.
+
+Preserved sections:
+- All existing principles (I–X) remain unchanged except IX.
+- All existing architecture, naming, technology, governance, and NFR sections
+  unchanged.
+- Clean Architecture, CQRS, DDD, Vertical Slice Architecture, SOLID, and
+  observability remain as stated.
+- JWT authentication, role-based and policy-based authorization, server-side
+  enforcement, and Serilog structured logging remain unchanged.
 
 Templates requiring updates:
-- ✅ .specify/templates/tasks-template.md — already updated in v1.0.0 to make
-  tests mandatory; principle renumbering (VI → VII) does not change its
-  meaning, no further edit required.
-- ✅ .specify/templates/plan-template.md — Constitution Check gate remains
-  generic ("[Gates determined based on constitution file]"); no edit
-  required, gates are derived at plan time from this file, including the
-  new Project Structure / Vertical Slice Architecture sections.
-- ✅ .specify/templates/spec-template.md — no change needed; acceptance
-  scenario format still aligns with the Testing Philosophy section.
-- ✅ Command/skill files (.claude/skills/speckit-*) — reviewed, no
-  agent-specific references requiring genericization.
+- ⚠ .specify/templates/spec-template.md — review for security acceptance
+  criteria alignment with A01, A06, A09 categories (recommend adding
+  security acceptance criteria section for sensitive features).
+- ⚠ .specify/templates/plan-template.md — review Constitution Check gate to
+  confirm OWASP baseline is included in threat modeling for critical features
+  (Phase 1 design).
+- ⚠ .specify/templates/tasks-template.md — recommend adding security-test
+  task type for features touching authentication, authorization, or state
+  transitions.
+- ✅ Command/skill files (.claude/skills/speckit-*) — reviewed, no updates
+  needed.
 
-Follow-up TODOs: None. All placeholders resolved.
+Follow-up TODOs: None. All OWASP requirements integrated. Version bumped to
+2.1.0 per semantic versioning (MINOR: materially expanded Security section
+and principle).
 -->
 
 # NovaLeave Constitution
@@ -227,12 +213,32 @@ Authentication MUST use JWT bearer tokens. Authorization MUST be role-based,
 and policy-based where role alone is insufficient, enforced declaratively on
 every protected endpoint and, where relevant, on the command/query handler
 itself — authorization MUST NOT rely solely on UI-level restrictions.
-Security controls are enforced on the server; the client is never trusted
-(see the Security section for the full set of required controls).
+Security controls are enforced on the server; the client is never trusted.
 
-**Rationale**: Leave data (medical/personal leave reasons, manager approvals)
-is sensitive; authentication and authorization must be enforced consistently
-at the API and application boundary, not assumed from client behavior.
+NovaLeave adopts the following OWASP Top 10:2025 categories as its primary
+application-security baseline:
+- **A01:2025 — Broken Access Control**: access control is enforced
+  server-side at both the Presentation and Application boundaries; frontend
+  controls are never treated as security controls.
+- **A06:2025 — Insecure Design**: security controls are designed during
+  specification and planning, with threat modeling and security acceptance
+  criteria established before implementation.
+- **A09:2025 — Security Logging and Alerting Failures**: all security-relevant
+  and business-critical events produce structured audit logs, with alerting
+  configured to detect and notify on suspicious activity.
+
+These categories are mandatory because NovaLeave processes sensitive employee
+information (medical/personal leave reasons), enforces manager-to-employee
+relationships with approval authority, modifies leave balances that affect
+payroll, and records approval decisions that create compliance obligations.
+See the OWASP Top 10:2025 Security Baseline section for the detailed control
+requirements for each category.
+
+**Rationale**: Leave data is sensitive and affects payroll and compliance;
+authentication and authorization must be enforced consistently at the API and
+application boundary, not assumed from client behavior. Systematic security
+design and audit logging are essential for correctness and compliance in a
+payroll-relevant system.
 
 ### X. Architecture Exists to Support the Business
 
@@ -369,6 +375,169 @@ These NFRs are normative: any exception requires explicit justification in a PR 
 - Least privilege: access to infrastructure, data, and deployment environments MUST follow the Principle of Least Privilege and be reviewed periodically.
 - Security testing: static analysis, dependency vulnerability scans, and automated security tests (SCA, SAST) MUST run in CI. High/critical findings MUST block merges until addressed or mitigated with an approved exception and mitigation plan.
 
+## OWASP Top 10:2025 Security Baseline
+
+### A01:2025 — Broken Access Control
+
+**Core Requirements**:
+- Access control MUST be enforced server-side at both the Presentation and Application boundaries.
+- Frontend controls, hidden routes, disabled buttons, client-supplied roles, or client-supplied ownership identifiers MUST NOT be treated as security controls.
+- Authorization MUST follow deny-by-default behavior.
+
+**Authorization Validation**:
+Every protected use case MUST validate:
+- The authenticated user's identity.
+- The authenticated user's role.
+- Ownership of the requested resource.
+- The user's organizational relationship to the resource.
+- Any resource-specific policy required by the business workflow.
+
+**Minimum Authorization Rules**:
+- Employees MAY access only their own leave requests and balances.
+- Managers MAY view, approve, or reject requests only for employees currently assigned to them.
+- HR users MAY access organization-wide information only through explicitly authorized HR use cases.
+- No user MAY approve or reject their own leave request.
+
+**Client Input Trust Boundaries**:
+- Request IDs, employee IDs, manager IDs, roles, and ownership information supplied by a client MUST NOT be trusted without server-side verification.
+- Authorization MUST be revalidated immediately before every state-changing operation.
+
+**JWT Validation**:
+- JWT issuer, audience, signature, expiration, and required claims MUST be validated.
+
+**Error Handling**:
+- Authorization failures MUST fail closed.
+- Authorization errors MUST NOT reveal whether an inaccessible resource exists.
+
+**Testing Requirements**:
+Automated tests MUST cover:
+- Anonymous access (no token, expired token, invalid token).
+- Incorrect-role access (user with wrong role attempting resource access).
+- Cross-user data access (one employee attempting to access another's requests).
+- Cross-manager access (manager attempting to access requests outside their team).
+- Direct-object-reference manipulation (guessing or altering resource IDs).
+- Privilege escalation attempts (user self-assigning elevated roles).
+- Attempts to approve one's own request.
+- Direct API access that bypasses the frontend.
+- Expired, invalid, or incorrectly issued JWTs.
+
+### A06:2025 — Insecure Design
+
+**Design-Time Security**:
+Security controls MUST be designed during specification and planning, not added only after implementation.
+
+**Security-Sensitive Feature Specifications**:
+Every security-sensitive feature specification MUST document:
+- Authorized actors (who can perform the action).
+- Protected assets (what data/state is at risk).
+- Sensitive data involved (PII, financial data, etc.).
+- Trust boundaries (which components are trusted; where does the system accept external input).
+- Allowed state transitions (valid workflow paths).
+- Prohibited state transitions (invalid or dangerous paths).
+- Successful flows (normal operation).
+- Failure flows (error handling).
+- Abuse and misuse cases (intentional and unintentional misuse scenarios).
+- Concurrency risks (race conditions, double-applies).
+- Replay or duplicate-operation risks (preventing repeated submission of the same request).
+- Required audit events (what must be logged).
+- Security acceptance criteria (testable security requirements).
+
+**Threat Modeling**:
+Threat modeling MUST be performed for at least:
+- Authentication (login, token refresh).
+- Leave request creation (data entry, validation).
+- Leave approval (authorization, state transition).
+- Leave rejection (authorization, state transition).
+- Leave balance changes (calculations, concurrency).
+- Administrative HR operations (bulk imports, corrections, role management).
+- Any retroactive adjustment workflow (historical data changes).
+- Any future payroll-related integration (if implemented).
+
+**Domain & Application Behavior Prevention**:
+Domain and Application behavior MUST prevent:
+- Negative leave balances.
+- Unauthorized approval or rejection.
+- Duplicate approval or rejection.
+- Replayed state-changing requests.
+- Invalid state transitions.
+- Concurrent double approval.
+- Unauthorized retroactive changes.
+- Trusting client-calculated balances.
+- Trusting client-calculated requested days.
+- Trusting client-supplied roles or ownership.
+- Bypassing business rules through direct endpoint access.
+
+**Specification Requirements**:
+For every critical workflow, the specification MUST contain security acceptance criteria before implementation starts.
+Security-sensitive design decisions MUST be documented in the relevant specification, plan, threat model, ADR, or pull request.
+
+### A09:2025 — Security Logging and Alerting Failures
+
+**Audit and Security Logging**:
+Security-relevant and business-critical events MUST produce structured audit or security logs.
+
+**Required Events**:
+The system MUST log, when applicable:
+- Successful authentication.
+- Failed authentication.
+- Authorization failures (access denied).
+- Leave request creation.
+- Leave approval.
+- Leave rejection.
+- Leave cancellation (if cancellation becomes part of an approved specification).
+- Administrative leave balance changes.
+- Invalid state-transition attempts.
+- Repeated validation failures (potential attack).
+- Suspicious direct-object-reference attempts.
+- Privilege or security-configuration changes.
+- Security-sensitive administrative actions.
+
+**Log Structure and Content**:
+Security and audit records MUST include, where applicable:
+- UTC timestamp (ISO 8601 format).
+- Actor identifier (user ID, service principal, etc.).
+- Actor role (Employee, Manager, HR Admin, System, etc.).
+- Action (the operation performed).
+- Entity type (LeaveRequest, LeaveBalance, Employee, etc.).
+- Entity identifier (resource ID affected).
+- Result or outcome (success/failure, reason for failure).
+- Correlation identifier (to trace related events).
+- Request identifier (to correlate with HTTP logs).
+- Source IP or equivalent request-origin information where legally and operationally appropriate.
+
+**Log Redaction and Protection**:
+Logs MUST NOT contain:
+- Passwords.
+- Password hashes.
+- Access tokens.
+- Refresh tokens.
+- JWT signing keys.
+- Secret values or configuration secrets.
+- Complete medical or personal leave reasons (redact or anonymize).
+- Unredacted sensitive personal information (SSNs, full medical details, etc.).
+- Full request payloads containing sensitive information.
+
+Business audit records MUST be protected against unauthorized modification or deletion.
+
+**Production Alerting**:
+Production environments MUST define alerting rules for:
+- Repeated failed authentication (e.g., 5+ failures in 5 minutes from same IP).
+- Repeated authorization failures (e.g., 10+ access-denied events in 10 minutes).
+- Suspicious access to multiple employee records (e.g., one user accessing 50+ employees in 1 hour).
+- Repeated invalid state-transition attempts (e.g., attempts to approve an already-approved request).
+- High-risk administrative changes (role changes, bulk imports, retroactive adjustments).
+- Unexpected spikes in rejected requests or server errors (potential DDoS or application failure).
+
+Alerts MUST contain enough context for investigation without exposing sensitive information.
+
+**Testing Requirements**:
+Automated tests MUST verify:
+- Required events are generated for critical operations.
+- Failed security operations are logged.
+- Correlation and request identifiers are included in logs.
+- Sensitive information is redacted in logs.
+- Business audit records are generated for critical state changes.
+
 ## Observability
 
 - Structured logging via Serilog is mandatory for all layers that can fail or make a decision worth auditing. Logs MUST include structured fields for correlation_id, request_id, actor_id (if available), and environment.
@@ -444,18 +613,38 @@ of which Presentation technology issues the request:
 - Business rules require unit tests that validate behavior, not implementation details — tests MUST survive a refactor that preserves behavior. Every domain rule implemented in code MUST have unit tests covering the positive and negative cases.
 - Critical workflows (see Principle VII) require integration tests exercising the full request pipeline (Presentation → Application → Infrastructure). End-to-end tests that include database and messaging interactions are REQUIRED for payroll-relevant flows.
 - Acceptance criteria MUST exist and be agreed upon before implementation begins, and MUST map directly to automated tests when possible.
+- Security testing is mandatory for critical features. Every critical feature MUST include, as applicable:
+  - Authentication tests (successful login, invalid credentials, expired tokens).
+  - Authorization tests (role-based access, policy-based access, denial cases).
+  - Resource-ownership tests (cross-user data access prevention).
+  - Manager-to-employee relationship tests (delegation and approval authority).
+  - Abuse-case tests (privilege escalation, self-approval, circumvention attempts).
+  - Invalid-state-transition tests (prevented transitions, duplicate state changes).
+  - Replay or duplicate-operation tests (idempotency, duplicate-submission prevention).
+  - Concurrency tests (race conditions, double-applies under concurrent load).
+  - Audit-event tests (required events are generated, correlation IDs are present).
+  - Sensitive-log-redaction tests (sensitive data is not exposed in logs).
 - Automated tests are part of the Definition of Done: a pull request introducing or modifying a Domain business rule MUST include unit tests for that rule, and one introducing or modifying a critical endpoint MUST include integration tests. A PR failing this gate MUST NOT be merged.
+- A pull request affecting authentication, authorization, leave balances, request state transitions, HR access, or auditing MUST NOT be merged without the corresponding automated security tests and passing security scans (SCA, SAST).
 - CI gating: unit and integration tests for changed features MUST run in CI; high-severity test regressions MUST block merges. Security scans, static analysis, and license checks MUST run in CI and block on high/critical findings.
 - Performance & load testing: changes that affect critical paths (submission, approval, balance calculation) MUST include performance benchmarks. Major releases MUST include load tests validating capacity planning targets.
 - UML & documentation acceptance: when domain entities or aggregates are added or materially changed, a UML class diagram (PlantUML or Mermaid) or equivalent visual model MUST be produced and committed to `docs/diagrams` or `.specify/diagrams`. The PR that changes the model MUST include the updated diagram and a short summary of the model change as part of its description. Where diagram-generation tooling is available, diagrams SHOULD be generated automatically.
 
-Acceptance criteria checklist (minimum) for a Domain change PR:
+**Acceptance criteria checklist (minimum) for a Domain change PR**:
 - Unit tests covering the rule(s) added/changed (pass in CI).
 - Integration test(s) for any changed critical endpoint (pass in CI).
 - Updated UML diagram(s) in `docs/diagrams` or `.specify/diagrams` when entities/aggregates change.
 - OpenAPI/Swagger updates if public API surface changes.
 - Security scan results (no high/critical findings) or an approved mitigation plan.
 - Performance benchmark if the change affects a critical path.
+
+**Security-sensitive PR acceptance checklist (minimum) for PRs affecting authentication, authorization, leave balances, request state transitions, HR access, or auditing**:
+- Server-side authorization rules are implemented and tested.
+- Ownership and organizational relationships are validated on the server.
+- Relevant abuse cases are tested (privilege escalation, self-approval, cross-user access, etc.).
+- Required security and audit events are emitted (logged with correct structure).
+- Logs do not expose sensitive information (redaction verified in tests).
+- No high or critical security findings remain unresolved unless there is an approved mitigation plan.
 
 These items are the minimum; product owners and reviewers may add additional acceptance checks as needed for regulatory, payroll, or customer-impacting changes.
 ## Business Risks & Mitigations
@@ -515,4 +704,4 @@ are not permitted.
 Constitution Check gate against the current version of this file before
 Phase 0 research begins, and MUST be re-checked after Phase 1 design.
 
-**Version**: 2.0.0 | **Ratified**: 2026-07-13 | **Last Amended**: 2026-07-13
+**Version**: 2.1.0 | **Ratified**: 2026-07-13 | **Last Amended**: 2026-07-14
