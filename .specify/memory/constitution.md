@@ -1,61 +1,52 @@
 <!--
 Sync Impact Report
 ==================
-Consolidation scope:
-- Base document: constitution.md (NovaLeave v2.2.0).
-- Inputs reviewed: Constitution grupo 4, Grupo 5, Constitution Grupo 3,
-  Constitution Grupo 1, and Constitution Grupo 02.
-- Note: Constitution grupo 4 is substantially equivalent to the base document.
-
-Version change: 2.2.0 -> 2.3.0
-Change type: MINOR
-Reason: consolidation adds material governance, UX, persistence, testability,
-and development-workflow requirements without redefining the existing core
-architecture, authentication model, or approved OWASP baseline.
+Version change: 2.3.0 -> 3.0.0
+Change type: MAJOR
+Reason: the primary presentation and authentication models are being redefined
+from Web API + future React + JWT Bearer to server-rendered ASP.NET Core MVC
+with Razor Views, Bootstrap, ASP.NET Core Identity, and secure cookie
+authentication. This is a backward-incompatible governance change.
 
 Preserved decisions:
-- .NET 10, ASP.NET Core Web API, C#, EF Core, SQL Server, FluentValidation,
-  Serilog, JWT Bearer, Docker, GitHub Actions, and Azure-ready deployment.
-- Clean Architecture with Domain, Application, Infrastructure, Presentation.
-- Vertical Slice organization in Application.
+- .NET 10, C#, Clean Architecture, Domain/Application/Infrastructure/
+  Presentation boundaries, EF Core, SQL Server, FluentValidation, Serilog,
+  xUnit, Docker, GitHub Actions, and Azure-ready deployment.
+- Vertical Slice organization inside Application.
 - CQRS preferred but not mandatory; MediatR optional.
 - OWASP Top 10:2025 primary baseline: A01, A06, and A09.
-- Graphify, OKF, and Mermaid are derived development/documentation tools,
-  never runtime dependencies or authoritative sources.
+- Domain invariants, optimistic concurrency, auditing, observability, data
+  governance, and Graphify/OKF/Mermaid governance.
 
-Consolidated additions:
-- Explicit actor and MVP authorization matrix.
-- HR read-only scope for the MVP; future adjustment workflows require an
-  approved specification and separate authorization/audit controls.
-- TimeProvider/IClock requirement for deterministic date rules.
-- Final-state and cancellation rules, balance deduction on approval, and
-  stronger persistence/concurrency requirements.
-- Data-access discipline: projections, AsNoTracking, pagination, indexing,
-  versioned migrations, and prohibition of EnsureCreated in production.
-- Accessibility/localization requirements for current or future user interfaces.
-- Human review requirements for AI-generated code.
-- ADR, regression-test, code-complexity, and pull-request sizing guidance.
-- Explicit list of business-policy questions that belong in feature specs and
-  MUST NOT be invented by code, AI agents, diagrams, or this constitution.
+Redefined decisions:
+- Primary presentation: ASP.NET Core MVC with Controllers and Razor Views.
+- UI framework: Bootstrap 5.3, version-pinned and used through shared layouts,
+  partial views, Tag Helpers, and accessible components.
+- Authentication: ASP.NET Core Identity with secure cookie authentication for
+  the web application.
+- Authorization: policies and resource-based authorization remain mandatory.
+- Web API and JWT Bearer are no longer defaults. They MAY be introduced only
+  for an approved external-client or integration requirement through an ADR.
+- React and Blazor are not approved frontend defaults. Introducing either
+  requires an ADR and a constitutional amendment when it changes project-wide
+  presentation rules.
 
-Conflicts resolved:
-- Presentation: retained Web API + future React; MVC/Razor-specific controls are
-  conditional when browser-form or cookie-based surfaces are introduced.
-- Authentication: retained JWT Bearer; Cookie Authentication/Identity is not
-  adopted by this amendment.
-- Physical structure: retained the existing multi-project src/ layout rather
-  than the single-project MVC proposal.
-- HR permissions: read-only for MVP; no balance adjustment or state transition
-  is allowed unless a later approved specification adds a controlled workflow.
-- Coverage: behavioral coverage of every invariant is mandatory; 80% line
-  coverage is a target for critical Domain/Application modules, not a substitute
-  for scenario coverage.
-- Patterns: Repository/UoW, factories, specifications, state machines, and
-  MediatR are used only when they solve an actual problem; no pattern is
-  mandatory merely for architectural purity.
-- Rules appearing in only one proposal (for example one pending request at a
-  time or a medical-leave balance exception) are not made constitutional rules;
-  they require an approved feature specification.
+Added or strengthened controls:
+- Thin MVC controllers, dedicated ViewModels, no Domain entities in views, and
+  no direct Controller/View access to EF Core or Infrastructure.
+- Global antiforgery validation for unsafe browser requests.
+- Post/Redirect/Get after successful form submissions.
+- Explicit overposting protection, server-authoritative validation, branded
+  MVC error pages, and RFC 7807 only for actual API endpoints.
+- Secure cookie settings, Identity lockout/password controls, session-lifetime
+  rules, and tests for CSRF, forced browsing, cookie expiration, and privilege
+  escalation.
+- Bootstrap accessibility limitations are acknowledged; WCAG compliance must
+  be verified independently rather than assumed from framework usage.
+- MVC-focused integration and end-to-end testing through WebApplicationFactory
+  and Playwright (or an approved equivalent).
+- Static asset governance, CSP compatibility, local hosting preference, and
+  dependency scanning for Bootstrap and other browser assets.
 
 Templates requiring review:
 - .specify/templates/spec-template.md
@@ -66,9 +57,9 @@ Templates requiring review:
 
 # NovaLeave — Consolidated Constitution
 
-**Version:** 2.3.0  
+**Version:** 3.0.0  
 **Ratified:** 2026-07-13  
-**Last Amended:** 2026-07-14  
+**Last Amended:** 2026-07-15  
 **Status:** Binding
 
 ## 1. Purpose, Scope, and Normative Language
@@ -104,13 +95,19 @@ The codebase MUST be organized into four layers:
    It depends only on Domain and its own abstractions.
 3. **Infrastructure**: EF Core, SQL Server, repositories/adapters, external
    services, and technical observability. It implements internal contracts.
-4. **Presentation**: ASP.NET Core Web API and any future clients. It translates
-   HTTP into use cases and contains no business rules.
+4. **Presentation**: ASP.NET Core MVC with Controllers, Razor Views,
+   ViewModels, Tag Helpers, filters, middleware, Bootstrap assets, and the
+   composition root. It translates HTTP requests and form submissions into
+   Application use cases and contains no business rules. An API surface MAY be
+   added only for an approved integration or external client requirement.
 
 Dependencies MUST point inward. Domain MUST NOT reference Application,
 Infrastructure, or Presentation. Application MUST NOT reference Infrastructure
-implementations. Presentation MUST NOT directly access `DbContext`, concrete
-repositories, or business rules.
+implementations. Controllers, Views, ViewModels, Tag Helpers, filters, and UI
+components MUST NOT directly access `DbContext`, concrete repositories, or
+business rules. `Program.cs` MAY reference Infrastructure registration
+extensions solely as the composition root; this exception does not permit
+Presentation classes to consume Infrastructure implementations directly.
 
 ### II. Simplicity Before Speculative Abstraction
 
@@ -216,14 +213,25 @@ reduces risk, and is simpler to maintain.
 
 ```text
 src/
-  Domain/
-  Application/
-  Infrastructure/
-  Presentation/
+  NovaLeave.Domain/
+  NovaLeave.Application/
+  NovaLeave.Infrastructure/
+  NovaLeave.Presentation.Web/
+    Controllers/
+    Views/
+      Shared/
+    ViewModels/
+    Filters/
+    TagHelpers/
+    Areas/                # only when a real module boundary requires it
+    wwwroot/
+      css/
+      js/
+      lib/
 tests/
-  UnitTests/
-  IntegrationTests/
-  EndToEndTests/          # when applicable
+  NovaLeave.UnitTests/
+  NovaLeave.IntegrationTests/
+  NovaLeave.EndToEndTests/          # critical browser journeys
 docs/
   adr/
   diagrams/
@@ -253,15 +261,24 @@ DTO, mapping, and related tests.
 ### 3.2 Approved Stack
 
 - **Runtime:** .NET 10 and C#.
-- **Backend:** ASP.NET Core Web API.
+- **Web presentation:** ASP.NET Core MVC with Controllers and Razor Views.
+- **UI framework:** Bootstrap 5.3.x, pinned to an explicit version.
 - **Persistence:** Entity Framework Core and SQL Server.
-- **Validation:** FluentValidation.
+- **Validation:** FluentValidation for external input and Domain invariants for
+  business rules.
 - **Logging:** Serilog over `ILogger<T>`.
-- **Authentication:** JWT Bearer.
-- **Authorization:** roles, policies, and resource-based authorization.
-- **Future frontend:** React + TypeScript.
+- **Authentication:** ASP.NET Core Identity with secure cookie authentication.
+- **Authorization:** policies and resource-based authorization; roles MAY be
+  claims used by policies but MUST NOT replace ownership or hierarchy checks.
+- **Optional API:** ASP.NET Core API endpoints and JWT Bearer MAY be introduced
+  only through an approved specification and ADR for a real external client or
+  integration.
+- **Alternative frontends:** React, Blazor, or another client technology are not
+  project defaults and require an ADR before adoption.
 - **Infrastructure:** Docker, GitHub Actions, and Azure-ready deployment.
-- **Testing:** xUnit; mocks/fakes only where they provide useful isolation.
+- **Testing:** xUnit; `WebApplicationFactory` for MVC integration tests; Playwright
+  or an approved equivalent for critical browser journeys; mocks/fakes only
+  where they provide useful isolation.
 
 Changing an approved decision requires an ADR and a constitutional amendment
 when the change affects a constitutional rule.
@@ -277,8 +294,16 @@ when the change affects a constitutional rule.
 - Asynchronous methods: `Async` suffix.
 - DTO, Request, Response, Command, Query, Handler, Validator, Repository,
   Controller, and ViewModel types MUST use the appropriate suffix.
-- REST endpoints: plural resources and resource-oriented routes, for example
-  `POST /api/leave-requests/{id}/approve`.
+- Controller names MUST end in `Controller`; each controller SHOULD represent a
+  cohesive user-facing resource or workflow.
+- Views MUST be grouped by controller or approved Area and MUST use dedicated
+  ViewModels rather than Domain entities.
+- MVC routes MUST be resource-oriented and readable, for example
+  `/leave-requests`, `/leave-requests/create`, and
+  `/leave-requests/{id}/approve`. State changes MUST use unsafe HTTP methods,
+  normally `POST`, and MUST NOT be performed through `GET`.
+- API routes, if approved, use plural resources under `/api` and follow HTTP
+  semantics.
 - Table names: singular, unless another convention is documented and applied
   consistently.
 
@@ -315,7 +340,7 @@ the same user acts as an employee.
 
 ## 5. Invariants and Lifecycle
 
-The following rules MUST hold regardless of client or endpoint:
+The following rules MUST hold regardless of browser screen, controller action, or approved API endpoint:
 
 1. The applicable balance can never become negative.
 2. The start date cannot be later than the end date.
@@ -386,37 +411,75 @@ MUST NOT assume an answer.
 
 ### 7.1 Authentication and Authorization
 
-- JWT validation MUST verify signature, issuer, audience, expiration, and
-  required claims.
-- The default policy is deny-by-default.
-- Every non-public endpoint MUST declare authorization.
+- The web application MUST use ASP.NET Core Identity with cookie
+  authentication. A custom password or session implementation is prohibited.
+- Authentication cookies MUST be `HttpOnly`, `Secure` in production, and use an
+  appropriate `SameSite` policy. Cookie lifetime, idle timeout, renewal, and
+  revocation behavior MUST be explicitly configured and tested.
+- Identity password, lockout, reset, and account-confirmation policies MUST be
+  configured according to the approved security specification; default values
+  MUST NOT be accepted without review.
+- Authentication state and role/claim changes MUST invalidate or refresh the
+  security stamp so stale authorization is not retained indefinitely.
+- ASP.NET Core Identity persistence and adapters belong in Infrastructure. The
+  Domain model MUST NOT inherit from or depend on `IdentityUser`; the identity
+  account and the business `Employee` are linked through an explicit stable
+  identifier and an Application use case.
+- The default authorization policy is deny-by-default.
+- Every non-public controller or action MUST declare authorization, preferably
+  through centralized policies.
 - Application MUST verify ownership and organizational relationships; hiding a
-  frontend button is not a security control.
-- IDs, roles, manager IDs, employee IDs, and balances supplied by the client are
-  untrusted.
+  menu item or Bootstrap button is not a security control.
+- IDs, roles, manager IDs, employee IDs, balances, hidden inputs, route values,
+  and form fields supplied by the browser are untrusted.
 - An authorization failure MUST fail closed and avoid revealing whether an
   inaccessible resource exists.
+- JWT Bearer authentication is permitted only for an approved API surface and
+  MUST then validate signature, issuer, audience, expiration, and required
+  claims.
 
-### 7.2 Input, Web, and Secure Configuration
+### 7.2 Input, MVC Forms, and Secure Configuration
 
 - All external input MUST be validated using allowlists, bounds, and formats.
+- MVC actions MUST accept dedicated input ViewModels. Binding Domain entities
+  or persistence entities directly from a request is prohibited because it
+  creates overposting risk.
+- Server-side validation is authoritative. Client-side Bootstrap or unobtrusive
+  validation MAY improve feedback but MUST NOT be the only validation.
+- FluentValidation validators MUST be resolved through DI and invoked explicitly
+  with `ValidateAsync` from the Application use case or a project-owned
+  asynchronous action filter. The deprecated/synchronous MVC auto-validation
+  pipeline and unsupported `FluentValidation.AspNetCore` client integration
+  MUST NOT be introduced in new code.
+- Validation failures MUST be mapped predictably to `ModelState` by a shared
+  adapter rather than duplicated in every controller.
+- All unsafe browser requests (`POST`, `PUT`, `PATCH`, `DELETE`) MUST validate
+  antiforgery tokens. The project SHOULD enforce this globally with
+  `AutoValidateAntiforgeryToken` and use explicit exceptions only for approved
+  API endpoints with an alternative CSRF threat model.
+- Successful form submissions SHOULD follow Post/Redirect/Get to prevent
+  accidental duplicate submissions and refresh replays.
 - EF Core or parameterized SQL is mandatory; concatenating user input into SQL
   is prohibited.
-- User content is encoded or sanitized before rendering; raw HTML MUST NOT be
-  used with untrusted data.
-- Production CORS uses explicit origins; wildcard origins with credentials are
-  prohibited.
+- Razor's default output encoding MUST remain enabled. `Html.Raw` or equivalent
+  rendering of untrusted content is prohibited unless a reviewed sanitizer and
+  an explicit business requirement exist.
+- CORS SHOULD be disabled for the server-rendered MVC application unless a real
+  cross-origin client exists. If enabled for an approved API, production uses
+  explicit origins; wildcard origins with credentials are prohibited.
 - TLS 1.2+ and HSTS are mandatory in production.
 - Secrets and keys are stored outside the repository, preferably in a managed
   secret store such as Azure Key Vault.
 - Production MUST use appropriate security headers: CSP,
   `X-Content-Type-Options`, framing protection, and `Referrer-Policy`.
-- Swagger UI, diagnostics, and detailed errors are not publicly exposed in
-  production without explicit controls.
-- Sensitive endpoints MUST apply rate limiting proportional to risk.
-- If cookie authentication or Razor forms are introduced, every mutation MUST
-  include anti-CSRF protection. This conditional rule does not replace JWT in
-  the current architecture.
+- Bootstrap and other browser assets MUST be pinned to explicit versions and
+  included in dependency/security scanning. Local hosting under `wwwroot/lib`
+  is preferred. A CDN MAY be used only with approved CSP configuration and
+  Subresource Integrity where supported.
+- Swagger UI is applicable only when an API is approved. Diagnostics and
+  detailed errors MUST NOT be publicly exposed in production.
+- Login, password reset, account recovery, and other sensitive endpoints MUST
+  apply rate limiting proportional to risk.
 
 ### 7.3 Sensitive Data
 
@@ -436,10 +499,12 @@ Every security specification or critical workflow MUST document:
 - concurrency, replay, and duplication risks;
 - audit events and security acceptance criteria.
 
-Tests MUST cover anonymous access, invalid/expired tokens, incorrect roles,
-cross-employee access, cross-team access, IDOR, privilege escalation,
-self-approval, duplicate transitions, replay, and direct access that bypasses
-the frontend.
+Tests MUST cover anonymous access, expired or invalid authentication cookies,
+incorrect roles, cross-employee access, cross-team access, IDOR, forced
+browsing, privilege escalation, self-approval, antiforgery failures, overposting
+attempts, duplicate form submissions, duplicate transitions, replay, and direct
+HTTP access that bypasses navigation or hidden UI controls. Approved API
+surfaces MUST additionally test invalid and expired tokens.
 
 ## 8. Auditing, Logging, and Observability
 
@@ -471,9 +536,13 @@ the frontend.
 ### 9.1 Test Pyramid
 
 - **Unit:** Domain and isolated use cases; no I/O.
-- **Integration:** EF Core/SQL and a realistic HTTP pipeline.
-- **End-to-end:** highest-risk or highest-value journeys, especially approval,
-  authorization, and payroll-impacting flows.
+- **Integration:** EF Core/SQL and the real MVC pipeline through
+  `WebApplicationFactory`, including routing, model binding, validation,
+  filters, authorization, antiforgery behavior, and rendered responses where
+  relevant.
+- **End-to-end:** critical browser journeys using Playwright or an approved
+  equivalent, especially login, request creation, validation, approval,
+  rejection, cancellation, authorization, and payroll-impacting flows.
 
 SQLite, Testcontainers, or an isolated SQL instance MAY be used according to the
 test's objective. EF Core InMemory MUST NOT be used to claim relational behavior
@@ -504,7 +573,9 @@ Before merge, CI MUST execute and pass:
 5. coverage measurement;
 6. SAST, SCA, and vulnerable-dependency scanning;
 7. license verification where applicable;
-8. migration and modified-Mermaid validation when tooling exists.
+8. migration and modified-Mermaid validation when tooling exists;
+9. browser asset vulnerability checks and critical MVC end-to-end tests when
+   affected by the change.
 
 High/Critical findings block merge unless a formal exception includes a
 mitigation, accountable owner, and expiration date.
@@ -525,37 +596,128 @@ mitigation, accountable owner, and expiration date.
 - Public interfaces and contracts MUST include sufficient XML documentation.
 - Comments explain intent, risk, or rationale; they do not repeat the code.
 
-## 11. API, User Experience, and Accessibility
+## 11. MVC, Bootstrap, User Experience, and Optional APIs
 
-- All HTTP errors MUST use RFC 7807 Problem Details.
-- Validation errors are actionable; technical details and stack traces are not
-  shown to users.
-- Public APIs MUST publish OpenAPI definitions and be versioned. A breaking
-  change requires a deprecation and migration plan.
-- Presentation/Application DTOs are used at boundaries; Domain entities are not
-  exposed directly.
-- The current or future frontend MUST apply the same capability matrix as the
-  server, but it is never considered a security control.
+### 11.1 MVC Presentation Rules
+
+- Controllers MUST be thin. Their responsibilities are limited to receiving the
+  HTTP request, invoking an Application use case, translating the result into a
+  ViewModel or redirect, and selecting the response.
+- Controllers and Views MUST NOT contain balance calculations, overlap checks,
+  authorization decisions, state-transition rules, or direct data access.
+- Views MUST use strongly typed ViewModels. Domain and EF Core entities MUST NOT
+  be exposed directly to Razor Views.
+- Shared layout, navigation, validation summary, status badges, alerts,
+  pagination, confirmation dialogs, and form components SHOULD be implemented
+  through `_Layout.cshtml`, partial views, View Components, or Tag Helpers to
+  avoid duplicated markup and behavior.
+- `Areas` MAY be used for cohesive modules such as HR administration only when
+  they improve navigation and ownership; they MUST NOT duplicate Application or
+  Domain logic.
+- Static files MUST be served only from approved locations under `wwwroot` and
+  the middleware pipeline MUST place static files, routing, authentication,
+  authorization, antiforgery behavior, and exception handling in a reviewed
+  order.
+- State-changing actions MUST use explicit confirmation where accidental
+  execution would have meaningful impact and MUST return clear feedback.
+
+### 11.2 Bootstrap Governance
+
+- Bootstrap 5.3.x is the approved UI framework and MUST be pinned to an explicit
+  version. Version upgrades require visual regression review and dependency
+  scanning.
+- Bootstrap MUST be used consistently through a small set of shared design
+  conventions for spacing, forms, tables, buttons, alerts, badges, navigation,
+  modals, and responsive breakpoints.
+- Project-specific CSS MUST live in controlled files under `wwwroot/css` and
+  SHOULD extend Bootstrap variables/utilities rather than duplicate the entire
+  framework.
+- Bootstrap JavaScript components MUST be initialized using the supported
+  Bootstrap APIs. Inline scripts and duplicated per-view initialization SHOULD
+  be avoided; shared modules under `wwwroot/js` are preferred.
+- Bootstrap does not guarantee accessibility by itself. Every screen MUST still
+  be reviewed for semantic markup, accessible names, focus behavior, keyboard
+  operation, contrast, reduced motion, and screen-reader feedback.
+- Color MUST NOT be the only way to communicate request status. Badges and
+  alerts MUST include readable text and appropriate semantics.
+
+### 11.3 Forms, Validation, and Feedback
+
+- Every form control MUST have an associated accessible label or equivalent
+  accessible name.
+- Razor Tag Helpers (`asp-for`, `asp-validation-for`,
+  `asp-validation-summary`) SHOULD be used to connect ViewModels and validation
+  messages consistently.
+- Bootstrap validation styles MAY mirror server results, but server-side
+  FluentValidation and Domain behavior remain authoritative.
+- Validation errors MUST be specific, actionable, localized, and preserve
+  non-sensitive user input when redisplaying the form.
+- Success, warning, and error feedback MUST use shared components and MUST be
+  understandable without relying only on color or icons.
+- Destructive or final actions such as rejection or cancellation SHOULD require
+  explicit confirmation and must remain protected by server-side authorization
+  and antiforgery validation.
+
+### 11.4 Errors and HTTP Responses
+
+- MVC validation failures return the same view with `ModelState` errors or an
+  equivalent typed result; they MUST NOT be converted into generic exceptions.
+- Unhandled MVC failures MUST be handled by centralized exception middleware or
+  filters, logged with correlation data, and rendered through branded
+  400/403/404/500 pages without stack traces.
+- Access denied and not-found behavior MUST avoid leaking protected resource
+  existence.
+- RFC 7807 Problem Details is mandatory only for approved API endpoints. It is
+  not the user-facing error format for normal Razor Views.
+
+### 11.5 Accessibility and Localization
+
 - User interfaces SHOULD meet WCAG 2.1 AA requirements: contrast, labels,
-  keyboard navigation, focus handling, and semantic HTML.
-- User-visible text SHOULD be centralized for localization and consistent
-  terminology.
-- State-changing actions MUST provide clear and unambiguous feedback.
+  keyboard navigation, visible focus, semantic headings, table headers, modal
+  focus management, and suitable ARIA only when native HTML is insufficient.
+- User-visible text, validation messages, status labels, and navigation SHOULD
+  be centralized in `.resx` resources or an approved localization mechanism.
+- Terminology MUST be consistent across Views; the same business concept cannot
+  alternate between unrelated labels without an approved content decision.
+- Responsive behavior MUST support the approved desktop and mobile viewport
+  range without hiding required actions or information.
+
+### 11.6 Optional API Rules
+
+- NovaLeave does not require a public API for the MVC MVP.
+- An API MAY be added only when an approved specification identifies a real
+  external client, integration, or automation requirement.
+- Approved APIs MUST publish OpenAPI definitions, use resource-oriented routes,
+  return RFC 7807 Problem Details, and follow semantic versioning for breaking
+  changes.
+- JWT Bearer is the default authentication mechanism only for such approved API
+  clients; MVC cookie authentication MUST NOT be replaced merely to reuse the
+  API model.
+- MVC actions and API endpoints MUST call the same Application use cases rather
+  than duplicate business logic.
 
 ## 12. Performance, Availability, and Operations
 
 ### 12.1 Performance
 
-- Read endpoints and critical flows SHOULD achieve p95 < 300 ms under expected
-  load.
-- Complex operations may reach p95 < 500 ms when documented and measured.
+- Critical Domain/Application operations and focused data queries SHOULD
+  achieve p95 < 300 ms under expected load.
+- Standard MVC pages SHOULD complete server-side processing and begin the
+  response within p95 < 500 ms under expected load, excluding client network and
+  browser rendering time.
+- Complex reports may exceed 500 ms only when documented, measured, and
+  paginated or moved to an approved asynchronous workflow where appropriate.
 - Changes that affect critical paths MUST include a proportional benchmark or
   load test.
 - RPS and concurrency targets MUST be documented for each production release.
 
 ### 12.2 Scalability
 
-- Presentation must be stateless and suitable for horizontal scaling.
+- Presentation MUST be stateless with respect to business workflow state and
+  suitable for horizontal scaling. Authentication cookies are permitted, but
+  mutable business data MUST NOT be stored only in in-process session.
+- TempData MAY be used for short-lived user feedback; it MUST NOT become the
+  authoritative store for requests, balances, or authorization state.
 - Long-running operations MUST execute outside the synchronous request through
   approved jobs or queues when such mechanisms are introduced.
 - Redis, messaging, or other infrastructure is not added until a real use case
@@ -662,7 +824,10 @@ before merge.
 - Authorization and abuse cases reviewed where applicable.
 - Migration and rollback strategy documented where applicable.
 - Auditing and log redaction verified.
-- OpenAPI, ADR, README, and diagrams updated where applicable.
+- Razor Views, shared Bootstrap components, localization resources, OpenAPI
+  (only if an API changed), ADR, README, and diagrams updated where applicable.
+- Antiforgery, overposting, authorization, accessibility, and responsive behavior
+  reviewed for affected MVC flows.
 - No unresolved High/Critical findings.
 - Performance impact measured for critical paths.
 
@@ -700,10 +865,11 @@ authorization, transactions, row versioning, tests, auditing, redaction,
 updated diagrams, and simplicity.
 
 The architecture MAY evolve toward notifications, calendars, Microsoft Entra
-ID, multi-company support, jobs, public APIs, Power BI, or other integrations,
-but no future possibility justifies implementing complexity before an approved
-need exists.
+ID, multi-company support, jobs, public APIs, Power BI, Blazor components, React,
+or other integrations, but none is a current default. Each requires an approved
+need and ADR, and no future possibility justifies implementing complexity before
+that need exists.
 
 ---
 
-**Version:** 2.3.0 | **Ratified:** 2026-07-13 | **Last Amended:** 2026-07-14
+**Version:** 3.0.0 | **Ratified:** 2026-07-13 | **Last Amended:** 2026-07-15
