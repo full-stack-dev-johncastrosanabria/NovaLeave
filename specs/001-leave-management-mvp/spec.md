@@ -65,9 +65,9 @@ As an authenticated Direct Manager, I want to view and resolve `Pending` request
 4. **AC-015 — Approve a non-balance-consuming request**
    **Related Requirements**: FR-006, BR-008, BR-013, BR-014, BR-020, AUTHZ-002, AUTHZ-007, CON-006, AUD-002
    **Given** a `Pending` non-balance-consuming request owned by an Employee currently assigned to the Manager's team, **When** the authorized Manager approves it, **Then** the system transitions the request to `Approved`, leaves balance unchanged, and creates exactly one transition audit record.
-5. **AC-016 — Reject a request**
-   **Related Requirements**: FR-007, BR-009, BR-014, BR-021, AUTHZ-002, AUTHZ-007, CON-006, AUD-002
-   **Given** a `Pending` request owned by an Employee currently assigned to the Manager's team, **When** the authorized Manager rejects it, **Then** the system transitions the request to `Rejected`, leaves balance unchanged, and creates exactly one transition audit record as one atomic business operation.
+5. **AC-016 — Reject a request with a rejection reason**
+   **Related Requirements**: FR-007, BR-009, BR-014, BR-021, BR-023, VAL-007, AUTHZ-002, AUTHZ-007, CON-006, AUD-002, SEC-005
+   **Given** a `Pending` request owned by an Employee currently assigned to the Manager's team and a rejection reason of 0–500 plain-text characters, **When** the authorized Manager rejects it, **Then** the system transitions the request to `Rejected`, records the rejection reason, leaves balance unchanged, creates exactly one transition audit record as one atomic business operation, and makes the rejection reason visible to the request owner, the rejecting Manager, and HR through authorized views.
 6. **AC-017 — Prevent self-approval**
    **Related Requirements**: AUTHZ-003, AUTHZ-005, AUD-004
    **Given** a `Pending` request owned by the authenticated Manager, **When** that Manager attempts to approve or reject it through any entry point, **Then** the system rejects the operation, preserves the request and balance, and records the authorization denial as a security-relevant event.
@@ -118,7 +118,7 @@ As an authenticated Human Resources user, I want read-only access to organizatio
    **Given** an authenticated HR user, **When** HR attempts to create, approve, reject, cancel, edit, reassign, or adjust a Leave Request or Leave Balance, **Then** the system rejects the operation, modifies no business data, and records the denial when security policy requires it.
 4. **AC-029 — Protect sensitive reasons outside authorized views**
    **Related Requirements**: SEC-005, SEC-006, AUD-006, ERR-003
-   **Given** a Leave Request containing sensitive personal information in its reason, **When** the system produces logs, traces, metrics, audit before-and-after payloads, or user-facing technical errors, **Then** the full reason does not appear in that output.
+   **Given** a Leave Request containing sensitive personal information in its reason or rejection reason, **When** the system produces logs, traces, metrics, audit before-and-after payloads, or user-facing technical errors, **Then** neither the full reason nor the full rejection reason appears in that output.
 ---
 ### Cross-Cutting Security and Failure Scenarios
 1. **AC-030 — Deny unauthenticated access**
@@ -134,6 +134,17 @@ As an authenticated Human Resources user, I want read-only access to organizatio
    **Related Requirements**: CON-006, ERR-002
    **Given** a valid approval, rejection, or cancellation that encounters a failure before all required effects complete, **When** the operation terminates, **Then** the system commits none of the request-state, balance, or successful-transition audit effects.
 ---
+### Additional Acceptance Scenarios
+1. **AC-034 — Reject a reason outside the required length**
+   **Related Requirements**: VAL-005, ERR-001
+   **Given** an authenticated Employee, **When** the Employee submits a request whose reason contains fewer than 10 characters or more than 500 characters, **Then** the system rejects the submission, creates no Leave Request, and returns actionable validation feedback identifying the reason-length rule.
+2. **AC-035 — Calculate requested units across a weekend and a holiday**
+   **Related Requirements**: BR-004
+   **Given** an authenticated Employee and a request whose inclusive start and end dates span a weekend and a date in the authoritative organization holiday calendar, **When** the Employee submits the request, **Then** the system calculates the requested units as the authoritative count of Monday-through-Friday dates within the inclusive range, excluding the holiday date, and creates the Leave Request with that total.
+3. **AC-036 — Reject an oversized rejection reason**
+   **Related Requirements**: VAL-007, ERR-001, BR-023
+   **Given** a `Pending` request owned by an Employee currently assigned to the Manager's team, **When** the authorized Manager attempts to reject it with a rejection reason longer than 500 characters, **Then** the system rejects the rejection operation, preserves the request in `Pending` state, and returns actionable validation feedback.
+---
 ### Edge Cases
 - **EC-001 — Current local date**: A request beginning on the Employee's current local date is not considered past solely because the UTC date differs.
 - **EC-002 — Date-range adjacency**: Start and end dates are inclusive. A request beginning on the calendar day after another request ends is adjacent and does not overlap.
@@ -144,7 +155,7 @@ As an authenticated Human Resources user, I want read-only access to organizatio
 - **EC-007 — Multiple Managers**: The authoritative organizational model permits exactly one current Direct Manager per Team. If the relationship is missing or ambiguous, resolution is denied until the source data is corrected.
 - **EC-008 — Approval and cancellation race**: Exactly one valid transition succeeds.
 - **EC-009 — Duplicate browser submission or network retry**: At most one equivalent Leave Request is created.
-- **EC-010 — Untrusted HTML or script in reason**: The reason is plain text, 10–500 characters, may contain line breaks, and must never execute markup or script.
+- **EC-010 — Untrusted HTML or script in reason**: The reason (10–500 characters) and the rejection reason (0–500 characters) are plain text, may contain line breaks, and must never execute markup or script.
 - **EC-011 — Partial-day request**: Rejected because the MVP supports full-day requests only.
 - **EC-012 — Edit a submitted request**: Editing a submitted request is outside the MVP. The owner may cancel a `Pending` request and submit a new one.
 - **EC-013 — Retroactive correction**: Outside the MVP and requires a separate authorized, controlled, and audited workflow.
@@ -182,6 +193,7 @@ No Optional requirements are defined because no optional feature is approved in 
 - **VAL-004 — Ignore Client-Derived Business Values** *(EARS: Unwanted Behavior)* — If a client supplies a requested-unit total, balance, owner identifier, actor role, team assignment, or other server-derived business value, then the system shall disregard it and use the authoritative server-derived value.
 - **VAL-005 — Validate the Request Reason** *(EARS: Ubiquitous)* — The system shall require the reason to contain 10–500 plain-text characters, allow line breaks, and treat markup as non-executable text.
 - **VAL-006 — Reject Partial-Day Input** *(EARS: Unwanted Behavior)* — If a submission requests less than a full-day unit or supplies an hourly interval, then the system shall reject it as outside the MVP.
+- **VAL-007 — Validate the Rejection Reason** *(EARS: Ubiquitous)* — The system shall require a Direct Manager's rejection reason to contain 0–500 plain-text characters, allow line breaks, and treat markup as non-executable text.
 ### Business Rules and Domain Invariants
 #### Date and Requested-Unit Rules
 - **BR-001 — Reject a Reversed Date Range** *(EARS: Unwanted Behavior)* — If a request start date is later than its end date, then the system shall reject the request.
@@ -210,6 +222,8 @@ No Optional requirements are defined because no optional feature is approved in 
 #### Transactional Business Outcomes
 - **BR-021 — Complete Rejection as One Business Outcome** *(EARS: Event-Driven)* — When an authorized rejection succeeds, the system shall commit the transition to `Rejected` and its transition audit record as one indivisible business outcome.
 - **BR-022 — Complete Cancellation as One Business Outcome** *(EARS: Event-Driven)* — When an authorized cancellation succeeds, the system shall commit the transition to `Cancelled` and its transition audit record as one indivisible business outcome.
+#### Decision Metadata
+- **BR-023 — Capture the Rejection Reason** *(EARS: Event-Driven)* — When the authorized Direct Manager rejects a `Pending` Leave Request, the system shall record the submitted rejection reason, if any, with the resulting `Rejected` request.
 ### Authorization and Resource-Ownership Requirements
 - **AUTHZ-001 — Restrict Employee Access to Owned Data** *(EARS: Ubiquitous)* — The system shall authorize an Employee to view or cancel only Leave Requests and Leave Balances owned by that Employee.
 - **AUTHZ-002 — Restrict Manager Access to Current Scope** *(EARS: Ubiquitous)* — The system shall authorize a Direct Manager to view, approve, or reject a request only when its owner is within that Manager's current authoritative organizational scope.
@@ -223,8 +237,8 @@ No Optional requirements are defined because no optional feature is approved in 
 - **SEC-002 — Avoid Protected Resource-Existence Disclosure** *(EARS: Unwanted Behavior)* — If an actor is not authorized to access a protected resource, then the system shall deny the operation without confirming whether that resource exists.
 - **SEC-003 — Prevent Identifier-Manipulation Access** *(EARS: Unwanted Behavior)* — If an actor manipulates a request, Employee, balance, Leave Type, or team identifier to access an unauthorized resource, then the system shall deny the operation.
 - **SEC-004 — Reject Invalid State Transitions** *(EARS: Unwanted Behavior)* — If an actor requests a transition not permitted for the Leave Request's current state, then the system shall reject it and preserve the current state.
-- **SEC-005 — Restrict Sensitive Reason Visibility** *(EARS: Ubiquitous)* — The system shall expose a Leave Request's reason only to its owning Employee, its currently authorized Direct Manager, and HR through explicitly authorized read-only use cases.
-- **SEC-006 — Redact Sensitive Information** *(EARS: Ubiquitous)* — The system shall redact Leave Request reasons, credentials, tokens, secret values, and unnecessary personal information from logs, traces, metrics, audit before-and-after payloads, and user-facing technical errors.
+- **SEC-005 — Restrict Sensitive Reason Visibility** *(EARS: Ubiquitous)* — The system shall expose a Leave Request's reason and rejection reason only to its owning Employee, its currently authorized Direct Manager, and HR through explicitly authorized read-only use cases.
+- **SEC-006 — Redact Sensitive Information** *(EARS: Ubiquitous)* — The system shall redact Leave Request reasons, rejection reasons, credentials, tokens, secret values, and unnecessary personal information from logs, traces, metrics, audit before-and-after payloads, and user-facing technical errors.
 - **SEC-007 — Protect Browser Mutations Against Request Forgery** *(EARS: Ubiquitous)* — The system shall require valid anti-forgery protection for every browser-based state-changing operation.
 ### Concurrency, Duplicate-Operation, and Atomicity Requirements
 - **CON-001 — Prevent Duplicate Request Creation** *(EARS: Unwanted Behavior)* — If submissions for the same Employee, Leave Type, start date, and end date are replayed or processed concurrently, then the system shall create at most one Leave Request.
@@ -234,19 +248,19 @@ No Optional requirements are defined because no optional feature is approved in 
 - **CON-005 — Evaluate Overlap Atomically with Confirmation** *(EARS: Event-Driven)* — When a request is confirmed for approval, the system shall evaluate the authoritative overlap condition within the same indivisible business operation as the approval.
 - **CON-006 — Commit Approval Atomically** *(EARS: Event-Driven)* — When an approval succeeds, the system shall commit the transition to `Approved`, any applicable balance deduction, and exactly one successful-transition audit record as one indivisible business operation.
 ### Audit and Observability Requirements
-- **AUD-001 — Audit Request Creation** *(EARS: Event-Driven)* — When a Leave Request is successfully created, the system shall create exactly one immutable request-creation audit record.
+- **AUD-001 — Audit Request Creation** *(EARS: Event-Driven)* — When a Leave Request is successfully created, the system shall create exactly one immutable request-creation audit record; if a submission is a duplicate, retry, or replay of an already-processed request creation, the system shall not create an additional request-creation audit record.
 - **AUD-002 — Audit Every Successful State Transition** *(EARS: Event-Driven)* — When a Leave Request successfully transitions to `Approved`, `Rejected`, or `Cancelled`, the system shall create exactly one immutable transition audit record.
 - **AUD-003 — Capture Minimum Audit Context** *(EARS: Ubiquitous)* — The system shall include at minimum the UTC timestamp, actor identifier, actor role, action, entity type, entity identifier, result, correlation identifier, and request identifier in every business audit record.
 - **AUD-004 — Record Security-Relevant Failures** *(EARS: Event-Driven)* — When authentication fails, authorization is denied, an invalid transition is attempted, or suspected unauthorized resource access occurs, the system shall create a structured security event suitable for monitoring and alerting.
 - **AUD-005 — Protect Audit Records** *(EARS: Ubiquitous)* — The system shall prevent normal application operations from modifying or physically deleting audit records.
-- **AUD-006 — Redact Audit Payloads** *(EARS: Ubiquitous)* — The system shall redact sensitive fields from audit before-and-after values and security-event payloads.
+- **AUD-006 — Redact Audit Payloads** *(EARS: Ubiquitous)* — The system shall redact sensitive fields, including the rejection reason, from audit before-and-after values and security-event payloads.
 ### Error and Failure Requirements
 - **ERR-001 — Return Actionable Validation Feedback** *(EARS: Unwanted Behavior)* — If request validation fails, then the system shall reject the operation and communicate the failed validation rule without exposing sensitive data or implementation details.
 - **ERR-002 — Preserve State on Failed Mutation** *(EARS: Unwanted Behavior)* — If approval, rejection, or cancellation does not complete successfully, then the system shall preserve the pre-operation request state and balance and shall not create a successful-transition audit record.
 - **ERR-003 — Protect User-Facing Errors** *(EARS: Ubiquitous)* — The system shall present user-facing errors without stack traces, database details, secret values, or sensitive Leave Request content.
 - **ERR-004 — Return a Conflict Outcome for Stale Operations** *(EARS: Unwanted Behavior)* — If a state-changing operation is rejected because authoritative data changed, then the system shall communicate a non-sensitive conflict outcome that allows the actor to refresh current information.
 ### Key Entities *(include if feature involves data)*
-- **Leave Request**: Represents an Employee's formal request for full-day time off. Key business attributes are the owner, start date, end date, Leave Type, reason, authoritative requested units, current state, creation information, resolution information, and concurrency identity. It begins in `Pending` and may transition only to `Approved`, `Rejected`, or `Cancelled`.
+- **Leave Request**: Represents an Employee's formal request for full-day time off. Key business attributes are the owner, start date, end date, Leave Type, reason, authoritative requested units, current state, creation information, resolution information, rejection reason (when rejected), and concurrency identity. It begins in `Pending` and may transition only to `Approved`, `Rejected`, or `Cancelled`.
 - **Leave Balance**: Represents the authoritative full-day units available to an Employee for one balance-consuming Leave Type. It cannot become negative and changes only through an approved balance-consuming request within this feature.
 - **Leave Type**: Represents an active organization-approved leave classification. The MVP catalog contains `Vacation` and `Personal Leave` as balance-consuming types, and `Medical Leave` as a non-balance-consuming type. All use the standard Manager approval workflow.
 - **Employee**: Represents a person who may submit requests, view owned requests and balances, and cancel owned `Pending` requests. A person may also hold another role, but authorization is evaluated per action and resource.
@@ -293,6 +307,7 @@ No Optional requirements are defined because no optional feature is approved in 
 - An authoritative source provides one applicable Leave Balance per Employee and balance-consuming Leave Type.
 - The MVP Leave Type catalog contains `Vacation`, `Personal Leave`, and `Medical Leave` with the policies defined in PD-002.
 - Every MVP Leave Request requires a reason.
+- A Direct Manager rejection may include a plain-text rejection reason of 0–500 characters, per PD-009.
 - The MVP supports full-day requests only.
 - Editing a submitted request is outside the MVP; an owner may cancel a `Pending` request and submit a replacement.
 - Balance accrual, expiration, carryover, and manual adjustment are outside this feature.
@@ -303,14 +318,14 @@ No Optional requirements are defined because no optional feature is approved in 
 - MVC, Razor Views, Bootstrap, authentication details, persistence, and code organization are governed by the constitution and `plan.md`, not by this functional specification.
 ### Approved MVP Policy Decisions
 - **PD-001 — Leave-Day Calculation**: Requested units are full working days. Start and end dates are inclusive; Monday through Friday count, except dates in the authoritative organization holiday calendar.
-- **PD-002 — Initial Leave-Type Catalog**: `Vacation` and `Personal Leave` are active and balance-consuming. `Medical Leave` is active and non-balance-consuming. Every type follows the standard Direct Manager approval workflow and requires a reason.
+- **PD-002 — Initial Leave-Type Catalog**: `Vacation` and `Personal Leave` are active and balance-consuming. `Medical Leave` is active and non-balance-consuming. Every type follows the standard Direct Manager approval workflow and requires a reason. This is the initial MVP catalog; the organization may add further Leave Types in the future without changing the behavior this specification defines for the existing types.
 - **PD-003 — Submission-Time Balance**: A balance-consuming request is rejected when the current authoritative applicable balance is insufficient.
 - **PD-004 — Pending Balance Reservation**: Pending requests do not reserve or deduct balance. Balance is authoritatively revalidated immediately before approval.
 - **PD-005 — Overlap Semantics**: Inclusive calendar-date overlap is prohibited against the same Employee's `Pending` or `Approved` requests, regardless of Leave Type. Rejected and Cancelled requests are excluded. Adjacent non-intersecting ranges are permitted.
 - **PD-006 — Multiple Pending Requests**: Multiple non-overlapping Pending requests are permitted.
 - **PD-007 — Organizational Cardinality**: Each Employee belongs to exactly one current Team; each Team has exactly one current Direct Manager; one Manager may manage multiple Teams. Missing or ambiguous assignment prevents resolution until source data is corrected.
 - **PD-008 — Reason Content**: Every request requires 10–500 plain-text characters. Line breaks are permitted; executable markup is not.
-- **PD-009 — Decision and Cancellation Comments**: Separate approval, rejection, and cancellation comments are outside this MVP. The original Employee reason remains the only narrative field.
+- **PD-009 — Decision and Cancellation Comments**: Approval comments and cancellation comments remain outside this MVP. Rejection requires a plain-text rejection reason of 0–500 characters, provided by the rejecting Direct Manager. The rejection reason is visible to the request owner, the rejecting Manager, and HR through authorized read-only views, and is redacted from logs, traces, technical errors, and audit payloads in the same manner as the Employee request reason. The Employee's original request reason and the Manager's rejection reason are the only narrative fields in this MVP.
 - **PD-010 — HR Delivery Gate**: HR read-only visibility is mandatory for the MVP production release.
 - **PD-011 — Balance Granularity**: Balance is tracked independently per Employee and per balance-consuming Leave Type.
 - **PD-012 — Duplicate-Submission Identity**: Submissions are equivalent when Employee, Leave Type, start date, and end date are identical. At most one equivalent request may be created when submissions race or replay.
@@ -340,12 +355,13 @@ The following matrix maps every normative requirement to at least one acceptance
 | VAL-002 | AC-001, AC-006 | Validation + Integration |
 | VAL-003 | AC-006 | Validation |
 | VAL-004 | AC-005 | Security + Integration |
-| VAL-005 | AC-002, EC-010 | Validation + Security |
+| VAL-005 | AC-002, AC-034, EC-010 | Validation + Security |
 | VAL-006 | EC-011 | Validation |
+| VAL-007 | AC-016, AC-036 | Validation |
 | BR-001 | AC-003 | Domain + Acceptance |
 | BR-002 | AC-004 | Domain + Acceptance |
 | BR-003 | AC-004, EC-001 | Domain + Time-Zone |
-| BR-004 | AC-001, AC-003, AC-004 | Domain |
+| BR-004 | AC-001, AC-003, AC-004, AC-035 | Domain |
 | BR-005 | AC-001 | Domain + Integration |
 | BR-006 | AC-014, AC-016, AC-022 | Domain |
 | BR-007 | AC-021, AC-024 | Domain |
@@ -364,6 +380,7 @@ The following matrix maps every normative requirement to at least one acceptance
 | BR-020 | AC-014 | Integration + Concurrency |
 | BR-021 | AC-016, AC-033 | Integration |
 | BR-022 | AC-022, AC-033 | Integration |
+| BR-023 | AC-016 | Domain + Integration |
 | AUTHZ-001 | AC-007, AC-008, AC-022, AC-023 | Authorization |
 | AUTHZ-002 | AC-012, AC-013, AC-014, AC-016 | Authorization |
 | AUTHZ-003 | AC-017 | Authorization + Security |
@@ -375,7 +392,7 @@ The following matrix maps every normative requirement to at least one acceptance
 | SEC-002 | AC-008, AC-013, AC-023, AC-030 | Security |
 | SEC-003 | AC-008, AC-013, AC-023 | Security |
 | SEC-004 | AC-021, AC-024 | Security + Domain |
-| SEC-005 | AC-026, AC-029 | Authorization + Privacy |
+| SEC-005 | AC-016, AC-026, AC-029 | Authorization + Privacy |
 | SEC-006 | AC-029 | Redaction |
 | SEC-007 | AC-032 | MVC Security |
 | CON-001 | AC-009 | Concurrency + Idempotency |
@@ -390,7 +407,7 @@ The following matrix maps every normative requirement to at least one acceptance
 | AUD-004 | AC-017, AC-023, AC-028, AC-031 | Security Logging |
 | AUD-005 | Specialized audit immutability test | Security + Integration |
 | AUD-006 | AC-029 | Redaction |
-| ERR-001 | AC-002, AC-003, AC-004, AC-006 | Acceptance |
+| ERR-001 | AC-002, AC-003, AC-004, AC-006, AC-034, AC-036 | Acceptance |
 | ERR-002 | AC-018, AC-020, AC-033 | Failure Injection + Integration |
 | ERR-003 | AC-029 | Security Output |
 | ERR-004 | AC-019, AC-020 | Acceptance + Integration |
