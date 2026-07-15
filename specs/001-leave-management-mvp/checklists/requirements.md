@@ -1,7 +1,7 @@
-# Specification Quality Checklist: NovaLeave — Leave Management MVP
+# Specification Quality Checklist: NovaLeave MVP — Leave and Vacation Request Management
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-07-13
+**Created**: 2026-07-15
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -31,12 +31,6 @@
 
 ## Notes
 
-- All items pass on the first validation pass. Ambiguities that arose during drafting
-  (leave balance granularity, accrual ownership, single- vs multi-level approval,
-  which leave types are pre-configured, whether "Draft" is required at launch) were
-  each resolved with a reasonable, documented default in the Assumptions section
-  rather than raised as [NEEDS CLARIFICATION] markers, since none of them lacked a
-  reasonable industry-standard default or carried scope/security impact severe
-  enough to block planning.
-- Ready for `/speckit-clarify` (optional, to challenge the documented assumptions) or
-  directly for `/speckit-plan`.
+- All items pass. Ten policy questions (leave-calculation basis, weekend/holiday handling, leave-type/balance-consumption catalog, medical-leave treatment, multiple-pending-request policy, half-day/hourly support, accrual/expiration/carryover, manager delegation, retroactive adjustments, payroll integration) are intentionally left in **Open Questions** per explicit instruction in the feature request; no requirement in the spec assumes an answer to any of them, so their absence does not block `/speckit-clarify` or `/speckit-plan` — it is a deliberate scope boundary, not an omission.
+- No [NEEDS CLARIFICATION] inline markers were used: the feature request explicitly asked for unresolved policy questions to be captured in an Open Questions section rather than resolved through the interactive clarification loop, and none of them meets the bar of blocking scope/security ambiguity that would otherwise warrant a marker.
+- Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`.
