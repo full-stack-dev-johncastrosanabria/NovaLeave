@@ -1,353 +1,418 @@
 # Feature Specification: NovaLeave MVP — Leave and Vacation Request Management
-
 **Feature Branch**: `001-leave-management-mvp`
-
 **Created**: 2026-07-15
-
-**Status**: Draft
-
-**Input**: User description: "Create the functional specification for the NovaLeave MVP, a leave and vacation request management system, covering Employee, Direct Manager, and Human Resources actors, using EARS-syntax requirements, per the constitution at `.specify/memory/constitution.md`."
-
-**Governance**: This specification is subordinate to `.specify/memory/constitution.md` (currently v3.0.0). It does not repeat the constitution's content; it references specific constitutional sections where a requirement is derived from or constrained by them. No conflict was identified between this request and the current constitution (see [Constitution Check](#constitution-check)).
-
+**Status**: Ready for Planning and Implementation
+**Input**: User description: "Create the functional specification for the NovaLeave MVP, a leave and vacation request management system covering Employee, Direct Manager, and Human Resources actors, using the standard Spec Kit template, EARS requirements, and the existing `.specify/memory/constitution.md` v3.0.0."
+**Governance**: This specification is subordinate to `.specify/memory/constitution.md` v3.0.0. The constitution remains authoritative for Clean Architecture, ASP.NET Core MVC, Razor Views, Bootstrap, authentication, persistence, security, testing, observability, and engineering governance. This specification defines business behavior and observable outcomes. It does not prescribe controllers, repositories, database tables, HTTP routes, framework classes, or code structure.
+**Revision Note**: This revision consolidates and corrects the previous draft by establishing a single normative source for each behavior, explicitly defining all lifecycle transitions, separating successful behavior from authorization and security denial behavior, adding request-creation and transition auditing, adding duplicate-submission protection, defining atomic success and rollback requirements, restoring requirement-to-scenario traceability, and recording unresolved business policy decisions as formal clarification gates rather than hidden assumptions.
 ---
-
-## Purpose and Business Value
-
-NovaLeave MVP gives an organization a single, auditable system of record for employee leave and vacation requests. It replaces ad hoc, unverifiable approval channels (email, chat, spreadsheets) with a workflow that:
-
-- lets employees request time off and track its status and remaining balance without asking HR or their manager directly;
-- lets direct managers resolve their team's requests with confidence that approvals are authorized, non-duplicated, and cannot be self-granted;
-- gives Human Resources organization-wide visibility for compliance and reporting without HR being able to alter outcomes during the MVP;
-- produces an immutable audit trail for every decision, satisfying the constitution's baseline for accountability and dispute resolution (constitution §8, §9.2).
-
-The business value is reduced approval latency, elimination of untraceable manual overrides, and a defensible record for every balance-affecting decision.
-
-## Scope
-
-**In scope for this MVP:**
-
-- Employee submission of a leave/vacation request with start date, end date, leave type, and reason.
-- Employee visibility into their own requests, statuses, history, and available balance.
-- Employee cancellation of their own Pending requests.
-- Direct manager visibility into requests from employees currently on their team.
-- Direct manager approval or rejection of Pending requests from their team.
-- Human Resources read-only visibility into organization-wide request history and balances.
-- Server-side enforcement of dates, balance, overlap, authorization, state transitions, and auditing described in this document.
-
-**Out of scope for this MVP:** see [Out-of-Scope Items](#out-of-scope-items).
-
-## Actors and Authorization Boundaries
-
-| Actor | Can do | Cannot do |
-|---|---|---|
-| **Employee** | Submit a request; view own requests, statuses, history, and balance; cancel own Pending request | View or act on another employee's requests or balance; approve/reject any request (including their own); edit a resolved request |
-| **Direct Manager** | View requests from employees currently assigned to their team; approve or reject Pending requests from their team | View or act on requests from employees not currently on their team; approve or reject their own request; act as HR |
-| **Human Resources** | View organization-wide request history and balances (read-only) | Create, approve, reject, cancel, or adjust any request or balance |
-
-A user MAY hold more than one role (constitution §4.4). Authorization is evaluated per action and per resource for the role being exercised; holding the Direct Manager role does not lift the restrictions that apply when the same person acts as an Employee (e.g., they still cannot approve their own request, and they still cannot view another employee's data outside their team).
-
-Team assignment is evaluated at the time of each operation, not at the time the request was submitted (constitution §4.2, §5 invariant 12).
-
-## Assumptions
-
-Reasonable defaults adopted where the request did not specify a value, so that the rest of the specification does not depend on an unapproved policy:
-
-- **A-001 — Overlap definition**: Two requests for the same employee overlap when their date ranges intersect. Overlap is evaluated only against that employee's own requests currently in `Pending` or `Approved` state; `Rejected` and `Cancelled` requests are excluded from the overlap check. This is a working definition for overlap *detection mechanics*; it does not resolve whether the organization permits more than one concurrently Pending request (see [Open Questions](#open-questions), OQ-005).
-- **A-002 — Submission-time balance check**: For a leave type that consumes balance, the system performs an informational, server-calculated balance check at submission time and rejects a request that already exceeds the employee's available balance, in addition to the mandatory authoritative revalidation immediately before approval (BR-021). This avoids creating Pending requests that could never be validly approved, while preserving the constitutional rule that deduction itself only happens on approval (constitution §5 invariant 10).
-- **A-003 — Leave type catalog exists**: A leave type is selected from a predefined, organization-approved catalog; the request must reference a valid, active leave type. The catalog's specific values and which of them consume balance are not defined by this specification (see OQ-003, OQ-004).
-- **A-004 — HR use cases are explicit**: HR's read-only access is delivered through explicitly authorized query use cases (constitution §4.3); HR does not receive incidental write capability through any shared screen or action.
-- **A-005 — Single authorized manager per request**: At the moment a request is evaluated, exactly one Direct Manager is authorized to act on it — the manager of the team the requesting employee is currently assigned to. Reassignment mid-request-lifecycle is addressed only as an open question (OQ-008), not resolved here.
-
-## Dependencies
-
-- An existing identity/authentication mechanism that reliably establishes the authenticated actor and their role(s) (constitution §7.1); this specification assumes such a mechanism is in place and does not define it.
-- An existing or concurrently defined data source for organizational structure (employee-to-team and team-to-manager assignment) that this feature can query as the source of truth for "currently assigned to their team."
-- An existing or concurrently defined leave-type catalog and balance ledger per employee, sufficient to support server-side balance calculation (constitution §5 invariant 13).
-- The employee's applicable time zone, to evaluate "past date" and calendar-day boundaries (constitution §5 invariant 4).
 
 ## User Scenarios & Testing *(mandatory)*
-
-### User Story 1 - Employee submits and tracks a leave request (Priority: P1)
-
-An employee wants to request time off, and later check whether it was approved, without contacting their manager or HR directly.
-
-**Why this priority**: This is the entry point of the entire workflow; no other actor has anything to review or approve without it. It is also the highest-value replacement for the current untracked, ad hoc process.
-
-**Independent Test**: Can be fully tested by having an authenticated employee submit a request with a valid date range, leave type, and reason, and then view it in their own request list with status `Pending` and see it reflected against their balance.
-
+User journeys are ordered by business criticality. Each story is independently testable using prepared prerequisite data where required. Priority indicates implementation order; all four stories remain within the approved MVP scope unless this specification is formally amended.
+### User Story 1 - Employee Submits and Tracks a Leave Request (Priority: P1)
+As an authenticated Employee, I want to submit a leave or vacation request and view its status, history, and applicable balance so that I can manage time off without relying on email, chat, spreadsheets, or manual follow-up.
+**Why this priority**: Submission is the entry point for every other workflow. Without it, the system cannot produce approvals, rejections, cancellations, balance effects, or an auditable record.
+**Independent Test**: Using an authenticated Employee and prepared reference data, submit a valid request and verify that exactly one `Pending` request is created, the creation is audited, the request is visible only to its owner and authorized actors, and no balance is deducted at submission.
 **Acceptance Scenarios**:
-
-1. **Given** an authenticated employee with sufficient balance, **When** they submit a request with a valid start date, end date, leave type, and reason, **Then** the system creates the request with status `Pending` and it appears in the employee's own history. *(FR-001, FR-002, BR-010)*
-2. **Given** an authenticated employee, **When** they view their own request history, **Then** they see only their own requests, statuses, and current available balance. *(FR-003, FR-004, AUTHZ-001)*
-
+1. **AC-001 — Submit a valid request**
+   **Related Requirements**: FR-001, FR-002, VAL-001, VAL-002, VAL-003, BR-001, BR-002, BR-003, BR-004, BR-005, BR-006, BR-014, AUD-001
+   **Given** an authenticated Employee, an active Leave Type, an available authoritative time zone, and request data that satisfies all approved date, overlap, and balance policies, **When** the Employee submits the request, **Then** the system creates exactly one Leave Request in `Pending` state, deducts no balance, and creates exactly one request-creation audit record.
+2. **AC-002 — Reject missing required data**
+   **Related Requirements**: FR-002, VAL-001, ERR-001
+   **Given** an authenticated Employee, **When** the Employee submits a request without a start date, end date, Leave Type, or reason, **Then** the system rejects the submission, creates no Leave Request, and returns actionable validation feedback.
+3. **AC-003 — Reject a reversed date range**
+   **Related Requirements**: BR-001, ERR-001
+   **Given** an authenticated Employee, **When** the Employee submits a request whose start date is later than its end date, **Then** the system rejects the submission and creates no Leave Request.
+4. **AC-004 — Reject a past-dated request**
+   **Related Requirements**: BR-002, BR-003, ERR-001
+   **Given** an authenticated Employee and the Employee's authoritative primary time zone, **When** the Employee submits a request whose start date is earlier than the Employee's current local date, **Then** the system rejects the submission and creates no Leave Request.
+5. **AC-005 — Ignore client-derived values**
+   **Related Requirements**: VAL-004, BR-004
+   **Given** an Employee submission containing a client-supplied requested-unit total, balance, owner identifier, role, or team assignment, **When** the system processes the request, **Then** the system ignores those supplied derived values and uses only authoritative server-derived values.
+6. **AC-006 — Reject an invalid Leave Type**
+   **Related Requirements**: VAL-002, VAL-003
+   **Given** an authenticated Employee, **When** the Employee submits a request referencing a nonexistent or inactive Leave Type, **Then** the system rejects the submission and creates no Leave Request.
+7. **AC-007 — View only owned requests and applicable balances**
+   **Related Requirements**: FR-003, FR-004, AUTHZ-001
+   **Given** an authenticated Employee with existing requests and applicable balances, **When** the Employee views their leave information, **Then** the system displays only that Employee's requests, statuses, history, and authoritative applicable balances.
+8. **AC-008 — Deny cross-Employee access**
+   **Related Requirements**: AUTHZ-001, AUTHZ-005, SEC-002, SEC-003
+   **Given** an authenticated Employee, **When** the Employee attempts to view another Employee's request or balance by modifying a resource identifier, **Then** the system denies the operation without confirming whether the targeted resource exists.
+9. **AC-009 — Prevent duplicate request creation**
+   **Related Requirements**: CON-001, AUD-001
+   **Given** one valid Employee submission, **When** equivalent submissions are replayed or processed concurrently, **Then** the system creates at most one Leave Request and at most one matching creation audit record according to the approved duplicate-submission identity policy.
+10. **AC-010 — Apply the approved overlap policy**
+    **Related Requirements**: BR-019, CON-005
+    **Given** an Employee with another request covered by the approved overlap policy, **When** the Employee submits a date range that overlaps it, **Then** the system rejects the new request and creates no duplicate business commitment.
+11. **AC-011 — Reject insufficient balance at submission**
+    **Related Requirements**: BR-018
+    **Given** a balance-consuming request whose requested units exceed the currently available balance, **When** the Employee submits it, **Then** the system rejects the submission, creates no Leave Request, and reserves no balance.
 ---
-
-### User Story 2 - Direct manager reviews and resolves team requests (Priority: P1)
-
-A direct manager wants to see the Pending requests from their current team and approve or reject each one, with confidence that the decision is final, authorized, and recorded.
-
-**Why this priority**: Without manager resolution, no request can leave the `Pending` state and the workflow delivers no business value beyond a request log.
-
-**Independent Test**: Can be fully tested by having an authenticated manager, whose team includes the requesting employee, view a Pending request and approve or reject it, then confirm the resulting state, balance effect (for approval), and audit record.
-
+### User Story 2 - Direct Manager Reviews and Resolves Team Requests (Priority: P1)
+As an authenticated Direct Manager, I want to view and resolve `Pending` requests from Employees currently assigned to my team so that decisions are authorized, final, auditable, and applied without duplicate balance deductions.
+**Why this priority**: Manager resolution completes the primary transactional workflow and produces the business outcome of an approved or rejected request.
+**Independent Test**: Using prepared `Pending` requests and authoritative organizational assignments, authenticate as a Direct Manager and verify team-scoped visibility, approval, rejection, authorization denial, self-approval prevention, concurrency control, balance behavior, atomicity, and auditing.
 **Acceptance Scenarios**:
-
-1. **Given** a Pending request from an employee currently on the manager's team, **When** the manager approves it, **Then** the system transitions the request to `Approved`, deducts the applicable balance, and creates an audit record atomically. *(BR-014, BR-019, BR-020, AUD-001)*
-2. **Given** a Pending request from an employee currently on the manager's team, **When** the manager rejects it, **Then** the system transitions the request to `Rejected`, does not change the balance, and creates an audit record. *(BR-014, BR-020)*
-3. **Given** a Pending request from an employee **not** currently on the manager's team, **When** the manager attempts to view or resolve it, **Then** the system denies the operation. *(AUTHZ-002, SEC-005)*
-4. **Given** a Pending request owned by the manager themself, **When** the manager attempts to approve or reject it, **Then** the system rejects the operation. *(BR-008, SEC-007)*
-
+1. **AC-012 — View current team requests**
+   **Related Requirements**: FR-005, AUTHZ-002, AUTHZ-006
+   **Given** an authenticated Direct Manager and Employees currently assigned to that Manager's team, **When** the Manager views requests for review, **Then** the system displays only requests belonging to Employees currently within the Manager's authorized scope.
+2. **AC-013 — Deny cross-team access**
+   **Related Requirements**: AUTHZ-002, AUTHZ-005, AUTHZ-006, SEC-002, SEC-003
+   **Given** an authenticated Direct Manager, **When** the Manager attempts to view or resolve a request owned by an Employee outside the Manager's current team, **Then** the system denies the operation without returning protected request data.
+3. **AC-014 — Approve a balance-consuming request atomically**
+   **Related Requirements**: FR-006, BR-008, BR-013, BR-015, BR-016, BR-020, AUTHZ-002, AUTHZ-003, AUTHZ-007, CON-002, CON-003, CON-004, CON-005, CON-006, AUD-002, AUD-003
+   **Given** a `Pending` balance-consuming request owned by an Employee currently assigned to the Manager's team, with sufficient authoritative balance and no prohibited overlap, **When** the authorized Manager approves it, **Then** the system transitions the request to `Approved`, deducts the applicable server-calculated units exactly once, and creates exactly one transition audit record as one atomic business operation.
+4. **AC-015 — Approve a non-balance-consuming request**
+   **Related Requirements**: FR-006, BR-008, BR-013, BR-014, BR-020, AUTHZ-002, AUTHZ-007, CON-006, AUD-002
+   **Given** a `Pending` non-balance-consuming request owned by an Employee currently assigned to the Manager's team, **When** the authorized Manager approves it, **Then** the system transitions the request to `Approved`, leaves balance unchanged, and creates exactly one transition audit record.
+5. **AC-016 — Reject a request**
+   **Related Requirements**: FR-007, BR-009, BR-014, BR-021, AUTHZ-002, AUTHZ-007, CON-006, AUD-002
+   **Given** a `Pending` request owned by an Employee currently assigned to the Manager's team, **When** the authorized Manager rejects it, **Then** the system transitions the request to `Rejected`, leaves balance unchanged, and creates exactly one transition audit record as one atomic business operation.
+6. **AC-017 — Prevent self-approval**
+   **Related Requirements**: AUTHZ-003, AUTHZ-005, AUD-004
+   **Given** a `Pending` request owned by the authenticated Manager, **When** that Manager attempts to approve or reject it through any entry point, **Then** the system rejects the operation, preserves the request and balance, and records the authorization denial as a security-relevant event.
+7. **AC-018 — Reject approval with insufficient balance**
+   **Related Requirements**: BR-012, BR-015, BR-016, AUTHZ-007, ERR-002
+   **Given** a `Pending` balance-consuming request whose authoritative balance is insufficient at approval time, **When** the authorized Manager attempts approval, **Then** the system rejects the approval, preserves the request in `Pending` state, does not deduct balance, and does not create a successful-transition audit record.
+8. **AC-019 — Handle concurrent approval attempts**
+   **Related Requirements**: CON-002, CON-003, CON-004, CON-006
+   **Given** one `Pending` request, **When** two approval attempts are processed concurrently, **Then** exactly one transition to `Approved` succeeds, at most one balance deduction occurs, exactly one successful-transition audit record is created, and the conflicting attempt fails without side effects.
+9. **AC-020 — Reject a stale Manager operation**
+   **Related Requirements**: AUTHZ-006, AUTHZ-007, CON-004, ERR-002
+   **Given** a Manager who previously viewed a request, **When** its state, balance, ownership relationship, or team assignment changes before the Manager submits a state-changing action, **Then** the system rejects the stale operation without modifying request state or balance.
+10. **AC-021 — Prevent invalid final-state transitions**
+    **Related Requirements**: BR-007, BR-011, SEC-004
+    **Given** a request in `Approved`, `Rejected`, or `Cancelled` state, **When** any actor attempts another state transition, **Then** the system rejects the operation and preserves the final state.
 ---
-
-### User Story 3 - Employee cancels a pending request (Priority: P2)
-
-An employee who submitted a request wants to withdraw it before their manager acts on it.
-
-**Why this priority**: Necessary for a usable workflow (plans change), but the system delivers its core value (request → decision → audit) without it, so it ranks below submission and resolution.
-
-**Independent Test**: Can be fully tested by having the owning employee cancel their own Pending request and confirming its status becomes `Cancelled` with no balance impact.
-
+### User Story 3 - Employee Cancels a Pending Request (Priority: P2)
+As an authenticated Employee, I want to cancel my own `Pending` request so that I can withdraw it before a Manager resolves it.
+**Why this priority**: Cancellation is required for a complete employee workflow but can be delivered after the primary submit-and-resolve path.
+**Independent Test**: Using a prepared `Pending` request, authenticate as its owner and verify successful cancellation, ownership enforcement, final-state protection, concurrency behavior, unchanged balance, and auditing.
 **Acceptance Scenarios**:
-
-1. **Given** a Pending request owned by the employee, **When** the employee cancels it, **Then** the system transitions it to `Cancelled`, leaves the balance unaffected, and creates an audit record. *(BR-013, BR-020)*
-2. **Given** a request already in a final state (`Approved`, `Rejected`, or `Cancelled`), **When** the owning employee attempts to cancel it, **Then** the system rejects the operation and the state remains unchanged. *(BR-012, BR-015)*
-
+1. **AC-022 — Cancel an owned Pending request atomically**
+   **Related Requirements**: FR-008, BR-010, BR-014, BR-022, AUTHZ-001, AUTHZ-007, CON-006, AUD-002, AUD-003
+   **Given** a `Pending` request owned by the authenticated Employee, **When** the Employee cancels it, **Then** the system transitions the request to `Cancelled`, leaves balance unchanged, and creates exactly one transition audit record as one atomic business operation.
+2. **AC-023 — Deny cancellation of another Employee's request**
+   **Related Requirements**: AUTHZ-001, AUTHZ-005, SEC-002, SEC-003, AUD-004
+   **Given** an authenticated Employee, **When** the Employee attempts to cancel a request owned by another Employee, **Then** the system denies the operation without revealing whether the request exists.
+3. **AC-024 — Deny cancellation of a final request**
+   **Related Requirements**: BR-007, BR-011, SEC-004
+   **Given** a request in `Approved`, `Rejected`, or `Cancelled` state, **When** its owner attempts cancellation, **Then** the system rejects the operation and preserves the final state.
+4. **AC-025 — Resolve approval-versus-cancellation concurrency**
+   **Related Requirements**: CON-002, CON-004, CON-006
+   **Given** one `Pending` request, **When** an authorized Manager approval and an owner cancellation are processed concurrently, **Then** exactly one valid transition succeeds and the conflicting operation fails without partial effects.
 ---
-
-### User Story 4 - Human Resources reviews organization-wide data (Priority: P3)
-
-An HR user wants to see every employee's request history and current balance across the organization for compliance and reporting, without being able to alter any of it.
-
-**Why this priority**: Valuable for oversight and reporting, but the workflow between employee and manager functions correctly without it; it is a read-only oversight capability layered on top of the core transactional flow.
-
-**Independent Test**: Can be fully tested by having an authenticated HR user retrieve organization-wide request history and balances, and confirming that no create, approve, reject, cancel, or adjust action is available or effective for that role.
-
+### User Story 4 - Human Resources Reviews Organization-Wide Data (Priority: P2)
+As an authenticated Human Resources user, I want read-only access to organization-wide request history and applicable balances so that I can perform compliance review and operational oversight without changing transactional outcomes.
+**Why this priority**: HR visibility is part of the approved MVP scope and supports oversight, but it can be implemented after the core Employee and Manager workflow.
+**Independent Test**: Using prepared requests and balances from multiple teams, authenticate as HR and verify organization-wide authorized reads, sensitive-reason access through approved use cases, and denial of every write capability.
 **Acceptance Scenarios**:
-
-1. **Given** an authenticated HR user, **When** they view organization-wide request history and balances, **Then** the system returns data across all employees regardless of team. *(FR-009, FR-010, AUTHZ-003)*
-2. **Given** an authenticated HR user, **When** they attempt any create, approve, reject, cancel, or adjust operation, **Then** the system rejects the operation. *(FR-011, BR-009)*
-
+1. **AC-026 — View organization-wide request history**
+   **Related Requirements**: FR-009, AUTHZ-004, SEC-005
+   **Given** an authenticated HR user and requests owned by Employees across multiple teams, **When** HR views organization-wide request history, **Then** the system returns authorized read-only history across those teams.
+2. **AC-027 — View organization-wide applicable balances**
+   **Related Requirements**: FR-010, AUTHZ-004
+   **Given** an authenticated HR user and applicable balances across the organization, **When** HR views balances, **Then** the system returns authorized read-only balance information.
+3. **AC-028 — Deny HR write operations**
+   **Related Requirements**: AUTHZ-004, AUTHZ-005, AUD-004
+   **Given** an authenticated HR user, **When** HR attempts to create, approve, reject, cancel, edit, reassign, or adjust a Leave Request or Leave Balance, **Then** the system rejects the operation, modifies no business data, and records the denial when security policy requires it.
+4. **AC-029 — Protect sensitive reasons outside authorized views**
+   **Related Requirements**: SEC-005, SEC-006, AUD-006, ERR-003
+   **Given** a Leave Request containing sensitive personal information in its reason, **When** the system produces logs, traces, metrics, audit before-and-after payloads, or user-facing technical errors, **Then** the full reason does not appear in that output.
 ---
-
+### Cross-Cutting Security and Failure Scenarios
+1. **AC-030 — Deny unauthenticated access**
+   **Related Requirements**: SEC-001, SEC-002
+   **Given** an unauthenticated actor, **When** the actor attempts any protected leave-management action, **Then** the system denies access without revealing protected resource existence.
+2. **AC-031 — Reject invalid authentication**
+   **Related Requirements**: SEC-001, AUD-004
+   **Given** an actor with invalid or expired authentication, **When** the actor attempts a protected action, **Then** the system denies access and records the authentication failure according to the security logging policy.
+3. **AC-032 — Protect browser state-changing operations**
+   **Related Requirements**: SEC-007
+   **Given** a browser-based state-changing request that lacks valid anti-forgery protection, **When** the system processes it, **Then** the system rejects the operation and modifies no business data.
+4. **AC-033 — Roll back a failed state-changing operation**
+   **Related Requirements**: CON-006, ERR-002
+   **Given** a valid approval, rejection, or cancellation that encounters a failure before all required effects complete, **When** the operation terminates, **Then** the system commits none of the request-state, balance, or successful-transition audit effects.
+---
 ### Edge Cases
-
-- What happens when an employee submits a request with a start date later than its end date? → rejected, not created (BR-001).
-- What happens when an employee submits a request for a date in the past? → rejected as outside the normal workflow (BR-002, BR-003).
-- What happens when a submitted request would exceed the employee's available balance for a balance-consuming leave type? → rejected at submission (A-002) and, independently, re-checked and rejected at approval time if it would still make the balance negative (BR-017, BR-021).
-- What happens when a new request's dates overlap an existing Pending or Approved request from the same employee? → rejected (BR-016, A-001).
-- How does the system handle a manager who is no longer assigned to the employee's team by the time they attempt to approve a request they could previously see? → the operation is denied; team assignment is revalidated at the moment of the action, not at the moment the list was rendered (BR-021, AUTHZ-005).
-- How does the system handle two approval attempts submitted for the same Pending request at nearly the same time (double-click, duplicate network retry, two browser tabs)? → exactly one transition and one balance deduction occur; the losing attempt fails without side effects (CON-001, BR-022).
-- How does the system handle an attempt to cancel, approve, or reject a request that is already in a final state? → rejected; the state does not change (BR-012, BR-015).
-- How does the system handle an employee who tries to view or cancel a request ID that belongs to a different employee? → denied, and the response does not confirm or deny that the request exists (AUTHZ-001, SEC-006).
-- How does the system handle a manager who tries to approve their own request by directly invoking the approval operation (bypassing any hidden UI control)? → rejected regardless of entry point, because authorization is enforced server-side, not through UI visibility (BR-008, SEC-007).
-- How does the system handle an anonymous (unauthenticated) actor attempting any of the above operations? → denied without revealing resource existence (SEC-001).
-- What happens when a leave request's reason field is viewed by an actor other than the owner, the owning employee's authorized direct manager, or HR? → not shown; sensitive content is restricted to those explicitly authorized actors (BR-023).
+- **EC-001 — Current local date**: A request beginning on the Employee's current local date is not considered past solely because the UTC date differs.
+- **EC-002 — Date-range adjacency**: Start and end dates are inclusive. A request beginning on the calendar day after another request ends is adjacent and does not overlap.
+- **EC-003 — Multiple non-overlapping Pending requests**: Permitted when each request independently satisfies date, overlap, and submission-time balance rules.
+- **EC-004 — Competing Pending requests for limited balance**: Pending requests do not reserve balance. Every approval revalidates balance; a later approval fails if the remaining balance is insufficient.
+- **EC-005 — Team reassignment while Pending**: The previous Manager loses authorization immediately when the authoritative organizational relationship changes. The current Manager may act only when authorized by that source.
+- **EC-006 — No authorized Manager**: The request remains `Pending`; HR receives no write or reassignment capability in this MVP.
+- **EC-007 — Multiple Managers**: The authoritative organizational model permits exactly one current Direct Manager per Team. If the relationship is missing or ambiguous, resolution is denied until the source data is corrected.
+- **EC-008 — Approval and cancellation race**: Exactly one valid transition succeeds.
+- **EC-009 — Duplicate browser submission or network retry**: At most one equivalent Leave Request is created.
+- **EC-010 — Untrusted HTML or script in reason**: The reason is plain text, 10–500 characters, may contain line breaks, and must never execute markup or script.
+- **EC-011 — Partial-day request**: Rejected because the MVP supports full-day requests only.
+- **EC-012 — Edit a submitted request**: Editing a submitted request is outside the MVP. The owner may cancel a `Pending` request and submit a new one.
+- **EC-013 — Retroactive correction**: Outside the MVP and requires a separate authorized, controlled, and audited workflow.
+- **EC-014 — Final-state mutation**: Rejected for every actor.
+- **EC-015 — Failure during audit persistence**: The related state-changing business operation does not partially commit.
+---
 
 ## Requirements *(mandatory)*
-
 ### Functional Requirements
-
-- **FR-001**: The system shall allow an authenticated employee to submit a leave or vacation request.
-- **FR-002**: When an employee submits a leave request, the system shall require a start date, an end date, a leave type, and a reason.
-- **FR-003**: The system shall allow an authenticated employee to view their own leave requests, including current status and history.
-- **FR-004**: The system shall allow an authenticated employee to view their own available leave balance.
-- **FR-005**: While a leave request is `Pending`, the system shall allow its owning employee to cancel it.
-- **FR-006**: The system shall allow an authenticated direct manager to view leave requests submitted by employees currently assigned to their team.
-- **FR-007**: While a leave request is `Pending`, the system shall allow the request's authorized direct manager to approve it.
-- **FR-008**: While a leave request is `Pending`, the system shall allow the request's authorized direct manager to reject it.
-- **FR-009**: The system shall allow an authenticated Human Resources user to view organization-wide leave request history.
-- **FR-010**: The system shall allow an authenticated Human Resources user to view organization-wide leave balances.
-- **FR-011**: If a Human Resources user attempts to create, approve, reject, cancel, or adjust a leave request or balance, then the system shall reject the operation.
-
-### Key Entities
-
-- **Leave Request**: An employee's request for time off. Attributes: owning employee, start date, end date, leave type, reason, status, requested-day total (server-calculated), timestamps. Belongs to exactly one employee; resolved by at most one direct manager.
-- **Leave Balance**: An employee's available leave, tracked per applicable leave type. Modified only by an approved, balance-consuming request (deduction) or by a mechanism outside this MVP's scope (accrual — see [Open Questions](#open-questions)).
-- **Employee**: A person who can submit requests and has a leave balance. Currently assigned to exactly one team for authorization purposes.
-- **Direct Manager**: A role held by a person with respect to a team; authorized to resolve requests only from employees currently on that team.
-- **Human Resources User**: A role with organization-wide, read-only visibility.
-- **Audit Record**: An immutable record of a state transition or other critical action, created for every transition (see [Audit and Observability Requirements](#audit-and-observability-requirements)).
-
-## Business Rules and Domain Invariants
-
-These correspond directly to the constitutional invariants in §5 and are restated here as testable, numbered requirements scoped to this feature.
-
-- **BR-001**: If a submitted leave request's start date is later than its end date, then the system shall reject the request and shall not create it.
-- **BR-002**: If a submitted leave request's start date or end date is earlier than the current date under the applicable date policy, then the system shall reject the request as outside the normal workflow.
-- **BR-003**: The system shall determine "current date" and "past date" for date validation using the employee's applicable local date and time-zone policy.
-- **BR-004**: The system shall calculate the requested number of leave days on the server according to the approved leave calculation policy.
-- **BR-005**: If a leave request submission or a state-changing operation includes a client-supplied requested-day total or balance value, then the system shall disregard that value and use only the server-calculated value.
-- **BR-006**: If an employee attempts to view or act on another employee's leave requests or balance, then the system shall deny the operation.
-- **BR-007**: The system shall allow a direct manager to view or act on a leave request only when the request belongs to an employee currently assigned to that manager's team.
-- **BR-008**: If a direct manager attempts to approve or reject a leave request they own, then the system shall reject the operation.
-- **BR-009**: While the MVP is in effect, the system shall restrict Human Resources users to read-only access to leave requests and balances.
-- **BR-010**: When an employee submits a valid leave request, the system shall create the request with a `Pending` status.
-- **BR-011**: While a leave request is `Pending`, the system shall allow it to transition only to `Approved`, `Rejected`, or `Cancelled`.
-- **BR-012**: The system shall treat `Approved`, `Rejected`, and `Cancelled` as final states during the MVP and shall not allow any further transition out of them.
-- **BR-013**: While a leave request is `Pending`, the system shall allow only its owning employee to cancel it.
-- **BR-014**: While a leave request is `Pending`, the system shall allow only its authorized direct manager to approve or reject it.
-- **BR-015**: If an attempt is made to edit a resolved leave request, or to return it to `Pending`, then the system shall reject the operation.
-- **BR-016**: If a submitted or evaluated leave request overlaps an existing `Pending` or `Approved` request for the same employee, then the system shall reject the operation.
-- **BR-017**: The system shall never allow an employee's applicable leave balance to become negative.
-- **BR-018**: The system shall deduct balance only when approving a request whose leave type consumes balance.
-- **BR-019**: While a leave request is `Pending`, when its authorized direct manager approves it, the system shall transition the request to `Approved` and apply the corresponding balance deduction atomically.
-- **BR-020**: When a leave request state transition occurs, the system shall create an audit record.
-- **BR-021**: Immediately before executing a state-changing operation on a leave request, the system shall revalidate identity, ownership, the manager-employee relationship, the request's current state, and the applicable balance.
-- **BR-022**: If concurrent or duplicate approval attempts occur on the same leave request, then the system shall apply the resulting balance deduction at most once.
-- **BR-023**: The system shall restrict visibility of a leave request's reason to the request's owner, its authorized direct manager, and Human Resources through approved use cases.
-- **BR-024**: The system shall not include a leave request's reason, or other unnecessary sensitive data, in logs, traces, metrics, or user-facing technical error messages.
-- **BR-025**: If a submitted leave request is for a balance-consuming leave type and its server-calculated requested days exceed the employee's available balance at submission time, then the system shall reject the request.
-
-## Request States and Permitted Transitions
-
-```mermaid
-stateDiagram-v2
-    [*] --> Pending : Employee submits valid request (BR-010)
-    Pending --> Approved : Authorized direct manager approves (BR-014, BR-019)
-    Pending --> Rejected : Authorized direct manager rejects (BR-014)
-    Pending --> Cancelled : Owning employee cancels (BR-013)
-    Approved --> [*]
-    Rejected --> [*]
-    Cancelled --> [*]
-```
-
-`Approved`, `Rejected`, and `Cancelled` are final states for the MVP; no transition out of them is permitted (BR-012, BR-015). Any transition not shown above is invalid and must be rejected (SEC-011).
-
-## Validation Requirements
-
-- **VAL-001**: If a leave request submission omits the start date, end date, or leave type, then the system shall reject the request and shall not create it.
-- **VAL-002**: The system shall validate the submitted leave type against the organization's approved leave-type catalog (A-003).
-- **VAL-003**: If a submitted leave type is not present or not active in the approved catalog, then the system shall reject the request.
-- **VAL-004**: The system shall treat all date, leave-type, balance, and requested-day values supplied by the client as untrusted input requiring server-side validation before use (constitution §7.1, §7.2).
-
-## Authorization and Resource-Ownership Requirements
-
-- **AUTHZ-001**: The system shall allow an employee to view only leave requests and balance records that they own.
-- **AUTHZ-002**: The system shall allow a direct manager to view and resolve only leave requests belonging to employees currently assigned to their team at the time of the operation.
-- **AUTHZ-003**: The system shall allow Human Resources users to view leave request history and balances across the organization in read-only mode.
-- **AUTHZ-004**: The system shall deny, by default, any action for which the actor's role, ownership, or manager-employee relationship has not been explicitly authorized.
-- **AUTHZ-005**: The system shall determine a manager's team-assignment authorization at the time of each operation, not from a previously cached or client-supplied relationship.
-
-## Security and Privacy Requirements
-
-Aligned to the constitution's OWASP Top 10:2025 baseline: A01 Broken Access Control, A06 Insecure Design, A09 Security Logging and Alerting Failures (constitution §9, §7.4).
-
-- **SEC-001**: If an unauthenticated actor attempts to access any leave request, balance, or approval function, then the system shall deny the operation without revealing whether the targeted resource exists.
-- **SEC-002**: If an actor presents invalid or expired authentication, then the system shall deny access to any protected leave-management function and require re-authentication.
-- **SEC-003**: If an authenticated actor's role does not permit the requested action, then the system shall deny the operation.
-- **SEC-004**: If an employee attempts to view or modify a leave request or balance belonging to another employee, then the system shall deny the operation.
-- **SEC-005**: If a manager attempts to view or act on a leave request belonging to an employee not currently assigned to their team, then the system shall deny the operation.
-- **SEC-006**: If an actor supplies or manipulates a request or resource identifier to attempt access to a leave request or balance they are not authorized to view, then the system shall deny the operation and shall not reveal the existence of the targeted resource to that actor.
-- **SEC-007**: If a manager attempts to approve or reject a leave request they own, then the system shall reject the operation.
-- **SEC-008**: If an actor attempts an action requiring a role or privilege beyond their assigned role, then the system shall deny the operation and shall not elevate the actor's effective privileges.
-- **SEC-009**: If an employee submits a leave request that duplicates an existing `Pending` or `Approved` request for the same employee, same leave type, and overlapping dates, then the system shall reject the duplicate.
-- **SEC-010**: If a state-changing operation is replayed or resubmitted after it has already been applied, then the system shall not apply it a second time and shall return a result reflecting the request's current, already-resolved state.
-- **SEC-011**: If an actor attempts a state transition not permitted for the leave request's current state, then the system shall reject the transition and leave the request's state unchanged.
-- **SEC-012**: The system shall redact a leave request's reason and other unnecessary sensitive data from logs, traces, metrics, and user-facing technical error messages.
-- **SEC-013**: The system shall record a security-relevant event for each of the following: successful authentication, failed authentication, access denial, request creation, approval, rejection, cancellation, and invalid-transition attempt.
-- **SEC-014**: If a security-relevant anomaly occurs — including repeated authentication failures, repeated access denials, or a suspected unauthorized resource-access attempt — then the system shall generate an event suitable for alerting.
-
-## Audit and Observability Requirements
-
-- **AUD-001**: When a leave request state transition occurs, the system shall create an audit record containing at minimum: timestamp, actor identifier, actor role, action, entity type, entity identifier, and result (constitution §8).
-- **AUD-002**: Where an audit record captures before/after values, the system shall redact sensitive fields, including the full reason, from that record.
-- **AUD-003**: The system shall protect audit records against unauthorized modification or deletion.
-- **AUD-004**: The system shall not physically delete leave requests or audit records through normal application operations.
-
-## Concurrency and Duplicate-Operation Requirements
-
-- **CON-001**: While a leave request is `Pending`, if two or more approval or rejection attempts occur concurrently, then the system shall apply exactly one resulting state transition and shall cause any other conflicting attempt to fail without applying an additional balance deduction.
-- **CON-002**: The system shall verify overlap atomically with the operation that confirms (approves) a request, such that two concurrently approved requests for the same employee cannot both be confirmed if they would overlap.
-- **CON-003**: If a state-changing operation is attempted against a leave request whose state or balance has changed since it was last read by the requesting actor, then the system shall detect the conflict and reject the operation rather than apply it against stale data.
-
-## Error and Failure Behavior
-
-- **ERR-001**: If a leave request submission fails validation, then the system shall reject the request, shall not create it, and shall communicate which validation rule failed without exposing sensitive or internal technical detail.
-- **ERR-002**: If an approval, rejection, or cancellation operation cannot complete due to a system or data error, then the system shall leave the leave request and balance unchanged and shall not partially apply the operation.
-- **ERR-003**: If a user-facing error occurs, then the system shall present a message that does not disclose sensitive leave data, internal implementation details, or stack traces.
-
-## Acceptance Scenarios
-
-Each scenario references the requirement identifier(s) it validates.
-
-1. **Submitting a valid request** — **Given** an authenticated employee with sufficient balance and no overlapping requests, **When** they submit a request with valid dates, leave type, and reason, **Then** the system creates it as `Pending`. *(FR-001, FR-002, BR-010)*
-2. **Submitting a request with invalid dates** — **Given** an authenticated employee, **When** they submit a request whose start date is later than its end date, **Then** the system rejects it and does not create it. *(BR-001, ERR-001)*
-3. **Submitting a request for a past date** — **Given** an authenticated employee, **When** they submit a request whose start date is before the current date in their local time zone, **Then** the system rejects it. *(BR-002, BR-003)*
-4. **Submitting a request with insufficient balance** — **Given** an authenticated employee whose available balance is less than the requested days for a balance-consuming leave type, **When** they submit the request, **Then** the system rejects it. *(BR-025, BR-017)*
-5. **Detecting an overlapping request** — **Given** an authenticated employee with an existing `Pending` request for a date range, **When** they submit a new request whose dates intersect that range, **Then** the system rejects the new request. *(BR-016)*
-6. **Viewing one's own request history** — **Given** an authenticated employee with prior requests, **When** they view their history, **Then** they see only their own requests and current balance. *(FR-003, FR-004, AUTHZ-001)*
-7. **Attempting to view another employee's data** — **Given** an authenticated employee, **When** they attempt to view another employee's requests or balance, **Then** the system denies the operation without confirming the target's existence. *(BR-006, SEC-004, SEC-006)*
-8. **Manager viewing their team's pending requests** — **Given** an authenticated manager whose team includes the requesting employee, **When** the manager views pending requests, **Then** the system returns only requests from employees currently on that team. *(FR-006, AUTHZ-002)*
-9. **Manager attempting to access another team's request** — **Given** an authenticated manager, **When** they attempt to view or resolve a request from an employee not currently on their team, **Then** the system denies the operation. *(BR-007, SEC-005)*
-10. **Approving a pending request** — **Given** a `Pending` request from an employee on the manager's team, **When** the manager approves it, **Then** the system transitions it to `Approved`, deducts balance, and creates an audit record, all atomically. *(BR-014, BR-019, BR-020, AUD-001)*
-11. **Rejecting a pending request** — **Given** a `Pending` request from an employee on the manager's team, **When** the manager rejects it, **Then** the system transitions it to `Rejected` without balance impact and creates an audit record. *(BR-014, BR-020)*
-12. **Attempting self-approval** — **Given** a `Pending` request owned by the manager, **When** the manager attempts to approve or reject it, **Then** the system rejects the operation. *(BR-008, SEC-007)*
-13. **Cancelling a pending request** — **Given** a `Pending` request owned by the employee, **When** the employee cancels it, **Then** the system transitions it to `Cancelled` without balance impact and creates an audit record. *(BR-013, BR-020)*
-14. **Attempting to cancel a resolved request** — **Given** a request already in `Approved`, `Rejected`, or `Cancelled` state, **When** the owning employee attempts to cancel it, **Then** the system rejects the operation and the state is unchanged. *(BR-012, BR-015)*
-15. **Two simultaneous approval attempts** — **Given** a `Pending` request, **When** two approval attempts are submitted concurrently, **Then** exactly one succeeds, exactly one balance deduction is applied, and the other attempt fails without side effects. *(CON-001, BR-022)*
-16. **Audit-record creation** — **Given** any successful state transition, **When** the transition completes, **Then** an audit record exists containing timestamp, actor identifier, actor role, action, entity type, entity identifier, and result. *(AUD-001, BR-020)*
-17. **Sensitive-data redaction** — **Given** a leave request with a reason containing personal information, **When** the system writes a log, trace, metric, or user-facing error related to that request, **Then** the reason does not appear in it. *(BR-024, SEC-012, AUD-002)*
-
-## Out-of-Scope Items
-
-The following are explicitly not part of this MVP and are not addressed by the requirements above:
-
-- Balance accrual, expiration, and carryover mechanics (see OQ-006).
-- Manager delegation or reassignment workflows (see OQ-007, OQ-008).
-- Retroactive adjustments or corrections to resolved requests (see OQ-009).
-- Payroll integration or any payroll-impacting behavior (see OQ-010).
-- Half-day, hourly, or partial-day requests (see OQ-002).
-- Any HR write capability (creation, approval, rejection, cancellation, or balance adjustment) — HR is read-only for the entire MVP (constitution §4.3).
-- Notifications, calendars, external identity providers beyond the existing authentication dependency, multi-company support, and any public API surface (constitution §17) — none of these are current defaults and each would require its own approved specification and ADR.
-- Reporting/analytics beyond the read-only history and balance views described here.
-
-## Open Questions
-
-The following policy questions are **not resolved** by this specification, are not assumed by any requirement above, and must be answered by an approved source (an amendment to this spec, a separate approved specification, or a constitutional amendment) before a dependent implementation decision is made:
-
-- **OQ-001**: Is the requested-day count based on calendar days or working days?
-- **OQ-002**: How do weekends and holidays affect the requested-day calculation, and are half-day or hourly requests supported?
-- **OQ-003**: Which leave types exist, and which of them consume balance?
-- **OQ-004**: Does medical leave consume balance, and does it have distinct rules from other leave types?
-- **OQ-005**: Is an employee permitted to have more than one `Pending` request at the same time (independent of whether their dates overlap)?
-- **OQ-006**: What are the balance accrual, expiration, and carryover rules?
-- **OQ-007**: What happens to a `Pending` request if the employee's direct manager changes before it is resolved?
-- **OQ-008**: Is manager delegation or temporary reassignment supported, and if so, under what authorization model?
-- **OQ-009**: Are retroactive adjustments to resolved requests or balances permitted, and if so, through what controlled, audited process (constitution §4.3 anticipates this requires an independent specification)?
-- **OQ-010**: What, if anything, does an approved/rejected/cancelled request need to communicate to payroll, and through what mechanism?
-
-No requirement in this specification presumes an answer to any of the above; where a rule depends on one of these questions (e.g., BR-004's "approved leave calculation policy," BR-018's "leave type consumes balance"), the rule is written to be parameterized by the eventual answer rather than to assume one.
+Every normative requirement uses exactly one standard EARS classification:
+- **Ubiquitous**: `The system shall ...`
+- **Event-Driven**: `When <trigger>, the system shall ...`
+- **State-Driven**: `While <state>, the system shall ...`
+- **Unwanted Behavior**: `If <undesired condition>, then the system shall ...`
+- **Optional**: `Where <approved optional capability applies>, the system shall ...`
+No Optional requirements are defined because no optional feature is approved in this MVP.
+#### Request Submission and Employee Visibility
+- **FR-001 — Create a Leave Request** *(EARS: Event-Driven)* — When an authenticated Employee submits request data that satisfies all applicable requirements, the system shall create exactly one Leave Request.
+- **FR-002 — Require Core Request Data** *(EARS: Ubiquitous)* — The system shall require a start date, an end date, an active Leave Type, and a reason for every MVP Leave Request.
+- **FR-003 — View Owned Request History** *(EARS: Ubiquitous)* — The system shall allow an authenticated Employee to view their own Leave Requests, statuses, and history.
+- **FR-004 — View Applicable Balances** *(EARS: Ubiquitous)* — The system shall allow an authenticated Employee to view their current authoritative applicable Leave Balances.
+#### Direct Manager Review and Resolution
+- **FR-005 — View Authorized Team Requests** *(EARS: Ubiquitous)* — The system shall allow an authenticated Direct Manager to view Leave Requests within the Manager's current authorized organizational scope.
+- **FR-006 — Offer Approval for Pending Requests** *(EARS: State-Driven)* — While a Leave Request is `Pending`, the system shall provide an approval action to its authorized Direct Manager.
+- **FR-007 — Offer Rejection for Pending Requests** *(EARS: State-Driven)* — While a Leave Request is `Pending`, the system shall provide a rejection action to its authorized Direct Manager.
+#### Employee Cancellation
+- **FR-008 — Offer Cancellation for an Owned Pending Request** *(EARS: State-Driven)* — While a Leave Request is `Pending`, the system shall provide a cancellation action to its owning Employee.
+#### Human Resources Read-Only Visibility
+- **FR-009 — View Organization-Wide Request History** *(EARS: Ubiquitous)* — The system shall allow an authenticated HR user to view organization-wide Leave Request history through explicitly authorized read-only use cases.
+- **FR-010 — View Organization-Wide Applicable Balances** *(EARS: Ubiquitous)* — The system shall allow an authenticated HR user to view organization-wide applicable Leave Balances through explicitly authorized read-only use cases.
+### Validation Requirements
+- **VAL-001 — Reject Missing Core Request Data** *(EARS: Unwanted Behavior)* — If a request omits the start date, end date, Leave Type, or reason, then the system shall reject the submission and create no Leave Request.
+- **VAL-002 — Validate Leave Type Against the Authoritative Catalog** *(EARS: Ubiquitous)* — The system shall validate every submitted Leave Type against the authoritative organization-approved catalog.
+- **VAL-003 — Reject an Unknown or Inactive Leave Type** *(EARS: Unwanted Behavior)* — If a submitted Leave Type does not exist or is inactive, then the system shall reject the submission and create no Leave Request.
+- **VAL-004 — Ignore Client-Derived Business Values** *(EARS: Unwanted Behavior)* — If a client supplies a requested-unit total, balance, owner identifier, actor role, team assignment, or other server-derived business value, then the system shall disregard it and use the authoritative server-derived value.
+- **VAL-005 — Validate the Request Reason** *(EARS: Ubiquitous)* — The system shall require the reason to contain 10–500 plain-text characters, allow line breaks, and treat markup as non-executable text.
+- **VAL-006 — Reject Partial-Day Input** *(EARS: Unwanted Behavior)* — If a submission requests less than a full-day unit or supplies an hourly interval, then the system shall reject it as outside the MVP.
+### Business Rules and Domain Invariants
+#### Date and Requested-Unit Rules
+- **BR-001 — Reject a Reversed Date Range** *(EARS: Unwanted Behavior)* — If a request start date is later than its end date, then the system shall reject the request.
+- **BR-002 — Reject a Past Start Date** *(EARS: Unwanted Behavior)* — If a request start date is earlier than the Employee's current local date, then the system shall reject the request.
+- **BR-003 — Use the Employee's Authoritative Time Zone** *(EARS: Ubiquitous)* — The system shall evaluate current-date and past-date rules using the Employee's authoritative primary time zone.
+- **BR-004 — Calculate Requested Units Authoritatively** *(EARS: Ubiquitous)* — The system shall calculate full-day requested units inclusively from the start date through the end date, counting Monday through Friday and excluding dates in the authoritative organization holiday calendar.
+#### Request Lifecycle
+- **BR-005 — Initialize a Request as Pending** *(EARS: Event-Driven)* — When a Leave Request is successfully created, the system shall assign `Pending` as its initial state.
+- **BR-006 — Restrict Pending Transitions** *(EARS: State-Driven)* — While a Leave Request is `Pending`, the system shall permit only the transitions to `Approved`, `Rejected`, or `Cancelled`.
+- **BR-007 — Preserve Final States** *(EARS: Ubiquitous)* — The system shall treat `Approved`, `Rejected`, and `Cancelled` as final MVP states.
+- **BR-008 — Transition an Approved Request** *(EARS: Event-Driven)* — When the authorized Direct Manager successfully approves a `Pending` Leave Request, the system shall transition it to `Approved`.
+- **BR-009 — Transition a Rejected Request** *(EARS: Event-Driven)* — When the authorized Direct Manager successfully rejects a `Pending` Leave Request, the system shall transition it to `Rejected`.
+- **BR-010 — Transition a Cancelled Request** *(EARS: Event-Driven)* — When the owning Employee successfully cancels a `Pending` Leave Request, the system shall transition it to `Cancelled`.
+- **BR-011 — Reject Mutation of a Final Request** *(EARS: Unwanted Behavior)* — If an actor attempts to edit or transition an `Approved`, `Rejected`, or `Cancelled` request, then the system shall reject the operation and preserve the current state.
+#### Balance Rules
+- **BR-012 — Prevent Negative Balance** *(EARS: Ubiquitous)* — The system shall never allow an Employee's applicable Leave Balance to become negative.
+- **BR-013 — Deduct Balance for Applicable Approval** *(EARS: Event-Driven)* — When a balance-consuming Leave Request is successfully approved, the system shall deduct the authoritative requested units from the applicable Leave Balance.
+- **BR-014 — Preserve Balance for Non-Deduction Outcomes** *(EARS: Event-Driven)* — When a Leave Request is created, rejected, cancelled, or approved as non-balance-consuming, the system shall leave the applicable Leave Balance unchanged.
+- **BR-015 — Revalidate Balance Before Approval** *(EARS: Event-Driven)* — When approval is requested for a balance-consuming Leave Request, the system shall revalidate the authoritative applicable Leave Balance immediately before approval.
+- **BR-016 — Reject an Approval That Would Produce Negative Balance** *(EARS: Unwanted Behavior)* — If approval would cause the applicable Leave Balance to become negative, then the system shall reject approval, preserve the request in `Pending` state, and preserve the balance.
+- **BR-017 — Apply Balance per Leave Type** *(EARS: Ubiquitous)* — The system shall maintain and evaluate a separate applicable Leave Balance for each Employee and each balance-consuming Leave Type.
+- **BR-018 — Reject Insufficient Balance at Submission** *(EARS: Event-Driven)* — When a balance-consuming request is submitted, the system shall reject it if the authoritative available balance is lower than the requested units and shall not reserve balance for any Pending request.
+#### Overlap Rules
+- **BR-019 — Reject Prohibited Overlap** *(EARS: Unwanted Behavior)* — If an inclusive calendar-date range intersects another `Pending` or `Approved` request for the same Employee, regardless of Leave Type, then the system shall reject the operation; adjacent non-intersecting ranges are permitted.
+- **BR-020 — Revalidate Overlap Before Approval** *(EARS: Event-Driven)* — When approval is requested, the system shall revalidate overlap against authoritative current requests immediately before approval.
+#### Transactional Business Outcomes
+- **BR-021 — Complete Rejection as One Business Outcome** *(EARS: Event-Driven)* — When an authorized rejection succeeds, the system shall commit the transition to `Rejected` and its transition audit record as one indivisible business outcome.
+- **BR-022 — Complete Cancellation as One Business Outcome** *(EARS: Event-Driven)* — When an authorized cancellation succeeds, the system shall commit the transition to `Cancelled` and its transition audit record as one indivisible business outcome.
+### Authorization and Resource-Ownership Requirements
+- **AUTHZ-001 — Restrict Employee Access to Owned Data** *(EARS: Ubiquitous)* — The system shall authorize an Employee to view or cancel only Leave Requests and Leave Balances owned by that Employee.
+- **AUTHZ-002 — Restrict Manager Access to Current Scope** *(EARS: Ubiquitous)* — The system shall authorize a Direct Manager to view, approve, or reject a request only when its owner is within that Manager's current authoritative organizational scope.
+- **AUTHZ-003 — Prevent Manager Self-Approval** *(EARS: Unwanted Behavior)* — If a Direct Manager attempts to approve or reject a Leave Request they own, then the system shall reject the operation.
+- **AUTHZ-004 — Restrict HR to Read-Only Access** *(EARS: Unwanted Behavior)* — If an HR user attempts to create, edit, approve, reject, cancel, reassign, or adjust a Leave Request or Leave Balance, then the system shall reject the operation and modify no business data.
+- **AUTHZ-005 — Deny by Default** *(EARS: Ubiquitous)* — The system shall deny every action not explicitly authorized for the actor, role, resource, ownership relationship, current organizational relationship, and request state.
+- **AUTHZ-006 — Evaluate Manager Scope at Operation Time** *(EARS: Ubiquitous)* — The system shall determine Manager authorization from the authoritative current organizational relationship rather than from a client-supplied or previously displayed relationship.
+- **AUTHZ-007 — Revalidate Mutation Authorization and Preconditions** *(EARS: Event-Driven)* — When an actor requests approval, rejection, or cancellation, the system shall revalidate identity, role, ownership, current organizational scope, request state, and applicable business preconditions immediately before mutation.
+### Security and Privacy Requirements
+- **SEC-001 — Deny Unauthenticated Access** *(EARS: Unwanted Behavior)* — If an unauthenticated actor attempts a protected leave-management action, then the system shall deny the operation.
+- **SEC-002 — Avoid Protected Resource-Existence Disclosure** *(EARS: Unwanted Behavior)* — If an actor is not authorized to access a protected resource, then the system shall deny the operation without confirming whether that resource exists.
+- **SEC-003 — Prevent Identifier-Manipulation Access** *(EARS: Unwanted Behavior)* — If an actor manipulates a request, Employee, balance, Leave Type, or team identifier to access an unauthorized resource, then the system shall deny the operation.
+- **SEC-004 — Reject Invalid State Transitions** *(EARS: Unwanted Behavior)* — If an actor requests a transition not permitted for the Leave Request's current state, then the system shall reject it and preserve the current state.
+- **SEC-005 — Restrict Sensitive Reason Visibility** *(EARS: Ubiquitous)* — The system shall expose a Leave Request's reason only to its owning Employee, its currently authorized Direct Manager, and HR through explicitly authorized read-only use cases.
+- **SEC-006 — Redact Sensitive Information** *(EARS: Ubiquitous)* — The system shall redact Leave Request reasons, credentials, tokens, secret values, and unnecessary personal information from logs, traces, metrics, audit before-and-after payloads, and user-facing technical errors.
+- **SEC-007 — Protect Browser Mutations Against Request Forgery** *(EARS: Ubiquitous)* — The system shall require valid anti-forgery protection for every browser-based state-changing operation.
+### Concurrency, Duplicate-Operation, and Atomicity Requirements
+- **CON-001 — Prevent Duplicate Request Creation** *(EARS: Unwanted Behavior)* — If submissions for the same Employee, Leave Type, start date, and end date are replayed or processed concurrently, then the system shall create at most one Leave Request.
+- **CON-002 — Apply One Conflicting State Transition** *(EARS: Unwanted Behavior)* — If conflicting state-changing operations are processed concurrently for the same `Pending` request, then the system shall apply exactly one valid transition and reject the others without partial effects.
+- **CON-003 — Prevent Duplicate Balance Deduction** *(EARS: Unwanted Behavior)* — If an approval is replayed, retried, or processed concurrently, then the system shall apply the corresponding balance deduction at most once.
+- **CON-004 — Reject Stale Mutations** *(EARS: Unwanted Behavior)* — If request state, applicable balance, ownership, or organizational authorization changes before a state-changing operation is committed, then the system shall reject the stale operation without modifying request state or balance.
+- **CON-005 — Evaluate Overlap Atomically with Confirmation** *(EARS: Event-Driven)* — When a request is confirmed for approval, the system shall evaluate the authoritative overlap condition within the same indivisible business operation as the approval.
+- **CON-006 — Commit Approval Atomically** *(EARS: Event-Driven)* — When an approval succeeds, the system shall commit the transition to `Approved`, any applicable balance deduction, and exactly one successful-transition audit record as one indivisible business operation.
+### Audit and Observability Requirements
+- **AUD-001 — Audit Request Creation** *(EARS: Event-Driven)* — When a Leave Request is successfully created, the system shall create exactly one immutable request-creation audit record.
+- **AUD-002 — Audit Every Successful State Transition** *(EARS: Event-Driven)* — When a Leave Request successfully transitions to `Approved`, `Rejected`, or `Cancelled`, the system shall create exactly one immutable transition audit record.
+- **AUD-003 — Capture Minimum Audit Context** *(EARS: Ubiquitous)* — The system shall include at minimum the UTC timestamp, actor identifier, actor role, action, entity type, entity identifier, result, correlation identifier, and request identifier in every business audit record.
+- **AUD-004 — Record Security-Relevant Failures** *(EARS: Event-Driven)* — When authentication fails, authorization is denied, an invalid transition is attempted, or suspected unauthorized resource access occurs, the system shall create a structured security event suitable for monitoring and alerting.
+- **AUD-005 — Protect Audit Records** *(EARS: Ubiquitous)* — The system shall prevent normal application operations from modifying or physically deleting audit records.
+- **AUD-006 — Redact Audit Payloads** *(EARS: Ubiquitous)* — The system shall redact sensitive fields from audit before-and-after values and security-event payloads.
+### Error and Failure Requirements
+- **ERR-001 — Return Actionable Validation Feedback** *(EARS: Unwanted Behavior)* — If request validation fails, then the system shall reject the operation and communicate the failed validation rule without exposing sensitive data or implementation details.
+- **ERR-002 — Preserve State on Failed Mutation** *(EARS: Unwanted Behavior)* — If approval, rejection, or cancellation does not complete successfully, then the system shall preserve the pre-operation request state and balance and shall not create a successful-transition audit record.
+- **ERR-003 — Protect User-Facing Errors** *(EARS: Ubiquitous)* — The system shall present user-facing errors without stack traces, database details, secret values, or sensitive Leave Request content.
+- **ERR-004 — Return a Conflict Outcome for Stale Operations** *(EARS: Unwanted Behavior)* — If a state-changing operation is rejected because authoritative data changed, then the system shall communicate a non-sensitive conflict outcome that allows the actor to refresh current information.
+### Key Entities *(include if feature involves data)*
+- **Leave Request**: Represents an Employee's formal request for full-day time off. Key business attributes are the owner, start date, end date, Leave Type, reason, authoritative requested units, current state, creation information, resolution information, and concurrency identity. It begins in `Pending` and may transition only to `Approved`, `Rejected`, or `Cancelled`.
+- **Leave Balance**: Represents the authoritative full-day units available to an Employee for one balance-consuming Leave Type. It cannot become negative and changes only through an approved balance-consuming request within this feature.
+- **Leave Type**: Represents an active organization-approved leave classification. The MVP catalog contains `Vacation` and `Personal Leave` as balance-consuming types, and `Medical Leave` as a non-balance-consuming type. All use the standard Manager approval workflow.
+- **Employee**: Represents a person who may submit requests, view owned requests and balances, and cancel owned `Pending` requests. A person may also hold another role, but authorization is evaluated per action and resource.
+- **Team**: Represents the single current organizational grouping assigned to an Employee. Each Team has exactly one current Direct Manager; one Manager may manage multiple Teams.
+- **Direct Manager Assignment**: Represents the authoritative current relationship that determines who may review and resolve an Employee's request.
+- **Request State**: Represents exactly one of four MVP states: `Pending`, `Approved`, `Rejected`, or `Cancelled`.
+- **Audit Record**: Represents an immutable record of request creation or a successful state transition, containing actor, action, target, outcome, and traceability identifiers without unnecessary sensitive content.
+- **Security Event**: Represents a structured record of a security-relevant failure or anomaly, separate from a successful business-transition audit record.
+---
 
 ## Success Criteria *(mandatory)*
-
 ### Measurable Outcomes
+- **SC-001 — Exactly-One Request Creation**: 100% of valid single submissions create exactly one `Pending` Leave Request and exactly one creation audit record.
+  **Measurement**: Acceptance and integration test comparison of successful submissions, stored requests, and creation audit records.
+- **SC-002 — Complete Transition Auditing**: 100% of successful transitions from `Pending` to `Approved`, `Rejected`, or `Cancelled` create exactly one matching transition audit record.
+  **Measurement**: Integration-test and audit-query comparison of successful transitions and audit records.
+- **SC-003 — No Negative Balances**: 0 successful approvals result in an applicable Leave Balance below zero.
+  **Measurement**: Domain, integration, concurrency, and acceptance tests plus production invariant monitoring.
+- **SC-004 — No Duplicate Deductions**: 0 replayed, retried, or concurrent approval tests produce more than one deduction for the same Leave Request.
+  **Measurement**: Concurrency-test comparison of request identifiers, balance mutations, and audit records.
+- **SC-005 — Authorization Isolation**: 100% of tested cross-Employee, cross-team, self-approval, unauthenticated, identifier-manipulation, and unauthorized HR write attempts are denied without returning protected data.
+  **Measurement**: Automated authorization and security-test suite.
+- **SC-006 — Final-State Integrity**: 100% of tested mutation attempts against `Approved`, `Rejected`, or `Cancelled` requests are rejected and preserve the current state.
+  **Measurement**: Domain and integration tests covering every actor and final state.
+- **SC-007 — Sensitive Data Protection**: 0 Leave Request reasons, credentials, tokens, or secret values appear in logs, traces, metrics, technical errors, or unredacted audit payloads during verification.
+  **Measurement**: Automated redaction tests and controlled log/audit inspection.
+- **SC-008 — Complete Manager Workflow**: An authorized Direct Manager can retrieve a current team member's `Pending` request and approve or reject it without manual database or HR intervention.
+  **Measurement**: End-to-end Manager journey test.
+- **SC-009 — HR Read-Only Enforcement**: HR can retrieve authorized organization-wide history and balances, while 100% of tested HR write attempts are denied.
+  **Measurement**: HR role-capability and end-to-end authorization tests.
+- **SC-010 — Concurrency Integrity**: 100% of tested conflicting state-changing operation pairs result in exactly one valid transition and no partial side effects.
+  **Measurement**: Approval-versus-approval, approval-versus-cancellation, and stale-data concurrency tests.
+- **SC-011 — Duplicate Submission Integrity**: 100% of replayed or concurrent submissions with the same Employee, Leave Type, start date, and end date produce no more than one Leave Request.
+  **Measurement**: Duplicate-submission integration and concurrency tests.
+- **SC-012 — Validation Clarity**: 100% of tested validation failures identify an actionable failed rule without exposing implementation details or sensitive content.
+  **Measurement**: MVC acceptance and security-output tests.
+---
 
-- **SC-001**: An employee can submit a valid leave request and see it appear in their own history with status `Pending` in the same session, with zero manual (human) intervention required to record it.
-- **SC-002**: 100% of state transitions (`Pending → Approved`, `Pending → Rejected`, `Pending → Cancelled`) produce exactly one corresponding audit record, verifiable by an independent query against the audit trail.
-- **SC-003**: 0 instances of an employee's balance becoming negative, verifiable across all approved requests at any point in time.
-- **SC-004**: 0 instances, under concurrent or duplicate approval attempts on the same request, of more than one balance deduction being applied for that request.
-- **SC-005**: 100% of cross-employee and cross-team access attempts in acceptance testing are denied, with 0 instances of an unauthorized actor's request returning another actor's data.
-- **SC-006**: 100% of self-approval attempts by a direct manager on their own request are rejected in acceptance testing.
-- **SC-007**: 0 instances, in acceptance testing or log review, of a leave request's reason appearing in logs, traces, metrics, or user-facing technical error output.
-- **SC-008**: A direct manager can retrieve their team's Pending requests and resolve one (approve or reject) without needing to consult any actor or system outside NovaLeave.
-- **SC-009**: An HR user can retrieve organization-wide request history and balances, with 0 available write actions (create, approve, reject, cancel, adjust) surfaced or effective for that role.
+## Assumptions
+### Confirmed Assumptions and Dependencies
+- An existing authentication mechanism establishes the authenticated actor and assigned role or roles.
+- An authoritative organizational source enforces the Employee, Team, and Direct Manager cardinality defined in PD-007.
+- The system can retrieve each Employee's authoritative primary time zone.
+- An authoritative source provides one applicable Leave Balance per Employee and balance-consuming Leave Type.
+- The MVP Leave Type catalog contains `Vacation`, `Personal Leave`, and `Medical Leave` with the policies defined in PD-002.
+- Every MVP Leave Request requires a reason.
+- The MVP supports full-day requests only.
+- Editing a submitted request is outside the MVP; an owner may cancel a `Pending` request and submit a replacement.
+- Balance accrual, expiration, carryover, and manual adjustment are outside this feature.
+- HR remains read-only and cannot act as a manual reassignment or correction operator.
+- Retroactive corrections, payroll integration, notifications, calendar integration, public external APIs, multi-company support, and automatic Manager delegation are outside this feature.
+- `Pending`, `Approved`, `Rejected`, and `Cancelled` are the only MVP states.
+- `Approved`, `Rejected`, and `Cancelled` are final.
+- MVC, Razor Views, Bootstrap, authentication details, persistence, and code organization are governed by the constitution and `plan.md`, not by this functional specification.
+### Approved MVP Policy Decisions
+- **PD-001 — Leave-Day Calculation**: Requested units are full working days. Start and end dates are inclusive; Monday through Friday count, except dates in the authoritative organization holiday calendar.
+- **PD-002 — Initial Leave-Type Catalog**: `Vacation` and `Personal Leave` are active and balance-consuming. `Medical Leave` is active and non-balance-consuming. Every type follows the standard Direct Manager approval workflow and requires a reason.
+- **PD-003 — Submission-Time Balance**: A balance-consuming request is rejected when the current authoritative applicable balance is insufficient.
+- **PD-004 — Pending Balance Reservation**: Pending requests do not reserve or deduct balance. Balance is authoritatively revalidated immediately before approval.
+- **PD-005 — Overlap Semantics**: Inclusive calendar-date overlap is prohibited against the same Employee's `Pending` or `Approved` requests, regardless of Leave Type. Rejected and Cancelled requests are excluded. Adjacent non-intersecting ranges are permitted.
+- **PD-006 — Multiple Pending Requests**: Multiple non-overlapping Pending requests are permitted.
+- **PD-007 — Organizational Cardinality**: Each Employee belongs to exactly one current Team; each Team has exactly one current Direct Manager; one Manager may manage multiple Teams. Missing or ambiguous assignment prevents resolution until source data is corrected.
+- **PD-008 — Reason Content**: Every request requires 10–500 plain-text characters. Line breaks are permitted; executable markup is not.
+- **PD-009 — Decision and Cancellation Comments**: Separate approval, rejection, and cancellation comments are outside this MVP. The original Employee reason remains the only narrative field.
+- **PD-010 — HR Delivery Gate**: HR read-only visibility is mandatory for the MVP production release.
+- **PD-011 — Balance Granularity**: Balance is tracked independently per Employee and per balance-consuming Leave Type.
+- **PD-012 — Duplicate-Submission Identity**: Submissions are equivalent when Employee, Leave Type, start date, and end date are identical. At most one equivalent request may be created when submissions race or replay.
+### Implementation Readiness Confirmation
+- [x] All MVP business policy decisions required by the normative requirements are explicit.
+- [x] No unresolved clarification marker remains.
+- [x] Every requirement maps to an acceptance scenario, edge case, or specialized test category.
+- [x] The Constitution Check passes against `.specify/memory/constitution.md` v3.0.0.
+- [x] The specification is ready to generate `plan.md`, `research.md`, `data-model.md`, threat analysis, and `tasks.md`.
+- [x] Implementation may proceed after the constitution-defined planning and test-first workflow is completed.
+
+## Requirement Traceability Matrix
+The following matrix maps every normative requirement to at least one acceptance scenario or a required specialized test category.
+| Requirement | Primary Scenario(s) | Required Test Type |
+|---|---|---|
+| FR-001 | AC-001 | Acceptance + Integration |
+| FR-002 | AC-001, AC-002 | Acceptance |
+| FR-003 | AC-007 | Acceptance |
+| FR-004 | AC-007, AC-027 | Acceptance + Integration |
+| FR-005 | AC-012 | Acceptance + Authorization |
+| FR-006 | AC-014, AC-015 | Acceptance + Integration |
+| FR-007 | AC-016 | Acceptance + Integration |
+| FR-008 | AC-022 | Acceptance + Integration |
+| FR-009 | AC-026 | Acceptance + Authorization |
+| FR-010 | AC-027 | Acceptance + Authorization |
+| VAL-001 | AC-002 | Validation |
+| VAL-002 | AC-001, AC-006 | Validation + Integration |
+| VAL-003 | AC-006 | Validation |
+| VAL-004 | AC-005 | Security + Integration |
+| VAL-005 | AC-002, EC-010 | Validation + Security |
+| VAL-006 | EC-011 | Validation |
+| BR-001 | AC-003 | Domain + Acceptance |
+| BR-002 | AC-004 | Domain + Acceptance |
+| BR-003 | AC-004, EC-001 | Domain + Time-Zone |
+| BR-004 | AC-001, AC-003, AC-004 | Domain |
+| BR-005 | AC-001 | Domain + Integration |
+| BR-006 | AC-014, AC-016, AC-022 | Domain |
+| BR-007 | AC-021, AC-024 | Domain |
+| BR-008 | AC-014, AC-015 | Domain + Integration |
+| BR-009 | AC-016 | Domain + Integration |
+| BR-010 | AC-022 | Domain + Integration |
+| BR-011 | AC-021, AC-024 | Domain + Security |
+| BR-012 | AC-018 | Domain + Concurrency |
+| BR-013 | AC-014 | Domain + Integration |
+| BR-014 | AC-001, AC-015, AC-016, AC-022 | Domain |
+| BR-015 | AC-014, AC-018 | Integration |
+| BR-016 | AC-018 | Domain + Integration |
+| BR-017 | AC-007, AC-014, AC-018, AC-027 | Domain + Data Model |
+| BR-018 | AC-011, AC-018, EC-004 | Domain + Integration |
+| BR-019 | AC-010, EC-002, EC-003 | Domain + Integration |
+| BR-020 | AC-014 | Integration + Concurrency |
+| BR-021 | AC-016, AC-033 | Integration |
+| BR-022 | AC-022, AC-033 | Integration |
+| AUTHZ-001 | AC-007, AC-008, AC-022, AC-023 | Authorization |
+| AUTHZ-002 | AC-012, AC-013, AC-014, AC-016 | Authorization |
+| AUTHZ-003 | AC-017 | Authorization + Security |
+| AUTHZ-004 | AC-026, AC-027, AC-028 | Authorization |
+| AUTHZ-005 | AC-008, AC-013, AC-017, AC-023, AC-028 | Security |
+| AUTHZ-006 | AC-012, AC-013, AC-020, EC-005 | Authorization |
+| AUTHZ-007 | AC-014, AC-016, AC-018, AC-020, AC-022 | Authorization + Integration |
+| SEC-001 | AC-030, AC-031 | Security |
+| SEC-002 | AC-008, AC-013, AC-023, AC-030 | Security |
+| SEC-003 | AC-008, AC-013, AC-023 | Security |
+| SEC-004 | AC-021, AC-024 | Security + Domain |
+| SEC-005 | AC-026, AC-029 | Authorization + Privacy |
+| SEC-006 | AC-029 | Redaction |
+| SEC-007 | AC-032 | MVC Security |
+| CON-001 | AC-009 | Concurrency + Idempotency |
+| CON-002 | AC-019, AC-025 | Concurrency |
+| CON-003 | AC-014, AC-019 | Concurrency + Integration |
+| CON-004 | AC-019, AC-020, AC-025 | Concurrency |
+| CON-005 | AC-010, AC-014 | Concurrency + Integration |
+| CON-006 | AC-014, AC-015, AC-016, AC-019, AC-022, AC-025, AC-033 | Transactional Integration |
+| AUD-001 | AC-001, AC-009 | Audit Integration |
+| AUD-002 | AC-014, AC-015, AC-016, AC-019, AC-022 | Audit Integration |
+| AUD-003 | AC-014, AC-016, AC-022 | Audit Schema Verification |
+| AUD-004 | AC-017, AC-023, AC-028, AC-031 | Security Logging |
+| AUD-005 | Specialized audit immutability test | Security + Integration |
+| AUD-006 | AC-029 | Redaction |
+| ERR-001 | AC-002, AC-003, AC-004, AC-006 | Acceptance |
+| ERR-002 | AC-018, AC-020, AC-033 | Failure Injection + Integration |
+| ERR-003 | AC-029 | Security Output |
+| ERR-004 | AC-019, AC-020 | Acceptance + Integration |
+---
 
 ## Constitution Check
-
-This specification was authored against `.specify/memory/constitution.md` v3.0.0 and complies as follows:
-
-| Constitutional area | How this specification complies |
+This specification has been checked against `.specify/memory/constitution.md` v3.0.0.
+| Constitutional Area | Result |
 |---|---|
-| §4.1–§4.3 Actors and Authorization | Actor capabilities and boundaries (Employee, Direct Manager, HR read-only) match §4.1–§4.3 exactly; no additional or reduced capability was introduced. |
-| §4.4 Multiple roles | Reflected in [Actors and Authorization Boundaries](#actors-and-authorization-boundaries): authorization is evaluated per action/resource, not per user. |
-| §5 Invariants and Lifecycle | Every numbered invariant in §5 (items 1–13) has a corresponding BR-xxx requirement in [Business Rules and Domain Invariants](#business-rules-and-domain-invariants); none was reduced, and none was strengthened beyond what §5 states. |
-| §5.1 Rules that belong in feature specifications | Every item in the §5.1 list is captured verbatim as an [Open Questions](#open-questions) entry (OQ-001–OQ-010) and no requirement in this spec assumes an answer to any of them, per §5.1's explicit prohibition. |
-| §7.3 Sensitive Data | BR-023, BR-024, SEC-012, AUD-002 restrict the reason field to owner/manager/HR and require redaction from logs, traces, metrics, and diagrams. |
-| §7.4 / §9 OWASP baseline (A01, A06, A09) | [Security and Privacy Requirements](#security-and-privacy-requirements) explicitly covers anonymous access, invalid/expired auth, incorrect roles, cross-employee access, cross-team access, IDOR, self-approval, privilege escalation, duplicate submissions, replay, invalid transitions, redaction, and required audit/security events — matching the constitution's mandated test coverage list in §7.4. |
-| §8 Auditing | AUD-001–AUD-004 mirror the minimum audit record fields and immutability requirements of §8. |
-| §6 Concurrency | CON-001–CON-003 restate the optimistic-concurrency and atomic-overlap-verification requirements of §6 at the specification level, without prescribing a specific mechanism (e.g., rowversion), which remains an implementation decision for the plan phase. |
-| Implementation independence | No controller, repository, database table, framework, class, endpoint, or code structure is prescribed anywhere in this document, consistent with the request and with the constitution reserving those decisions for the plan and code (§1, §3). |
-| Scope discipline | [Out-of-Scope Items](#out-of-scope-items) explicitly excludes notifications, calendars, external IdP changes, multi-company support, and public APIs, matching §17's list of non-default future evolutions. |
-
-**No conflicts were identified** between this feature request and the current constitution. No deviation or exception is being requested; therefore no §16.3 exception record is required for this specification.
+| Clean Architecture | Compliant. The specification defines observable behavior without prescribing layer implementations. |
+| MVC, Razor Views, and Bootstrap | Compliant. These remain constitutional and planning decisions, not functional requirements, except for browser-security behavior such as anti-forgery protection. |
+| Employee capabilities | Compliant. Employees submit, view owned data, and cancel owned `Pending` requests. |
+| Direct Manager capabilities | Compliant. Managers act only within current authorized organizational scope and cannot self-approve. |
+| HR access | Compliant. HR remains organization-wide read-only and receives no reassignment, correction, or balance-adjustment capability. |
+| Lifecycle invariants | Compliant. Exactly four states are defined; all transitions and final-state restrictions are explicit. |
+| Balance integrity | Compliant. Balance granularity, submission validation, non-reservation of Pending requests, approval revalidation, negative-balance prevention, and duplicate-deduction protection are explicit. |
+| Date and overlap rules | Compliant. Working-day calculation, holiday exclusion, inclusive boundaries, overlap states, and adjacency are explicitly defined. |
+| Security baseline | Compliant. The specification covers authentication denial, resource authorization, IDOR, self-approval, state-transition abuse, anti-forgery, and sensitive-data redaction. |
+| Auditability | Compliant. Creation and every successful transition have explicit immutable audit requirements; security-relevant failures are separately logged. |
+| Concurrency | Compliant. Duplicate creation, conflicting mutations, stale writes, overlap confirmation, duplicate deduction, and transaction atomicity are addressed. |
+| Test-first and traceability | Compliant. Every normative requirement maps to an acceptance scenario or specialized test type. |
+| Scope discipline | Compliant. Editing submitted requests, partial days, retroactive corrections, HR writes, payroll, notifications, calendars, external APIs, multi-company support, and automatic delegation remain outside this MVP. |
+| Policy completeness | Compliant. All implementation-blocking MVP policies are explicit and traceable to PD-001 through PD-012. |
+**Constitution Result**: PASS for specification quality and governance alignment.
+**Implementation Result**: READY — The specification contains no unresolved implementation-blocking business policy. Planning and test-first implementation may proceed under the constitution.
