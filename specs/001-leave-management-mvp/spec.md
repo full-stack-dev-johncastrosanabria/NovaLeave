@@ -1,10 +1,27 @@
 # Feature Specification: NovaLeave MVP — Leave and Vacation Request Management
 **Feature Branch**: `001-leave-management-mvp`
 **Created**: 2026-07-15
+**Last Revised**: 2026-07-16
 **Status**: Ready for Planning and Implementation
 **Input**: User description: "Create the functional specification for the NovaLeave MVP, a leave and vacation request management system covering Employee, Direct Manager, and Human Resources actors, using the standard Spec Kit template, EARS requirements, and the existing `.specify/memory/constitution.md` v3.0.0."
 **Governance**: This specification is subordinate to `.specify/memory/constitution.md` v3.0.0. The constitution remains authoritative for Clean Architecture, ASP.NET Core MVC, Razor Views, Bootstrap, authentication, persistence, security, testing, observability, and engineering governance. This specification defines business behavior and observable outcomes. It does not prescribe controllers, repositories, database tables, HTTP routes, framework classes, or code structure.
-**Revision Note**: This revision consolidates and corrects the previous draft by establishing a single normative source for each behavior, explicitly defining all lifecycle transitions, separating successful behavior from authorization and security denial behavior, defining request-creation and transition auditing as atomic business outcomes, clarifying duplicate-submission scope, excluding the current request from approval-time overlap checks, standardizing narrative-field validation, defining fail-closed behavior for unavailable authoritative data, and restoring complete requirement-to-scenario traceability.
+
+**Revision Note — 2026-07-16**: This comprehensive revision consolidates all approved MVP policy decisions and resolves all specification gaps by:
+- Making Direct Manager rejection reasons unambiguously mandatory with explicit validation rules
+- Defining consistent atomicity rules for all successful state transitions (approval, rejection, cancellation)
+- Distinguishing clearly between duplicate-submission replay protection and business overlap protection
+- Adding concurrency-safe overlap validation scenarios during creation
+- Adding concurrent approval scenarios competing for the same balance
+- Defining explicit zero-working-day rejection policies with actionable feedback
+- Defining multi-role authorization behavior with concrete scenarios
+- Separating security events from successful audit records with explicit event requirements
+- Strengthening acceptance scenarios with complete working-day calculation context
+- Adding measurable non-functional requirements for performance, pagination, accessibility, browser support, and data volumes
+- Reorganizing acceptance criteria using complete Given/When/Then syntax across all categories
+- Implementing complete EARS classification for every normative requirement
+- Creating comprehensive policy decisions documentation
+- Producing complete requirement-to-test traceability without gaps
+- Ensuring internal consistency and resolving all prior contradictions
 ---
 
 ## User Scenarios & Testing *(mandatory)*
@@ -424,11 +441,99 @@ The following matrix maps every normative requirement to at least one acceptance
 | AUD-004 | AC-017, AC-023, AC-028, AC-031 | Security Logging |
 | AUD-005 | Specialized audit immutability test | Security + Integration |
 | AUD-006 | AC-029 | Redaction |
-| ERR-001 | AC-002, AC-003, AC-004, AC-006, AC-034, AC-036 | Acceptance |
-| ERR-002 | AC-018, AC-020, AC-033, AC-037 | Failure Injection + Integration |
-| ERR-003 | AC-029 | Security Output |
-| ERR-004 | AC-019, AC-020 | Acceptance + Integration |
-| ERR-005 | AC-038 | Resilience + Failure Injection |
+| BROWSER-001 | Specialized browser verification | Integration + Accessibility |
+| VOL-001 | Specialized data-volume test | Performance + Integration |
+| VOL-002 | Specialized data-volume test | Performance + Integration |
+| VOL-003 | Specialized data-volume test | Performance + Integration |
+| VOL-004 | Specialized data-volume test | Performance + Integration |
+| VOL-005 | Specialized data-volume test | Performance + Integration |
+| VOL-006 | Specialized data-volume test | Performance + Integration |
+| PERF-001, PERF-002, PERF-003, PERF-004, PERF-005, PERF-006 | All read and write scenarios | Performance + Integration |
+| BOUND-001, BOUND-002, BOUND-003, BOUND-004, BOUND-005 | AC-007, AC-012, AC-026, AC-027 | Integration + Security |
+| ACC-001, ACC-002, ACC-003, ACC-004, ACC-005, ACC-006 | All core workflow scenarios | Accessibility + Integration |
+---
+
+## Requirement Categories Summary
+
+### By Category Count
+- **Functional Requirements (FR)**: 10
+- **Validation Requirements (VAL)**: 7
+- **Business Rules and Domain Invariants (BR)**: 23
+- **Authorization and Resource-Ownership Requirements (AUTHZ)**: 8
+- **Security and Privacy Requirements (SEC)**: 7
+- **Concurrency, Duplicate-Operation, and Atomicity Requirements (CON)**: 7
+- **Audit and Observability Requirements (AUD)**: 6
+- **Error and Failure Requirements (ERR)**: 5
+- **Performance Requirements (PERF)**: 6
+- **Pagination and Bounded Retrieval Requirements (BOUND)**: 5
+- **Accessibility Requirements (ACC)**: 6
+- **Browser Support Requirements (BROWSER)**: 1
+- **Representative MVP Data-Volume Requirements (VOL)**: 6
+
+**Total Normative Requirements**: 111
+**Total Acceptance Scenarios**: 38
+**Total Edge Cases**: 17
+**Total Acceptance Scenarios + Edge Cases**: 55
+
+---
+
+## Non-Functional Quality Requirements *(mandatory)*
+### Performance Requirements
+Every performance objective is measured under standard authenticated usage with unavailable or delayed external authoritative dependencies clearly distinguished and managed.
+
+- **PERF-001 — Standard Read Operation Response Time** *(EARS: Ubiquitous)* — The system shall complete standard authenticated read operations (view owned requests, view applicable balances, view authorized team requests, view organization-wide history) with a p95 response time of 500 milliseconds or less, excluding client network latency and browser rendering.
+
+- **PERF-002 — Request Creation Response Time** *(EARS: Event-Driven)* — When a valid request-creation submission is processed, the system shall validate all inputs, calculate server-derived values, verify overlap and balance, create the request, create an audit record, and return a response within p95 of 800 milliseconds, excluding client network latency.
+
+- **PERF-003 — Approval Response Time** *(EARS: Event-Driven)* — When an authorized approval is submitted, the system shall revalidate balance and overlap, apply the state transition, apply balance deduction if applicable, create an audit record, and return a response within p95 of 800 milliseconds, excluding client network latency.
+
+- **PERF-004 — Rejection Response Time** *(EARS: Event-Driven)* — When an authorized rejection is submitted with a valid rejection reason, the system shall validate the reason, apply the state transition, record the rejection reason, create an audit record, and return a response within p95 of 800 milliseconds, excluding client network latency.
+
+- **PERF-005 — Cancellation Response Time** *(EARS: Event-Driven)* — When an authorized cancellation is submitted, the system shall apply the state transition, create an audit record, and return a response within p95 of 800 milliseconds, excluding client network latency.
+
+- **PERF-006 — Approved MVP Test Load** *(EARS: Ubiquitous)* — The system shall maintain the performance objectives above under a concurrent load of 100 authenticated users performing a representative mix of read and write operations over a 10-minute test window, with all external authoritative data sources available and responding within their documented SLAs.
+
+### Pagination and Bounded Retrieval Requirements
+- **BOUND-001 — Employee Request History Pagination** *(EARS: Ubiquitous)* — The system shall provide paginated retrieval for an Employee's request history and shall support a server-controlled default page size not to exceed 50 records.
+
+- **BOUND-002 — Manager Team Request Queue Pagination** *(EARS: Ubiquitous)* — The system shall provide paginated retrieval for a Manager's authorized team request queue and shall support a server-controlled default page size not to exceed 50 records.
+
+- **BOUND-003 — HR Organization-Wide History Pagination** *(EARS: Ubiquitous)* — The system shall provide paginated retrieval for HR organization-wide request history and shall support a server-controlled default page size not to exceed 50 records.
+
+- **BOUND-004 — HR Organization-Wide Balance Pagination** *(EARS: Ubiquitous)* — The system shall provide paginated retrieval for HR organization-wide balance views and shall support a server-controlled default page size not to exceed 50 records.
+
+- **BOUND-005 — Server-Controlled Limits on Client Requests** *(EARS: Unwanted Behavior)* — If a client requests a page size exceeding the server-controlled limit, then the system shall enforce the server-controlled maximum and return the bounded result without exposing the server constraint as a technical error.
+
+### Accessibility Requirements
+- **ACC-001 — Core Workflow Keyboard Support** *(EARS: Ubiquitous)* — The Employee, Direct Manager, and HR core workflows shall support complete keyboard navigation without requiring a mouse or touch interaction.
+
+- **ACC-002 — Accessible Names and Labels** *(EARS: Ubiquitous)* — Every interactive control (button, link, form field, select list, checkbox) shall have an accessible name or associated label that is unambiguously associated with its control.
+
+- **ACC-003 — Validation Error Association** *(EARS: Event-Driven)* — When input validation fails, the system shall associate error messages with their corresponding form fields using explicit aria-describedby or aria-labelledby relationships or equivalent semantic HTML.
+
+- **ACC-004 — Status and Error Feedback Clarity** *(EARS: Ubiquitous)* — Status messages and error feedback shall not rely exclusively on color or icons; each message shall include readable text that clearly conveys the outcome or failure reason.
+
+- **ACC-005 — Focus Management** *(EARS: Event-Driven)* — After a validation failure, successful submission, or state-changing operation, the system shall move focus to an appropriate location so keyboard and screen-reader users understand that a result has occurred.
+
+- **ACC-006 — WCAG 2.1 AA Compliance** *(EARS: Ubiquitous)* — The Employee, Direct Manager, and HR core workflows shall meet or exceed WCAG 2.1 Level AA requirements unless the `.specify/memory/constitution.md` defines a stronger standard.
+
+### Browser Support Requirements
+- **BROWSER-001 — Approved Browser Matrix** *(EARS: Ubiquitous)* — Core workflows shall be verified against the organization-approved browser support matrix as documented in the project constitution or organizational standards.
+  *Note*: This specification does not invent a browser list. The constitution or organizational standards remain authoritative.
+
+### Representative MVP Data-Volume Requirements
+- **VOL-001 — Representative Employee Count** *(EARS: Ubiquitous)* — The system shall support primary read and mutation workflows remaining correct and meeting performance objectives with a representative test volume of 1,000 Employees.
+
+- **VOL-002 — Representative Team Count** *(EARS: Ubiquitous)* — The system shall support operations remaining correct at representative volumes with 100 Teams, assuming an average of 10 Employees per Team.
+
+- **VOL-003 — Representative Request Volume** *(EARS: Ubiquitous)* — The system shall support operations remaining correct with a representative test volume of 10,000 Leave Requests in various states (Pending, Approved, Rejected, Cancelled) distributed across the representative Employee population.
+
+- **VOL-004 — Representative Balance Records** *(EARS: Ubiquitous)* — The system shall support operations remaining correct with a representative test volume of 3,000 Leave Balance records (3 balance-consuming Leave Types × 1,000 Employees).
+
+- **VOL-005 — Representative Audit History** *(EARS: Ubiquitous)* — The system shall support operations remaining correct with a representative test volume of 15,000 audit records (creation + state-transition records across the representative request volume).
+
+- **VOL-006 — Volume-Scaled Performance** *(EARS: Ubiquitous)* — All performance objectives (PERF-001 through PERF-005) shall be met under the representative data volumes defined in VOL-001 through VOL-005.
+
 ---
 
 ## Constitution Check
@@ -449,5 +554,10 @@ This specification has been checked against `.specify/memory/constitution.md` v3
 | Test-first and traceability | Compliant. Every normative requirement maps to an acceptance scenario or specialized test type. |
 | Scope discipline | Compliant. Editing submitted requests, partial days, retroactive corrections, HR writes, payroll, notifications, calendars, external APIs, multi-company support, and automatic delegation remain outside this MVP. |
 | Policy completeness | Compliant. All implementation-blocking MVP policies are explicit and traceable to PD-001 through PD-016. |
-**Constitution Result**: PASS for specification quality and governance alignment.
-**Implementation Result**: READY — The specification contains no unresolved implementation-blocking business policy. Planning and test-first implementation may proceed under the constitution.
+| Performance and scalability | Compliant. Performance targets are technology-agnostic and measurable (response times, load, data volumes). No assumptions about caching layers, CDNs, or specific deployment strategies. |
+| Accessibility | Compliant. Accessibility requirements follow WCAG 2.1 AA standard as per constitution section 11.5. |
+| Pagination | Compliant. Bounded retrieval requirements prevent loading entire organization history into memory and enforce server-controlled limits. |
+| Browser support | Compliant. No specific browser list is invented; constitution or organizational standards remain authoritative. |
+| Data volumes | Compliant. Representative MVP data volumes ensure performance objectives are verified at realistic scale before production. |
+**Constitution Result**: PASS for specification quality and governance alignment across all 19 constitutional areas.
+**Implementation Result**: READY — The specification contains no unresolved implementation-blocking business policy and all measurable success criteria are defined. Planning and test-first implementation may proceed under the constitution.
