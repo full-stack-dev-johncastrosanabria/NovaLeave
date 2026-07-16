@@ -582,7 +582,6 @@ This specification has been checked against `.specify/memory/constitution.md` v3
 | Auditability | Compliant. Creation and every successful transition have explicit immutable audit requirements; security-relevant failures are separately logged. |
 | Concurrency | Compliant. Duplicate creation, conflicting mutations, stale writes, overlap confirmation, duplicate deduction, and transaction atomicity are addressed. |
 | Test-first and traceability | Compliant. Every normative requirement maps to an acceptance scenario or specialized test type. |
-<<<<<<< HEAD
 | Scope discipline | Compliant. Editing submitted requests, partial days, retroactive corrections, HR writes, payroll, notifications, calendars, external APIs, multi-company support, and automatic delegation remain outside this MVP. |
 | Policy completeness | Compliant. All implementation-blocking MVP policies are explicit and traceable to PD-001 through PD-016. |
 | Performance and scalability | Compliant. Performance targets are technology-agnostic and measurable (response times, load, data volumes). No assumptions about caching layers, CDNs, or specific deployment strategies. |
@@ -592,9 +591,7 @@ This specification has been checked against `.specify/memory/constitution.md` v3
 | Data volumes | Compliant. Representative MVP data volumes ensure performance objectives are verified at realistic scale before production. |
 **Constitution Result**: PASS for specification quality and governance alignment across all 19 constitutional areas.
 **Implementation Result**: READY — The specification contains no unresolved implementation-blocking business policy and all measurable success criteria are defined. Planning and test-first implementation may proceed under the constitution.
-=======
 | Scope discipline | Compliant. Editing submitted requests, withdrawing approved leave, partial days, retroactive corrections, HR writes, payroll, notifications, calendars, external APIs, multi-company support, and automatic/system-selected delegation remain outside this MVP. An explicit authoritative delegate approver is now in scope per PD-022 (constitution §5.1 reserves delegation policy to the specification). |
 | Policy completeness | Compliant for implementation-blocking policy. All implementation-blocking MVP policies are explicit and traceable to PD-001 through PD-022 (PD-017–PD-021 resolve previously implicit points; PD-022 is a scope addition from the 2026-07-16 clarification adding a delegate approver). Eleven non-blocking business/policy questions remain tracked for Product Owner review in `docs/questions_po.md`. |
 **Constitution Result**: PASS for specification quality and governance alignment.
 **Implementation Result**: READY WITH OPEN QUESTIONS — The specification contains no unresolved *implementation-blocking* business policy for the core Employee-and-Manager workflow; previously implicit points are resolved in PD-017 through PD-021, and the 2026-07-16 `/speckit.clarify` session added an explicit delegate approver (PD-022, AC-039) that `plan.md` and test design must reflect. Eleven business/policy questions remain open for Product Owner review (see [`docs/questions_po.md`](../../docs/questions_po.md)); two could revise existing business rules (Medical-Leave overlap Q2, regional workweek/holiday calendars Q4) and should be confirmed before the affected areas are built. Planning and test-first implementation of the core workflow may proceed under the constitution on the recorded decisions.
->>>>>>> origin/main

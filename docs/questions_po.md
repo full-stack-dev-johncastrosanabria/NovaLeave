@@ -10,14 +10,17 @@
 The critical review surfaced 19 points. I resolved 5 of them myself with defensible defaults
 (recorded in the spec as **PD-017 through PD-021** and summarized in the **Appendix** below —
 please veto any you disagree with). Of the remaining 14, a `/speckit.clarify` session on
-**2026-07-16** resolved **three** (Q1, Q3, and Q7 — marked ✅ below), leaving **11 genuine
-business, policy, legal, or org-structure decisions** that need your call. They are grouped by impact:
+**2026-07-16** resolved **three** (Q1, Q3, and Q7 — marked ✅ below). A later business-rule and
+alternative-flow review on the same date added **five more** (Q15–Q19), for **16 open** genuine
+business, policy, legal, or org-structure decisions that need your call. They are grouped by impact:
 
 - **Rule-affecting** (now **Q2 and Q4**; Q1 and Q3 resolved): answering against the current spec
   default would change a business rule or user story and should be settled before build starts.
 - **Launch-blocking policy** (Q5–Q6, Q8–Q10; **Q7 resolved**): needed before the MVP goes to
   production, but do not block starting the core workflow.
 - **Confirm-and-defer** (Q11–Q14): lower urgency; a reasonable default exists and is noted.
+- **Specification-review findings** (Q15–Q19, added 2026-07-16): decisions surfaced by a review of
+  the business rules and missing flows; three (Q15, Q16, Q19) may add new requirements once decided.
 
 Each item lists the **question**, **why it matters**, the **current spec assumption**, and my
 **recommendation** so the meeting can be a yes/no/adjust rather than an open design session.
@@ -155,6 +158,62 @@ Each item lists the **question**, **why it matters**, the **current spec assumpt
 - **Recommendation (low priority)**: Provide ballpark headcount and monthly request volume.
 
 ---
+
+## Specification-review findings — added 2026-07-16
+
+These come from a review of the business rules (BR-*) and the actors/alternative flows. Each needs a
+business decision, so it is captured here rather than written into the spec as an invented rule. The
+spec itself received only the three consistency fixes noted in its Specification Review Note
+(BR-023, CON-008, BR-018) — none of which invents policy.
+
+### Q15. Should a request that computes to zero working days be rejected?
+- **Why it matters**: BR-004 counts Monday–Friday minus holidays with **no minimum of 1**, and VAL-006
+  only rejects *partial-day/hourly* input. A span that is entirely weekend/holiday computes **0 units**
+  and nothing currently rejects it — it would create a request that consumes no balance yet still
+  blocks overlap (BR-019) and is approvable.
+- **Current spec assumption**: Undefined; a 0-unit request would be created.
+- **Recommendation**: Reject a request whose computed working units is 0, with a validation error. If
+  you instead want to allow it, confirm the intended semantics (blocks overlap, no balance effect).
+- **Impact**: likely adds a validation requirement.
+
+### Q16. How should a missing balance record for a balance-consuming type be treated?
+- **Why it matters**: BR-017 assumes one balance per employee × balance-consuming type. If seeding
+  missed a row, is that "authoritative data unavailable → fail closed" (AUTHZ-008) or "no entitlement →
+  treat as 0 / reject as insufficient"? The two give different employee experiences.
+- **Current spec assumption**: AUTHZ-008 gives a fail-closed default for unavailable balance data, but a
+  missing record is not explicitly named.
+- **Recommendation**: Treat a missing required balance record as unavailable authoritative data (fail
+  closed, AUTHZ-008), so the employee gets a corrective error rather than a silent zero — or choose
+  "missing = 0 entitlement." (Related: Q5, Q13.)
+- **Impact**: clarifies AUTHZ-008 scope or adds a rule.
+
+### Q17. What happens to an employee's requests on deactivation, termination, or removal from all teams?
+- **Why it matters**: There is no flow for an employee account being deactivated/terminated mid-lifecycle,
+  or an employee left with no team (no authorized manager from the employee's side). Pending requests may
+  dangle; the status of already-`Approved` future leave is undefined. EC-006 only covers a *team* with no
+  manager, not an *employee* with no team.
+- **Current spec assumption**: Unaddressed.
+- **Recommendation**: Define whether deactivation auto-cancels Pending requests, what happens to Approved
+  future leave, and whether such requests remain visible to managers/HR. This is a PO/HR + org-source call.
+- **Impact**: new edge cases / possibly a new flow.
+
+### Q18. Can the authoritative source re-seed a balance below units already consumed?
+- **Why it matters**: Balance is external, read-only, and static (PD-021). BR-012's "never negative" governs
+  *system* operations; an external re-seed to a value below what approvals already deducted could produce a
+  negative balance the spec does not handle.
+- **Current spec assumption**: Unaddressed.
+- **Recommendation**: Confirm the authoritative source guarantees re-seeds never drop below consumed units,
+  or define how the system detects/surfaces a negative-from-reseed condition. (Related: Q5, Q13.)
+- **Impact**: a constraint on the balance source, or a new detection rule.
+
+### Q19. May two managers approve each other's leave (circular / mutual management)?
+- **Why it matters**: Self-approval is blocked (AUTHZ-003), but if A is the primary or delegate manager
+  (PD-022) for B's team and B is the manager for A's team, each can approve the other's leave — that is not
+  self-approval, so it is currently permitted.
+- **Current spec assumption**: Permitted (only self-approval is blocked).
+- **Recommendation**: Confirm mutual approval is acceptable, or add a segregation-of-duties constraint.
+  This is a PO/governance decision. (Related: Q8.)
+- **Impact**: possibly a new authorization rule.
 
 ## Appendix — decisions I already resolved (please veto if wrong)
 
