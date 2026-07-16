@@ -1,29 +1,12 @@
 # Feature Specification: NovaLeave MVP — Leave and Vacation Request Management
 **Feature Branch**: `001-leave-management-mvp`
 **Created**: 2026-07-15
-**Last Revised**: 2026-07-16
-**Status**: Ready for Planning — core workflow may proceed on recorded decisions; 11 business questions pending Product Owner review on Friday (see [`docs/questions_po.md`](../../docs/questions_po.md)). Defaults for previously implicit points are recorded in PD-017 through PD-021; a 2026-07-16 `/speckit.clarify` session resolved three further questions (see the Clarifications section) and added a delegate approver (PD-022).
+**Status**: Ready for Planning — core workflow may proceed on recorded decisions; 16 business questions pending Product Owner review on Friday (see [`docs/questions_po.md`](../../docs/questions_po.md)). Defaults for previously implicit points are recorded in PD-017 through PD-021; a 2026-07-16 `/speckit.clarify` session resolved three further questions (see the Clarifications section) and added a delegate approver (PD-022).
 **Input**: User description: "Create the functional specification for the NovaLeave MVP, a leave and vacation request management system covering Employee, Direct Manager, and Human Resources actors, using the standard Spec Kit template, EARS requirements, and the existing `.specify/memory/constitution.md` v3.0.0."
 **Governance**: This specification is subordinate to `.specify/memory/constitution.md` v3.0.0. The constitution remains authoritative for Clean Architecture, ASP.NET Core MVC, Razor Views, Bootstrap, authentication, persistence, security, testing, observability, and engineering governance. This specification defines business behavior and observable outcomes. It does not prescribe controllers, repositories, database tables, HTTP routes, framework classes, or code structure.
-
-**Revision Note — 2026-07-16 (Comprehensive)**: This comprehensive revision consolidates all approved MVP policy decisions and resolves all specification gaps by:
-- Making Direct Manager rejection reasons unambiguously mandatory with explicit validation rules
-- Defining consistent atomicity rules for all successful state transitions (approval, rejection, cancellation)
-- Distinguishing clearly between duplicate-submission replay protection and business overlap protection
-- Adding concurrency-safe overlap validation scenarios during creation
-- Adding concurrent approval scenarios competing for the same balance
-- Defining explicit zero-working-day rejection policies with actionable feedback
-- Defining multi-role authorization behavior with concrete scenarios
-- Separating security events from successful audit records with explicit event requirements
-- Strengthening acceptance scenarios with complete working-day calculation context
-- Adding measurable non-functional requirements for performance, pagination, accessibility, browser support, and data volumes
-- Reorganizing acceptance criteria using complete Given/When/Then syntax across all categories
-- Implementing complete EARS classification for every normative requirement
-- Creating comprehensive policy decisions documentation
-- Producing complete requirement-to-test traceability without gaps
-- Ensuring internal consistency and resolving all prior contradictions
-
+**Revision Note**: This revision consolidates and corrects the previous draft by establishing a single normative source for each behavior, explicitly defining all lifecycle transitions, separating successful behavior from authorization and security denial behavior, defining request-creation and transition auditing as atomic business outcomes, clarifying duplicate-submission scope, excluding the current request from approval-time overlap checks, standardizing narrative-field validation, defining fail-closed behavior for unavailable authoritative data, and restoring complete requirement-to-scenario traceability.
 **Product-Owner Review Note (2026-07-16)**: A demanding-Product-Owner critical review surfaced 19 open points. Five were resolved with defensible defaults and recorded here as PD-017 through PD-021 (whole-day units, no in-app administration, English-only UI, submission-time-only past-date rule, and static seeded balances). The remaining 14 were captured in [`docs/questions_po.md`](../../docs/questions_po.md) for the Friday review. A subsequent `/speckit.clarify` session (2026-07-16, recorded in the Clarifications section) resolved three of them — approved-leave withdrawal (kept `Approved` final), the mandatory reason (kept mandatory for all types), and the no-manager fallback (added an explicit delegate approver, PD-022) — leaving 11 open, of which two (Medical-Leave overlap and regional workweek/holiday calendars) remain potentially rule-affecting.
+**Specification Review Note (2026-07-16)**: A follow-up review of the business rules and alternative flows applied three consistency fixes that align the spec with rules it already states — it removed the "if any" contradiction in BR-023 (the rejection reason is mandatory per VAL-007), added submission-time overlap atomicity (CON-008 / AC-040) so concurrent submissions cannot both create mutually overlapping requests under BR-019, and pinned the "available balance" wording in BR-018 to the non-reserving reading already set by PD-004. It did **not** invent new policy: five items that require a genuine business decision — zero-working-day requests, missing balance records, employee termination/deactivation, external balance re-seed integrity, and circular (mutual) management — were added to [`docs/questions_po.md`](../../docs/questions_po.md) as Q15–Q19, bringing the open total to 16.
 ---
 
 ## Clarifications
@@ -75,6 +58,9 @@ As an authenticated Employee, I want to submit a leave or vacation request and v
 11. **AC-011 — Reject insufficient balance at submission**
     **Related Requirements**: BR-018
     **Given** a balance-consuming request whose requested units exceed the currently available balance, **When** the Employee submits it, **Then** the system rejects the submission, creates no Leave Request, and reserves no balance.
+12. **AC-040 — Reject concurrent mutually-overlapping submissions**
+    **Related Requirements**: BR-019, CON-008
+    **Given** an authenticated Employee with no existing requests, **When** two submissions whose inclusive date ranges overlap each other are processed concurrently, **Then** the system creates at most one of them and rejects the other for prohibited overlap, so that no two mutually overlapping requests exist for the same Employee.
 ---
 ### User Story 2 - Direct Manager Reviews and Resolves Team Requests (Priority: P1)
 As an authenticated Direct Manager, I want to view and resolve `Pending` requests from Employees currently assigned to my team so that decisions are authorized, final, auditable, and applied without duplicate balance deductions.
@@ -255,7 +241,7 @@ No Optional requirements are defined because no optional feature is approved in 
 - **BR-015 — Revalidate Balance Before Approval** *(EARS: Event-Driven)* — When approval is requested for a balance-consuming Leave Request, the system shall revalidate the authoritative applicable Leave Balance immediately before approval.
 - **BR-016 — Reject an Approval That Would Produce Negative Balance** *(EARS: Unwanted Behavior)* — If approval would cause the applicable Leave Balance to become negative, then the system shall reject approval, preserve the request in `Pending` state, and preserve the balance.
 - **BR-017 — Apply Balance per Leave Type** *(EARS: Ubiquitous)* — The system shall maintain and evaluate a separate applicable Leave Balance for each Employee and each balance-consuming Leave Type.
-- **BR-018 — Reject Insufficient Balance at Submission** *(EARS: Event-Driven)* — When a balance-consuming request is submitted, the system shall reject it if the authoritative available balance is lower than the requested units and shall not reserve balance for any Pending request.
+- **BR-018 — Reject Insufficient Balance at Submission** *(EARS: Event-Driven)* — When a balance-consuming request is submitted, the system shall reject it if the authoritative available balance — the seeded balance for that Employee and Leave Type, not reduced by other outstanding Pending requests (PD-004) — is lower than the requested units, and shall not reserve balance for any Pending request.
 #### Overlap Rules
 - **BR-019 — Reject Prohibited Overlap** *(EARS: Unwanted Behavior)* — If an inclusive calendar-date range intersects another distinct `Pending` or `Approved` request for the same Employee, regardless of Leave Type, then the system shall reject the operation; the request currently being evaluated for approval shall be excluded from comparison with itself, and adjacent non-intersecting ranges are permitted.
 - **BR-020 — Revalidate Overlap Before Approval** *(EARS: Event-Driven)* — When approval is requested, the system shall revalidate overlap against authoritative current requests immediately before approval.
@@ -263,7 +249,7 @@ No Optional requirements are defined because no optional feature is approved in 
 - **BR-021 — Complete Rejection as One Business Outcome** *(EARS: Event-Driven)* — When an authorized rejection succeeds, the system shall commit the transition to `Rejected` and its transition audit record as one indivisible business outcome.
 - **BR-022 — Complete Cancellation as One Business Outcome** *(EARS: Event-Driven)* — When an authorized cancellation succeeds, the system shall commit the transition to `Cancelled` and its transition audit record as one indivisible business outcome.
 #### Decision Metadata
-- **BR-023 — Capture the Rejection Reason** *(EARS: Event-Driven)* — When the authorized Direct Manager rejects a `Pending` Leave Request, the system shall record the submitted rejection reason, if any, with the resulting `Rejected` request.
+- **BR-023 — Capture the Rejection Reason** *(EARS: Event-Driven)* — When the authorized Direct Manager rejects a `Pending` Leave Request, the system shall record the submitted rejection reason, which is required per VAL-007, with the resulting `Rejected` request.
 ### Authorization and Resource-Ownership Requirements
 - **AUTHZ-001 — Restrict Employee Access to Owned Data** *(EARS: Ubiquitous)* — The system shall authorize an Employee to view or cancel only Leave Requests and Leave Balances owned by that Employee.
 - **AUTHZ-002 — Restrict Manager Access to Current Scope** *(EARS: Ubiquitous)* — The system shall authorize a Direct Manager, or an authoritative delegate acting for a Team whose primary Direct Manager is unavailable (PD-022), to view, approve, or reject a request only when its owner is within that authoritative organizational scope.
@@ -289,6 +275,7 @@ No Optional requirements are defined because no optional feature is approved in 
 - **CON-005 — Evaluate Overlap Atomically with Confirmation** *(EARS: Event-Driven)* — When a request is confirmed for approval, the system shall evaluate the authoritative overlap condition within the same indivisible business operation as the approval.
 - **CON-006 — Commit Approval Atomically** *(EARS: Event-Driven)* — When an approval succeeds, the system shall commit the transition to `Approved`, any applicable balance deduction, and exactly one successful-transition audit record as one indivisible business operation.
 - **CON-007 — Commit Request Creation Atomically** *(EARS: Event-Driven)* — When request creation succeeds, the system shall commit the new `Pending` Leave Request and exactly one immutable request-creation audit record as one indivisible business operation.
+- **CON-008 — Evaluate Submission Overlap Atomically** *(EARS: Event-Driven)* — When a Leave Request is submitted, the system shall evaluate the authoritative overlap condition (BR-019, PD-005) within the same indivisible operation that creates the request, so that two concurrently processed submissions cannot both create mutually overlapping requests for the same Employee. This requirement enforces the existing overlap policy under concurrency and introduces no new overlap semantics.
 ### Audit and Observability Requirements
 - **AUD-001 — Audit Request Creation** *(EARS: Event-Driven)* — When a Leave Request is successfully created, the system shall create exactly one immutable request-creation audit record; if a submission is a duplicate, retry, or replay of an already-processed request creation, the system shall not create an additional request-creation audit record.
 - **AUD-002 — Audit Every Successful State Transition** *(EARS: Event-Driven)* — When a Leave Request successfully transitions to `Approved`, `Rejected`, or `Cancelled`, the system shall create exactly one immutable transition audit record.
@@ -393,7 +380,7 @@ The following decisions resolve previously implicit points with defensible defau
 - **PD-022 — Delegate Approver (Clarification 2026-07-16)**: When a Team's primary Direct Manager is unavailable or the role is vacant, an authoritative delegate (alternate) Direct Manager relationship may authorize viewing and resolution of that Team's `Pending` requests. The delegate relationship is an explicit relationship provided by the authoritative organizational source; automatic or system-selected delegation is out of scope. HR remains strictly read-only and gains no write or reassignment capability. Throughout this specification, "authorized Direct Manager" includes an authorized delegate acting for a Team whose primary Direct Manager is unavailable; every Direct Manager rule applies equally to a delegate — self-approval prevention (AUTHZ-003), current-scope evaluation (AUTHZ-006), and mutation-time revalidation (AUTHZ-007). If neither a primary nor a delegate is authoritatively available, the request remains `Pending` until the source data provides one. This decision replaces the earlier assumption that all Manager delegation was out of scope. *(Note: this is a scope addition beyond the previously implicit defaults; unlike PD-017–PD-021 it changes behavior and should be reflected in `plan.md` and test design.)*
 ### Implementation Readiness Confirmation
 - [x] All implementation-blocking MVP business policy decisions required by the normative requirements are explicit; previously implicit points are resolved with defaults in PD-017 through PD-021, and the 2026-07-16 clarification added a delegate approver (PD-022).
-- [ ] 11 business, policy, legal, or org-structure questions remain open pending Product Owner review on Friday (see [`docs/questions_po.md`](../../docs/questions_po.md)). Two of them — Medical-Leave overlap (Q2) and regional workweek/holiday calendars (Q4) — could revise existing business rules if answered against the current default and should be settled before building the affected areas. (The 2026-07-16 clarification resolved the previously rule-affecting Q1 and Q3, plus the manager-fallback question.)
+- [ ] 16 business, policy, legal, or org-structure questions remain open pending Product Owner review on Friday (see [`docs/questions_po.md`](../../docs/questions_po.md)). Two of the clarify-session items — Medical-Leave overlap (Q2) and regional workweek/holiday calendars (Q4) — could revise existing business rules if answered against the current default; three of the specification-review items — zero-working-day requests (Q15), missing balance records (Q16), and circular management (Q19) — may add new requirements once decided. All should be settled before building the affected areas. (The 2026-07-16 clarification resolved the previously rule-affecting Q1 and Q3, plus the manager-fallback question.)
 - [x] Every requirement maps to an acceptance scenario, edge case, or specialized test category.
 - [x] The Constitution Check passes against `.specify/memory/constitution.md` v3.0.0.
 - [x] The specification is ready to generate `plan.md`, `research.md`, `data-model.md`, threat analysis, and `tasks.md`.
@@ -438,7 +425,7 @@ The following matrix maps every normative requirement to at least one acceptance
 | BR-016 | AC-018 | Domain + Integration |
 | BR-017 | AC-007, AC-014, AC-018, AC-027 | Domain + Data Model |
 | BR-018 | AC-011, AC-018, EC-004 | Domain + Integration |
-| BR-019 | AC-010, AC-014, EC-002, EC-003 | Domain + Integration |
+| BR-019 | AC-010, AC-014, AC-040, EC-002, EC-003 | Domain + Integration |
 | BR-020 | AC-014 | Integration + Concurrency |
 | BR-021 | AC-016, AC-033 | Integration |
 | BR-022 | AC-022, AC-033 | Integration |
@@ -465,105 +452,18 @@ The following matrix maps every normative requirement to at least one acceptance
 | CON-005 | AC-010, AC-014 | Concurrency + Integration |
 | CON-006 | AC-014, AC-015, AC-016, AC-019, AC-022, AC-025, AC-033 | Transactional Integration |
 | CON-007 | AC-001, AC-037 | Transactional Integration + Failure Injection |
+| CON-008 | AC-040 | Concurrency + Integration |
 | AUD-001 | AC-001, AC-009, AC-037 | Audit Integration |
 | AUD-002 | AC-014, AC-015, AC-016, AC-019, AC-022 | Audit Integration |
 | AUD-003 | AC-014, AC-016, AC-022 | Audit Schema Verification |
 | AUD-004 | AC-017, AC-023, AC-028, AC-031 | Security Logging |
 | AUD-005 | Specialized audit immutability test | Security + Integration |
 | AUD-006 | AC-029 | Redaction |
-| BROWSER-001 | Specialized browser verification | Integration + Accessibility |
-| VOL-001 | Specialized data-volume test | Performance + Integration |
-| VOL-002 | Specialized data-volume test | Performance + Integration |
-| VOL-003 | Specialized data-volume test | Performance + Integration |
-| VOL-004 | Specialized data-volume test | Performance + Integration |
-| VOL-005 | Specialized data-volume test | Performance + Integration |
-| VOL-006 | Specialized data-volume test | Performance + Integration |
-| PERF-001, PERF-002, PERF-003, PERF-004, PERF-005, PERF-006 | All read and write scenarios | Performance + Integration |
-| BOUND-001, BOUND-002, BOUND-003, BOUND-004, BOUND-005 | AC-007, AC-012, AC-026, AC-027 | Integration + Security |
-| ACC-001, ACC-002, ACC-003, ACC-004, ACC-005, ACC-006 | All core workflow scenarios | Accessibility + Integration |
----
-
-## Requirement Categories Summary
-
-### By Category Count
-- **Functional Requirements (FR)**: 10
-- **Validation Requirements (VAL)**: 7
-- **Business Rules and Domain Invariants (BR)**: 23
-- **Authorization and Resource-Ownership Requirements (AUTHZ)**: 8
-- **Security and Privacy Requirements (SEC)**: 7
-- **Concurrency, Duplicate-Operation, and Atomicity Requirements (CON)**: 7
-- **Audit and Observability Requirements (AUD)**: 6
-- **Error and Failure Requirements (ERR)**: 5
-- **Performance Requirements (PERF)**: 6
-- **Pagination and Bounded Retrieval Requirements (BOUND)**: 5
-- **Accessibility Requirements (ACC)**: 6
-- **Browser Support Requirements (BROWSER)**: 1
-- **Representative MVP Data-Volume Requirements (VOL)**: 6
-
-**Total Normative Requirements**: 111
-**Total Acceptance Scenarios**: 38
-**Total Edge Cases**: 17
-**Total Acceptance Scenarios + Edge Cases**: 55
-
----
-
-## Non-Functional Quality Requirements *(mandatory)*
-### Performance Requirements
-Every performance objective is measured under standard authenticated usage with unavailable or delayed external authoritative dependencies clearly distinguished and managed.
-
-- **PERF-001 — Standard Read Operation Response Time** *(EARS: Ubiquitous)* — The system shall complete standard authenticated read operations (view owned requests, view applicable balances, view authorized team requests, view organization-wide history) with a p95 response time of 500 milliseconds or less, excluding client network latency and browser rendering.
-
-- **PERF-002 — Request Creation Response Time** *(EARS: Event-Driven)* — When a valid request-creation submission is processed, the system shall validate all inputs, calculate server-derived values, verify overlap and balance, create the request, create an audit record, and return a response within p95 of 800 milliseconds, excluding client network latency.
-
-- **PERF-003 — Approval Response Time** *(EARS: Event-Driven)* — When an authorized approval is submitted, the system shall revalidate balance and overlap, apply the state transition, apply balance deduction if applicable, create an audit record, and return a response within p95 of 800 milliseconds, excluding client network latency.
-
-- **PERF-004 — Rejection Response Time** *(EARS: Event-Driven)* — When an authorized rejection is submitted with a valid rejection reason, the system shall validate the reason, apply the state transition, record the rejection reason, create an audit record, and return a response within p95 of 800 milliseconds, excluding client network latency.
-
-- **PERF-005 — Cancellation Response Time** *(EARS: Event-Driven)* — When an authorized cancellation is submitted, the system shall apply the state transition, create an audit record, and return a response within p95 of 800 milliseconds, excluding client network latency.
-
-- **PERF-006 — Approved MVP Test Load** *(EARS: Ubiquitous)* — The system shall maintain the performance objectives above under a concurrent load of 100 authenticated users performing a representative mix of read and write operations over a 10-minute test window, with all external authoritative data sources available and responding within their documented SLAs.
-
-### Pagination and Bounded Retrieval Requirements
-- **BOUND-001 — Employee Request History Pagination** *(EARS: Ubiquitous)* — The system shall provide paginated retrieval for an Employee's request history and shall support a server-controlled default page size not to exceed 50 records.
-
-- **BOUND-002 — Manager Team Request Queue Pagination** *(EARS: Ubiquitous)* — The system shall provide paginated retrieval for a Manager's authorized team request queue and shall support a server-controlled default page size not to exceed 50 records.
-
-- **BOUND-003 — HR Organization-Wide History Pagination** *(EARS: Ubiquitous)* — The system shall provide paginated retrieval for HR organization-wide request history and shall support a server-controlled default page size not to exceed 50 records.
-
-- **BOUND-004 — HR Organization-Wide Balance Pagination** *(EARS: Ubiquitous)* — The system shall provide paginated retrieval for HR organization-wide balance views and shall support a server-controlled default page size not to exceed 50 records.
-
-- **BOUND-005 — Server-Controlled Limits on Client Requests** *(EARS: Unwanted Behavior)* — If a client requests a page size exceeding the server-controlled limit, then the system shall enforce the server-controlled maximum and return the bounded result without exposing the server constraint as a technical error.
-
-### Accessibility Requirements
-- **ACC-001 — Core Workflow Keyboard Support** *(EARS: Ubiquitous)* — The Employee, Direct Manager, and HR core workflows shall support complete keyboard navigation without requiring a mouse or touch interaction.
-
-- **ACC-002 — Accessible Names and Labels** *(EARS: Ubiquitous)* — Every interactive control (button, link, form field, select list, checkbox) shall have an accessible name or associated label that is unambiguously associated with its control.
-
-- **ACC-003 — Validation Error Association** *(EARS: Event-Driven)* — When input validation fails, the system shall associate error messages with their corresponding form fields using explicit aria-describedby or aria-labelledby relationships or equivalent semantic HTML.
-
-- **ACC-004 — Status and Error Feedback Clarity** *(EARS: Ubiquitous)* — Status messages and error feedback shall not rely exclusively on color or icons; each message shall include readable text that clearly conveys the outcome or failure reason.
-
-- **ACC-005 — Focus Management** *(EARS: Event-Driven)* — After a validation failure, successful submission, or state-changing operation, the system shall move focus to an appropriate location so keyboard and screen-reader users understand that a result has occurred.
-
-- **ACC-006 — WCAG 2.1 AA Compliance** *(EARS: Ubiquitous)* — The Employee, Direct Manager, and HR core workflows shall meet or exceed WCAG 2.1 Level AA requirements unless the `.specify/memory/constitution.md` defines a stronger standard.
-
-### Browser Support Requirements
-- **BROWSER-001 — Approved Browser Matrix** *(EARS: Ubiquitous)* — Core workflows shall be verified against the organization-approved browser support matrix as documented in the project constitution or organizational standards.
-  *Note*: This specification does not invent a browser list. The constitution or organizational standards remain authoritative.
-
-### Representative MVP Data-Volume Requirements
-- **VOL-001 — Representative Employee Count** *(EARS: Ubiquitous)* — The system shall support primary read and mutation workflows remaining correct and meeting performance objectives with a representative test volume of 1,000 Employees.
-
-- **VOL-002 — Representative Team Count** *(EARS: Ubiquitous)* — The system shall support operations remaining correct at representative volumes with 100 Teams, assuming an average of 10 Employees per Team.
-
-- **VOL-003 — Representative Request Volume** *(EARS: Ubiquitous)* — The system shall support operations remaining correct with a representative test volume of 10,000 Leave Requests in various states (Pending, Approved, Rejected, Cancelled) distributed across the representative Employee population.
-
-- **VOL-004 — Representative Balance Records** *(EARS: Ubiquitous)* — The system shall support operations remaining correct with a representative test volume of 3,000 Leave Balance records (3 balance-consuming Leave Types × 1,000 Employees).
-
-- **VOL-005 — Representative Audit History** *(EARS: Ubiquitous)* — The system shall support operations remaining correct with a representative test volume of 15,000 audit records (creation + state-transition records across the representative request volume).
-
-- **VOL-006 — Volume-Scaled Performance** *(EARS: Ubiquitous)* — All performance objectives (PERF-001 through PERF-005) shall be met under the representative data volumes defined in VOL-001 through VOL-005.
-
+| ERR-001 | AC-002, AC-003, AC-004, AC-006, AC-034, AC-036 | Acceptance |
+| ERR-002 | AC-018, AC-020, AC-033, AC-037 | Failure Injection + Integration |
+| ERR-003 | AC-029 | Security Output |
+| ERR-004 | AC-019, AC-020 | Acceptance + Integration |
+| ERR-005 | AC-038 | Resilience + Failure Injection |
 ---
 
 ## Constitution Check
@@ -582,16 +482,7 @@ This specification has been checked against `.specify/memory/constitution.md` v3
 | Auditability | Compliant. Creation and every successful transition have explicit immutable audit requirements; security-relevant failures are separately logged. |
 | Concurrency | Compliant. Duplicate creation, conflicting mutations, stale writes, overlap confirmation, duplicate deduction, and transaction atomicity are addressed. |
 | Test-first and traceability | Compliant. Every normative requirement maps to an acceptance scenario or specialized test type. |
-| Scope discipline | Compliant. Editing submitted requests, partial days, retroactive corrections, HR writes, payroll, notifications, calendars, external APIs, multi-company support, and automatic delegation remain outside this MVP. |
-| Policy completeness | Compliant. All implementation-blocking MVP policies are explicit and traceable to PD-001 through PD-016. |
-| Performance and scalability | Compliant. Performance targets are technology-agnostic and measurable (response times, load, data volumes). No assumptions about caching layers, CDNs, or specific deployment strategies. |
-| Accessibility | Compliant. Accessibility requirements follow WCAG 2.1 AA standard as per constitution section 11.5. |
-| Pagination | Compliant. Bounded retrieval requirements prevent loading entire organization history into memory and enforce server-controlled limits. |
-| Browser support | Compliant. No specific browser list is invented; constitution or organizational standards remain authoritative. |
-| Data volumes | Compliant. Representative MVP data volumes ensure performance objectives are verified at realistic scale before production. |
-**Constitution Result**: PASS for specification quality and governance alignment across all 19 constitutional areas.
-**Implementation Result**: READY — The specification contains no unresolved implementation-blocking business policy and all measurable success criteria are defined. Planning and test-first implementation may proceed under the constitution.
 | Scope discipline | Compliant. Editing submitted requests, withdrawing approved leave, partial days, retroactive corrections, HR writes, payroll, notifications, calendars, external APIs, multi-company support, and automatic/system-selected delegation remain outside this MVP. An explicit authoritative delegate approver is now in scope per PD-022 (constitution §5.1 reserves delegation policy to the specification). |
-| Policy completeness | Compliant for implementation-blocking policy. All implementation-blocking MVP policies are explicit and traceable to PD-001 through PD-022 (PD-017–PD-021 resolve previously implicit points; PD-022 is a scope addition from the 2026-07-16 clarification adding a delegate approver). Eleven non-blocking business/policy questions remain tracked for Product Owner review in `docs/questions_po.md`. |
+| Policy completeness | Compliant for implementation-blocking policy. All implementation-blocking MVP policies are explicit and traceable to PD-001 through PD-022 (PD-017–PD-021 resolve previously implicit points; PD-022 is a scope addition from the 2026-07-16 clarification adding a delegate approver). Sixteen non-blocking business/policy questions remain tracked for Product Owner review in `docs/questions_po.md`. |
 **Constitution Result**: PASS for specification quality and governance alignment.
-**Implementation Result**: READY WITH OPEN QUESTIONS — The specification contains no unresolved *implementation-blocking* business policy for the core Employee-and-Manager workflow; previously implicit points are resolved in PD-017 through PD-021, and the 2026-07-16 `/speckit.clarify` session added an explicit delegate approver (PD-022, AC-039) that `plan.md` and test design must reflect. Eleven business/policy questions remain open for Product Owner review (see [`docs/questions_po.md`](../../docs/questions_po.md)); two could revise existing business rules (Medical-Leave overlap Q2, regional workweek/holiday calendars Q4) and should be confirmed before the affected areas are built. Planning and test-first implementation of the core workflow may proceed under the constitution on the recorded decisions.
+**Implementation Result**: READY WITH OPEN QUESTIONS — The specification contains no unresolved *implementation-blocking* business policy for the core Employee-and-Manager workflow; previously implicit points are resolved in PD-017 through PD-021, and the 2026-07-16 `/speckit.clarify` session added an explicit delegate approver (PD-022, AC-039) that `plan.md` and test design must reflect. Sixteen business/policy questions remain open for Product Owner review (see [`docs/questions_po.md`](../../docs/questions_po.md)); two could revise existing business rules (Medical-Leave overlap Q2, regional workweek/holiday calendars Q4) and three specification-review items may add requirements (zero-working-day Q15, missing balance record Q16, circular management Q19); all should be confirmed before the affected areas are built. Planning and test-first implementation of the core workflow may proceed under the constitution on the recorded decisions.
