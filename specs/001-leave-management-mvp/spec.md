@@ -2,11 +2,11 @@
 **Feature Branch**: `001-leave-management-mvp`
 **Created**: 2026-07-15
 **Last Revised**: 2026-07-16
-**Status**: Ready for Planning and Implementation
+**Status**: Ready for Planning — core workflow may proceed on recorded decisions; 11 business questions pending Product Owner review on Friday (see [`docs/questions_po.md`](../../docs/questions_po.md)). Defaults for previously implicit points are recorded in PD-017 through PD-021; a 2026-07-16 `/speckit.clarify` session resolved three further questions (see the Clarifications section) and added a delegate approver (PD-022).
 **Input**: User description: "Create the functional specification for the NovaLeave MVP, a leave and vacation request management system covering Employee, Direct Manager, and Human Resources actors, using the standard Spec Kit template, EARS requirements, and the existing `.specify/memory/constitution.md` v3.0.0."
 **Governance**: This specification is subordinate to `.specify/memory/constitution.md` v3.0.0. The constitution remains authoritative for Clean Architecture, ASP.NET Core MVC, Razor Views, Bootstrap, authentication, persistence, security, testing, observability, and engineering governance. This specification defines business behavior and observable outcomes. It does not prescribe controllers, repositories, database tables, HTTP routes, framework classes, or code structure.
 
-**Revision Note — 2026-07-16**: This comprehensive revision consolidates all approved MVP policy decisions and resolves all specification gaps by:
+**Revision Note — 2026-07-16 (Comprehensive)**: This comprehensive revision consolidates all approved MVP policy decisions and resolves all specification gaps by:
 - Making Direct Manager rejection reasons unambiguously mandatory with explicit validation rules
 - Defining consistent atomicity rules for all successful state transitions (approval, rejection, cancellation)
 - Distinguishing clearly between duplicate-submission replay protection and business overlap protection
@@ -22,7 +22,18 @@
 - Creating comprehensive policy decisions documentation
 - Producing complete requirement-to-test traceability without gaps
 - Ensuring internal consistency and resolving all prior contradictions
+
+**Product-Owner Review Note (2026-07-16)**: A demanding-Product-Owner critical review surfaced 19 open points. Five were resolved with defensible defaults and recorded here as PD-017 through PD-021 (whole-day units, no in-app administration, English-only UI, submission-time-only past-date rule, and static seeded balances). The remaining 14 were captured in [`docs/questions_po.md`](../../docs/questions_po.md) for the Friday review. A subsequent `/speckit.clarify` session (2026-07-16, recorded in the Clarifications section) resolved three of them — approved-leave withdrawal (kept `Approved` final), the mandatory reason (kept mandatory for all types), and the no-manager fallback (added an explicit delegate approver, PD-022) — leaving 11 open, of which two (Medical-Leave overlap and regional workweek/holiday calendars) remain potentially rule-affecting.
 ---
+
+## Clarifications
+
+### Session 2026-07-16
+- Q: Should working-day calculation (BR-004) use a single organization workweek and holiday calendar, or per-region ones? → A: **Deferred to Product Owner** (see [`docs/questions_po.md`](../../docs/questions_po.md), Q4).
+- Q: Can an employee withdraw an already-`Approved` request within the MVP? → A: **No** — `Approved` remains a final state; withdrawing approved leave and reversing its balance deduction is out of MVP scope.
+- Q: Should Medical Leave be exempt from the overlap block (BR-019)? → A: **Deferred to Product Owner** (see [`docs/questions_po.md`](../../docs/questions_po.md), Q2).
+- Q: How should the MVP resolve a `Pending` request when no primary Direct Manager is available? → A: **An authorized delegate (alternate) Direct Manager from the authoritative organizational source may resolve it; HR remains read-only** (see PD-022).
+- Q: Must a 10–500 character reason be mandatory for every leave type, including Vacation? → A: **Yes** — mandatory for all types (confirms FR-002 / PD-008).
 
 ## User Scenarios & Testing *(mandatory)*
 User journeys are ordered by business criticality. Each story is independently testable using prepared prerequisite data where required. Priority indicates implementation order; all four stories remain within the approved MVP scope unless this specification is formally amended.
@@ -100,6 +111,9 @@ As an authenticated Direct Manager, I want to view and resolve `Pending` request
 10. **AC-021 — Prevent invalid final-state transitions**
     **Related Requirements**: BR-007, BR-011, SEC-004
     **Given** a request in `Approved`, `Rejected`, or `Cancelled` state, **When** any actor attempts another state transition, **Then** the system rejects the operation and preserves the final state.
+11. **AC-039 — Delegate resolves when the primary Manager is unavailable**
+    **Related Requirements**: FR-005, FR-006, FR-007, AUTHZ-002, AUTHZ-003, AUTHZ-006, AUTHZ-007, PD-022
+    **Given** a `Pending` request whose owning Employee's Team has no available primary Direct Manager and an authoritative delegate (alternate) Direct Manager assigned to that Team, **When** the authorized delegate approves or rejects it, **Then** the system resolves the request under the same rules that apply to the primary Direct Manager — including self-approval prevention and mutation-time revalidation — and denies the action to any actor who is neither the primary nor an authorized delegate.
 ---
 ### User Story 3 - Employee Cancels a Pending Request (Priority: P2)
 As an authenticated Employee, I want to cancel my own `Pending` request so that I can withdraw it before a Manager resolves it.
@@ -174,8 +188,8 @@ As an authenticated Human Resources user, I want read-only access to organizatio
 - **EC-003 — Multiple non-overlapping Pending requests**: Permitted when each request independently satisfies date, overlap, and submission-time balance rules.
 - **EC-004 — Competing Pending requests for limited balance**: Pending requests do not reserve balance. Every approval revalidates balance; a later approval fails if the remaining balance is insufficient.
 - **EC-005 — Team reassignment while Pending**: The previous Manager loses authorization immediately when the authoritative organizational relationship changes. The current Manager may act only when authorized by that source.
-- **EC-006 — No authorized Manager**: The request remains `Pending`; HR receives no write or reassignment capability in this MVP.
-- **EC-007 — Multiple Managers**: The authoritative organizational model permits exactly one current Direct Manager per Team. If the relationship is missing or ambiguous, resolution is denied until the source data is corrected.
+- **EC-006 — No authorized primary Manager**: When a Team has no available primary Direct Manager (vacant role, unavailable, or ambiguous primary assignment), an authoritative delegate (alternate) Direct Manager for that Team may resolve the request (see PD-022). If neither a primary nor a delegate is authoritatively available, the request remains `Pending` until the organizational source provides one; HR still receives no write or reassignment capability in this MVP.
+- **EC-007 — Multiple Managers**: The authoritative organizational model permits exactly one current *primary* Direct Manager per Team, plus at most any authoritative delegate (alternate) relationship for that Team (PD-022); a delegate is not a second primary. If the primary relationship is missing or ambiguous and no authoritative delegate exists, resolution is denied until the source data is corrected.
 - **EC-008 — Approval and cancellation race**: Exactly one valid transition succeeds.
 - **EC-009 — Duplicate browser submission or network retry**: At most one equivalent Leave Request is created.
 - **EC-010 — Untrusted HTML or script in reason**: The normalized reason and rejection reason each contain 10–500 Unicode text elements, are plain text, may contain line breaks, and must never execute markup or script.
@@ -186,6 +200,7 @@ As an authenticated Human Resources user, I want read-only access to organizatio
 - **EC-015 — Failure during audit persistence**: The related request-creation or state-changing business operation does not partially commit.
 - **EC-016 — Re-submit after a final non-approved outcome**: A prior `Rejected` or `Cancelled` request does not permanently block a new intentional submission with the same Employee, Leave Type, start date, and end date; the new submission must independently satisfy all current validation, overlap, balance, and authorization rules.
 - **EC-017 — Policy changes after submission**: The authoritative requested-unit total and the balance-consuming classification captured when the request is created remain the values used for that request's later approval; catalog or holiday-calendar changes apply only to newly created requests unless a separate controlled correction workflow is introduced.
+- **EC-018 — Start date passes while Pending**: The not-in-the-past rule (BR-002) is a submission-time validation. A validly submitted request whose start date passes before a Manager resolves it remains eligible for approval, rejection, or owner cancellation; approval still revalidates authoritative balance and overlap but does not re-apply the past-date rule (see PD-020). When no primary Direct Manager is available to resolve it in time, an authorized delegate may act (see EC-006 and PD-022).
 ---
 
 ## Requirements *(mandatory)*
@@ -222,9 +237,9 @@ No Optional requirements are defined because no optional feature is approved in 
 ### Business Rules and Domain Invariants
 #### Date and Requested-Unit Rules
 - **BR-001 — Reject a Reversed Date Range** *(EARS: Unwanted Behavior)* — If a request start date is later than its end date, then the system shall reject the request.
-- **BR-002 — Reject a Past Start Date** *(EARS: Unwanted Behavior)* — If a request start date is earlier than the Employee's current local date, then the system shall reject the request.
+- **BR-002 — Reject a Past Start Date** *(EARS: Unwanted Behavior)* — If a request start date is earlier than the Employee's current local date, then the system shall reject the request. This rule is evaluated at submission time only; a request whose start date passes while it remains `Pending` is not re-checked against this rule at approval (see PD-020 and EC-018).
 - **BR-003 — Use the Employee's Authoritative Time Zone** *(EARS: Ubiquitous)* — The system shall evaluate current-date and past-date rules using the Employee's authoritative primary time zone.
-- **BR-004 — Calculate Requested Units Authoritatively** *(EARS: Ubiquitous)* — The system shall calculate full-day requested units inclusively from the start date through the end date, counting Monday through Friday and excluding dates in the authoritative organization holiday calendar, and shall store that authoritative total with the created request for use throughout its lifecycle.
+- **BR-004 — Calculate Requested Units Authoritatively** *(EARS: Ubiquitous)* — The system shall calculate full-day requested units as a whole number, inclusively from the start date through the end date, counting Monday through Friday and excluding dates in the authoritative organization holiday calendar, and shall store that authoritative total with the created request for use throughout its lifecycle (see PD-017). The single Monday–Friday workweek and single organization holiday calendar assumed here are pending Product Owner confirmation for a multi-region workforce (see `docs/questions_po.md`, Q4).
 #### Request Lifecycle
 - **BR-005 — Initialize a Request as Pending** *(EARS: Event-Driven)* — When a Leave Request is successfully created, the system shall assign `Pending` as its initial state.
 - **BR-006 — Restrict Pending Transitions** *(EARS: State-Driven)* — While a Leave Request is `Pending`, the system shall permit only the transitions to `Approved`, `Rejected`, or `Cancelled`.
@@ -234,7 +249,7 @@ No Optional requirements are defined because no optional feature is approved in 
 - **BR-010 — Transition a Cancelled Request** *(EARS: Event-Driven)* — When the owning Employee successfully cancels a `Pending` Leave Request, the system shall transition it to `Cancelled`.
 - **BR-011 — Reject Mutation of a Final Request** *(EARS: Unwanted Behavior)* — If an actor attempts to edit or transition an `Approved`, `Rejected`, or `Cancelled` request, then the system shall reject the operation and preserve the current state.
 #### Balance Rules
-- **BR-012 — Prevent Negative Balance** *(EARS: Ubiquitous)* — The system shall never allow an Employee's applicable Leave Balance to become negative.
+- **BR-012 — Prevent Negative Balance** *(EARS: Ubiquitous)* — The system shall never allow an Employee's applicable Leave Balance to become negative. Balances are maintained as non-negative whole numbers of working-day units (see PD-017).
 - **BR-013 — Deduct Balance for Applicable Approval** *(EARS: Event-Driven)* — When a balance-consuming Leave Request is successfully approved, the system shall deduct the authoritative requested units from the applicable Leave Balance.
 - **BR-014 — Preserve Balance for Non-Deduction Outcomes** *(EARS: Event-Driven)* — When a Leave Request is created, rejected, cancelled, or approved as non-balance-consuming, the system shall leave the applicable Leave Balance unchanged.
 - **BR-015 — Revalidate Balance Before Approval** *(EARS: Event-Driven)* — When approval is requested for a balance-consuming Leave Request, the system shall revalidate the authoritative applicable Leave Balance immediately before approval.
@@ -251,11 +266,11 @@ No Optional requirements are defined because no optional feature is approved in 
 - **BR-023 — Capture the Rejection Reason** *(EARS: Event-Driven)* — When the authorized Direct Manager rejects a `Pending` Leave Request, the system shall record the submitted rejection reason, if any, with the resulting `Rejected` request.
 ### Authorization and Resource-Ownership Requirements
 - **AUTHZ-001 — Restrict Employee Access to Owned Data** *(EARS: Ubiquitous)* — The system shall authorize an Employee to view or cancel only Leave Requests and Leave Balances owned by that Employee.
-- **AUTHZ-002 — Restrict Manager Access to Current Scope** *(EARS: Ubiquitous)* — The system shall authorize a Direct Manager to view, approve, or reject a request only when its owner is within that Manager's current authoritative organizational scope.
+- **AUTHZ-002 — Restrict Manager Access to Current Scope** *(EARS: Ubiquitous)* — The system shall authorize a Direct Manager, or an authoritative delegate acting for a Team whose primary Direct Manager is unavailable (PD-022), to view, approve, or reject a request only when its owner is within that authoritative organizational scope.
 - **AUTHZ-003 — Prevent Manager Self-Approval** *(EARS: Unwanted Behavior)* — If a Direct Manager attempts to approve or reject a Leave Request they own, then the system shall reject the operation.
 - **AUTHZ-004 — Restrict HR to Read-Only Access** *(EARS: Unwanted Behavior)* — If an HR user attempts to create, edit, approve, reject, cancel, reassign, or adjust a Leave Request or Leave Balance, then the system shall reject the operation and modify no business data.
 - **AUTHZ-005 — Deny by Default** *(EARS: Ubiquitous)* — The system shall deny every action not explicitly authorized for the actor, role, resource, ownership relationship, current organizational relationship, and request state.
-- **AUTHZ-006 — Evaluate Manager Scope at Operation Time** *(EARS: Ubiquitous)* — The system shall determine Manager authorization from the authoritative current organizational relationship rather than from a client-supplied or previously displayed relationship.
+- **AUTHZ-006 — Evaluate Manager Scope at Operation Time** *(EARS: Ubiquitous)* — The system shall determine Manager authorization, including any authoritative delegate relationship (PD-022), from the authoritative current organizational relationship rather than from a client-supplied or previously displayed relationship.
 - **AUTHZ-007 — Revalidate Mutation Authorization and Preconditions** *(EARS: Event-Driven)* — When an actor requests approval, rejection, or cancellation, the system shall revalidate identity, role, ownership, current organizational scope, request state, and applicable business preconditions immediately before mutation.
 - **AUTHZ-008 — Fail Closed on Unavailable Authoritative Data** *(EARS: Unwanted Behavior)* — If authoritative identity, time-zone, holiday-calendar, Leave Type, balance, ownership, or organizational-assignment data required for an operation is unavailable or ambiguous, then the system shall deny or defer the operation, modify no business data, and shall not substitute client-supplied values.
 ### Security and Privacy Requirements
@@ -289,11 +304,11 @@ No Optional requirements are defined because no optional feature is approved in 
 - **ERR-005 — Return a Safe Authoritative-Data Failure Outcome** *(EARS: Unwanted Behavior)* — If required authoritative data cannot be retrieved or resolved, then the system shall return a non-sensitive retryable or corrective outcome, expose no implementation details, and preserve all business data.
 ### Key Entities *(include if feature involves data)*
 - **Leave Request**: Represents an Employee's formal request for full-day time off. Key business attributes are the owner, start date, end date, Leave Type, reason, authoritative requested units, current state, creation information, resolution information, rejection reason (when rejected), and concurrency identity. It begins in `Pending` and may transition only to `Approved`, `Rejected`, or `Cancelled`.
-- **Leave Balance**: Represents the authoritative full-day units available to an Employee for one balance-consuming Leave Type. It cannot become negative and changes only through an approved balance-consuming request within this feature.
-- **Leave Type**: Represents an active organization-approved leave classification. The MVP catalog contains `Vacation` and `Personal Leave` as balance-consuming types, and `Medical Leave` as a non-balance-consuming type. All use the standard Manager approval workflow.
+- **Leave Balance**: Represents the authoritative full-day units available to an Employee for one balance-consuming Leave Type, held as a non-negative whole number (PD-017). Within this feature it is a static seeded entitlement with no accrual, expiry, carryover, or period reset (PD-021), and changes only through an approved balance-consuming request. The entitlement values and any annual-reset expectation are pending Product Owner input (see `docs/questions_po.md`, Q5). It cannot become negative.
+- **Leave Type**: Represents an active organization-approved leave classification. The MVP catalog contains `Vacation` and `Personal Leave` as balance-consuming types, and `Medical Leave` as a non-balance-consuming type. All use the standard Manager approval workflow. Because `Medical Leave` consumes no balance, no limit currently caps its span; whether it should be capped or require documentation is pending Product Owner input (see `docs/questions_po.md`, Q6).
 - **Employee**: Represents a person who may submit requests, view owned requests and balances, and cancel owned `Pending` requests. A person may also hold another role, but authorization is evaluated per action and resource.
-- **Team**: Represents the single current organizational grouping assigned to an Employee. Each Team has exactly one current Direct Manager; one Manager may manage multiple Teams.
-- **Direct Manager Assignment**: Represents the authoritative current relationship that determines who may review and resolve an Employee's request.
+- **Team**: Represents the single current organizational grouping assigned to an Employee. Each Team has exactly one current primary Direct Manager and, optionally, an authoritative delegate (alternate) Direct Manager who may act when the primary is unavailable (PD-022); one Manager may serve as the primary for multiple Teams.
+- **Direct Manager Assignment**: Represents the authoritative current relationship that determines who may review and resolve an Employee's request. It includes the Team's single primary Direct Manager and, optionally, an authoritative delegate (alternate) Direct Manager who may act when the primary is unavailable (PD-022).
 - **Request State**: Represents exactly one of four MVP states: `Pending`, `Approved`, `Rejected`, or `Cancelled`.
 - **Audit Record**: Represents an immutable record of request creation or a successful state transition, containing actor, action, target, outcome, and traceability identifiers without unnecessary sensitive content.
 - **Security Event**: Represents a structured record of a security-relevant failure or anomaly, separate from a successful business-transition audit record.
@@ -338,12 +353,19 @@ No Optional requirements are defined because no optional feature is approved in 
 - A Direct Manager rejection requires a normalized plain-text rejection reason of 10–500 Unicode text elements, per PD-009.
 - The MVP supports full-day requests only.
 - Editing a submitted request is outside the MVP; an owner may cancel a `Pending` request and submit a replacement.
+- Withdrawing or cancelling an already-`Approved` request is outside the MVP; `Approved` is final and its balance deduction is permanent within this feature (Clarification 2026-07-16).
+- The authoritative organizational source may provide a delegate (alternate) Direct Manager relationship for a Team, per PD-022.
 - Balance accrual, expiration, carryover, and manual adjustment are outside this feature.
 - HR remains read-only and cannot act as a manual reassignment or correction operator.
-- Retroactive corrections, payroll integration, notifications, calendar integration, public external APIs, multi-company support, and automatic Manager delegation are outside this feature.
+- Retroactive corrections, payroll integration, notifications, calendar integration, public external APIs, multi-company support, and automatic or system-selected Manager delegation are outside this feature; an explicit authoritative delegate relationship is supported per PD-022.
 - `Pending`, `Approved`, `Rejected`, and `Cancelled` are the only MVP states.
 - `Approved`, `Rejected`, and `Cancelled` are final.
 - MVC, Razor Views, Bootstrap, authentication details, persistence, and code organization are governed by the constitution and `plan.md`, not by this functional specification.
+- Requested units and Leave Balances are whole numbers of working days (PD-017).
+- The MVP provides no in-app administration; Leave Types, holiday calendar, teams and assignments, and initial balances are provisioned from external authoritative sources and treated as read-only inputs (PD-018). The specific source systems and their owners are pending Product Owner input (see `docs/questions_po.md`, Q13).
+- The MVP user interface is English-only (PD-019).
+- The not-in-the-past rule is a submission-time validation and is not re-applied at approval (PD-020).
+- Within this feature a Leave Balance is a static seeded entitlement with no accrual, expiry, carryover, or period reset (PD-021); the entitlement values are pending Product Owner input.
 ### Approved MVP Policy Decisions
 - **PD-001 — Leave-Day Calculation**: Requested units are full working days. Start and end dates are inclusive; Monday through Friday count, except dates in the authoritative organization holiday calendar.
 - **PD-002 — Initial Leave-Type Catalog**: `Vacation` and `Personal Leave` are active and balance-consuming. `Medical Leave` is active and non-balance-consuming. Every type follows the standard Direct Manager approval workflow and requires a reason. This is the initial MVP catalog; the organization may add further Leave Types in the future without changing the behavior this specification defines for the existing types.
@@ -351,7 +373,7 @@ No Optional requirements are defined because no optional feature is approved in 
 - **PD-004 — Pending Balance Reservation**: Pending requests do not reserve or deduct balance. Balance is authoritatively revalidated immediately before approval.
 - **PD-005 — Overlap Semantics**: Inclusive calendar-date overlap is prohibited against the same Employee's `Pending` or `Approved` requests, regardless of Leave Type. Rejected and Cancelled requests are excluded. Adjacent non-intersecting ranges are permitted.
 - **PD-006 — Multiple Pending Requests**: Multiple non-overlapping Pending requests are permitted.
-- **PD-007 — Organizational Cardinality**: Each Employee belongs to exactly one current Team; each Team has exactly one current Direct Manager; one Manager may manage multiple Teams. Missing or ambiguous assignment prevents resolution until source data is corrected.
+- **PD-007 — Organizational Cardinality**: Each Employee belongs to exactly one current Team; each Team has exactly one current primary Direct Manager plus at most one optional authoritative delegate (alternate) Direct Manager (PD-022); one Manager may serve as the primary for multiple Teams. Missing or ambiguous primary assignment with no authoritative delegate prevents resolution until source data is corrected.
 - **PD-008 — Reason Content**: Every request requires a normalized reason of 10–500 Unicode text elements. Leading and trailing whitespace is trimmed, whitespace-only input is invalid, line breaks are permitted, and executable markup is not.
 - **PD-009 — Decision and Cancellation Comments**: Approval comments and cancellation comments remain outside this MVP. Rejection requires a normalized plain-text rejection reason of 10–500 Unicode text elements, provided by the rejecting Direct Manager. The rejection reason is visible to the request owner, the currently authorized Direct Manager, and HR through authorized read-only views. A former Manager retains only the non-sensitive actor metadata preserved in the audit record and does not retain access solely because they previously acted on the request. The rejection reason is redacted from logs, traces, technical errors, and audit payloads in the same manner as the Employee request reason. The Employee's original request reason and the Manager's rejection reason are the only narrative fields in this MVP.
 - **PD-010 — HR Delivery Gate**: HR read-only visibility is mandatory for the MVP production release.
@@ -361,13 +383,21 @@ No Optional requirements are defined because no optional feature is approved in 
 - **PD-014 — Leave-Type Policy Snapshot**: The Leave Type must be active at submission. Its identifier and balance-consuming classification are captured with the request and remain authoritative for that request's lifecycle; later catalog changes apply to newly created requests unless a separate controlled correction workflow is introduced.
 - **PD-015 — Narrative Normalization**: Request and rejection reasons are trimmed before validation. Whitespace-only values are invalid. Length limits are evaluated using Unicode text elements after normalization, line breaks are permitted, and markup remains non-executable plain text.
 - **PD-016 — Authoritative-Source Failure Policy**: Operations fail closed when required authoritative data is unavailable or ambiguous. No client-provided fallback is accepted, no business mutation occurs, and the actor receives a safe retryable or corrective result.
+### Resolved Defaults from Product-Owner Review (Pending Veto)
+The following decisions resolve previously implicit points with defensible defaults. They are low-risk clarifications rather than new business policy and may be overridden by the Product Owner during the Friday review (see [`docs/questions_po.md`](../../docs/questions_po.md)).
+- **PD-017 — Whole-Day Units and Integer Balances**: Requested units and Leave Balances are non-negative whole numbers of working days. Partial-day and hourly requests are already out of scope, so no fractional units or balances exist in the MVP.
+- **PD-018 — No In-App Administration**: The MVP contains no administrative surface for managing Leave Types, the holiday calendar, teams, Direct Manager assignments, or initial balances. These reference datasets are provisioned from external authoritative sources and are read-only inputs to this feature.
+- **PD-019 — English-Only Interface**: The MVP user interface is presented in English only. This affects presentation only and no business rule; it is revisited if the workforce is confirmed multilingual.
+- **PD-020 — Submission-Time Past-Date Enforcement**: The not-in-the-past rule (BR-002) is enforced only when a request is submitted. A validly submitted request whose start date passes while it is still `Pending` remains eligible for approval, rejection, or owner cancellation; approval revalidates authoritative balance and overlap but does not re-apply the past-date rule.
+- **PD-021 — Static Seeded Balance**: Within this feature a Leave Balance is a static entitlement seeded from the authoritative source, with no accrual, expiry, carryover, or period reset. The balance changes only through an approved balance-consuming request. The entitlement values and any reset expectation are a business decision pending Product Owner input.
+- **PD-022 — Delegate Approver (Clarification 2026-07-16)**: When a Team's primary Direct Manager is unavailable or the role is vacant, an authoritative delegate (alternate) Direct Manager relationship may authorize viewing and resolution of that Team's `Pending` requests. The delegate relationship is an explicit relationship provided by the authoritative organizational source; automatic or system-selected delegation is out of scope. HR remains strictly read-only and gains no write or reassignment capability. Throughout this specification, "authorized Direct Manager" includes an authorized delegate acting for a Team whose primary Direct Manager is unavailable; every Direct Manager rule applies equally to a delegate — self-approval prevention (AUTHZ-003), current-scope evaluation (AUTHZ-006), and mutation-time revalidation (AUTHZ-007). If neither a primary nor a delegate is authoritatively available, the request remains `Pending` until the source data provides one. This decision replaces the earlier assumption that all Manager delegation was out of scope. *(Note: this is a scope addition beyond the previously implicit defaults; unlike PD-017–PD-021 it changes behavior and should be reflected in `plan.md` and test design.)*
 ### Implementation Readiness Confirmation
-- [x] All MVP business policy decisions required by the normative requirements are explicit, including duplicate scope, narrative validation, policy snapshots, and authoritative-source failure behavior.
-- [x] No unresolved clarification marker remains.
+- [x] All implementation-blocking MVP business policy decisions required by the normative requirements are explicit; previously implicit points are resolved with defaults in PD-017 through PD-021, and the 2026-07-16 clarification added a delegate approver (PD-022).
+- [ ] 11 business, policy, legal, or org-structure questions remain open pending Product Owner review on Friday (see [`docs/questions_po.md`](../../docs/questions_po.md)). Two of them — Medical-Leave overlap (Q2) and regional workweek/holiday calendars (Q4) — could revise existing business rules if answered against the current default and should be settled before building the affected areas. (The 2026-07-16 clarification resolved the previously rule-affecting Q1 and Q3, plus the manager-fallback question.)
 - [x] Every requirement maps to an acceptance scenario, edge case, or specialized test category.
 - [x] The Constitution Check passes against `.specify/memory/constitution.md` v3.0.0.
 - [x] The specification is ready to generate `plan.md`, `research.md`, `data-model.md`, threat analysis, and `tasks.md`.
-- [x] Implementation may proceed after the constitution-defined planning and test-first workflow is completed.
+- [x] The core Employee-and-Manager workflow may proceed on the recorded defaults after the constitution-defined planning and test-first workflow is completed; areas touched by Q1–Q4 should await Product Owner confirmation.
 
 ## Requirement Traceability Matrix
 The following matrix maps every normative requirement to at least one acceptance scenario or a required specialized test category.
@@ -378,8 +408,8 @@ The following matrix maps every normative requirement to at least one acceptance
 | FR-003 | AC-007 | Acceptance |
 | FR-004 | AC-007, AC-027 | Acceptance + Integration |
 | FR-005 | AC-012 | Acceptance + Authorization |
-| FR-006 | AC-014, AC-015 | Acceptance + Integration |
-| FR-007 | AC-016 | Acceptance + Integration |
+| FR-006 | AC-014, AC-015, AC-039 | Acceptance + Integration |
+| FR-007 | AC-016, AC-039 | Acceptance + Integration |
 | FR-008 | AC-022 | Acceptance + Integration |
 | FR-009 | AC-026 | Acceptance + Authorization |
 | FR-010 | AC-027 | Acceptance + Authorization |
@@ -414,11 +444,11 @@ The following matrix maps every normative requirement to at least one acceptance
 | BR-022 | AC-022, AC-033 | Integration |
 | BR-023 | AC-016 | Domain + Integration |
 | AUTHZ-001 | AC-007, AC-008, AC-022, AC-023 | Authorization |
-| AUTHZ-002 | AC-012, AC-013, AC-014, AC-016 | Authorization |
+| AUTHZ-002 | AC-012, AC-013, AC-014, AC-016, AC-039 | Authorization |
 | AUTHZ-003 | AC-017 | Authorization + Security |
 | AUTHZ-004 | AC-026, AC-027, AC-028 | Authorization |
 | AUTHZ-005 | AC-008, AC-013, AC-017, AC-023, AC-028 | Security |
-| AUTHZ-006 | AC-012, AC-013, AC-020, EC-005 | Authorization |
+| AUTHZ-006 | AC-012, AC-013, AC-020, AC-039, EC-005 | Authorization |
 | AUTHZ-007 | AC-014, AC-016, AC-018, AC-020, AC-022 | Authorization + Integration |
 | AUTHZ-008 | AC-038 | Authorization + Resilience |
 | SEC-001 | AC-030, AC-031 | Security |
@@ -543,7 +573,7 @@ This specification has been checked against `.specify/memory/constitution.md` v3
 | Clean Architecture | Compliant. The specification defines observable behavior without prescribing layer implementations. |
 | MVC, Razor Views, and Bootstrap | Compliant. These remain constitutional and planning decisions, not functional requirements, except for browser-security behavior such as anti-forgery protection. |
 | Employee capabilities | Compliant. Employees submit, view owned data, and cancel owned `Pending` requests. |
-| Direct Manager capabilities | Compliant. Managers act only within current authorized organizational scope and cannot self-approve. |
+| Direct Manager capabilities | Compliant. Managers act only within current authorized organizational scope and cannot self-approve. Delegate (alternate) Manager approval when the primary is unavailable is resolved by PD-022, which the constitution (§5.1, "Delegation when the direct manager changes") explicitly reserves to the feature specification; the delegate is modeled as an authoritative team-manager relationship evaluated at operation time and is bound by every Direct Manager rule, including self-approval prevention. |
 | HR access | Compliant. HR remains organization-wide read-only and receives no reassignment, correction, or balance-adjustment capability. |
 | Lifecycle invariants | Compliant. Exactly four states are defined; all transitions and final-state restrictions are explicit. |
 | Balance integrity | Compliant. Balance granularity, submission validation, non-reservation of Pending requests, approval revalidation, negative-balance prevention, and duplicate-deduction protection are explicit. |
@@ -552,6 +582,7 @@ This specification has been checked against `.specify/memory/constitution.md` v3
 | Auditability | Compliant. Creation and every successful transition have explicit immutable audit requirements; security-relevant failures are separately logged. |
 | Concurrency | Compliant. Duplicate creation, conflicting mutations, stale writes, overlap confirmation, duplicate deduction, and transaction atomicity are addressed. |
 | Test-first and traceability | Compliant. Every normative requirement maps to an acceptance scenario or specialized test type. |
+<<<<<<< HEAD
 | Scope discipline | Compliant. Editing submitted requests, partial days, retroactive corrections, HR writes, payroll, notifications, calendars, external APIs, multi-company support, and automatic delegation remain outside this MVP. |
 | Policy completeness | Compliant. All implementation-blocking MVP policies are explicit and traceable to PD-001 through PD-016. |
 | Performance and scalability | Compliant. Performance targets are technology-agnostic and measurable (response times, load, data volumes). No assumptions about caching layers, CDNs, or specific deployment strategies. |
@@ -561,3 +592,9 @@ This specification has been checked against `.specify/memory/constitution.md` v3
 | Data volumes | Compliant. Representative MVP data volumes ensure performance objectives are verified at realistic scale before production. |
 **Constitution Result**: PASS for specification quality and governance alignment across all 19 constitutional areas.
 **Implementation Result**: READY — The specification contains no unresolved implementation-blocking business policy and all measurable success criteria are defined. Planning and test-first implementation may proceed under the constitution.
+=======
+| Scope discipline | Compliant. Editing submitted requests, withdrawing approved leave, partial days, retroactive corrections, HR writes, payroll, notifications, calendars, external APIs, multi-company support, and automatic/system-selected delegation remain outside this MVP. An explicit authoritative delegate approver is now in scope per PD-022 (constitution §5.1 reserves delegation policy to the specification). |
+| Policy completeness | Compliant for implementation-blocking policy. All implementation-blocking MVP policies are explicit and traceable to PD-001 through PD-022 (PD-017–PD-021 resolve previously implicit points; PD-022 is a scope addition from the 2026-07-16 clarification adding a delegate approver). Eleven non-blocking business/policy questions remain tracked for Product Owner review in `docs/questions_po.md`. |
+**Constitution Result**: PASS for specification quality and governance alignment.
+**Implementation Result**: READY WITH OPEN QUESTIONS — The specification contains no unresolved *implementation-blocking* business policy for the core Employee-and-Manager workflow; previously implicit points are resolved in PD-017 through PD-021, and the 2026-07-16 `/speckit.clarify` session added an explicit delegate approver (PD-022, AC-039) that `plan.md` and test design must reflect. Eleven business/policy questions remain open for Product Owner review (see [`docs/questions_po.md`](../../docs/questions_po.md)); two could revise existing business rules (Medical-Leave overlap Q2, regional workweek/holiday calendars Q4) and should be confirmed before the affected areas are built. Planning and test-first implementation of the core workflow may proceed under the constitution on the recorded decisions.
+>>>>>>> origin/main
