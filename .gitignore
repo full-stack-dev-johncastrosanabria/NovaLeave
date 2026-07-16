@@ -1,0 +1,126 @@
+# ==============================================================================
+# NovaLeave — unified .gitignore
+# The team uses both JetBrains Rider and Visual Studio, so this file keeps the
+# IDE-local, generated, and build-output files from either toolchain (plus the
+# usual .NET, editor, and OS cruft) out of version control.
+# Shared, intentionally-tracked settings (e.g. *.sln.DotSettings, .editorconfig)
+# are NOT ignored.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# JetBrains Rider / IntelliJ
+# ------------------------------------------------------------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+# Per-user Rider settings (team-shared settings live in *.sln.DotSettings)
+*.DotSettings.user
+
+# ------------------------------------------------------------------------------
+# Visual Studio
+# ------------------------------------------------------------------------------
+.vs/
+*.suo
+*.user
+*.userosscache
+*.userprefs
+*.sln.docstates
+*.rsuser
+*.vsp
+*.vspx
+
+# Visual Studio Code (ignore local state, keep shared config)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ------------------------------------------------------------------------------
+# .NET build output
+# ------------------------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+[Bb]uild/
+bld/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+project.lock.json
+project.fragment.lock.json
+
+# ------------------------------------------------------------------------------
+# NuGet
+# ------------------------------------------------------------------------------
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+.nuget/
+
+# ------------------------------------------------------------------------------
+# Test results / coverage
+# ------------------------------------------------------------------------------
+[Tt]est[Rr]esult*/
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+coverage*.info
+
+# ------------------------------------------------------------------------------
+# Compiler / MSBuild intermediate & diagnostic files
+# ------------------------------------------------------------------------------
+*.binlog
+*.ilk
+*.pch
+*.pdb
+*.ipdb
+*.iobj
+*.pgc
+*.pgd
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.tlog
+*.vspscc
+*.vssscc
+
+# ------------------------------------------------------------------------------
+# App secrets & local overrides (never commit)
+# ------------------------------------------------------------------------------
+*.pfx
+*.publishsettings
+appsettings.*.local.json
+secrets.json
+
+# ------------------------------------------------------------------------------
+# OS / shell cruft
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+*~
+*.swp
