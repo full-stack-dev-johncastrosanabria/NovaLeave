@@ -1,6 +1,29 @@
 <!--
 Sync Impact Report
 ==================
+Version change: 3.0.0 -> 4.0.0
+Change type: MAJOR
+Reason: the MVP business model is redefined per the 2026-07-16 Product Owner
+decisions. Actors are reduced to User and Approver; Employee/Direct Manager/HR,
+teams, hierarchies, delegation, and escalation are removed. The lifecycle adds
+automatic timeout cancellation (CancelledByTimeout) and Approver deactivation of
+an approved request before it begins (CancelledByApprover) with atomic balance
+restoration, and Pending requests become editable. Balance becomes a single
+global accruing balance (one day per completed month, non-expiring) with Pending
+reservations. Time-zone-based date evaluation is removed. This is a
+backward-incompatible governance change.
+
+Amended invariants (Section 5): 3 (next-day minimum start), 4 (single business
+date, no per-user time zone), 6 (Pending is editable), 7 (User/Approver
+transition set including timeout and pre-start deactivation; owner cancellation
+deferred to an approved specification), 8 (Approved is final except a valid
+pre-start deactivation), 9 (Pending editable; resolved requests only undergo a
+bounded pre-start deactivation), 10 (reserve-on-create, deduct-on-approve,
+restore-on-deactivation), 12 (revalidate role and active status).
+Amended sections: 4 (Actors), 5.1, 7.1, 7.3, 7.4, and Principle IX.
+
+Prior 3.0.0 report retained below.
+--------------------------------------------------------------------------------
 Version change: 2.3.0 -> 3.0.0
 Change type: MAJOR
 Reason: the primary presentation and authentication models are being redefined
@@ -57,9 +80,9 @@ Templates requiring review:
 
 # NovaLeave — Consolidated Constitution
 
-**Version:** 3.0.0  
+**Version:** 4.0.0  
 **Ratified:** 2026-07-13  
-**Last Amended:** 2026-07-15  
+**Last Amended:** 2026-07-16  
 **Status:** Binding
 
 ## 1. Purpose, Scope, and Normative Language
@@ -187,7 +210,7 @@ are baseline requirements, not optional enhancements.
 ### IX. Security by Design
 
 The server never trusts the client. Authentication, authorization, ownership,
-hierarchical relationships, requested-day calculations, balances, and state
+role and active status, requested-day calculations, balances, and state
 transitions MUST be revalidated server-side.
 
 NovaLeave adopts the following OWASP Top 10:2025 categories as its primary
@@ -252,7 +275,7 @@ Application/
     Reject/
     Cancel/
   LeaveBalances/
-    GetByEmployee/
+    GetByUser/
 ```
 
 Each slice contains its request/command/query, handler or service, validator,
@@ -309,59 +332,75 @@ when the change affects a constitutional rule.
 
 ## 4. MVP Actors and Authorization
 
-### 4.1 Employee
+The MVP defines exactly two application roles — `User` and `Approver` — plus the
+automatic system actor. There are no teams, reporting lines, organizational
+scopes, primary/delegate/alternate managers, approval hierarchies, escalation
+chains, or HR role.
 
-An Employee MAY create requests and view their own requests, statuses, history,
-and balance. An Employee MUST NOT view another employee's data or modify a
-resolved request.
+### 4.1 User
 
-### 4.2 Direct Manager
+A User MAY create vacation requests, view their own requests, statuses, history,
+and global balance, and edit their own `Pending` requests. A User MUST NOT view
+or modify another User's data.
 
-A Direct Manager MAY view and resolve requests only for employees assigned to
-their team at the time of the operation. A Direct Manager MUST NOT approve or
-reject their own request.
+### 4.2 Approver
 
-### 4.3 Human Resources
+An Approver whose status is `Active` MAY approve, reject, or — before the
+vacation period begins — deactivate any eligible vacation request in the system,
+without team or organizational scope. An Approver MUST NOT approve, reject, or
+deactivate a request they own. An `Inactive` Approver MUST NOT resolve requests.
 
-In the MVP, HR has organization-wide **read-only** access to history and
-balances through explicitly authorized use cases. HR MUST NOT create, approve,
-reject, cancel, or adjust requests or balances.
+### 4.3 Active and Inactive Status
 
-A future HR correction or retroactive-adjustment workflow requires an
-independent specification, dedicated authorization, dual control where
-appropriate, and immutable auditing. This constitution does not presume that
-such a workflow exists.
+Users and Approvers have an `Active` or `Inactive` status. Every protected
+operation requires a current authenticated identity with `Active` status, role
+authorization, resource authorization, and a valid request state.
 
 ### 4.4 Users with Multiple Roles
 
-A user MAY hold more than one role. Authorization is evaluated per action and
-resource; holding the manager role does not remove restrictions that apply when
-the same user acts as an employee.
+A person MAY hold both the `User` and `Approver` roles and MAY submit their own
+requests. Authorization is evaluated per action and resource; holding the
+`Approver` role does not permit resolving one's own request.
 
 ## 5. Invariants and Lifecycle
 
 The following rules MUST hold regardless of browser screen, controller action, or approved API endpoint:
 
-1. The applicable balance can never become negative.
+1. The global balance, available balance, and reservation total can never become
+   negative.
 2. The start date cannot be later than the end date.
-3. Requests for past dates are not allowed in the normal workflow.
-4. “Past” is determined using the employee's primary time zone; timestamps are
-   stored in UTC.
+3. Requests for past dates or the current date are not allowed; the earliest
+   valid start date is the following calendar day.
+4. Date rules are evaluated against a single system business date without
+   per-user time-zone behavior; timestamps are stored in UTC.
 5. Overlapping requests are prohibited according to the active policy.
-6. A request starts in `Pending`.
+6. A request starts in `Pending` and MAY be edited while `Pending` with full
+   revalidation.
 7. Permitted MVP transitions:
-   - `Pending -> Approved`, by the authorized direct manager.
-   - `Pending -> Rejected`, by the authorized direct manager.
-   - `Pending -> Cancelled`, by the employee who owns the request.
-8. `Approved`, `Rejected`, and `Cancelled` are final states in the MVP.
-9. A resolved request cannot be edited or returned to `Pending`.
-10. Balance is deducted only when approving a request whose leave type consumes
-    balance; creating or rejecting a request does not deduct balance.
+   - `Pending -> Approved`, by an active Approver who does not own the request.
+   - `Pending -> Rejected`, by an active Approver who does not own the request.
+   - `Pending -> CancelledByTimeout`, by the system after the configured
+     unresolved-request timeout.
+   - `Approved -> CancelledByApprover`, by an active Approver who does not own
+     the request, only before the vacation period begins.
+   A separate User-initiated cancellation of a `Pending` request is not part of
+   the MVP unless introduced by an approved specification.
+8. `Rejected`, `CancelledByTimeout`, and `CancelledByApprover` are final states.
+   `Approved` is final except for a valid pre-start deactivation to
+   `CancelledByApprover`.
+9. A `Pending` request may be edited; a resolved request may not be edited,
+   except that an `Approved` request may undergo a bounded, audited, pre-start
+   deactivation. No request is returned to `Pending`.
+10. A `Pending` request reserves its requested days without a permanent
+    deduction. Approving a balance-consuming request converts the reservation
+    into a permanent deduction; rejecting or timing out a request releases the
+    reservation; a valid pre-start deactivation restores the previously deducted
+    days. Creating a request never produces a permanent deduction.
 11. Every transition generates an audit record.
-12. Identity, ownership, manager-employee relationship, and balance are
+12. Identity, ownership, role, active status, request state, and balance are
     revalidated immediately before a state-changing operation.
-13. The requested number of days MUST be calculated server-side according to an
-    approved policy; a client-calculated value is never accepted as truth.
+13. The requested number of working days MUST be calculated server-side according
+    to an approved policy; a client-calculated value is never accepted as truth.
 
 ### 5.1 Rules That Belong in Feature Specifications
 
@@ -373,8 +412,10 @@ feature specification MUST resolve, when applicable:
 - Medical or legal exceptions.
 - Whether more than one pending request is permitted.
 - Half days, hourly requests, or partial ranges.
-- Accrual, expiration, and carryover of balances.
-- Delegation when the direct manager changes.
+- Accrual, expiration, and carryover of balances, and Pending balance reservation.
+- Automatic timeout cancellation of unresolved requests and its configuration.
+- Approver deactivation of an approved request and its balance effect.
+- Whether a User may cancel their own `Pending` request.
 - Retroactive corrections and their payroll impact.
 
 Until an approved specification exists, code, AI, Graphify, OKF, and diagrams
@@ -423,14 +464,14 @@ MUST NOT assume an answer.
   security stamp so stale authorization is not retained indefinitely.
 - ASP.NET Core Identity persistence and adapters belong in Infrastructure. The
   Domain model MUST NOT inherit from or depend on `IdentityUser`; the identity
-  account and the business `Employee` are linked through an explicit stable
+  account and the business `User` is linked through an explicit stable
   identifier and an Application use case.
 - The default authorization policy is deny-by-default.
 - Every non-public controller or action MUST declare authorization, preferably
   through centralized policies.
-- Application MUST verify ownership and organizational relationships; hiding a
-  menu item or Bootstrap button is not a security control.
-- IDs, roles, manager IDs, employee IDs, balances, hidden inputs, route values,
+- Application MUST verify ownership and active status; hiding a menu item or
+  Bootstrap button is not a security control.
+- IDs, roles, user IDs, request IDs, balances, hidden inputs, route values,
   and form fields supplied by the browser are untrusted.
 - An authorization failure MUST fail closed and avoid revealing whether an
   inaccessible resource exists.
@@ -483,10 +524,11 @@ MUST NOT assume an answer.
 
 ### 7.3 Sensitive Data
 
-A request reason may contain personal or medical information and is classified
-as Sensitive/PII. It may be visible only to the owner, the authorized direct
-manager, and HR through approved use cases. Logs, traces, metrics, and diagrams
-MUST NOT contain the complete reason or other unnecessary sensitive data.
+A request reason may contain personal information and is classified as
+Sensitive/PII. It may be visible only to the owner and an authorized active
+Approver acting on the request through an approved use case. Logs, traces,
+metrics, and diagrams MUST NOT contain the complete reason or other unnecessary
+sensitive data.
 
 ### 7.4 OWASP A01, A06, and A09
 
@@ -500,11 +542,13 @@ Every security specification or critical workflow MUST document:
 - audit events and security acceptance criteria.
 
 Tests MUST cover anonymous access, expired or invalid authentication cookies,
-incorrect roles, cross-employee access, cross-team access, IDOR, forced
-browsing, privilege escalation, self-approval, antiforgery failures, overposting
-attempts, duplicate form submissions, duplicate transitions, replay, and direct
-HTTP access that bypasses navigation or hidden UI controls. Approved API
-surfaces MUST additionally test invalid and expired tokens.
+expired-session reuse, incorrect roles, inactive-Approver resolution attempts,
+cross-user access and IDOR, forced browsing, privilege escalation,
+self-resolution, antiforgery failures, overposting attempts, duplicate form
+submissions, duplicate transitions, timeout-versus-resolution races, pre-start
+deactivation boundaries, replay, and direct HTTP access that bypasses navigation
+or hidden UI controls. Approved API surfaces MUST additionally test invalid and
+expired tokens.
 
 ## 8. Auditing, Logging, and Observability
 
@@ -611,9 +655,9 @@ mitigation, accountable owner, and expiration date.
   pagination, confirmation dialogs, and form components SHOULD be implemented
   through `_Layout.cshtml`, partial views, View Components, or Tag Helpers to
   avoid duplicated markup and behavior.
-- `Areas` MAY be used for cohesive modules such as HR administration only when
-  they improve navigation and ownership; they MUST NOT duplicate Application or
-  Domain logic.
+- `Areas` MAY be used for cohesive modules such as an administrative module only
+  when they improve navigation and ownership; they MUST NOT duplicate Application
+  or Domain logic.
 - Static files MUST be served only from approved locations under `wwwroot` and
   the middleware pipeline MUST place static files, routing, authentication,
   authorization, antiforgery behavior, and exception handling in a reviewed
@@ -872,4 +916,4 @@ that need exists.
 
 ---
 
-**Version:** 3.0.0 | **Ratified:** 2026-07-13 | **Last Amended:** 2026-07-15
+**Version:** 4.0.0 | **Ratified:** 2026-07-13 | **Last Amended:** 2026-07-16
