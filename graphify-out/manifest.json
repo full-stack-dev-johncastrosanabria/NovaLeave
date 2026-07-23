@@ -1,0 +1,77 @@
+{
+  ".specify/feature.json": {
+    "mtime": 1784046385.9842415,
+    "ast_hash": "14135b49faa824d13f0d3ecd37a5df68",
+    "semantic_hash": "14135b49faa824d13f0d3ecd37a5df68"
+  },
+  ".specify/init-options.json": {
+    "mtime": 1784046886.4156191,
+    "ast_hash": "1823a1f81a01b2868aef138d8e27bf3c",
+    "semantic_hash": "1823a1f81a01b2868aef138d8e27bf3c"
+  },
+  ".specify/integration.json": {
+    "mtime": 1784046886.408157,
+    "ast_hash": "b0748494af491389f5596c7d99ad6259",
+    "semantic_hash": "b0748494af491389f5596c7d99ad6259"
+  },
+  ".specify/integrations/copilot.manifest.json": {
+    "mtime": 1784046886.3772724,
+    "ast_hash": "f043b83450c6ad01a65ee96dd8bf9739",
+    "semantic_hash": "f043b83450c6ad01a65ee96dd8bf9739"
+  },
+  ".specify/integrations/speckit.manifest.json": {
+    "mtime": 1784046886.4056492,
+    "ast_hash": "a50be8948cacdc29e9a1525d0d2366e7",
+    "semantic_hash": "a50be8948cacdc29e9a1525d0d2366e7"
+  },
+  ".specify/scripts/bash/check-prerequisites.sh": {
+    "mtime": 1784046385.9870584,
+    "ast_hash": "c145bd82b841fa6a0178667a5f134da0",
+    "semantic_hash": "c145bd82b841fa6a0178667a5f134da0"
+  },
+  ".specify/scripts/bash/common.sh": {
+    "mtime": 1784046385.9880636,
+    "ast_hash": "815b8a6772c0bebc5367861a00e1a5fb",
+    "semantic_hash": "815b8a6772c0bebc5367861a00e1a5fb"
+  },
+  ".specify/scripts/bash/create-new-feature.sh": {
+    "mtime": 1784046385.9880636,
+    "ast_hash": "f19aa6901560dab47c09b3b54632504f",
+    "semantic_hash": "f19aa6901560dab47c09b3b54632504f"
+  },
+  ".specify/scripts/bash/setup-plan.sh": {
+    "mtime": 1784046385.9880636,
+    "ast_hash": "1f0c10a6b658d229e4479083b8966122",
+    "semantic_hash": "1f0c10a6b658d229e4479083b8966122"
+  },
+  ".specify/scripts/bash/setup-tasks.sh": {
+    "mtime": 1784046385.9880636,
+    "ast_hash": "c6e6f8dad73b07783113a601bacff566",
+    "semantic_hash": "c6e6f8dad73b07783113a601bacff566"
+  },
+  ".specify/workflows/workflow-registry.json": {
+    "mtime": 1784046385.991068,
+    "ast_hash": "97156fa14b7fed5c5ef0c8fdce85b6b0",
+    "semantic_hash": "97156fa14b7fed5c5ef0c8fdce85b6b0"
+  },
+  ".vs/NovaLeave.slnx/v18/DocumentLayout.backup.json": {
+    "mtime": 1784048940.4272637,
+    "ast_hash": "389b3af18b1526ced7be82d00f5bc698",
+    "semantic_hash": "389b3af18b1526ced7be82d00f5bc698"
+  },
+  ".vs/NovaLeave.slnx/v18/DocumentLayout.json": {
+    "mtime": 1784058600.0578582,
+    "ast_hash": "55656a3d1d0fa90967fa72fa9e165bd0",
+    "semantic_hash": "55656a3d1d0fa90967fa72fa9e165bd0"
+  },
+  ".vs/VSWorkspaceState.json": {
+    "mtime": 1784058600.2776153,
+    "ast_hash": "b5ec03a363250714a794195317749486",
+    "semantic_hash": "b5ec03a363250714a794195317749486"
+  },
+  ".vscode/settings.json": {
+    "mtime": 1784040635.0351613,
+    "ast_hash": "71ce04c96375523d09cf98d4bb1209b9",
+    "semantic_hash": "71ce04c96375523d09cf98d4bb1209b9"
+  }
+}

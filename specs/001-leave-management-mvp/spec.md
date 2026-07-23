@@ -393,6 +393,7 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 - The Pending-resolution timeout `X` and session lifetime are configurable system parameters.
 - User-facing language and localization follow the constitution (§3.3, Spanish by default) and are not redefined by this specification.
 - MVC, Razor Views, Bootstrap, ASP.NET Core Identity configuration, persistence, and code organization are governed by the constitution and `plan.md`, not by this functional specification.
+- Frontend design, visual language, UX/UI, and responsive rules for this feature are defined in the companion document `frontend-design-spec.md` in the same feature directory.
 
 ### Delivery and UX-Validation Constraint (non-normative)
 - Before implementing the affected user interfaces, the team shall create visual prototypes and validate the prototypes, workflows, terminology, and usability with stakeholders. Stitch and Banani may be used as prototyping tools. This is a delivery and UX-validation constraint, not a runtime business requirement, and does not alter any EARS requirement above.
