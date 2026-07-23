@@ -152,6 +152,11 @@ authoritative location and be reused by every flow. Balance calculations,
 overlap checks, transitions, permissions, or policies MUST NOT be duplicated
 across controllers, handlers, services, clients, or queries.
 
+**Rationale**: Centralizing rules in Domain guarantees a single, testable
+source of truth for what constitutes a valid leave request, balance, or
+approval — preventing rule drift between Presentation, Application, and
+Infrastructure code paths.
+
 ### IV. Rich Domain and Business-Rule Isolation
 
 Invariants MUST be protected by entities, value objects, aggregates, or domain
