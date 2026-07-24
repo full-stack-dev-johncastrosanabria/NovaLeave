@@ -1,6 +1,41 @@
 <!--
 Sync Impact Report
 ==================
+Version change: 5.0.0 -> 6.0.0
+Change type: MAJOR
+Reason: Add HR as a third combinable application role with organization-wide
+read access and approver-capability management, per approved role-based frontend
+specification. The prior two-role model (User, Approver only) is replaced with
+a three-role model (User, Approver, HR). HR has authorized read access to
+requests, calendar, balances, and audit; may activate/deactivate canResolveRequests
+for existing Approvers with explicit reason, confirmation, row-version
+concurrency, transaction-safe persistence, and audit logging. HR must not
+approve, reject, deactivate requests, edit balances, or assign/remove roles.
+This is a backward-incompatible governance change.
+
+Amended invariants (Section 5): Actor definitions expanded; mutual exclusivity
+now covers three roles; authorization revalidation includes HR capabilities.
+Amended sections: 4 (Actors), 5 (Lifecycle), 7.1 (Auth), 7.4 (Security Tests),
+11 (MVC/Frontend Governance), 15.1 (Authority Order), 16.4 (Amendments), 17 (Risks).
+
+Prior 5.0.0 report retained below.
+--------------------------------------------------------------------------------
+Version change: 4.0.0 -> 5.0.0
+Change type: MAJOR
+Reason: Actor/Authorization refinements per role-based frontend specification.
+Actors remain User and Approver only. Clarify that requesting and approving are
+mutually exclusive per resource. Inactive users cannot submit requests. Explicit
+that Approver must be active to resolve requests. Edit Pending restricted to
+Active User only. System actor performs timeout cancellation. These are
+backward-incompatible governance changes affecting authorization boundaries.
+
+Amended invariants (Section 5): 3 (inactive user cannot submit), 7 (mutually
+exclusive transitions per resource), 12 (active status revalidation before
+state change). Amended sections: 4 (Actors), 5 (Lifecycle), 7.1 (Auth), and
+Principle IX (Security by Design).
+
+Prior 4.0.0 report retained below.
+--------------------------------------------------------------------------------
 Version change: 3.0.0 -> 4.0.0
 Change type: MAJOR
 Reason: the MVP business model is redefined per the 2026-07-16 Product Owner
@@ -21,68 +56,13 @@ pre-start deactivation), 9 (Pending editable; resolved requests only undergo a
 bounded pre-start deactivation), 10 (reserve-on-create, deduct-on-approve,
 restore-on-deactivation), 12 (revalidate role and active status).
 Amended sections: 4 (Actors), 5.1, 7.1, 7.3, 7.4, and Principle IX.
-
-Prior 3.0.0 report retained below.
---------------------------------------------------------------------------------
-Version change: 2.3.0 -> 3.0.0
-Change type: MAJOR
-Reason: the primary presentation and authentication models are being redefined
-from Web API + future React + JWT Bearer to server-rendered ASP.NET Core MVC
-with Razor Views, Bootstrap, ASP.NET Core Identity, and secure cookie
-authentication. This is a backward-incompatible governance change.
-
-Preserved decisions:
-- .NET 10, C#, Clean Architecture, Domain/Application/Infrastructure/
-  Presentation boundaries, EF Core, SQL Server, FluentValidation, Serilog,
-  xUnit, Docker, GitHub Actions, and Azure-ready deployment.
-- Vertical Slice organization inside Application.
-- CQRS preferred but not mandatory; MediatR optional.
-- OWASP Top 10:2025 primary baseline: A01, A06, and A09.
-- Domain invariants, optimistic concurrency, auditing, observability, data
-  governance, and Graphify/OKF/Mermaid governance.
-
-Redefined decisions:
-- Primary presentation: ASP.NET Core MVC with Controllers and Razor Views.
-- UI framework: Bootstrap 5.3, version-pinned and used through shared layouts,
-  partial views, Tag Helpers, and accessible components.
-- Authentication: ASP.NET Core Identity with secure cookie authentication for
-  the web application.
-- Authorization: policies and resource-based authorization remain mandatory.
-- Web API and JWT Bearer are no longer defaults. They MAY be introduced only
-  for an approved external-client or integration requirement through an ADR.
-- React and Blazor are not approved frontend defaults. Introducing either
-  requires an ADR and a constitutional amendment when it changes project-wide
-  presentation rules.
-
-Added or strengthened controls:
-- Thin MVC controllers, dedicated ViewModels, no Domain entities in views, and
-  no direct Controller/View access to EF Core or Infrastructure.
-- Global antiforgery validation for unsafe browser requests.
-- Post/Redirect/Get after successful form submissions.
-- Explicit overposting protection, server-authoritative validation, branded
-  MVC error pages, and RFC 7807 only for actual API endpoints.
-- Secure cookie settings, Identity lockout/password controls, session-lifetime
-  rules, and tests for CSRF, forced browsing, cookie expiration, and privilege
-  escalation.
-- Bootstrap accessibility limitations are acknowledged; WCAG compliance must
-  be verified independently rather than assumed from framework usage.
-- MVC-focused integration and end-to-end testing through WebApplicationFactory
-  and Playwright (or an approved equivalent).
-- Static asset governance, CSP compatibility, local hosting preference, and
-  dependency scanning for Bootstrap and other browser assets.
-
-Templates requiring review:
-- .specify/templates/spec-template.md
-- .specify/templates/plan-template.md
-- .specify/templates/tasks-template.md
-- Any Spec Kit commands or skills that contain a Constitution Check.
 -->
 
 # NovaLeave — Consolidated Constitution
 
-**Version:** 4.0.0  
+**Version:** 6.0.0  
 **Ratified:** 2026-07-13  
-**Last Amended:** 2026-07-16  
+**Last Amended:** 2026-07-23  
 **Status:** Binding
 
 ## 1. Purpose, Scope, and Normative Language
@@ -184,6 +164,9 @@ Within `Application/`, code MUST be organized by feature or vertical slice, not
 in global `Commands`, `Handlers`, or `Validators` folders without documented
 justification.
 
+Each slice contains its request/command/query, handler or service, validator,
+DTO, mapping, and related tests.
+
 ### VI. Dependency Injection and Testable Time
 
 All dependencies MUST be constructor-injected through the native ASP.NET Core
@@ -227,6 +210,10 @@ baseline:
 
 Other applicable security controls remain mandatory as cross-cutting practices,
 even when they are not among the three prioritized categories.
+
+Authorization decisions MUST be evaluated per resource and action. Roles MAY be
+expressed as claims used by policies but MUST NOT replace ownership or
+hierarchy checks.
 
 ### X. Architecture Serves the Business
 
@@ -304,9 +291,9 @@ DTO, mapping, and related tests.
 - **Alternative frontends:** React, Blazor, or another client technology are not
   project defaults and require an ADR before adoption.
 - **Infrastructure:** Docker, GitHub Actions, and Azure-ready deployment.
-- **Testing:** xUnit; `WebApplicationFactory` for MVC integration tests; Playwright
-  or an approved equivalent for critical browser journeys; mocks/fakes only
-  where they provide useful isolation.
+- **Testing:** xUnit; `WebApplicationFactory` for MVC integration tests;
+  Playwright or an approved equivalent for critical browser journeys; mocks/fakes
+  only where they provide useful isolation.
 
 Changing an approved decision requires an ADR and a constitutional amendment
 when the change affects a constitutional rule.
@@ -337,10 +324,10 @@ when the change affects a constitutional rule.
 
 ## 4. MVP Actors and Authorization
 
-The MVP defines exactly two application roles — `User` and `Approver` — plus the
+The MVP defines three application roles — `User`, `Approver`, and `HR` — plus the
 automatic system actor. There are no teams, reporting lines, organizational
 scopes, primary/delegate/alternate managers, approval hierarchies, escalation
-chains, or HR role.
+chains, or role-assignment authority for HR.
 
 ### 4.1 User
 
@@ -355,32 +342,78 @@ vacation period begins — deactivate any eligible vacation request in the syste
 without team or organizational scope. An Approver MUST NOT approve, reject, or
 deactivate a request they own. An `Inactive` Approver MUST NOT resolve requests.
 
-### 4.3 Active and Inactive Status
+### 4.3 HR
 
-Users and Approvers have an `Active` or `Inactive` status. Every protected
+HR has authorized organization-wide read access to:
+
+- Vacation requests
+- Organizational calendar information
+- Vacation balances and movements
+- Relevant audit information
+- Approver capability status (`canResolveRequests`)
+
+HR MUST NOT:
+
+- Approve requests
+- Reject requests
+- Deactivate approved requests
+- Modify vacation balances
+- Assign or remove roles
+
+HR may activate or deactivate `canResolveRequests` only for an identity that
+already has the `Approver` role. This operation requires:
+
+- Authorized HR identity
+- Explicit reason
+- Confirmation
+- Validation that the target already has `Approver`
+- Expected row version
+- Optimistic concurrency handling
+- Transaction-safe persistence
+- Audit logging
+
+### 4.4 Active and Inactive Status
+
+Users, Approvers, and HR have an `Active` or `Inactive` status. Every protected
 operation requires a current authenticated identity with `Active` status, role
 authorization, resource authorization, and a valid request state.
 
-### 4.4 Users with Multiple Roles
+**Inactive users cannot submit, edit, or perform any state-changing operation on
+requests.** An inactive Approver cannot resolve requests. An inactive HR cannot
+perform approver-capability management operations.
 
-A person MAY hold both the `User` and `Approver` roles and MAY submit their own
-requests. Authorization is evaluated per action and resource; holding the
-`Approver` role does not permit resolving one's own request.
+### 4.5 Users with Multiple Roles
+
+A person MAY hold any valid combination of the `User`, `Approver`, and `HR` roles
+and MAY submit their own requests when the `User` role is also held.
+Authorization is evaluated per action and resource; holding the `Approver` or
+`HR` role does not permit resolving one's own request.
+
+### 4.6 Mutual Exclusivity Per Resource
+
+For any given vacation request resource, the acts of **requesting** (creating,
+editing) and **approving** (approving, rejecting, deactivating) are mutually
+exclusive. The same identity MUST NOT perform both roles on the same resource.
+This constraint is enforced by the authorization layer and revalidated in the
+Application layer before any state transition. HR read access does not conflict
+with this rule.
 
 ## 5. Invariants and Lifecycle
 
-The following rules MUST hold regardless of browser screen, controller action, or approved API endpoint:
+The following rules MUST hold regardless of browser screen, controller action, or
+approved API endpoint:
 
 1. The global balance, available balance, and reservation total can never become
    negative.
 2. The start date cannot be later than the end date.
 3. Requests for past dates or the current date are not allowed; the earliest
-   valid start date is the following calendar day.
+   valid start date is the following calendar day. **An inactive User cannot
+   submit a request.**
 4. Date rules are evaluated against a single system business date without
    per-user time-zone behavior; timestamps are stored in UTC.
 5. Overlapping requests are prohibited according to the active policy.
 6. A request starts in `Pending` and MAY be edited while `Pending` with full
-   revalidation.
+   revalidation **by an Active User only**.
 7. Permitted MVP transitions:
    - `Pending -> Approved`, by an active Approver who does not own the request.
    - `Pending -> Rejected`, by an active Approver who does not own the request.
@@ -402,7 +435,7 @@ The following rules MUST hold regardless of browser screen, controller action, o
     reservation; a valid pre-start deactivation restores the previously deducted
     days. Creating a request never produces a permanent deduction.
 11. Every transition generates an audit record.
-12. Identity, ownership, role, active status, request state, and balance are
+12. Identity, ownership, role, **active status**, request state, and balance are
     revalidated immediately before a state-changing operation.
 13. The requested number of working days MUST be calculated server-side according
     to an approved policy; a client-calculated value is never accepted as truth.
@@ -417,7 +450,8 @@ feature specification MUST resolve, when applicable:
 - Medical or legal exceptions.
 - Whether more than one pending request is permitted.
 - Half days, hourly requests, or partial ranges.
-- Accrual, expiration, and carryover of balances, and Pending balance reservation.
+- Accrual, expiration, and carryover of balances, and Pending balance
+  reservation.
 - Automatic timeout cancellation of unresolved requests and its configuration.
 - Approver deactivation of an approved request and its balance effect.
 - Whether a User may cancel their own `Pending` request.
@@ -457,8 +491,8 @@ MUST NOT assume an answer.
 
 ### 7.1 Authentication and Authorization
 
-- The web application MUST use ASP.NET Core Identity with cookie
-  authentication. A custom password or session implementation is prohibited.
+- The web application MUST use ASP.NET Core Identity with cookie authentication.
+  A custom password or session implementation is prohibited.
 - Authentication cookies MUST be `HttpOnly`, `Secure` in production, and use an
   appropriate `SameSite` policy. Cookie lifetime, idle timeout, renewal, and
   revocation behavior MUST be explicitly configured and tested.
@@ -476,8 +510,8 @@ MUST NOT assume an answer.
   through centralized policies.
 - Application MUST verify ownership and active status; hiding a menu item or
   Bootstrap button is not a security control.
-- IDs, roles, user IDs, request IDs, balances, hidden inputs, route values,
-  and form fields supplied by the browser are untrusted.
+- IDs, roles, user IDs, request IDs, balances, hidden inputs, route values, and
+  form fields supplied by the browser are untrusted.
 - An authorization failure MUST fail closed and avoid revealing whether an
   inaccessible resource exists.
 - JWT Bearer authentication is permitted only for an approved API surface and
@@ -516,8 +550,8 @@ MUST NOT assume an answer.
 - TLS 1.2+ and HSTS are mandatory in production.
 - Secrets and keys are stored outside the repository, preferably in a managed
   secret store such as Azure Key Vault.
-- Production MUST use appropriate security headers: CSP,
-  `X-Content-Type-Options`, framing protection, and `Referrer-Policy`.
+- Production MUST use appropriate security headers: CSP, `X-Content-Type-Options`,
+  framing protection, and `Referrer-Policy`.
 - Bootstrap and other browser assets MUST be pinned to explicit versions and
   included in dependency/security scanning. Local hosting under `wwwroot/lib`
   is preferred. A CDN MAY be used only with approved CSP configuration and
@@ -535,6 +569,9 @@ Approver acting on the request through an approved use case. Logs, traces,
 metrics, and diagrams MUST NOT contain the complete reason or other unnecessary
 sensitive data.
 
+HR read access to request reasons is authorized; audit of HR access to sensitive
+data is required.
+
 ### 7.4 OWASP A01, A06, and A09
 
 Every security specification or critical workflow MUST document:
@@ -551,8 +588,11 @@ expired-session reuse, incorrect roles, inactive-Approver resolution attempts,
 cross-user access and IDOR, forced browsing, privilege escalation,
 self-resolution, antiforgery failures, overposting attempts, duplicate form
 submissions, duplicate transitions, timeout-versus-resolution races, pre-start
-deactivation boundaries, replay, and direct HTTP access that bypasses navigation
-or hidden UI controls. Approved API surfaces MUST additionally test invalid and
+deactivation boundaries, replay, direct HTTP access that bypasses navigation
+or hidden UI controls, **HR request-resolution attempts, HR balance-editing
+attempts, HR role-assignment attempts, HR approver-capability management
+violations (missing reason, missing confirmation, missing row version, missing
+target Approver role)**. Approved API surfaces MUST additionally test invalid and
 expired tokens.
 
 ## 8. Auditing, Logging, and Observability
@@ -745,6 +785,26 @@ mitigation, accountable owner, and expiration date.
 - MVC actions and API endpoints MUST call the same Application use cases rather
   than duplicate business logic.
 
+### 11.7 Frontend Governance Boundaries
+
+The approved Frontend Design Specification governs:
+- Design tokens, color palette, typography, spacing, border, radius, and shadow tokens
+- Responsive behavior and breakpoints
+- Accessibility rules (WCAG 2.1 AA, keyboard, focus, ARIA, reduced motion)
+- Motion restrictions and animation duration limits
+- Component standards (buttons, forms, cards, tables, alerts, modals, badges)
+
+The approved Role-Based Frontend Views Specification governs:
+- Route-to-role mapping and exclusive/shared routes
+- View inventory per role (User, Approver, HR/RRHH)
+- Navigation structure per role
+- View-level accessibility requirements
+- Controller authorization policies per role
+
+This Constitution governs architecture, security, roles, cross-cutting invariants,
+engineering quality, and governance. Presentational details are delegated to
+the approved frontend specifications per the Authority Order (§15.1).
+
 ## 12. Performance, Availability, and Operations
 
 ### 12.1 Performance
@@ -817,9 +877,10 @@ requirement MUST be recorded as a gap, risk, and evolution plan.
 
 1. Current constitution.
 2. Approved feature specifications.
-3. Approved ADRs and plans.
-4. Executable code and tests.
-5. OKF, Mermaid, and Graphify as derived artifacts.
+3. Approved frontend design specification for visual and interaction rules.
+4. Approved ADRs and plans.
+5. Executable code and tests.
+6. OKF, Mermaid, and Graphify as derived artifacts.
 
 A derived artifact never replaces an authoritative source. A conflict MUST be
 reported and resolved explicitly.
@@ -908,10 +969,11 @@ repeat it after the Phase 1 design.
 ## 17. Risks and Evolution
 
 Primary risks include incorrect balances, unauthorized approvals, lost audit
-records, PII leakage, concurrency races, stale documentation, and
-overengineering. Mandatory mitigations are domain invariants, resource-based
-authorization, transactions, row versioning, tests, auditing, redaction,
-updated diagrams, and simplicity.
+records, PII leakage, concurrency races, stale documentation, **HR capability
+management abuse (unauthorized role assignment, balance modification, or
+request resolution)**, and overengineering. Mandatory mitigations are domain
+invariants, resource-based authorization, transactions, row versioning, tests,
+auditing, redaction, updated diagrams, and simplicity.
 
 The architecture MAY evolve toward notifications, calendars, Microsoft Entra
 ID, multi-company support, jobs, public APIs, Power BI, Blazor components, React,
@@ -921,4 +983,4 @@ that need exists.
 
 ---
 
-**Version:** 4.0.0 | **Ratified:** 2026-07-13 | **Last Amended:** 2026-07-16
+**Version:** 6.0.0 | **Ratified:** 2026-07-13 | **Last Amended:** 2026-07-23

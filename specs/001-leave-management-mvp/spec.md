@@ -1,19 +1,19 @@
 # Feature Specification: NovaLeave MVP — Vacation Request Management
 **Feature Branch**: `001-leave-management-mvp`
 **Created**: 2026-07-15
-**Last Refactored**: 2026-07-16
-**Status**: Ready for Planning. The core `User`/`Approver` vacation workflow may proceed on the recorded decisions. The two prior Constitution conflicts (Approver deactivation of an approved request; time-zone removal) are **resolved** by the Constitution v4.0.0 amendment (2026-07-16). Four business questions (OQ-002–OQ-005) remain open and should be settled before building the affected areas; OQ-001 (owner cancellation) is resolved as out of MVP scope by v4.0.0.
-**Input**: Authoritative Product Owner decisions (2026-07-16) that supersede the prior Employee/Direct-Manager/HR, multi-leave-type model. The MVP is now a single-leave-type (`Vacation`) system with two application roles (`User`, `Approver`), a global accruing balance with Pending reservations, Pending editing, automatic timeout cancellation, and Approver deactivation of an approved request before it begins.
-**Governance**: This specification is subordinate to `.specify/memory/constitution.md` v4.0.0. The constitution remains authoritative for Clean Architecture, ASP.NET Core MVC, Razor Views, Bootstrap, ASP.NET Core Identity, persistence, security, testing, observability, and engineering governance. This specification defines business behavior and observable outcomes. It does not prescribe controllers, repositories, database tables, HTTP routes, framework classes, or code structure.
-**Revision Note**: This revision replaces the previous business model in its entirety. Superseded and removed: the Employee/Direct-Manager/HR actor set; Teams, organizational scope, primary/delegate/alternate managers, delegation, and escalation; `Personal Leave` and `Medical Leave`; per–Leave-Type balances and static seeded balances; holiday calendars; employee-specific time zones; the "Pending does not reserve balance" policy; the "`Approved` is always immutable / only three final states" rule; and "editing a Pending request is outside the MVP." Newly added: a global accruing vacation balance with Pending reservations; two request input modes; Pending editing with full revalidation; automatic timeout cancellation (`CancelledByTimeout`); Approver deactivation of an approved request before its start date (`CancelledByApprover`) with atomic balance restoration; active/inactive user status; session expiration; and a basic visual vacation calendar. Historical concepts are named here only to explain the revision; they are no longer normative policy.
-**Constitution Alignment Note**: The two behaviors that previously conflicted with Constitution v3.0.0 — Approver deactivation of an `Approved` request (former invariants 8–9) and removal of time zones (former invariant 4) — are **reconciled by the Constitution v4.0.0 amendment (2026-07-16)**, which redefines the actor model (`User`/`Approver`) and lifecycle invariants 3, 4, 6–10, and 12 to match these Product Owner decisions. Owner cancellation of a `Pending` request is deferred to a future approved specification by v4.0.0 invariant 7. This specification is aligned with Constitution v4.0.0; no unresolved Constitution conflict remains.
+**Last Refactored**: 2026-07-23
+**Status**: Ready for Planning. The core `User`/`Approver`/`HR` vacation workflow may proceed on the recorded decisions. The two prior Constitution conflicts (Approver deactivation of an approved request; time-zone removal) are **resolved** by the Constitution v4.0.0 amendment (2026-07-16). HR role added by Constitution v6.0.0 amendment (2026-07-23). Four business questions (OQ-002–OQ-005) remain open and should be settled before building the affected areas; OQ-001 (owner cancellation) is resolved as out of MVP scope by v4.0.0.
+**Input**: Authoritative Product Owner decisions (2026-07-16) that supersede the prior Employee/Direct-Manager/HR, multi-leave-type model. The MVP is now a single-leave-type (`Vacation`) system with three application roles (`User`, `Approver`, `HR`), a global accruing balance with Pending reservations, Pending editing, automatic timeout cancellation, and Approver deactivation of an approved request before it begins. HR has organization-wide read access and approver-capability management per Constitution v6.0.0 §4.3.
+**Governance**: This specification is subordinate to `.specify/memory/constitution.md` v6.0.0. The constitution remains authoritative for Clean Architecture, ASP.NET Core MVC, Razor Views, Bootstrap, ASP.NET Core Identity, persistence, security, testing, observability, and engineering governance. This specification defines business behavior and observable outcomes. It does not prescribe controllers, repositories, database tables, HTTP routes, framework classes, or code structure.
+**Revision Note**: This revision replaces the previous business model in its entirety. Superseded and removed: the Employee/Direct-Manager/HR actor set (legacy three-role model with teams/hierarchies); Teams, organizational scope, primary/delegate/alternate managers, delegation, and escalation; `Personal Leave` and `Medical Leave`; per–Leave-Type balances and static seeded balances; holiday calendars; employee-specific time zones; the "Pending does not reserve balance" policy; the "`Approved` is always immutable / only three final states" rule; and "editing a Pending request is outside the MVP." Newly added: a global accruing vacation balance with Pending reservations; two request input modes; Pending editing with full revalidation; automatic timeout cancellation (`CancelledByTimeout`); Approver deactivation of an approved request before its start date (`CancelledByApprover`) with atomic balance restoration; active/inactive user status; session expiration; a basic visual vacation calendar; and the `HR` role with organization-wide read access to requests, calendar, balances, audit, and approver-capability management (activate/deactivate `canResolveRequests` for existing Approvers). Historical concepts are named here only to explain the revision; they are no longer normative policy.
+**Constitution Alignment Note**: The two behaviors that previously conflicted with Constitution v3.0.0 — Approver deactivation of an `Approved` request (former invariants 8–9) and removal of time zones (former invariant 4) — are **reconciled by the Constitution v4.0.0 amendment (2026-07-16)**, which redefines the actor model (`User`/`Approver`) and lifecycle invariants 3, 4, 6–10, and 12 to match these Product Owner decisions. The Constitution v6.0.0 amendment (2026-07-23) adds `HR` as a third combinable role with read-only organization-wide access and approver-capability management, amending §4 (Actors), §5 (Lifecycle), §7.1 (Auth), §7.4 (Security Tests), §11 (MVC/Frontend Governance), §15.1 (Authority Order), §16.4 (Amendments), and §17 (Risks). Owner cancellation of a `Pending` request is deferred to a future approved specification by v4.0.0 invariant 7. This specification is aligned with Constitution v6.0.0; no unresolved Constitution conflict remains.
 ---
 
 ## Clarifications
 
 ### Session 2026-07-16 (Product Owner decisions applied)
 - Q: Which leave types are in the MVP? → A: **Only `Vacation`.** `Personal Leave` and `Medical Leave` are out of scope. The domain remains parametric so more types can be added later.
-- Q: Which application roles exist? → A: **Only `User` and `Approver`.** No teams, managers, delegates, escalation, or HR. Any active Approver may resolve any eligible request except their own.
+- Q: Which application roles exist? → A: **`User`, `Approver`, and `HR`.** No teams, managers, delegates, escalation. Any active Approver may resolve any eligible request except their own. HR has organization-wide read access to requests, calendar, balances, audit, and approver-capability management (activate/deactivate `canResolveRequests` for existing Approvers with reason, confirmation, row version, audit) per Constitution v6.0.0 §4.3.
 - Q: How is balance modeled? → A: **One global balance per User**, accruing **one day per completed month**, non-expiring; Pending requests **reserve** availability; approval makes the reservation a permanent deduction.
 - Q: May a Pending request be edited? → A: **Yes**, with full atomic revalidation. Approved-request date editing remains out of scope.
 - Q: What happens to an unresolved Pending request? → A: It is **automatically cancelled after a configurable `X` days** as `CancelledByTimeout`, releasing its reservation.
@@ -112,6 +112,15 @@ As an authenticated active Approver, I want to approve or reject any eligible `P
 9. **AC-021 — Reject a transition on a terminal request**
    **Related Requirements**: BR-007, BR-011, SEC-004
    **Given** a request in `Rejected`, `CancelledByTimeout`, or `CancelledByApprover` state, or an `Approved` request whose vacation period has begun, **When** any actor attempts a further transition, **Then** the system rejects the operation and preserves the current state.
+10. **AC-058 — Newly created request appears in the Approver queue**
+    **Related Requirements**: FR-025, AUTHZ-002, AUTHZ-003, CON-008, AUD-001
+    **Given** User A creates a valid vacation request, **When** the request creation transaction completes successfully, **Then** the request is stored as `Pending` and appears exactly once in the `Aprobaciones` queue for active Approver B, **And** Approver B can open its detail, **And** no team, hierarchy, department, or assigned-approver filter prevents visibility, **And** the request is not resolvable by its owner.
+11. **AC-059 — Allow overlapping dates for different users**
+    **Related Requirements**: BR-019, AUTHZ-002, CON-008
+    **Given** User A has a `Pending` or `Approved` request for a date range, **When** User B submits a request that partially or fully overlaps that range, **Then** User B's request is allowed when User B independently satisfies all date, balance, and validation rules.
+12. **AC-060 — Demo users available on login screen**
+    **Related Requirements**: FR-001, CFG-003, SEC-001
+    **Given** the application is seeded with demo identities (`user@demo`, `approver@demo`, `hr@demo`, all password `Demo123!`), **When** the login page is rendered, **Then** a visual account switcher (`Cuenta` dropdown) displays these identities with masked emails, **And** selecting one pre-fills the email field without authenticating, **And** submitting valid credentials for a demo identity grants access to the corresponding role context(s).
 
 ### User Story 3 - System Cancels an Unresolved Request by Timeout (Priority: P2)
 As the system operator, I want a `Pending` request that is not resolved within a configurable number of days to be cancelled automatically, so that stale requests do not hold reservations indefinitely.
@@ -218,7 +227,7 @@ As an authenticated User, I want a basic visual vacation calendar, so that I can
 ### Functional Requirements
 Every normative requirement uses exactly one standard EARS classification: **Ubiquitous** (`The system shall …`), **Event-Driven** (`When <trigger>, the system shall …`), **State-Driven** (`While <state>, the system shall …`), **Unwanted Behavior** (`If <condition>, then the system shall …`), or **Optional** (`Where <approved capability applies>, the system shall …`). No Optional requirements are defined.
 
-*Retired identifiers (behavior removed with the prior model): FR-009 and FR-010 (HR read-only visibility). FR-008 is reserved pending the owner-cancellation decision (OQ-001) and is intentionally not reused.*
+*Retired identifiers (behavior removed with the prior model): FR-008 is reserved pending the owner-cancellation decision (OQ-001) and is intentionally not reused. FR-009 and FR-010 (HR read-only visibility) are **active** under Constitution v6.0.0 §4.3. AUTHZ-004 (HR read-only restriction) is **revised** — HR has authorized read access but MUST NOT approve, reject, deactivate, modify balances, or assign/remove roles.*
 
 #### User Capabilities
 - **FR-001 — Create a Vacation Request** *(Event-Driven)* — When an authenticated active User submits request data that satisfies all applicable requirements, the system shall create exactly one `Vacation Request`.
@@ -228,6 +237,9 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 - **FR-005 — Edit an Owned Pending Request** *(State-Driven)* — While a request owned by the User is `Pending`, the system shall allow the owner to edit it, subject to full revalidation (BR-025).
 - **FR-012 — Support Both Input Modes** *(Ubiquitous)* — The system shall accept a request as either a start date and end date, or a start date and a number of working days, and shall normalize either into one authoritative date range and one authoritative working-day total before creating or updating the request.
 - **FR-015 — Provide a Basic Vacation Calendar** *(Ubiquitous)* — The system shall provide a basic visual vacation calendar of the authorized vacation periods to an authenticated User.
+- **FR-023 — Calculate and Return Projected Post-Approval Balance** *(Event-Driven)* — When an Approver views a `Pending` request eligible for approval, the system shall calculate and return the projected available balance after approval, computed as authoritative available balance minus authoritative requested working days, for display as an informational value only.
+- **FR-024 — Navigate from Calendar Event to Authorized Request Detail** *(Event-Driven)* — When an authorized user activates a calendar event or its accessible dialog, the system shall navigate to the corresponding request detail view according to the active role and authorization: User owner → own request detail; eligible Approver → Approver request detail; HR → read-only HR request detail. Navigation shall be denied if the actor lacks authorization for the target view.
+- **FR-025 — Expose Newly Created Pending Requests to Eligible Approvers** *(Event-Driven)* — When a valid vacation-request creation transaction completes, the system shall make the resulting Pending request available exactly once in the approval queue of every active eligible Approver other than its owner, without requiring manual synchronization or application restart.
 
 #### Approver Capabilities
 - **FR-006 — Approve a Pending Request** *(State-Driven)* — While a request is `Pending`, the system shall provide an approval action to any active Approver who does not own it.
@@ -237,6 +249,16 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 #### System Capabilities
 - **FR-013 — Automatically Cancel Unresolved Requests by Timeout** *(Event-Driven)* — When a request has remained `Pending` for at least the configured timeout `X` days without resolution, the system shall cancel it as `CancelledByTimeout`.
 - **FR-014 — Accrue Vacation Monthly** *(Event-Driven)* — When a User completes a whole month of service, the system shall add exactly one whole vacation day to that User's global balance.
+
+#### HR Capabilities *(Constitution v6.0.0 §4.3)*
+- **FR-009 — HR Read-Only Request List** *(State-Driven)* — While authenticated as an active HR identity, the system shall provide a read-only, filterable, paginated list of all vacation requests across the organization, including requester, dates, status, working days, reservation, and deduction.
+- **FR-016 — HR Read-Only Request Detail** *(State-Driven)* — While authenticated as an active HR identity, the system shall provide a read-only detail view of any vacation request including its full audit trail, without resolution actions.
+- **FR-017 — HR Organizational Calendar** *(State-Driven)* — While authenticated as an active HR identity, the system shall provide a month-view calendar showing all approved vacation periods organization-wide, with requester names visible (authorized for HR).
+- **FR-018 — HR Read-Only Balances List** *(State-Driven)* — While authenticated as an active HR identity, the system shall provide a list of all users with balance summary (accrued, reserved, deducted, available).
+- **FR-019 — HR Read-Only Balance Movements** *(State-Driven)* — While authenticated as an active HR identity, the system shall provide a timeline of balance movements for any user (accruals, reservations, deductions, restorations).
+- **FR-020 — HR Relevant Audit Log** *(State-Driven)* — While authenticated as an active HR identity, the system shall provide a filterable audit log with timestamp, actor, role, action, entity, and result.
+- **FR-021 — HR Approver Capability List** *(State-Driven)* — While authenticated as an active HR identity, the system shall provide a list of all identities with the `Approver` role and their `canResolveRequests` status.
+- **FR-022 — HR Toggle Approver Capability** *(Event-Driven)* — When an active HR identity requests to activate or deactivate `canResolveRequests` for an identity that already has the `Approver` role, the system shall require an explicit reason, confirmation, validation of target's Approver role, expected row version, optimistic concurrency handling, transaction-safe persistence, and audit logging.
 
 ### Validation Requirements
 - **VAL-001 — Reject Missing Core Request Data** *(Unwanted Behavior)* — If a request omits the start date, both the end-date and day-count inputs, or the reason, then the system shall reject the submission and create no request.
@@ -285,6 +307,9 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 - **BR-033 — Do Not Expire Accrued Days** *(Ubiquitous)* — The system shall not expire accrued vacation days; they accumulate indefinitely until permanently deducted by an approval.
 - **BR-034 — Bound Request Size** *(Ubiquitous)* — The system shall require a minimum request of one working day and a maximum request equal to the User's currently available balance.
 - **BR-035 — Restore Balance on Valid Deactivation** *(Event-Driven)* — When an `Approved` request is validly deactivated before its start date, the system shall restore its previously deducted working-day total to the owner's global balance as part of the same atomic operation as the state transition and audit record.
+- **BR-036 — Calculate Projected Available Balance** *(Ubiquitous)* — The system shall compute the projected available balance after approval as `authoritativeAvailableExcludingCurrent - authoritativeRequestedDays`, using the authoritative available balance **excluding the current request's reservation** (accrued minus permanently deducted minus reserved by other active Pending requests) and the authoritative requested working-day total server-side; this value is informational only and must never be trusted from the client.
+- **BR-037 — Deny Approval When Projected Balance Is Negative** *(Unwanted Behavior)* — If the projected available balance after approval would be negative (using `authoritativeAvailableExcludingCurrent - authoritativeRequestedDays`), the system shall reject the approval, preserve the request as `Pending`, produce no permanent deduction, and return a clear warning indicating insufficient available balance for the requested days.
+- **BR-038 — Revalidate Projected Balance on Approval Submission** *(Event-Driven)* — When an approval POST is processed, the system shall revalidate the projected available balance immediately before committing the transition using `authoritativeAvailableExcludingCurrent - authoritativeRequestedDays`; if the revalidated projected balance is negative, the system shall reject the approval with a conflict outcome.
 
 #### Overlap Rules
 - **BR-019 — Reject Prohibited Overlap** *(Unwanted Behavior)* — If a request's inclusive calendar-date range intersects another `Pending` or `Approved` request owned by the same User, then the system shall reject it; the request being evaluated is excluded from comparison with itself, adjacent non-intersecting ranges are permitted, and `Rejected`, `CancelledByTimeout`, and `CancelledByApprover` requests do not block dates.
@@ -305,16 +330,26 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 - **AUTHZ-008 — Fail Closed on Unavailable Authoritative Data** *(Unwanted Behavior)* — If authoritative identity, active-status, leave-type, balance, ownership, or request-state data required for an operation is unavailable or ambiguous, then the system shall deny or defer the operation, modify no business data, and substitute no client-supplied value.
 - **AUTHZ-009 — Deny Resolution by an Inactive Approver** *(Unwanted Behavior)* — If an Approver whose status is `Inactive` attempts to approve, reject, or deactivate a request, then the system shall reject the operation and modify no business data.
 - **AUTHZ-010 — Require Active Authenticated Identity for Protected Operations** *(Ubiquitous)* — The system shall require a current authenticated identity with `Active` status, role authorization, resource authorization, and a valid request state for every protected operation.
+- **AUTHZ-011 — Authorize Active HR for Read Access** *(Ubiquitous)* — The system shall authorize any active HR identity to read all vacation requests, organizational calendar information, vacation balances and movements, and relevant audit information across the organization.
+- **AUTHZ-012 — Authorize Active HR for Approver Capability Management** *(Event-Driven)* — When an active HR identity requests to activate or deactivate `canResolveRequests` for an identity that already has the `Approver` role, the system shall authorize the operation subject to explicit reason, confirmation, target Approver role validation, expected row version, optimistic concurrency, transaction-safe persistence, and audit logging.
+- **AUTHZ-013 — Prohibit HR Request Resolution** *(Unwanted Behavior)* — If an HR identity attempts to approve, reject, or deactivate any vacation request, then the system shall reject the operation and modify no business data.
+- **AUTHZ-014 — Prohibit HR Balance Modification** *(Unwanted Behavior)* — If an HR identity attempts to modify any vacation balance, then the system shall reject the operation and modify no business data.
+- **AUTHZ-015 — Prohibit HR Role Assignment** *(Unwanted Behavior)* — If an HR identity attempts to assign or remove any role, then the system shall reject the operation and modify no business data.
+- **AUTHZ-016 — Require Active HR for Capability Management** *(Unwanted Behavior)* — If an identity with `Inactive` status and the `HR` role attempts to toggle `canResolveRequests`, then the system shall reject the operation and modify no business data.
+- **AUTHZ-017 — Authorize Calendar Navigation per Role** *(Ubiquitous)* — The system shall authorize navigation from a calendar event to a request detail only when the actor holds the necessary role and resource authorization: User owners may navigate to their own request detail; eligible Approvers may navigate to the Approver request detail; active HR may navigate to the read-only HR request detail.
+- **AUTHZ-018 — Preserve Calendar Anonymization on Unauthorized Navigation** *(Unwanted Behavior)* — If the calendar view is anonymized for a role, the system shall not expose a navigation link or action to an unauthorized request detail for that role.
+- **AUTHZ-019 — Require Keyboard-Accessible Calendar Navigation** *(Ubiquitous)* — Calendar events and their dialogs shall support keyboard activation and provide an accessible name for navigation to the authorized request detail.
 
 ### Security and Privacy Requirements
 - **SEC-001 — Deny Unauthenticated Access** *(Unwanted Behavior)* — If an unauthenticated actor attempts a protected action, then the system shall deny the operation.
 - **SEC-002 — Avoid Protected Resource-Existence Disclosure** *(Unwanted Behavior)* — If an actor is not authorized for a protected resource, then the system shall deny the operation without confirming whether it exists.
 - **SEC-003 — Prevent Identifier-Manipulation Access** *(Unwanted Behavior)* — If an actor manipulates a request, User, or balance identifier to reach an unauthorized resource, then the system shall deny the operation.
 - **SEC-004 — Reject Invalid State Transitions** *(Unwanted Behavior)* — If an actor requests a transition not permitted for the request's current state, then the system shall reject it and preserve the current state.
-- **SEC-005 — Restrict Sensitive Reason Visibility** *(Ubiquitous)* — The system shall expose a request's reason and rejection reason only to its owning User and to an authorized active Approver acting on it through an authorized use case.
+- **SEC-005 — Restrict Sensitive Reason Visibility** *(Ubiquitous)* — The system shall expose a request's reason and rejection reason only to its owning User, to an authorized active Approver acting on it through an authorized use case, and to an authorized active HR identity through an authorized read-only use case.
 - **SEC-006 — Redact Sensitive Information** *(Ubiquitous)* — The system shall redact request reasons, rejection reasons, credentials, tokens, secret values, and unnecessary personal information from logs, traces, metrics, audit before-and-after payloads, and user-facing technical errors.
 - **SEC-007 — Protect Browser Mutations Against Request Forgery** *(Ubiquitous)* — The system shall require valid anti-forgery protection for every browser-based state-changing operation.
 - **SEC-008 — Expire Sessions and Reject Reuse** *(Unwanted Behavior)* — If an authenticated session has expired or been invalidated, then the system shall deny protected access using it, require re-authentication, and not honor the expired session artifact.
+- **SEC-009 — Audit HR Access to Sensitive Reasons** *(Event-Driven)* — When an active HR identity accesses a request reason or rejection reason through an authorized read-only use case, the system shall create a structured audit event recording the HR actor, the accessed request, the reason field accessed, and the timestamp.
 
 ### Concurrency, Duplicate-Operation, and Atomicity Requirements
 - **CON-001 — Prevent Duplicate Request Creation** *(Unwanted Behavior)* — If the same logical submission for a User, start date, and resolved range is replayed, retried, or processed concurrently, then the system shall create at most one request; a prior terminal request shall not permanently block a later intentional submission with the same values.
@@ -328,6 +363,7 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 - **CON-009 — Make Timeout Idempotent and Concurrency-Safe** *(Event-Driven)* — When the timeout operation runs, the system shall transition each eligible request at most once, remain safe under repetition, and yield to any concurrently committed resolution.
 - **CON-010 — Commit Deactivation Atomically** *(Event-Driven)* — When a valid deactivation succeeds, the system shall commit the transition to `CancelledByApprover`, the balance restoration, and exactly one audit record as one indivisible operation.
 - **CON-011 — Commit Pending Edit Atomically** *(Event-Driven)* — When a Pending edit succeeds, the system shall commit the revalidated values, the corrected reservation, and exactly one audit record as one indivisible operation.
+- **CON-012 — Enforce Mutually Exclusive Approve and Reject Transitions** *(Unwanted Behavior)* — The system shall treat approve and reject as mutually exclusive transitions for a given request; after one action is submitted, all conflicting resolution actions shall be disabled server-side, the request state shall be revalidated on POST, and exactly one valid transition shall be permitted with optimistic concurrency control; stale or duplicate competing transitions shall be rejected without side effects.
 
 ### Audit and Observability Requirements
 - **AUD-001 — Audit Request Creation** *(Event-Driven)* — When a request is successfully created, the system shall create exactly one immutable creation audit record; a duplicate, retry, or replay of an already-processed creation shall not create an additional record.
@@ -338,6 +374,8 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 - **AUD-006 — Redact Audit Payloads** *(Ubiquitous)* — The system shall redact sensitive fields, including request and rejection reasons, from audit before-and-after values and security-event payloads.
 - **AUD-007 — Audit Balance Deduction and Restoration** *(Event-Driven)* — When a balance is permanently deducted on approval or restored on deactivation, the system shall record that balance effect within the same audit record as its transition.
 - **AUD-008 — Attribute Timeout to the System Actor** *(Event-Driven)* — When a request is cancelled by timeout, the system shall record the system as the actor and record the configured timeout rule that triggered the transition, and shall not require a human rejection reason.
+- **AUD-009 — Audit HR Approver Capability Toggle** *(Event-Driven)* — When an active HR identity successfully activates or deactivates `canResolveRequests` for an Approver, the system shall create exactly one immutable audit record with the HR actor identifier, target Approver identifier, prior and new capability value, explicit reason, row version, and timestamp.
+- **AUD-010 — Audit Failed HR Capability Toggle** *(Event-Driven)* — When an HR capability toggle is rejected due to missing reason, missing confirmation, missing/invalid row version (optimistic concurrency conflict), target lacking Approver role, or inactive HR actor, the system shall create a structured security event recording the HR actor, target (if applicable), failure reason, and timestamp.
 
 ### Error and Failure Requirements
 - **ERR-001 — Return Actionable Validation Feedback** *(Unwanted Behavior)* — If validation fails, then the system shall reject the operation and communicate the failed rule without exposing sensitive data or implementation details.
@@ -350,9 +388,17 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 ### Configuration Requirements
 - **CFG-001 — Configure the Timeout Limit** *(Ubiquitous)* — The system shall treat the Pending-resolution timeout `X` (in days) as a configurable system parameter that can change without altering the domain workflow.
 - **CFG-002 — Configure Session Lifetime** *(Ubiquitous)* — The system shall treat authenticated-session lifetime and expiration behavior as configurable, consistent with the constitutional security baseline.
+- **CFG-003 — Provision Initial Demo Identities** *(Ubiquitous)* — The system shall provide a configurable, idempotent mechanism to seed initial demo users at application startup (e.g., via `IHostedService` or `IDbInitializer`) with the following roles and statuses for manual verification and E2E testing:
+  - `demo.user@novaleave.test` — roles: `User`, `Approver` (Active); HR: Inactive
+  - `demo.approver@novaleave.test` — role: `Approver` (Active, `canResolveRequests=true`); User: Inactive; HR: Inactive
+  - `demo.rrhh@novaleave.test` — role: `HR` (Active); User: Inactive; Approver: Inactive
+  - `demo.combo@novaleave.test` — roles: `User` (Active), `Approver` (Active, `canResolveRequests=true`), `HR` (Active) — for multi-role context switching
+  - All identities: `Active=true`, default password configurable, employment start date = 12 months before seed date (ensures accrued balance ≥ 12 days), initial `canResolveRequests` per role assignment above
+  - Seeding is opt-in via configuration flag (e.g., `NovaLeave:SeedDemoUsers=true`) and MUST NOT run in Production environments
 
 ### Key Entities *(include if feature involves data)*
-- **User**: A person authenticated through ASP.NET Core Identity, linked to the business user by a stable identifier. Holds one or more of the roles `User` and `Approver`, an `Active`/`Inactive` status, service or employment-start information sufficient to determine completed months for accrual, and exactly one global vacation balance.
+- **User**: A person authenticated through ASP.NET Core Identity, linked to the business user by a stable identifier. Holds one or more of the roles `User`, `Approver`, and `HR`, an `Active`/`Inactive` status, service or employment-start information sufficient to determine completed months for accrual, and exactly one global vacation balance.
+- **HR**: An identity with the `HR` role and `Active`/`Inactive` status. Authorized for organization-wide read access to vacation requests, organizational calendar information, vacation balances and movements, relevant audit information, and Approver capability status (`canResolveRequests`). May activate or deactivate `canResolveRequests` only for an identity that already has the `Approver` role, requiring explicit reason, confirmation, expected row version, optimistic concurrency handling, transaction-safe persistence, and audit logging. MUST NOT approve, reject, deactivate requests; modify vacation balances; or assign/remove roles. *(Constitution v6.0.0 §4.3)*
 - **Vacation Request**: A User's request for full working days of vacation. Attributes: owner, input mode, authoritative start date, authoritative end date, authoritative working-day total, reason, state, reservation effect, approval metadata, rejection metadata (including rejection reason), timeout metadata, deactivation metadata, and a version/concurrency identity. It begins `Pending` and transitions per the lifecycle rules.
 - **Vacation Balance**: The global, non-expiring balance for one User. Attributes: accrued days, permanently deducted days, days reserved by active Pending requests, and available days (accrued − deducted − reserved). All quantities are non-negative whole working days.
 - **Leave Type**: A parametric leave classification. In the MVP the only active type is `Vacation`; the model remains extensible so additional types can be introduced later without redesigning the request lifecycle. Balance is global and not partitioned by type.
@@ -400,9 +446,9 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 
 ### Approved Product Decisions (2026-07-16)
 - **PD-001 — Single Leave Type**: `Vacation` is the only active MVP type; the domain stays parametric and extensible. `Personal Leave` and `Medical Leave` are out of scope.
-- **PD-002 — Two Roles**: The only application roles are `User` and `Approver`. No teams, managers, delegates, escalation, or HR.
+- **PD-002 — Three Roles**: The application roles are `User`, `Approver`, and `HR`. No teams, managers, delegates, escalation. Any active Approver may resolve any eligible request except their own. HR has organization-wide read access to requests, calendar, balances, audit, and approver-capability management (activate/deactivate `canResolveRequests` for existing Approvers with reason, confirmation, row version, audit) per Constitution v6.0.0 §4.3.
 - **PD-003 — Global Approver Authority**: Any active Approver may resolve any eligible request; no one may resolve their own request.
-- **PD-004 — Active/Inactive Status**: Users and Approvers have `Active`/`Inactive` status; an inactive Approver cannot resolve requests.
+- **PD-004 — Active/Inactive Status**: Users, Approvers, and HR have `Active`/`Inactive` status; an inactive Approver cannot resolve requests; an inactive HR cannot perform approver-capability management; an inactive User cannot submit or edit requests.
 - **PD-005 — Global Accruing Balance**: One global balance per User; +1 whole day per completed month; no proration; no expiry; accumulates indefinitely; never negative.
 - **PD-006 — Pending Reservation**: Pending requests reserve availability; available balance accounts for other Pending reservations; approval converts a reservation into a permanent deduction; rejection and timeout release it (no deduction occurred, so this is a release, not a return of deducted days).
 - **PD-007 — Full-Day Calendar Rules**: Inclusive calendar dates and whole working days; Saturdays and Sundays excluded; holidays counted as working days; no holiday calendar; no time zones; earliest start is the following calendar day; zero-working-day ranges are rejected.
@@ -424,17 +470,17 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 - **OQ-005 — Calendar scope**: Whether the basic vacation calendar shows only the User's own requests or broader anonymized availability is undefined.
 
 ### Explicitly Out of MVP Scope
-`Personal Leave`; `Medical Leave`; half-day requests; hourly requests; attachments; holiday calendars; time-zone handling; the HR role and HR workflows; teams and reporting hierarchies; manager delegation; approval escalation; SSO; automatic password recovery; Google Calendar integration; Outlook integration; payroll integration; other external integrations; advanced reports; data analytics; AI simulations; advanced AI functionality; conversational bots; partial cancellation; approved-request date editing; cancellation after the approved period begins; and any additional complexity not explicitly approved for the MVP.
+`Personal Leave`; `Medical Leave`; half-day requests; hourly requests; attachments; holiday calendars; time-zone handling; teams and reporting hierarchies; manager delegation; approval escalation; SSO; automatic password recovery; Google Calendar integration; Outlook integration; payroll integration; other external integrations; advanced reports; data analytics; AI simulations; advanced AI functionality; conversational bots; partial cancellation; approved-request date editing; cancellation after the approved period begins; and any additional complexity not explicitly approved for the MVP.
 
 ### Future Direction (not MVP requirements)
 Additional leave types; vacation-pattern analytics; KPIs; AI-assisted reporting; conversational bots; predictive or simulation capabilities; and external calendar, payroll, or enterprise integrations may be considered in later phases but must not become MVP requirements.
 
 ### Implementation Readiness Confirmation
-- [x] The `User`/`Approver`, `Vacation`-only business model is fully specified with EARS requirements and complete acceptance-scenario traceability.
-- [x] The two prior Constitution conflicts (Approver deactivation; time-zone removal) are resolved by the Constitution v4.0.0 amendment (2026-07-16); no unresolved Constitution conflict remains.
+- [x] The `User`/`Approver`/`HR`, `Vacation`-only business model is fully specified with EARS requirements and complete acceptance-scenario traceability.
+- [x] The two prior Constitution conflicts (Approver deactivation; time-zone removal) are resolved by the Constitution v4.0.0 amendment (2026-07-16); the HR role addition is resolved by the Constitution v6.0.0 amendment (2026-07-23); no unresolved Constitution conflict remains.
 - [ ] Four business questions remain open (OQ-002–OQ-005) and must be resolved before building the affected areas (completed-month semantics, inactive-User operations, deactivation reason, calendar scope). OQ-001 (owner cancellation) is resolved as out of MVP scope by v4.0.0.
 - [x] Every normative requirement maps to at least one acceptance scenario, edge case, or specialized test category.
-- [x] The core create-resolve-reserve-accrue workflow may proceed on the recorded decisions under Constitution v4.0.0, following the constitution-defined planning and test-first workflow.
+- [x] The core create-resolve-reserve-accrue workflow may proceed on the recorded decisions under Constitution v6.0.0, following the constitution-defined planning and test-first workflow.
 
 ## Requirement Traceability Matrix
 Every normative requirement maps to at least one acceptance scenario, edge case, or specialized test.
@@ -452,6 +498,15 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | FR-013 | AC-048 | Integration + Concurrency |
 | FR-014 | AC-054 | Domain + Integration |
 | FR-015 | AC-057 | Acceptance |
+| FR-009 | AC-HR-001 | Acceptance + Authorization |
+| FR-016 | AC-HR-002 | Acceptance + Authorization |
+| FR-017 | AC-HR-003 | Acceptance + Authorization |
+| FR-018 | AC-HR-004 | Acceptance + Authorization |
+| FR-019 | AC-HR-005 | Acceptance + Authorization |
+| FR-020 | AC-HR-006 | Acceptance + Authorization |
+| FR-021 | AC-HR-007 | Acceptance + Authorization |
+| FR-022 | AC-HR-008 | Integration + Concurrency + Security |
+| FR-025 | AC-058 | Integration + Authorization |
 | VAL-001 | AC-002, AC-043 | Validation |
 | VAL-002 | AC-001 | Validation |
 | VAL-003 | AC-038 | Validation |
@@ -477,12 +532,12 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | BR-016 | AC-018 | Domain + Integration |
 | BR-017 | AC-007, AC-044 | Domain + Data Model |
 | BR-018 | AC-011 | Domain + Integration |
-| BR-019 | AC-010, AC-040, EC-002 | Domain + Integration |
+| BR-019 | AC-010, AC-040, AC-058, AC-059, EC-002 | Domain + Integration |
 | BR-020 | AC-012 | Integration + Concurrency |
 | BR-021 | AC-016, AC-033 | Integration |
 | BR-023 | AC-016 | Domain + Integration |
 | BR-024 | AC-043, EC-006 | Domain + Validation |
-| BR-025 | AC-045, AC-046 | Integration + Concurrency |
+| BR-025 | AC-045, AC-046, AC-059 | Integration + Concurrency |
 | BR-026 | AC-048 | Domain + Integration |
 | BR-027 | AC-050, AC-051 | Domain + Integration |
 | BR-028 | AC-052 | Domain |
@@ -494,14 +549,20 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | BR-034 | AC-011 | Domain |
 | BR-035 | AC-050, AC-053 | Domain + Integration |
 | AUTHZ-001 | AC-007, AC-008 | Authorization |
-| AUTHZ-002 | AC-012, AC-050 | Authorization |
-| AUTHZ-003 | AC-017 | Authorization + Security |
+| AUTHZ-002 | AC-012, AC-050, AC-058 | Authorization |
+| AUTHZ-003 | AC-017, AC-058 | Authorization + Security |
 | AUTHZ-005 | AC-008, AC-017, AC-047 | Security |
 | AUTHZ-006 | AC-012, AC-020 | Authorization |
 | AUTHZ-007 | AC-012, AC-018, AC-020, AC-046, AC-050 | Authorization + Integration |
 | AUTHZ-008 | AC-038 | Authorization + Resilience |
 | AUTHZ-009 | AC-047 | Authorization + Security |
 | AUTHZ-010 | AC-047, AC-055 | Authorization |
+| AUTHZ-011 | AC-HR-001, AC-HR-002, AC-HR-003, AC-HR-004, AC-HR-005, AC-HR-006 | Authorization |
+| AUTHZ-012 | AC-HR-008 | Authorization + Integration |
+| AUTHZ-013 | AC-HR-010 | Security |
+| AUTHZ-014 | AC-HR-011 | Security |
+| AUTHZ-015 | AC-HR-012 | Security |
+| AUTHZ-016 | AC-HR-008 | Authorization + Security |
 | SEC-001 | AC-030, AC-031 | Security |
 | SEC-002 | AC-008, AC-030, AC-057 | Security |
 | SEC-003 | AC-008 | Security |
@@ -510,6 +571,7 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | SEC-006 | AC-029 | Redaction |
 | SEC-007 | AC-032 | MVC Security |
 | SEC-008 | AC-055, AC-056 | Security |
+| SEC-009 | AC-HR-009 | Security Logging |
 | CON-001 | AC-009, EC-016 | Concurrency + Idempotency |
 | CON-002 | AC-019, AC-049 | Concurrency |
 | CON-003 | AC-019, AC-053 | Concurrency + Integration |
@@ -517,10 +579,10 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | CON-005 | AC-012 | Concurrency + Integration |
 | CON-006 | AC-012, AC-033 | Transactional Integration |
 | CON-007 | AC-001, AC-037 | Transactional Integration + Failure Injection |
-| CON-008 | AC-010, AC-040 | Concurrency + Integration |
+| CON-008 | AC-010, AC-040, AC-058, AC-059 | Concurrency + Integration |
 | CON-009 | AC-048, AC-049 | Concurrency + Idempotency |
 | CON-010 | AC-050, AC-053 | Transactional Integration |
-| CON-011 | AC-045, AC-046 | Transactional Integration |
+| CON-011 | AC-045, AC-046, AC-059 | Transactional Integration |
 | AUD-001 | AC-001, AC-009, AC-037 | Audit Integration |
 | AUD-002 | AC-012, AC-016, AC-045, AC-048, AC-050 | Audit Integration |
 | AUD-003 | AC-012, AC-048 | Audit Schema Verification |
@@ -529,6 +591,8 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | AUD-006 | AC-029 | Redaction |
 | AUD-007 | AC-012, AC-050 | Audit Integration |
 | AUD-008 | AC-048 | Audit Schema Verification |
+| AUD-009 | AC-HR-008 | Audit Integration |
+| AUD-010 | AC-HR-009 | Security Logging |
 | ERR-001 | AC-002, AC-003, AC-004, AC-043, AC-052 | Acceptance |
 | ERR-002 | AC-018, AC-046, AC-051, AC-053 | Failure Injection + Integration |
 | ERR-003 | AC-029 | Security Output |
@@ -537,31 +601,40 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | ERR-006 | AC-048 | Acceptance |
 | CFG-001 | AC-048 | Configuration + Integration |
 | CFG-002 | AC-055 | Configuration + Security |
+| CFG-003 | AC-060 | Configuration + Integration |
 ---
 
 ## Constitution Check
-This specification has been checked against `.specify/memory/constitution.md` v4.0.0.
+This specification has been checked against `.specify/memory/constitution.md` v6.0.0.
 
 ### Conflicts Resolved by the Constitution v4.0.0 Amendment (2026-07-16)
-The three items previously reported against Constitution v3.0.0 are now resolved by the v4.0.0 amendment, which adopted the Product Owner model (per §16.4, a MAJOR amendment with a Sync Impact Report). No unresolved Constitution conflict remains:
+The three items previously reported against Constitution v3.0.0 are now resolved by the v4.0.0 amendment, which adopted the Product Owner model (per §16.4, a MAJOR amendment with a Sync Impact Report):
 1. **Approved-request deactivation** — v4.0.0 amends invariant 8 (`Approved` is final *except a valid pre-start deactivation*) and invariant 9 (a resolved request may undergo a bounded, audited pre-start deactivation), and adds `Approved → CancelledByApprover` to invariant 7. FR-011 / BR-027 / BR-035 now comply.
 2. **Removal of time zones** — v4.0.0 amends invariant 4 to evaluate dates against a single system business date without per-user time zones (UTC storage retained). BR-003 now complies.
 3. **Owner cancellation** — v4.0.0 invariant 7 explicitly defers User-initiated cancellation of a `Pending` request to a future approved specification, so the Constitution no longer mandates it. Recorded as OQ-001 (out of MVP scope); nothing invented.
+
+### HR Role Addition via Constitution v6.0.0 Amendment (2026-07-23)
+The Constitution v6.0.0 amendment (MAJOR, per §16.4 with Sync Impact Report) adds `HR` as a third combinable application role with organization-wide read access and approver-capability management. This specification has been amended to align:
+- §4 (Actors) expanded to three roles with HR read-only access and prohibitions
+- §5 (Lifecycle) amended to include HR active-status revalidation
+- §7.1 (Auth) and §7.4 (Security Tests) amended with HR policies and test cases
+- §11 (MVC/Frontend Governance) amended to reference role-based frontend specs
+- §15.1 (Authority Order), §16.4 (Amendments), §17 (Risks) updated accordingly
 
 | Constitutional Area | Result |
 |---|---|
 | Clean Architecture | Compliant. Behavior only; no layer/implementation prescribed. |
 | MVC, Razor Views, Bootstrap | Compliant. Presentation remains a constitutional/planning concern; anti-forgery and server-authoritative validation are honored. |
 | ASP.NET Core Identity & sessions | Compliant. Identity with cookie auth; configured session expiration and expired-session rejection (SEC-008, CFG-002). SSO and automatic password recovery are out of scope; Identity password policies remain governed by the constitution. |
-| Roles & authorization | Compliant with adaptation. Two roles (`User`, `Approver`); deny-by-default; ownership and active-status checks; global (non-scoped) Approver authority replaces the manager/team model. §7.4's "cross-team access" test category no longer applies (no teams); cross-User IDOR testing is retained. |
-| Lifecycle invariants | Compliant under v4.0.0. The revised lifecycle (`CancelledByTimeout`, `CancelledByApprover`, pre-start deactivation, Pending editing) matches amended invariants 3, 4, 6–10, and 12. |
+| Roles & authorization | Compliant. Three roles (`User`, `Approver`, `HR`); deny-by-default; ownership and active-status checks; global (non-scoped) Approver authority; HR read-only with capability management per §4.3. §7.4's test cases include HR resolution/balance/role/capability violation attempts. |
+| Lifecycle invariants | Compliant under v6.0.0. The revised lifecycle (`CancelledByTimeout`, `CancelledByApprover`, pre-start deactivation, Pending editing) matches amended invariants 3, 4, 6–10, and 12; HR inactive status revalidation added. |
 | Balance integrity | Compliant. One global non-negative balance; monthly accrual (constitution §5.1 reserves accrual policy to the spec); Pending reservations; approval deduction; deactivation restoration; duplicate-effect protection; atomic with audit (§6). |
-| Date and overlap rules | Compliant under v4.0.0 (amended invariants 3 and 4). Inclusive whole working days; weekends excluded; holidays counted; next-day minimum; zero-day rejection; overlap and adjacency defined; single business date, no time zones. |
-| Security baseline | Compliant. Authentication denial, IDOR fail-closed, self-resolution denial, invalid-transition rejection, anti-forgery, redaction, and session expiration are specified; server never trusts client-derived values. |
-| Auditability | Compliant. Creation, editing, and every successful transition (including timeout and deactivation) and balance effects are immutably audited with the constitution's minimum fields; security events are separate. |
-| Concurrency | Compliant. Optimistic-concurrency-style stale rejection, one-winner transitions, duplicate-effect prevention, atomic overlap-with-confirmation, and idempotent timeout are specified (§6). |
-| Test-first and traceability | Compliant. Every requirement maps to a scenario or specialized test. |
+| Date and overlap rules | Compliant under v6.0.0 (amended invariants 3 and 4). Inclusive whole working days; weekends excluded; holidays counted; next-day minimum; zero-day rejection; overlap and adjacency defined; single business date, no time zones. |
+| Security baseline | Compliant. Authentication denial, IDOR fail-closed, self-resolution denial, invalid-transition rejection, anti-forgery, redaction, session expiration, HR reason-access audit, HR capability-toggle audit are specified; server never trusts client-derived values. |
+| Auditability | Compliant. Creation, editing, and every successful transition (including timeout and deactivation) and balance effects are immutably audited with the constitution's minimum fields; security events are separate; HR capability toggle audited (AUD-009, AUD-010). |
+| Concurrency | Compliant. Optimistic-concurrency-style stale rejection, one-winner transitions, duplicate-effect prevention, atomic overlap-with-confirmation, idempotent timeout, HR capability optimistic concurrency (row version) are specified (§6). |
+| Test-first and traceability | Compliant. Every requirement maps to a scenario or specialized test; new HR requirements (FR-009, FR-016–022, AUTHZ-011–016, SEC-009, AUD-009–010) have traceability pending acceptance scenarios. |
 | Localization | Compliant. User-facing language follows the constitution (§3.3, Spanish default); the prior English-only assumption is removed. |
-| Scope discipline | Compliant. Out-of-scope items are enumerated; only approved values are configurable. |
-**Constitution Result**: PASS — the specification aligns with Constitution v4.0.0; the two prior lifecycle conflicts are resolved by the amendment and no unresolved Constitution conflict remains.
-**Implementation Result**: READY WITH OPEN QUESTIONS — the core create-resolve-reserve-accrue workflow is fully specified and Constitution-aligned, and may enter planning and test-first design. Four product questions (OQ-002–OQ-005) should be resolved before building the areas they affect (completed-month accrual semantics, inactive-User operations, deactivation reason, calendar scope); OQ-001 is resolved as out of MVP scope.
+| Scope discipline | Compliant. Out-of-scope items are enumerated; only approved values are configurable; HR role and workflows are IN scope per Constitution v6.0.0. |
+**Constitution Result**: PASS — the specification aligns with Constitution v6.0.0; the two prior lifecycle conflicts are resolved by the v4.0.0 amendment; the HR role addition is resolved by the v6.0.0 amendment; no unresolved Constitution conflict remains.
+**Implementation Result**: READY WITH OPEN QUESTIONS — the core create-resolve-reserve-accrue workflow with HR read-only and capability management is fully specified and Constitution-aligned, and may enter planning and test-first design. Four product questions (OQ-002–OQ-005) should be resolved before building the areas they affect (completed-month accrual semantics, inactive-User operations, deactivation reason, calendar scope); OQ-001 is resolved as out of MVP scope.
