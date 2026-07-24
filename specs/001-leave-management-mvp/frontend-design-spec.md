@@ -484,6 +484,16 @@ The create/edit request form must expose **only two input modes** via an accessi
 - Both modes normalize server-side to one authoritative date range and one authoritative working-day total.
 - Weekend exclusion (Mon–Fri only) applies in both modes; holidays counted as working days per MVP rule.
 
+### 18.1 Excess Justification Field (Conditional)
+
+When the server detects that the requested working-day total exceeds the User's available balance at submission time:
+
+- **Additional field required**: `Justificación de exceso` (textarea, 10–500 characters, trimmed, whitespace-only rejected, markup treated as plain text).
+- **Accessible label**: `Justificación por solicitar días que exceden su saldo disponible (10–500 caracteres)`.
+- **Client hint**: Inline text "Este campo es obligatorio cuando los días solicitados superan su saldo disponible" displayed below the field conditionally.
+- **Visual distinction**: Field rendered with a subtle warning accent (semantic warning token from Section 4.1) but no emojis.
+- **Server behavior**: Request is created in `PendingEscalated` state; Approver cannot approve/reject directly — must escalate to HR.
+
 ## 19. Weekend Exclusion in Working-Day Calculation
 
 - **Date-range mode**: Count Monday–Friday inclusively; exclude Saturdays and Sundays.
@@ -511,17 +521,46 @@ The create/edit request form must expose **only two input modes** via an accessi
 - **Empty states**: "No hay solicitudes pendientes" / "Sin solicitudes elegibles" with illustration (SVG, `aria-hidden`).
 - **Reduced motion**: Respects `prefers-reduced-motion` (Section 8).
 
+### 20.1 Escalated Requests (`PendingEscalated` State)
+
+When a request exceeds the User's available balance at submission:
+
+- **List badge**: `Exceso de saldo` (semantic warning token, distinct from `Pendiente`).
+- **Detail view**: Displays `Disponible actual` (available balance at submission), `Días solicitados` (total requested), `Exceso` (requested − available), and the User's `Justificación de exceso` with label `Justificación del solicitante`.
+- **Actions**:
+  - **Escalar a RRHH** (primary action): Opens accessible modal requiring escalation reason (10–500 chars) and explicit confirmation; on submit transitions to `EscalatedToHR`, locks Approver actions, records audit.
+  - **Rechazar** (secondary): Standard rejection flow with reason (10–500 chars); releases any reserved days; transitions to `Rejected`.
+  - **Approve**: Disabled/hidden for `PendingEscalated` — cannot approve directly.
+- **Projected balance card**: Shows `Disponible actual`, `Días solicitados`, `Exceso`, and `Disponible después de aprobar (negativo)` = `Disponible actual` − `Días solicitados` (negative value with warning style).
+- **No emojis** in badges or buttons.
+
+### 20.2 Authorized Excess Requests (`PendingAuthorizedExcess` State)
+
+After HR authorizes the excess days:
+
+- **List badge**: `Exceso autorizado` (semantic info token).
+- **Detail view**: Shows HR authorization record (authorizer, date, authorized excess count, authorization reason) with label `Autorización RRHH`.
+- **Projected balance card**: `Disponible actual` (available at submission), `Días solicitados`, `Exceso autorizado`, `Disponible después de aprobar (negativo)` = negative value (warning style).
+- **Actions**: Standard **Aprobar** and **Rechazar** enabled; Approve deducts total days creating negative balance with `NegativeBalanceCarryForward`; Reject transitions to `Rejected` and releases reservation.
+- **Mutually exclusive**: Approve/Reject mutually exclusive per §23.
+
 ## 21. HR UI/UX Improvements
 
-**Applies to**: Request list, Request detail, Organizational calendar, Balances list, Balance movements, Audit log, Approver capability list.
+**Applies to**: Request list, Request detail, Organizational calendar, Balances list, Balance movements, Audit log, Approver capability list, **Escalated request resolution**.
 
 - **Visual standards**: Same tokens, spacing, cards, tables, shadows as rest of app.
-- **Read-only indicators**: Visible badge/label `Solo lectura` on all HR views; no resolution actions (Approve/Reject/Deactivate) rendered or actionable.
+- **Read-only indicators**: Visible badge/label `Solo lectura` on all HR views; no resolution actions (Approve/Reject/Deactivate) rendered or actionable **except** for `EscalatedToHR` requests (see below).
 - **Tables**: Server-side pagination, sortable columns, filter toolbar; responsive card fallback on mobile.
 - **Calendar**: Month view with approved periods; requester names visible (HR-authorized); keyboard-navigable events.
-- **Balances/Movements**: Summary cards (`Acumulado total`, `Pendientes`, `Días gozados`, `Disponible`); movement timeline with date, concept, amount, resulting balance.
+- **Balances/Movements**: Summary cards (`Acumulado total`, `Pendientes`, `Días gozados`, `Disponible`); movement timeline with date, concept, amount, resulting balance; **when `NegativeBalanceCarryForward > 0`, show recovery plan card with months to zero**.
 - **Capability management**: List shows Approver identity, `canResolveRequests` toggle; toggle requires reason (10–500 chars), confirmation modal, row version (optimistic concurrency), success/error/conflict toasts.
 - **States**: Empty, loading, forbidden (403), conflict (stale version), error — all with accessible messaging.
+- **Escalated request resolution** (`/rrhh/solicitudes/{id}` for `EscalatedToHR` state):
+  - **Detail view**: Mirrors Approver detail with `Exceso de saldo` badge, `Disponible actual`, `Días solicitados`, `Exceso`, `Justificación del solicitante`, and `Autorización RRHH` section (empty pending resolution).
+  - **Actions**: Two primary actions — **Autorizar exceso** and **Rechazar exceso**; both require reason (10–500 chars) and explicit confirmation modal; **Approve/Reject/Deactivate not shown**.
+  - **Autorizar exceso**: On submit, transitions to `PendingAuthorizedExcess`, records authorized excess count and HR reason, unlocks Approver actions, creates authorization audit event.
+  - **Rechazar exceso**: On submit, transitions to `Pending` with `Días solicitados` reduced to available balance at submission time, `Exceso` set to zero, notifies Approver.
+  - **Negative balance carry-forward visibility**: In balance list and movements, shows `NegativeBalanceCarryForward` as a distinct concept with recovery timeline.
 
 ## 22. Calendar-to-Detail Navigation
 

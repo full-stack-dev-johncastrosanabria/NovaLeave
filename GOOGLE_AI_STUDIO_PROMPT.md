@@ -119,22 +119,22 @@ docker/
 
 ### Phase 1: Domain Layer (NovaLeave.Domain)
 **Entities & Value Objects:**
-- `User` (Id, IdentityId, Roles[], ActiveStatus, EmploymentStartDate, Balance)
-- `VacationRequest` (Id, OwnerId, InputMode, StartDate, EndDate, WorkingDaysTotal, Reason, State, Version, Reservation, ApprovalMetadata, RejectionMetadata, TimeoutMetadata, DeactivationMetadata)
-- `VacationBalance` (UserId, AccruedDays, DeductedDays, ReservedDays, AvailableDays computed)
+- `User` (Id, IdentityId, Roles[], ActiveStatus, EmploymentStartDate, Balance, NegativeBalanceCarryForward)
+- `VacationRequest` (Id, OwnerId, InputMode, StartDate, EndDate, WorkingDaysTotal, Reason, ExcessJustification, State, Version, Reservation, ApprovalMetadata, RejectionMetadata, TimeoutMetadata, DeactivationMetadata, EscalationMetadata, HRAuthorizationMetadata)
+- `VacationBalance` (UserId, AccruedDays, DeductedDays, ReservedDays, AvailableDays computed, NegativeBalanceCarryForward)
 - `LeaveType` (Id, Name, IsActive, ConsumesBalance) — MVP only `Vacation`
-- `RequestState` enum: `Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`
+- `RequestState` enum: `Pending`, `PendingEscalated`, `EscalatedToHR`, `PendingAuthorizedExcess`, `Approved`, `ApprovedEscalated`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`
 - `AuditRecord` (immutable)
 - `SecurityEvent` (immutable)
 - `SystemParameter` (TimeoutDays, SessionLifetime)
 
 **Domain Services:**
 - `WorkingDayCalculator` — authoritative Mon–Fri count, weekend exclusion, holiday inclusion (no calendar)
-- `BalanceService` — accrual (1 day/completed month), reservation, deduction, restoration, available calculation
+- `BalanceService` — accrual (1 day/completed month), reservation, deduction, restoration, available calculation, **negative balance recovery from accruals**
 - `OverlapValidator` — inclusive range intersection against Pending/Approved same owner
-- `StateTransitionValidator` — validates all transitions per invariants (BR-006, BR-007, BR-027, BR-028)
+- `StateTransitionValidator` — validates all transitions per invariants (BR-006, BR-007, BR-027, BR-028, BR-043, BR-044, BR-045)
 
-**Domain Events:** `RequestCreated`, `RequestEdited`, `RequestApproved`, `RequestRejected`, `RequestCancelledByTimeout`, `RequestCancelledByApprover`, `BalanceAccrued`, `BalanceDeducted`, `BalanceRestored`, `ApproverCapabilityToggled`
+**Domain Events:** `RequestCreated`, `RequestEdited`, `RequestApproved`, `RequestRejected`, `RequestCancelledByTimeout`, `RequestCancelledByApprover`, `BalanceAccrued`, `BalanceDeducted`, `BalanceRestored`, `ApproverCapabilityToggled`, `RequestEscalatedToHR`, `HRAuthorizedExcess`, `HRRejectedExcess`, `AccrualRecoveredNegativeBalance`
 
 ### Phase 2: Application Layer (NovaLeave.Application)
 **Vertical Slices (feature folders):**
@@ -161,6 +161,18 @@ LeaveRequests/
     DeactivateApprovedRequestCommand
     DeactivateApprovedRequestHandler
     DeactivateApprovedRequestValidator
+  Escalate/
+    EscalateRequestToHRCommand
+    EscalateRequestToHRHandler
+    EscalateRequestToHRValidator
+  HRAuthorize/
+    HRAuthorizeExcessCommand
+    HRAuthorizeExcessHandler
+    HRAuthorizeExcessValidator
+  HRReject/
+    HRRejectExcessCommand
+    HRRejectExcessHandler
+    HRRejectExcessValidator
   Get/
     GetMyRequestsQuery
     GetRequestDetailQuery
@@ -172,6 +184,7 @@ LeaveBalances/
   GetMyBalanceHandler
   GetAllBalancesQuery (HR)
   GetBalanceMovementsQuery (HR)
+  GetAccrualRecoveryPlanQuery (HR + User)
 HR/
   GetApproversListQuery
   ToggleApproverCapabilityCommand
@@ -181,6 +194,7 @@ HR/
 System/
   RunTimeoutCancellationCommand
   RunMonthlyAccrualCommand
+  RunAccrualRecoveryCommand
 ```
 
 **Cross-Cutting:**
@@ -224,19 +238,22 @@ CalendarioController          [RequireActiveUser|Approver|HR]
 
 AprobacionesController        [RequireActiveApprover]
   GET    /aprobaciones             → PendingRequestsViewModel (with projected balance columns)
-  GET    /aprobaciones/{id}        → ApproverRequestDetailViewModel (projected balance card, actions)
+  GET    /aprobaciones/{id}        → ApproverRequestDetailViewModel (projected balance card, **actions vary by state**: Pending=Approve/Reject/Deactivate; PendingEscalated=Escalar a RRHH/Rechazar; PendingAuthorizedExcess=Approve/Reject)
   POST   /aprobaciones/{id}/aprobar   → ApproveVacationRequestCommand (mutually exclusive, revalidate projected)
   POST   /aprobaciones/{id}/rechazar  → RejectVacationRequestCommand (reason required 10-500)
   POST   /aprobaciones/{id}/desactivar → DeactivateApprovedRequestCommand (pre-start only)
+  POST   /aprobaciones/{id}/escalar   → EscalateRequestToHRCommand (reason required 10-500, confirmation)
   GET    /aprobaciones/historial   → ApproverHistoryViewModel
 
 RRHHController                [RequireActiveHR]
   GET    /rrhh                     → HRDashboardViewModel
   GET    /rrhh/solicitudes         → HRRequestListViewModel (filterable, paginated)
-  GET    /rrhh/solicitudes/{id}    → HRRequestDetailViewModel (read-only, projected balance)
+  GET    /rrhh/solicitudes/{id}    → HRRequestDetailViewModel (read-only, projected balance; **actions for EscalatedToHR: Autorizar exceso / Rechazar exceso**)
+  POST   /rrhh/solicitudes/{id}/autorizar-exceso → HRAuthorizeExcessCommand (reason 10-500, confirmation, row version)
+  POST   /rrhh/solicitudes/{id}/rechazar-exceso → HRRejectExcessCommand (reason 10-500, confirmation)
   GET    /rrhh/calendario          → HRCalendarViewModel (org-wide, names visible)
-  GET    /rrhh/saldos              → HRBalanceListViewModel (cards: Acumulado total, Pendientes, Días gozados, Disponible)
-  GET    /rrhh/saldos/{userId}     → HRBalanceMovementsViewModel
+  GET    /rrhh/saldos              → HRBalanceListViewModel (cards: Acumulado total, Pendientes, Días gozados, Disponible; **NegativeBalanceCarryForward visible**)
+  GET    /rrhh/saldos/{userId}     → HRBalanceMovementsViewModel (**AccrualRecovery movements shown**)
   GET    /rrhh/auditoria           → HRAuditLogViewModel
   GET    /rrhh/aprobadores         → HRApproverListViewModel
   GET    /rrhh/aprobadores/{id}/capacidad → ApproverCapabilityViewModel (GET shows modal data)
@@ -256,23 +273,27 @@ RRHHController                [RequireActiveHR]
 
 **User Context (`Mi espacio`):**
 - `MisSolicitudes/Index.cshtml` — table with **server-side pagination** (page size selector, first/prev/next/last, `aria-label` controls, total count via `aria-live="polite"`), empty state, create button
-- `MisSolicitudes/Create.cshtml` — dual-mode radio group (§18), date inputs, working-days preview (aria-live), balance impact, submit
+- `MisSolicitudes/Create.cshtml` — dual-mode radio group (§18), date inputs, working-days preview (aria-live), balance impact, submit; **when requested days > available: conditional `Justificación de exceso` field (10–500 chars, validation per §18.1), creates `PendingEscalated`**
 - `MisSolicitudes/Edit.cshtml` — pre-filled dual-mode, version token, revalidation
-- `MisSolicitudes/Detail.cshtml` — status badge, dates, days, reason, balance impact, audit timeline, edit link (Pending+owner only)
-- `Saldo/Index.cshtml` — four summary cards (§16), movements timeline, reservation breakdown (dl)
+- `MisSolicitudes/Detail.cshtml` — status badge, dates, days, reason, balance impact, audit timeline, edit link (Pending+owner only); **for `PendingEscalated`: shows `Exceso de saldo` badge, excess count, justification**
+- `Saldo/Index.cshtml` — four summary cards (§16), movements timeline, reservation breakdown (dl); **when `NegativeBalanceCarryForward > 0`: recovery plan card showing months to zero**
 
 **Approver Context (`Aprobaciones`):**
-- `Aprobaciones/Index.cshtml` — table with requester, dates, days, **Disponible actual** (authoritative available **excluding current request's reservation**), **Días solicitados**, **Disponible después de aprobar** (= Disponible actual − Días solicitados), overlap warning, actions; **server-side pagination** (page size selector, first/prev/next/last, `aria-label`, total via `aria-live="polite"`); responsive cards on mobile
-- `Aprobaciones/Detail.cshtml` — full detail + projected balance card (§17: Disponible actual excluding current reservation, Días solicitados, Disponible después de aprobar), revalidation banner, rejection textarea (char counter 10-500, aria-live), approve/reject/deactivate buttons (deactivate only when Approved+pre-start), loading states, mutually exclusive disable on submit (§23)
+- `Aprobaciones/Index.cshtml` — table with requester, dates, days, **Disponible actual** (authoritative available **excluding current request's reservation**), **Días solicitados**, **Disponible después de aprobar** (= Disponible actual − Días solicitados), overlap warning, **state badges: `Pendiente` / `Exceso de saldo` / `Exceso autorizado`**, actions; **server-side pagination** (page size selector, first/prev/next/last, `aria-label`, total via `aria-live="polite"`); responsive cards on mobile
+- `Aprobaciones/Detail.cshtml` — full detail **actions vary by state**:
+  - `Pending`/`PendingAuthorizedExcess`: projected balance card, approve/reject/deactivate (pre-start)
+  - `PendingEscalated`: `Exceso de saldo` badge, `Disponible actual`, `Días solicitados`, `Exceso`, `Justificación del solicitante`, **Escalar a RRHH** (primary, modal with reason 10–500 + confirmation), **Rechazar** (secondary, standard rejection), Approve disabled
 - `Aprobaciones/Historial.cshtml` — resolved requests table with **server-side pagination** (page size selector, first/prev/next/last, `aria-label`, total via `aria-live="polite"`)
 
 **HR Context (`RRHH`):**
 - `RRHH/Index.cshtml` — dashboard summary cards
 - `RRHH/Solicitudes.cshtml` — filterable **server-side paginated table** (page size selector, first/prev/next/last, `aria-label`, total via `aria-live="polite"`), row click → detail
-- `RRHH/Detalle.cshtml` — read-only mirror of Approver detail, **projected balance read-only**, audit trail, no action buttons, `Solo lectura` badge
+- `RRHH/Detalle.cshtml` — **actions vary by state**:
+  - Standard requests: read-only mirror of Approver detail, `Solo lectura` badge, no action buttons
+  - `EscalatedToHR`: `Exceso de saldo` badge, `Disponible actual`, `Días solicitados`, `Exceso`, `Justificación del solicitante`, **Autorizar exceso** (primary, modal with authorized excess count, reason 10–500, confirmation, row version → transitions to `PendingAuthorizedExcess`), **Rechazar exceso** (secondary, modal with reason 10–500, confirmation → transitions to `Pending` with requested days = available balance), Approve/Reject/Deactivate hidden
 - `RRHH/Calendario.cshtml` — org calendar with requester names, keyboard nav to `/rrhh/solicitudes/{id}`
-- `RRHH/Saldos.cshtml` — user table with four balance cards per user, **server-side pagination** (page size selector, first/prev/next/last, `aria-label`, total via `aria-live="polite"`)
-- `RRHH/Movimientos.cshtml` — timeline with date, concept, amount, resulting balance
+- `RRHH/Saldos.cshtml` — user table with four balance cards per user, **server-side pagination** (page size selector, first/prev/next/last, `aria-label`, total via `aria-live="polite"`); **shows `NegativeBalanceCarryForward` badge and recovery timeline**
+- `RRHH/Movimientos.cshtml` — timeline with date, concept, amount, resulting balance; **includes `AccrualRecovery` movements reducing carry-forward**
 - `RRHH/Auditoria.cshtml` — filterable audit table with **server-side pagination** (page size selector, first/prev/next/last, `aria-label`, total via `aria-live="polite"`), redacted payloads, sortable headers
 - `RRHH/Aprobadores.cshtml` — table with toggle `canResolveRequests`, **server-side pagination** (page size selector, first/prev/next/last, `aria-label`, total via `aria-live="polite"`), modal with reason (10-500), confirmation, row version check
 - `RRHH/Capacidad.cshtml` — capability toggle form (GET loads modal, POST executes)
@@ -311,9 +332,10 @@ RRHHController                [RequireActiveHR]
 #### E2E Tests (NovaLeave.EndToEndTests)
 - Playwright critical journeys:
   1. User: login → create request (both modes) → view balance → edit pending → calendar nav
-  2. Approver: login → list pending → view detail with projected balance → approve (success) → reject (with reason) → deactivate pre-start
-  3. HR: login → dashboard → request list → detail (read-only) → calendar → balances → movements → audit → approver capability toggle (reason, confirmation, concurrency conflict)
+  2. Approver: login → list pending → view detail with projected balance → approve (success) → reject (with reason) → deactivate pre-start → escalate excess to HR → approve authorized excess
+  3. HR: login → dashboard → request list → detail (read-only) → calendar → balances → movements → audit → approver capability toggle (reason, confirmation, concurrency conflict) → authorize/reject excess days → view accrual recovery plan
   4. Security: cross-user IDOR, self-resolution, inactive approver, expired session, antiforgery missing, HR attempting resolution/balance edit/role assignment
+  5. Excess flow: user submits 10-day request with 5 available balance + justification → approver sees Exceso de saldo badge, escalates with reason → HR authorizes excess with reason → approver approves authorized excess → user balance shows negative with carry-forward → monthly accrual reduces carry-forward → user cannot create new requests until carry-forward zero
 
 #### Accessibility Tests
 - axe-core automated on every view
@@ -338,12 +360,13 @@ RRHHController                [RequireActiveHR]
 
 ### Feature Spec (spec.md)
 - [ ] All FR, VAL, BR, AUTHZ, SEC, CON, AUD, ERR, CFG requirements implemented
-- [ ] All 60 acceptance scenarios (AC-001 through AC-HR-012 + AC-058, AC-059, AC-060) passing
+- [ ] All acceptance scenarios (AC-001 through AC-HR-013 + AC-058, AC-059, AC-060, **AC-061 through AC-068**) passing
 - [ ] Projected balance: server-calculated `available - requestedDays` (FR-023, BR-036, BR-037, BR-038)
 - [ ] Calendar-to-detail nav per role authorization (FR-024, AUTHZ-017, AUTHZ-018, AUTHZ-019)
 - [ ] Mutually exclusive approve/reject (CON-012, UI + server)
 - [ ] Creation-to-queue visibility: new eligible Pending request appears in `/aprobaciones` exactly once without manual sync (FR-025, AC-058)
 - [ ] User-scoped overlap: different users may overlap; same user rejected (BR-019, AC-059)
+- [ ] **Excess request flow**: User submits request exceeding balance with justification → created as `PendingEscalated` → Approver sees `Exceso de saldo` badge, escalates to HR with reason → HR authorizes/rejects excess → Approver approves authorized excess → negative balance with `NegativeBalanceCarryForward` → monthly accrual reduces carry-forward → new requests blocked until carry-forward zero (FR-026, FR-027, FR-028, FR-029, BR-043–BR-049, AC-061–AC-068)
 
 ### Frontend Design Spec (frontend-design-spec.md)
 - [ ] Login screen branded per §13
