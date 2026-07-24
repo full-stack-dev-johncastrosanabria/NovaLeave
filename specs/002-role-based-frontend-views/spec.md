@@ -98,9 +98,12 @@ When an identity has at least two authorized contexts:
 | `/aprobaciones/{id}/aprobar` | POST | `Approver` (Active, Eligible, Not Owner) | Approve request |
 | `/aprobaciones/{id}/rechazar` | POST | `Approver` (Active, Eligible, Not Owner) | Reject request |
 | `/aprobaciones/{id}/desactivar` | POST | `Approver` (Active, Eligible, Not Owner) | Deactivate approved request (pre-start) |
+| `/aprobaciones/{id}/escalar` | POST | `Approver` (Active, Eligible, Not Owner) | Escalate `PendingEscalated` request to HR |
 | `/rrhh` | GET | `HR` (Active) | HR dashboard |
 | `/rrhh/solicitudes` | GET | `HR` (Active) | Read-only request list (org-wide) |
 | `/rrhh/solicitudes/{id}` | GET | `HR` (Active) | Read-only request detail |
+| `/rrhh/solicitudes/{id}/autorizar-exceso` | POST | `HR` (Active) | Authorize excess days for `EscalatedToHR` request |
+| `/rrhh/solicitudes/{id}/rechazar-exceso` | POST | `HR` (Active) | Reject excess, reduce to available balance |
 | `/rrhh/calendario` | GET | `HR` (Active) | Organizational calendar |
 | `/rrhh/saldos` | GET | `HR` (Active) | Read-only balances list |
 | `/rrhh/saldos/{userId}` | GET | `HR` (Active) | Read-only balance detail and movements |
@@ -148,7 +151,7 @@ When an identity has at least two authorized contexts:
 | View | Route | Purpose | Key Components |
 |------|-------|---------|----------------|
 | **Pendientes de Resolución** | `/aprobaciones` | List all eligible `Pending` requests across organization | Table with requester, dates, working days, **balance available, projected balance (Disponible actual, Días solicitados, Disponible después de aprobar)**, overlap warnings, action buttons |
-| **Detalle para Resolución** | `/aprobaciones/{id}` | Detail view with resolution actions | Full request info, **balance revalidation with projected balance**, overlap revalidation, approve/reject/deactivate buttons, rejection reason textarea |
+| **Detalle para Resolución** | `/aprobaciones/{id}` | Detail view with resolution actions | Full request info, **balance revalidation with projected balance**, overlap revalidation, approve/reject/deactivate buttons, rejection reason textarea; for `PendingEscalated`: shows `Exceso de saldo` badge, `Disponible actual`, `Días solicitados`, `Exceso`, `Justificación del solicitante`, **Escalar a RRHH** action (primary), **Rechazar** (secondary), Approve disabled |
 | **Historial de Resoluciones** | `/aprobaciones/historial` | List of requests resolved by this approver | Table with date, action, requester, status, audit link |
 | **Calendario Básico** | `/calendario` | Month-view calendar showing approved periods (org-wide, anonymized per policy) | Month grid, event markers, legend |
 
@@ -158,7 +161,9 @@ When an identity has at least two authorized contexts:
 |------|-------|---------|----------------|
 | **Dashboard RRHH** | `/rrhh` | Organization-wide summary cards | Total pending, active approvers, balance summary, quick links |
 | **Solicitudes (Solo Lectura)** | `/rrhh/solicitudes` | Filterable, paginated list of all requests | Table with requester, dates, status, working days, reservation, deduction |
-| **Detalle de Solicitud (Solo Lectura)** | `/rrhh/solicitudes/{id}` | Full request detail including audit trail | Same as Approver detail but read-only; no resolution actions |
+| **Detalle de Solicitud (Solo Lectura)** | `/rrhh/solicitudes/{id}` | Full request detail including audit trail | Same as Approver detail but read-only; no resolution actions; for `EscalatedToHR`: shows `Autorizar exceso` and `Rechazar exceso` actions |
+| **Autorizar Exceso RRHH** | `/rrhh/solicitudes/{id}/autorizar-exceso` | HR authorizes excess days | Modal with authorized excess count, reason (10–500 chars), confirmation, row version; transitions to `PendingAuthorizedExcess` |
+| **Rechazar Exceso RRHH** | `/rrhh/solicitudes/{id}/rechazar-exceso` | HR rejects excess, reduces to available balance | Modal with reason (10–500 chars), confirmation; transitions to `Pending` with requested days = available balance at submission |
 | **Calendario Organizacional** | `/rrhh/calendario` | Month-view calendar showing all approved periods | Month grid, event markers, legend, filter by department/team if applicable |
 | **Saldos (Solo Lectura)** | `/rrhh/saldos` | List all users with balance summary | Table with user, **Acumulado total, Pendientes, Días gozados, Disponible** |
 | **Movimientos de Saldo (Solo Lectura)** | `/rrhh/saldos/{userId}` | Balance history for user | Timeline of accruals, reservations, deductions, restorations |
