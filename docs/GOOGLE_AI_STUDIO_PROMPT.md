@@ -83,15 +83,15 @@ Route-to-role mapping, views, navigation, accessibility checklists, acceptance c
 
 ## Open Questions (RESOLVED / OUT OF MVP SCOPE — Do Not Implement)
 
-Per Constitution v6.0.0 (2026-07-27):
+Per Constitution v6.0.0 (2026-07-27) and Product Owner decision:
+
+✅ **OQ-002 — RESOLVED (2026-07-27)**: Completed-month semantics for accrual defined as **calendar month** (un mes calendario sin importar el mes). A "completed month" means: for each full calendar month (e.g., January 1-31, February 1-28/29, etc.) that has fully elapsed since the User's EmploymentStartDate, add 1 day. The first partial month is not counted. Partial months at the end are not counted. Implemented in `BalanceService.AccrueOneDay()` and Monthly Accrual job.
 
 ✅ **OQ-003 — RESOLVED**: Inactive users cannot create requests, edit requests, or execute actions that change request state (§4.4).
 
 ✅ **OQ-005 — RESOLVED**: User calendar displays only authenticated user's authorized requests; HR calendar displays authorized requests org-wide.
 
-📄 **OQ-002 — OUT OF MVP SCOPE**: Completed-month semantics for accrual (calendar vs anniversary boundaries) — addressed in future spec.
-
-📄 **OQ-004 — OUT OF MVP SCOPE**: Mandatory reason for Approver deactivation — addressed in future spec.
+📄 **OQ-004 — OUT OF MVP SCOPE**: Mandatory reason for Approver deactivation — addressed in future spec. Do not implement.
 
 ---
 
@@ -336,7 +336,7 @@ High/Critical findings block merge unless formal exception with mitigation, owne
 
 ## Important Reminders
 - **Do not invent requirements** — only what's in the three specs + Constitution
-- **Do not resolve out-of-scope questions** (OQ-002, OQ-004) — leave as TODOs with comments referencing the OQ
+- **Do not resolve out-of-scope questions** (OQ-004) — leave as TODOs with comments referencing the OQ
 - **Server is the authority** — client preview is informational only
 - **Spanish for users, English for code** — ViewModels, DTOs, entities in English; .resx or View-level Spanish strings
 - **No MediatR unless justified** — native handlers/services preferred

@@ -584,7 +584,7 @@ The following Constitution v6.0.0 provisions **MUST** be amended via a **MAJOR a
 | **ADR-001: Email Provider Selection** | Capability 2 | Pending |
 | **ADR-002: Outbox Dispatcher Technology** (Hangfire vs. Quartz vs. custom `IHostedService`) | Capability 2 | Pending |
 | **ADR-003: Physical User Deletion Policy** | Capability 1 | Pending — Legal/Compliance input required |
-| **ADR-004: Accrual "Completed Month" Semantics** | Capability 3 (recovery depends on accrual) | Pending — links to OQ-002 |
+| **ADR-004: Accrual "Completed Month" Semantics** | Capability 3 (recovery depends on accrual) | **Resolved (2026-07-27)** — calendar month boundary from EmploymentStartDate; first partial month excluded |
 | **Spec: User & Role Administration** | Capability 1 | Pending PO approval |
 | **Spec: Email Notification System** | Capability 2 | Pending PO approval + ADR-001/002 |
 | **Spec: Excess Balance Requests & Monthly Recovery** | Capability 3 | Pending PO approval + Constitutional Amendment |
@@ -596,10 +596,10 @@ The following Constitution v6.0.0 provisions **MUST** be amended via a **MAJOR a
 
 | Phase | Capabilities | Prerequisites |
 |-------|--------------|---------------|
-| **Phase 0** | Constitutional Amendment v7.0.0; ADR-001, ADR-002, ADR-003, ADR-004 | PO + Legal + Security + Architecture sign-off |
+| **Phase 0** | Constitutional Amendment v7.0.0; ADR-001, ADR-002, ADR-003 | PO + Legal + Security + Architecture sign-off |
 | **Phase 1** | Email Notifications (Capability 2) — infrastructure + MVP event coverage | ADR-001, ADR-002 ratified; provider credentials provisioned |
 | **Phase 2** | User & Role Administration (Capability 1) — logical delete only | ADR-003 ratified; specification approved |
-| **Phase 3** | Excess Balance Requests + Monthly Recovery (Capability 3) | Constitution v7.0.0 ratified; ADR-004 ratified; specification approved |
+| **Phase 3** | Excess Balance Requests + Monthly Recovery (Capability 3) | Constitution v7.0.0 ratified; specification approved |
 
 > Phases may overlap where dependencies allow. Each phase requires independent specification approval and Constitution Check.
 
@@ -647,7 +647,7 @@ The following Constitution v6.0.0 provisions **MUST** be amended via a **MAJOR a
 | OPQ-06 | Can HR revoke an approved excess authorization? | 3 | PO |
 | OPQ-07 | Required evidence / justification categories for excess? | 3 | PO |
 | OPQ-08 | Is excess justification visible to Approver? To other HR? | 3 | PO + Privacy |
-| OPQ-09 | Exact semantics of "completed month" for accrual (calendar vs. anniversary)? | 3 (depends on) | PO — links to OQ-002 |
+| OPQ-09 | Exact semantics of "completed month" for accrual (calendar vs. anniversary)? | 3 (depends on) | **Resolved (2026-07-27)** — calendar month boundary from EmploymentStartDate; first partial month excluded |
 | OPQ-10 | Effect of `CancelledByApprover` on excess debt (full restoration vs. partial)? | 3 | PO |
 | OPQ-11 | Behavior for inactive users with pending excess requests? | 3 | PO |
 | OPQ-12 | Physical deletion allowed for users? Under what legal basis? | 1 | Legal + PO |
@@ -664,7 +664,7 @@ This proposal advances to specification **only if all** conditions are met:
 1. **Product Owner** approves each capability scope and priority
 2. **Legal/Compliance** signs off on deletion policy (OPQ-12), negative balance on termination (OPQ-05), and email data handling
 3. **Security** approves expanded HR threat model and administrative safeguards
-4. **Architecture** ratifies ADR-001 through ADR-004
+4. **Architecture** ratifies ADR-001 through ADR-003
 5. **Constitution v7.0.0** amendment ratified per §16.4 with Sync Impact Report
 6. **Independent Functional Specifications** authored, reviewed, and approved for each capability
 7. **Feature Flags** defined and defaulted `false` in `appsettings.json` schema

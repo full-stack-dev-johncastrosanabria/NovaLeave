@@ -873,7 +873,7 @@ The system determines that a User completed a month according to an approved rul
 ### Controls and references
 
 - Idempotency key by User and period, `TimeProvider`/`IClock`, and atomic transaction.
-- References: `FR-014`, `BR-032`, `BR-033`, `AC-054`, `OQ-002`.
+- References: `FR-014`, `BR-032`, `BR-033`, `AC-054`. **OQ-002 RESOLVED (2026-07-27): calendar month boundary from EmploymentStartDate**.
 
 ---
 
@@ -1131,7 +1131,7 @@ The following are not part of these use cases:
 - Teams, departments, managers, delegation, hierarchy, or escalation.
 - SSO, public APIs, payroll integration, or external calendar integration.
 
-# 7. Open Question
+# 7. Open Question (Resolved)
 
-- **OQ-002:** The exact definition of a completed month for UC-17 remains unresolved. The system must not invent calendar-month, anniversary-date, or partial-month semantics without an approved specification.
+- **OQ-002 — RESOLVED (2026-07-27):** Completed-month semantics for accrual defined as **calendar month** (un mes calendario sin importar el mes). A "completed month" means: for each full calendar month (e.g., January 1-31, February 1-28/29, etc.) that has fully elapsed since the User's EmploymentStartDate, add 1 day. The first partial month is not counted. Partial months at the end are not counted. Implemented in `BalanceService.AccrueOneDay()` and Monthly Accrual job.
 

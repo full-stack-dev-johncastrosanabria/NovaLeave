@@ -464,9 +464,7 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 
 ### Open Questions (unresolved — do not implement until answered)
 - **OQ-001 — Owner cancellation of a Pending request** *(Resolved 2026-07-16)*: Deferred — a separate User-initiated cancellation of a `Pending` request is **out of MVP scope**. Constitution v4.0.0 invariant 7 explicitly defers it to a future approved specification, so no Constitution conflict remains and nothing is invented here. It may be added later by an approved specification. *(Reserved identifier: FR-008.)*
-- **OQ-002 — Completed-month semantics for accrual** *(Documented as OUT OF MVP SCOPE)*: The exact rule for what constitutes a "completed month" from a User's employment-start date (calendar month boundaries vs. anniversary-day boundaries, partial first month) is undefined.
-  
-  > **Out of MVP Scope**: The exact definition of a completed month will be addressed in a future specification. It must no longer remain an MVP implementation blocker.
+- **OQ-002 — Completed-month semantics for accrual** *(RESOLVED 2026-07-27)*: **Resolved: Calendar month boundary starting from employment start date.** A "completed month" is defined as each full calendar month elapsed since the EmploymentStartDate. The first partial month (if EmploymentStartDate is not the 1st) does not count; accrual begins on the 1st of the following calendar month. For example: EmploymentStartDate = 2025-03-15 → first accrual on 2025-04-01, second on 2025-05-01, etc. This is implemented in `BalanceService.AccrueMonthly()` and the Monthly Accrual job.
 
 - **OQ-003 — Inactive User operations** *(RESOLVED per Constitution v6.0.0)*: Inactive users cannot create requests, edit requests, or execute actions that change request state. This is now explicitly stated in Constitution v6.0.0 §4.4. Update requirements, edge cases, scenarios, rules, and acceptance criteria accordingly.
   
@@ -485,7 +483,7 @@ Additional leave types; vacation-pattern analytics; KPIs; AI-assisted reporting;
 ### Implementation Readiness Confirmation
 - [x] The `User`/`Approver`/`HR`, `Vacation`-only business model is fully specified with EARS requirements and complete acceptance-scenario traceability.
 - [x] The two prior Constitution conflicts (Approver deactivation; time-zone removal) are resolved by the Constitution v4.0.0 amendment (2026-07-16); the HR role addition is resolved by the Constitution v6.0.0 amendment (2026-07-23); no unresolved Constitution conflict remains.
-- [x] All open questions are resolved or documented as out of MVP scope. OQ-002 (completed-month semantics) and OQ-004 (mandatory deactivation reason) are documented as OUT OF MVP SCOPE and no longer block implementation. OQ-003 (inactive User operations) and OQ-005 (calendar scope) are resolved per Constitution v6.0.0. OQ-001 (owner cancellation) is resolved as out of MVP scope by v4.0.0. No MVP implementation blockers remain.
+- [x] All open questions are resolved or documented as out of MVP scope. **OQ-002 (completed-month semantics) is RESOLVED (2026-07-27): calendar month boundary from EmploymentStartDate**. OQ-004 (mandatory deactivation reason) is documented as OUT OF MVP SCOPE and no longer blocks implementation. OQ-003 (inactive User operations) and OQ-005 (calendar scope) are resolved per Constitution v6.0.0. OQ-001 (owner cancellation) is resolved as out of MVP scope by v4.0.0. No MVP implementation blockers remain.
 - [x] Every normative requirement maps to at least one acceptance scenario, edge case, or specialized test category.
 - [x] The core create-resolve-reserve-accrue workflow may proceed on the recorded decisions under Constitution v6.0.0, following the constitution-defined planning and test-first workflow.
 
