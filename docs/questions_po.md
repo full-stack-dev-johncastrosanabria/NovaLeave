@@ -22,12 +22,12 @@ business, policy, legal, or org-structure decisions that need your call. They ar
 - **Specification-review findings** (Q15–Q19, added 2026-07-16): decisions surfaced by a review of
   the business rules and missing flows; three (Q15, Q16, Q19) may add new requirements once decided.
 
-**Constitution v6.0.0 Resolution (2026-07-27)**: Two previously open questions are now resolved by the Constitution v6.0.0 amendment:
+**Constitution v6.0.0 Resolution (2026-07-27)**: Three previously open questions are now resolved by the Constitution v6.0.0 amendment:
+- **OQ-002 — Completed-month semantics for accrual**: **RESOLVED (2026-07-27)** — A "completed month" is defined as each full calendar month elapsed since the EmploymentStartDate. The first partial month (if EmploymentStartDate is not the 1st) does not count; accrual begins on the 1st of the following calendar month. Example: EmploymentStartDate = 2025-03-15 → first accrual on 2025-04-01, second on 2025-05-01, etc. Implemented in `BalanceService.AccrueMonthly()` and the Monthly Accrual job.
 - **OQ-003 — Inactive User operations**: RESOLVED per Constitution v6.0.0 §4.4 — Inactive users cannot create requests, edit requests, or execute actions that change request state. Update requirements, edge cases, scenarios, rules, and acceptance criteria accordingly.
 - **OQ-005 — Calendar scope**: RESOLVED per Constitution v6.0.0 — User calendar displays only the authenticated User's own authorized requests. HR calendar displays authorized requests across the organization. Update FR-015, AC-057, views, navigation, accessibility, permissions, and UI components accordingly. Do not broaden User permissions.
 
-Two questions are documented as explicitly OUT OF MVP SCOPE per Constitution v6.0.0 §15.3 scope discipline:
-- **OQ-002 — Completed-month semantics for accrual**: OUT OF MVP SCOPE — The exact definition of a completed month will be addressed in a future specification. It must no longer remain an MVP implementation blocker.
+One question is documented as explicitly OUT OF MVP SCOPE per Constitution v6.0.0 §15.3 scope discipline:
 - **OQ-004 — Mandatory reason for deactivation**: OUT OF MVP SCOPE — The MVP does not introduce a mandatory deactivation-reason requirement until an approved specification exists. Do not invent new requirements.
 
 Each item lists the **question**, **why it matters**, the **current spec assumption**, and my
