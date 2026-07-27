@@ -1,9 +1,9 @@
 # NovaLeave MVP — Open Questions for the Product Owner
 
 **Feature**: `001-leave-management-mvp`
-**Prepared**: 2026-07-16
+**Prepared**: 2026-07-27
 **For**: Friday spec review with the Product Owner
-**Source**: A demanding-PO critical read of [`specs/001-leave-management-mvp/spec.md`](../specs/001-leave-management-mvp/spec.md).
+**Source**: A demanding-PO critical read of [`specs/001-leave-management-mvp/spec.md`](../specs/001-leave-management-mvp/spec.md) aligned with Constitution v6.0.0.
 
 ## How to use this document
 
@@ -21,6 +21,14 @@ business, policy, legal, or org-structure decisions that need your call. They ar
 - **Confirm-and-defer** (Q11–Q14): lower urgency; a reasonable default exists and is noted.
 - **Specification-review findings** (Q15–Q19, added 2026-07-16): decisions surfaced by a review of
   the business rules and missing flows; three (Q15, Q16, Q19) may add new requirements once decided.
+
+**Constitution v6.0.0 Resolution (2026-07-27)**: Two previously open questions are now resolved by the Constitution v6.0.0 amendment:
+- **OQ-003 — Inactive User operations**: RESOLVED per Constitution v6.0.0 §4.4 — Inactive users cannot create requests, edit requests, or execute actions that change request state. Update requirements, edge cases, scenarios, rules, and acceptance criteria accordingly.
+- **OQ-005 — Calendar scope**: RESOLVED per Constitution v6.0.0 — User calendar displays only the authenticated User's own authorized requests. HR calendar displays authorized requests across the organization. Update FR-015, AC-057, views, navigation, accessibility, permissions, and UI components accordingly. Do not broaden User permissions.
+
+Two questions are documented as explicitly OUT OF MVP SCOPE per Constitution v6.0.0 §15.3 scope discipline:
+- **OQ-002 — Completed-month semantics for accrual**: OUT OF MVP SCOPE — The exact definition of a completed month will be addressed in a future specification. It must no longer remain an MVP implementation blocker.
+- **OQ-004 — Mandatory reason for deactivation**: OUT OF MVP SCOPE — The MVP does not introduce a mandatory deactivation-reason requirement until an approved specification exists. Do not invent new requirements.
 
 Each item lists the **question**, **why it matters**, the **current spec assumption**, and my
 **recommendation** so the meeting can be a yes/no/adjust rather than an open design session.
