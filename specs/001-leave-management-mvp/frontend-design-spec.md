@@ -3,7 +3,7 @@
 **Related Feature**: `001-leave-management-mvp`
 **Version**: 1.3.0
 **Date**: 2026-07-23
-**Status**: Draft for review
+**Status**: Ready for Planning. Design tokens, components, accessibility baseline, and responsive rules approved.
 
 ## 1. Purpose
 

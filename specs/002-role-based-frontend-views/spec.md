@@ -3,7 +3,7 @@
 **Related Feature**: `002-role-based-frontend-views`
 **Version**: 2.0.0
 **Date**: 2026-07-23
-**Status**: Draft for review
+**Status**: Ready for Planning. All 34 RBFV criteria defined and traced to MVP requirements.
 **Constitution**: `.specify/memory/constitution.md` v6.0.0
 
 ---
@@ -159,7 +159,7 @@ When an identity has at least two authorized contexts:
 | **Dashboard RRHH** | `/rrhh` | Organization-wide summary cards | Total pending, active approvers, balance summary, quick links |
 | **Solicitudes (Solo Lectura)** | `/rrhh/solicitudes` | Filterable, paginated list of all requests | Table with requester, dates, status, working days, reservation, deduction |
 | **Detalle de Solicitud (Solo Lectura)** | `/rrhh/solicitudes/{id}` | Full request detail including audit trail | Same as Approver detail but read-only; no resolution actions |
-| **Calendario Organizacional** | `/rrhh/calendario` | Month-view calendar showing all approved periods | Month grid, event markers, legend, filter by department/team if applicable |
+| **Calendario Organizacional** | `/rrhh/calendario` | Month-view calendar showing all approved periods | Month grid, event markers, legend, filter by requester name if applicable |
 | **Saldos (Solo Lectura)** | `/rrhh/saldos` | List all users with balance summary | Table with user, **Acumulado total, Pendientes, Días gozados, Disponible** |
 | **Movimientos de Saldo (Solo Lectura)** | `/rrhh/saldos/{userId}` | Balance history for user | Timeline of accruals, reservations, deductions, restorations |
 | **Auditoría Relevante** | `/rrhh/auditoria` | Filterable audit log | Table with timestamp, actor, role, action, entity, result |
@@ -364,7 +364,7 @@ Every view MUST satisfy the baseline from `frontend-design-spec.md` §8 plus the
 - [ ] **Weekend columns (Sat/Sun) visually distinct**: muted background, no event rendering
 - [ ] Events show requester name (HR-authorized) + working-day count (e.g., `Juan Pérez — 5 días`)
 - [ ] Multiple events per day stack vertically with `+N más` overflow indicator
-- [ ] Filter toolbar: department/team `<select>` (accessible label), `Buscar` input (debounced 300ms)
+- [ ] Filter toolbar: requester name `<input>` (accessible label), `Buscar` input (debounced 300ms)
 - [ ] **Calendar events keyboard-activatable (Enter/Space) → navigate to `/rrhh/solicitudes/{id}`**
 - [ ] Month navigation buttons accessible with `aria-label`
 - [ ] `aria-live="polite"` region announces month change and filter results count

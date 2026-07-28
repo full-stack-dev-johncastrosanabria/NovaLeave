@@ -1179,7 +1179,7 @@ Given an active HR identity, when HR opens `/rrhh/calendario`, then the system d
 - Multiple events per day stack with "+N más" overflow
 - Keyboard navigation: arrow keys move by day/week, Home/End jump to month boundaries, PageUp/PageDown change month
 - Event activation (Enter/Space) navigates to `/rrhh/solicitudes/{id}`
-- Filter toolbar: department/team select (accessible label), search input (debounced 300ms)
+- Filter toolbar: requester name `<input>` (accessible label), search input (debounced 300ms)
 - Weekend columns visually distinct (muted background, no events)
 - `aria-live="polite"` announces month change and filter results count
 - Tooltip on hover/focus: requester, date range, working days, status "Aprobada"

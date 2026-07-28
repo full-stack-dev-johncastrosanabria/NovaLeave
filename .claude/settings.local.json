@@ -6,7 +6,9 @@
       "Bash(git push *)",
       "Bash(cat)",
       "Bash(gh pr *)",
-      "Bash(gh auth *)"
+      "Bash(gh auth *)",
+      "Bash(.specify/scripts/bash/setup-plan.sh *)",
+      "Bash(/c/Users/AbrahamVillalobosUga/Desktop/AI-NOVA/NovaLeave/.specify/scripts/bash/setup-tasks.sh *)"
     ]
   }
 }
