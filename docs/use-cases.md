@@ -84,7 +84,7 @@ The person opens or submits the login screen.
 
 - Secure `HttpOnly` cookie; `Secure` in production; appropriate `SameSite` policy.
 - Antiforgery, lockout, non-enumerable messages, and structured logging.
-- References: `SEC-001`, `SEC-008`, `CFG-002`, `AC-030`, `AC-031`, `AC-055`, `AC-056`, `RBFV-033`.
+- References: `SEC-001`, `SEC-008`, `CFG-002`, `AC-030`, `AC-031`, `AC-055`, `AC-056`, `RBFV-033`, `RBFV-018`, `RBFV-027`.
 
 ---
 
@@ -179,7 +179,7 @@ The User opens `Mis solicitudes`.
 ### Controls and references
 
 - Server-side owner filtering, pagination, and resource authorization.
-- References: `FR-003`, `AUTHZ-001`, `AUTHZ-005`, `SEC-002`, `SEC-003`, `AC-007`, `AC-008`, `RBFV-001`.
+- References: `FR-003`, `AUTHZ-001`, `AUTHZ-005`, `SEC-002`, `SEC-003`, `AC-007`, `AC-008`, `RBFV-001`, `RBFV-002`, `RBFV-011`.
 
 ---
 
@@ -240,7 +240,7 @@ The User submits the new-request form.
 ### Controls and references
 
 - Server-side calculation, antiforgery, dedicated input model, idempotency, optimistic concurrency, and atomic transaction.
-- References: `FR-001`, `FR-002`, `FR-012`, `FR-025`; `VAL-001`, `VAL-004`, `VAL-005`, `VAL-009`; `BR-001`, `BR-002`, `BR-004`, `BR-005`, `BR-018`, `BR-019`, `BR-024`, `BR-030`, `BR-034`; `CON-001`, `CON-007`, `CON-008`; `AUD-001`; `AC-001–005`, `AC-009–011`, `AC-035`, `AC-040–043`, `AC-058`, `AC-059`.
+- References: `FR-001`, `FR-002`, `FR-012`, `FR-025`; `VAL-001`, `VAL-004`, `VAL-005`, `VAL-009`; `BR-001`, `BR-002`, `BR-004`, `BR-005`, `BR-018`, `BR-019`, `BR-024`, `BR-030`, `BR-034`; `CON-001`, `CON-007`, `CON-008`; `AUD-001`; `AC-001–005`, `AC-009–011`, `AC-035`, `AC-040–043`, `AC-058`, `AC-059`, `RBFV-028`, `RBFV-029`, `RBFV-034`.
 
 ---
 
@@ -294,7 +294,7 @@ The owner submits the edit form.
 ### Controls and references
 
 - Owner authorization, full revalidation, optimistic concurrency, antiforgery, and atomicity.
-- References: `FR-005`, `BR-025`, `CON-004`, `CON-008`, `CON-011`, `AUD-002`, `ERR-002`, `ERR-004`, `AC-045`, `AC-046`.
+- References: `FR-005`, `BR-025`, `CON-004`, `CON-008`, `CON-011`, `AUD-002`, `ERR-002`, `ERR-004`, `AC-045`, `AC-046`, `RBFV-028`, `RBFV-029`.
 
 ---
 
@@ -341,7 +341,7 @@ The User opens an authorized row or calendar event.
 ### Controls and references
 
 - Resource authorization, sensitive-data redaction, and accessible navigation.
-- References: `FR-003`, `FR-024`, `AUTHZ-001`, `SEC-002`, `SEC-005`, `RBFV-026`.
+- References: `FR-003`, `FR-024`, `AUTHZ-001`, `SEC-002`, `SEC-005`, `RBFV-026`, `RBFV-001`, `RBFV-011`.
 
 ---
 
@@ -386,7 +386,7 @@ The User opens `Mi historial`.
 ### Controls and references
 
 - Authoritative calculation, owner-only query, and sensitive-data redaction.
-- References: `FR-004`, `BR-012`, `BR-017`, `BR-031`, `AC-007`, `AC-044`, `RBFV-024`.
+- References: `FR-004`, `BR-012`, `BR-017`, `BR-031`, `AC-007`, `AC-044`, `RBFV-024`, `RBFV-018`.
 
 ---
 
@@ -433,7 +433,7 @@ The User opens the calendar or changes month.
 ### Controls and references
 
 - Owner filtering, resource authorization, and WCAG 2.1 AA behavior.
-- References: `FR-015`, `FR-024`, `AUTHZ-001`, `AUTHZ-017`, `AUTHZ-019`, `SEC-002`, `AC-057`, `RBFV-026`.
+- References: `FR-015`, `FR-024`, `AUTHZ-001`, `AUTHZ-017`, `AUTHZ-019`, `SEC-002`, `AC-057`, `RBFV-026`, `RBFV-018`, `RBFV-019`, `RBFV-029`.
 
 ---
 
@@ -481,7 +481,7 @@ The Approver opens `Pendientes`.
 ### Controls and references
 
 - Global authorization without team, department, or hierarchy scope; strict owner exclusion.
-- References: `FR-025`, `AUTHZ-002`, `AUTHZ-003`, `AUTHZ-009`, `AC-047`, `AC-058`, `RBFV-003`, `RBFV-034`.
+- References: `FR-025`, `AUTHZ-002`, `AUTHZ-003`, `AUTHZ-009`, `AC-047`, `AC-058`, `RBFV-003`, `RBFV-034`, `RBFV-007`, `RBFV-012`, `RBFV-014`, `RBFV-025`, `RBFV-031`.
 
 ---
 
@@ -528,7 +528,7 @@ The Approver selects a request from the queue or an authorized calendar event.
 ### Controls and references
 
 - All displayed values are server-derived; UI values are informational, not authoritative.
-- References: `FR-023`, `BR-036`, `BR-037`, `AUTHZ-002`, `AUTHZ-003`, `RBFV-025`.
+- References: `FR-023`, `BR-036`, `BR-037`, `AUTHZ-002`, `AUTHZ-003`, `RBFV-025`, `RBFV-026`, `RBFV-030`, `RBFV-028`, `RBFV-031`.
 
 ---
 
@@ -581,7 +581,7 @@ The Approver confirms `Aprobar`.
 ### Controls and references
 
 - Antiforgery, optimistic concurrency, mutually exclusive actions, idempotency, and atomic transaction.
-- References: `FR-006`; `BR-008`, `BR-013`, `BR-015`, `BR-016`, `BR-020`, `BR-037`, `BR-038`; `AUTHZ-002`, `AUTHZ-003`, `AUTHZ-007`; `CON-002`, `CON-003`, `CON-005`, `CON-006`, `CON-012`; `AUD-002`, `AUD-007`; `AC-012`, `AC-017–020`.
+- References: `FR-006`; `BR-008`, `BR-013`, `BR-015`, `BR-016`, `BR-020`, `BR-037`, `BR-038`; `AUTHZ-002`, `AUTHZ-003`, `AUTHZ-007`; `CON-002`, `CON-003`, `CON-005`, `CON-006`, `CON-012`; `AUD-002`, `AUD-007`; `AC-012`, `AC-017–020`, `RBFV-014`, `RBFV-025`, `RBFV-030`, `RBFV-031`.
 
 ---
 
@@ -632,7 +632,7 @@ The Approver confirms `Rechazar` with a reason.
 ### Controls and references
 
 - Normalized plain text, redaction, antiforgery, optimistic concurrency, and atomic transaction.
-- References: `FR-007`, `VAL-007`, `BR-009`, `BR-014`, `BR-021`, `BR-023`, `CON-002`, `CON-012`, `AUD-002`, `AC-016`, `AC-036`.
+- References: `FR-007`, `VAL-007`, `BR-009`, `BR-014`, `BR-021`, `BR-023`, `CON-002`, `CON-012`, `AUD-002`, `AC-016`, `AC-036`, `RBFV-030`, `RBFV-028`, `RBFV-031`.
 
 ---
 
@@ -685,7 +685,7 @@ The Approver confirms `Desactivar`.
 
 - Strict temporal boundary, full-request action, antiforgery, optimistic concurrency, atomicity, and idempotency.
 - No human-entered deactivation reason is mandatory in the MVP.
-- References: `FR-011`, `BR-027`, `BR-028`, `BR-035`, `AUTHZ-002`, `AUTHZ-003`, `CON-003`, `CON-010`, `AUD-002`, `AUD-007`, `AC-050–053`.
+- References: `FR-011`, `BR-027`, `BR-028`, `BR-035`, `AUTHZ-002`, `AUTHZ-003`, `CON-003`, `CON-010`, `AUD-002`, `AUD-007`, `AC-050–053`, `RBFV-014`, `RBFV-025`, `RBFV-030`, `RBFV-031`.
 
 ---
 
@@ -773,7 +773,7 @@ The Approver opens the calendar.
 ### Controls and references
 
 - Anonymization, resource authorization, and accessibility.
-- References: `FR-024`, `AUTHZ-017`, `AUTHZ-018`, `AUTHZ-019`, `RBFV-026`.
+- References: `FR-024`, `AUTHZ-017`, `AUTHZ-018`, `AUTHZ-019`, `RBFV-026`, `RBFV-018`, `RBFV-019`, `RBFV-029`, `RBFV-033`.
 
 ---
 
@@ -823,7 +823,7 @@ A `Pending` request reaches at least configurable timeout `X` and the process ru
 ### Controls and references
 
 - Idempotency, optimistic concurrency, bounded queries, testable time abstraction, and atomic transaction.
-- References: `FR-013`, `BR-026`, `CON-002`, `CON-009`, `AUD-002`, `AUD-008`, `CFG-001`, `ERR-006`, `AC-048`, `AC-049`.
+- References: `FR-013`, `BR-026`, `CON-002`, `CON-009`, `AUD-002`, `AUD-008`, `CFG-001`, `ERR-006`, `AC-048`, `AC-049`, `RBFV-018`.
 
 ---
 
@@ -873,7 +873,7 @@ The system determines that a User completed a month according to an approved rul
 ### Controls and references
 
 - Idempotency key by User and period, `TimeProvider`/`IClock`, and atomic transaction.
-- References: `FR-014`, `BR-032`, `BR-033`, `AC-054`. **OQ-002 RESOLVED (2026-07-27): calendar month boundary from EmploymentStartDate**.
+- References: `FR-014`, `BR-032`, `BR-033`, `AC-054`, `RBFV-018`. **OQ-002 RESOLVED (2026-07-27): calendar month boundary from EmploymentStartDate**.
 
 ---
 
@@ -923,7 +923,7 @@ HR opens the request list or a request detail.
 ### Controls and references
 
 - Server-enforced read-only behavior, pagination, redaction, and PII-access auditing.
-- References: `FR-009`, `FR-016`, `AUTHZ-011`, `AUTHZ-013`, `SEC-005`, `SEC-009`, `RBFV-005`, `RBFV-006`.
+- References: `FR-009`, `FR-016`, `AUTHZ-011`, `AUTHZ-013`, `SEC-005`, `SEC-009`, `RBFV-005`, `RBFV-006`, `RBFV-016`, `RBFV-018`.
 
 ---
 
@@ -968,7 +968,7 @@ HR opens the calendar or changes month.
 ### Controls and references
 
 - HR authorization, accessible calendar behavior, and read-only detail.
-- References: `FR-017`, `FR-024`, `AUTHZ-011`, `AUTHZ-017`, `AUTHZ-019`, `RBFV-026`.
+- References: `FR-017`, `FR-024`, `AUTHZ-011`, `AUTHZ-017`, `AUTHZ-019`, `RBFV-026`, `RBFV-018`, `RBFV-019`, `RBFV-029`, `RBFV-032`.
 
 ---
 
@@ -1012,7 +1012,7 @@ HR opens `Saldos` or selects a User.
 ### Controls and references
 
 - Read-only authorization, pagination, dedicated query models, deny-by-default, and no generic balance update.
-- References: `FR-018`, `FR-019`, `AUTHZ-011`, `AUTHZ-014`, `RBFV-007`, `RBFV-024`.
+- References: `FR-018`, `FR-019`, `AUTHZ-011`, `AUTHZ-014`, `RBFV-007`, `RBFV-024`, `RBFV-014`, `RBFV-018`.
 
 ---
 
@@ -1057,7 +1057,7 @@ HR opens `Auditoría` and applies filters.
 ### Controls and references
 
 - Immutability, redaction, pagination, and HR authorization.
-- References: `FR-020`, `AUTHZ-011`, `AUD-003`, `AUD-005`, `AUD-006`, `SEC-006`.
+- References: `FR-020`, `AUTHZ-011`, `AUD-003`, `AUD-005`, `AUD-006`, `SEC-006`, `RBFV-016`, `RBFV-018`.
 
 ---
 
@@ -1112,7 +1112,272 @@ HR confirms a capability change with a reason.
 ### Controls and references
 
 - Explicit reason, confirmation, resource authorization, role revalidation, optimistic concurrency, deny-by-default, atomic transaction, and authorization-state refresh when required.
-- References: `FR-021`, `FR-022`, `AUTHZ-012`, `AUTHZ-015`, `AUTHZ-016`, `AUD-009`, `AUD-010`, `RBFV-013`, `RBFV-015–017`.
+- References: `FR-021`, `FR-022`, `AUTHZ-012`, `AUTHZ-015`, `AUTHZ-016`, `AUD-009`, `AUD-010`, `RBFV-013`, `RBFV-015`, `RBFV-016`, `RBFV-017`, `RBFV-018`.
+
+---
+
+# 5. HR Acceptance Criteria (AC-HR)
+
+These acceptance criteria correspond to the HR use cases (UC-18 through UC-22) and are referenced in the MVP Feature Specification traceability matrix.
+
+## AC-HR-001 — HR Views Organization-Wide Request List
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-18 |
+| Related Requirements | FR-009, AUTHZ-011, SEC-005, SEC-009, RBFV-005, RBFV-006 |
+| Priority | P2 |
+
+### Scenario
+Given an active HR identity, when HR navigates to `/rrhh/solicitudes`, then the system displays a filterable, paginated list of all vacation requests across the organization with requester, dates, status, working days, reservation, and deduction.
+
+### Acceptance Conditions
+- List includes all requests regardless of owner, team, or department
+- Filters: status, date range, requester name/email
+- Server-side pagination (page size 10/25/50)
+- No resolution actions (approve/reject/deactivate) visible or accessible
+- Sensitive reasons redacted in list view; access to reason audited per SEC-009
+- Inactive HR receives 403
+
+---
+
+## AC-HR-002 — HR Views Read-Only Request Detail
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-18 (detail) |
+| Related Requirements | FR-016, AUTHZ-011, SEC-005, SEC-009, RBFV-005, RBFV-006 |
+| Priority | P2 |
+
+### Scenario
+Given an active HR identity and any request ID, when HR opens `/rrhh/solicitudes/{id}`, then the system displays full request detail including complete audit trail in read-only mode.
+
+### Acceptance Conditions
+- All fields visible: owner, dates, working days, reason, state, reservation, deduction, rejection reason, timeout metadata, deactivation metadata
+- Full audit timeline with actor, role, action, timestamp, result
+- No resolution action buttons present
+- Reason and rejection reason displayed (HR-authorized access, audited per SEC-009)
+- Direct invocation of resolution endpoints returns 403
+- Inactive HR receives 403
+
+---
+
+## AC-HR-003 — HR Views Organizational Calendar
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-19 |
+| Related Requirements | FR-017, FR-024, AUTHZ-011, AUTHZ-017, AUTHZ-019, RBFV-026 |
+| Priority | P3 |
+
+### Scenario
+Given an active HR identity, when HR opens `/rrhh/calendario`, then the system displays a month-view calendar of all approved vacation periods organization-wide with requester names and working-day counts.
+
+### Acceptance Conditions
+- All approved periods for requested month rendered
+- Event label format: "Requester Name — N días"
+- Multiple events per day stack with "+N más" overflow
+- Keyboard navigation: arrow keys move by day/week, Home/End jump to month boundaries, PageUp/PageDown change month
+- Event activation (Enter/Space) navigates to `/rrhh/solicitudes/{id}`
+- Filter toolbar: department/team select (accessible label), search input (debounced 300ms)
+- Weekend columns visually distinct (muted background, no events)
+- `aria-live="polite"` announces month change and filter results count
+- Tooltip on hover/focus: requester, date range, working days, status "Aprobada"
+- Inactive HR receives 403
+
+---
+
+## AC-HR-004 — HR Views All User Balances Summary
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-20 |
+| Related Requirements | FR-018, AUTHZ-011, AUTHZ-014, RBFV-007, RBFV-024 |
+| Priority | P2 |
+
+### Scenario
+Given an active HR identity, when HR opens `/rrhh/saldos`, then the system displays a paginated list of all users with balance summary: Acumulado total, Pendientes, Días gozados, Disponible.
+
+### Acceptance Conditions
+- Four summary values per user matching exact labels
+- Server-side pagination (page size 10/25/50)
+- Sortable by user name, any balance column
+- No edit actions, no balance modification endpoints accessible
+- Clicking user navigates to `/rrhh/saldos/{userId}` for movements
+- Inactive HR receives 403
+- Available balance never negative
+
+---
+
+## AC-HR-005 — HR Views Balance Movements for a User
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-20 (detail) |
+| Related Requirements | FR-019, AUTHZ-011, AUTHZ-014, RBFV-007, RBFV-024 |
+| Priority | P2 |
+
+### Scenario
+Given an active HR identity and a target user ID, when HR opens `/rrhh/saldos/{userId}`, then the system displays a timeline of all balance movements: accruals, reservations, releases, deductions, restorations.
+
+### Acceptance Conditions
+- Timeline ordered chronologically (newest first or oldest first, configurable)
+- Each entry: date, concept (Devengo/Reserva/Liberación/Deducción/Restauración), amount, resulting balance
+- Request-linked movements show request ID and link to `/rrhh/solicitudes/{id}`
+- No modification actions available
+- Direct balance-edit endpoint returns 403
+- Inactive HR receives 403
+
+---
+
+## AC-HR-006 — HR Views Filterable Audit Log
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-21 |
+| Related Requirements | FR-020, AUTHZ-011, AUD-003, AUD-005, AUD-006, SEC-006, RBFV-016 |
+| Priority | P2 |
+
+### Scenario
+Given an active HR identity, when HR opens `/rrhh/auditoria` and applies filters, then the system displays relevant business and security audit events with minimum traceability fields and redacted sensitive payloads.
+
+### Acceptance Conditions
+- Filters: date range, actor, role, action, entity type, result
+- Server-side pagination with accessible controls
+- Columns: timestamp (UTC), actor, role, action, entity, entity ID, result
+- Sensitive fields (reasons, rejection reasons, credentials, tokens, secrets) redacted in payload columns
+- Sortable columns with `aria-sort` announcement
+- Responsive: card fallback on mobile with timestamp + actor + action + result
+- Audit records immutable — no delete/modify actions
+- Inactive HR receives 403
+
+---
+
+## AC-HR-007 — HR Views Approver Capability List
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-22 (list) |
+| Related Requirements | FR-021, AUTHZ-012, AUTHZ-015, RBFV-013, RBFV-015 |
+| Priority | P2 |
+
+### Scenario
+Given an active HR identity, when HR opens `/rrhh/aprobadores`, then the system displays all identities holding the `Approver` role with their `canResolveRequests` status.
+
+### Acceptance Conditions
+- Table columns: name, email, active status, `canResolveRequests` (toggle)
+- Only identities with `Approver` role listed
+- Inactive approvers clearly marked
+- Server-side pagination with accessible controls
+- Toggle opens modal (see AC-HR-008)
+- Audit trail link per capability change
+- Inactive HR receives 403
+- No role assignment/removal actions present
+
+---
+
+## AC-HR-008 — HR Toggles Approver Capability
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-22 (action) |
+| Related Requirements | FR-022, AUTHZ-012, AUTHZ-015, AUTHZ-016, AUD-009, AUD-010, RBFV-013, RBFV-015, RBFV-016, RBFV-017 |
+| Priority | P2 |
+
+### Scenario
+Given an active HR identity and a target identity with `Approver` role, when HR confirms enable/disable of `canResolveRequests` with explicit reason, confirmation, and valid row version, then the system atomically updates the capability and writes an audit record.
+
+### Acceptance Conditions
+- Modal requires: reason (10–500 chars normalized), explicit confirmation checkbox, current row version
+- On success: capability updated, audit record with actor HR, target approver, prior/new value, reason, row version, timestamp
+- On missing reason: 400 with validation message
+- On missing confirmation: 400 with validation message
+- On stale row version: 409 Conflict, no change
+- On target lacking Approver role: 400 with safe message
+- On inactive HR: 403
+- On audit/persistence failure: atomic rollback, no partial commit
+- Security event logged for: missing reason, missing confirmation, stale version, non-Approver target, inactive HR, role-assignment attempt
+
+---
+
+## AC-HR-009 — HR Access to Sensitive Reasons Audited
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-18, UC-18 (detail), UC-21 |
+| Related Requirements | SEC-009, AUD-003, AUD-006, SEC-005 |
+| Priority | P2 |
+
+### Scenario
+Given an active HR identity, when HR views a request reason or rejection reason through authorized read-only use cases (UC-18, UC-21), then the system creates a structured audit event recording HR actor, accessed request, reason field accessed, and timestamp.
+
+### Acceptance Conditions
+- Audit event created for each distinct reason-field access (request reason, rejection reason)
+- Event fields: timestamp_utc, actor_id, actor_role=HR, action=ReasonAccessed, entity_type=VacationRequest, entity_id, result=Success, correlation_id, request_id, accessed_field (Reason|RejectionReason)
+- Reason content NOT included in audit event (redacted per AUD-006)
+- Logs/traces/metrics do not contain reason content (SEC-006)
+- Inactive HR: access denied, security event logged
+
+---
+
+## AC-HR-010 — HR Cannot Approve/Reject/Deactivate Requests
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-18, UC-19, UC-20, UC-21, UC-22 |
+| Related Requirements | AUTHZ-013, SEC-001, SEC-002, RBFV-006 |
+| Priority | P2 (Security) |
+
+### Scenario
+Given an active HR identity, when HR attempts to invoke any request resolution endpoint (approve, reject, deactivate), then the system returns 403 Forbidden and changes no business data.
+
+### Acceptance Conditions
+- POST `/aprobaciones/{id}/aprobar` → 403
+- POST `/aprobaciones/{id}/rechazar` → 403
+- POST `/aprobaciones/{id}/desactivar` → 403
+- Direct navigation to resolution views → 403
+- Security event logged per attempt with actor, target, action, result=Denied
+- UI shows no resolution action buttons in HR views
+
+---
+
+## AC-HR-011 — HR Cannot Modify Vacation Balances
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-20, UC-20 (detail) |
+| Related Requirements | AUTHZ-014, SEC-001, SEC-002, RBFV-007 |
+| Priority | P2 (Security) |
+
+### Scenario
+Given an active HR identity, when HR attempts to modify any vacation balance via any endpoint, then the system returns 403/400 and changes no balance data.
+
+### Acceptance Conditions
+- No generic balance-update endpoint exposed
+- Overposting attempt (extra form fields) → ignored, 400
+- Direct API call to balance modification → 403
+- Security event logged with actor, target user, action, result=Denied
+- UI shows no edit controls on balance views
+
+---
+
+## AC-HR-012 — HR Cannot Assign or Remove Roles
+
+| Field | Value |
+|---|---|
+| Related Use Case | UC-22 |
+| Related Requirements | AUTHZ-015, SEC-001, SEC-002, RBFV-008 |
+| Priority | P2 (Security) |
+
+### Scenario
+Given an active HR identity, when HR attempts to assign or remove any role (User, Approver, HR) for any identity, then the system returns 403 and makes no role changes.
+
+### Acceptance Conditions
+- No role-management endpoint exposed to HR
+- Capability toggle (AC-HR-008) only affects `canResolveRequests`, not role membership
+- Attempt to toggle capability for non-Approver → 400 (validated in AC-HR-008)
+- Security event logged for any role-assignment/removal attempt
+- UI: no role management controls in HR context
 
 ---
 

@@ -227,7 +227,7 @@ As an authenticated User, I want a basic visual vacation calendar, so that I can
 ### Functional Requirements
 Every normative requirement uses exactly one standard EARS classification: **Ubiquitous** (`The system shall …`), **Event-Driven** (`When <trigger>, the system shall …`), **State-Driven** (`While <state>, the system shall …`), **Unwanted Behavior** (`If <condition>, then the system shall …`), or **Optional** (`Where <approved capability applies>, the system shall …`). No Optional requirements are defined.
 
-*Retired identifiers (behavior removed with the prior model): FR-008 is reserved pending the owner-cancellation decision (OQ-001) and is intentionally not reused. FR-009 and FR-010 (HR read-only visibility) are **active** under Constitution v6.0.0 §4.3. AUTHZ-004 (HR read-only restriction) is **revised** — HR has authorized read access but MUST NOT approve, reject, deactivate, modify balances, or assign/remove roles.*
+*Retired identifiers (behavior removed with the prior model): FR-008 is reserved pending the owner-cancellation decision (OQ-001) and is intentionally not reused. FR-009 (HR read-only visibility) is **active** under Constitution v6.0.0 §4.3. AUTHZ-004 (HR read-only restriction) is **revised** — HR has authorized read access but MUST NOT approve, reject, deactivate, modify balances, or assign/remove roles.*
 
 #### User Capabilities
 - **FR-001 — Create a Vacation Request** *(Event-Driven)* — When an authenticated active User submits request data that satisfies all applicable requirements, the system shall create exactly one `Vacation Request`.
@@ -493,25 +493,25 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 |---|---|---|
 | FR-001 | AC-001 | Acceptance + Integration |
 | FR-002 | AC-001, AC-002 | Acceptance |
-| FR-003 | AC-007 | Acceptance |
-| FR-004 | AC-007, AC-044 | Acceptance + Integration |
+| FR-003 | AC-007, RBFV-001 | Acceptance |
+| FR-004 | AC-007, AC-044, RBFV-024 | Acceptance + Integration |
 | FR-005 | AC-045, AC-046 | Acceptance + Integration |
-| FR-006 | AC-012 | Acceptance + Authorization |
+| FR-006 | AC-012, RBFV-003 | Acceptance + Authorization |
 | FR-007 | AC-016 | Acceptance + Integration |
 | FR-011 | AC-050, AC-051 | Acceptance + Integration |
 | FR-012 | AC-041, AC-042 | Acceptance |
 | FR-013 | AC-048 | Integration + Concurrency |
 | FR-014 | AC-054 | Domain + Integration |
-| FR-015 | AC-057 | Acceptance |
-| FR-009 | AC-HR-001 | Acceptance + Authorization |
-| FR-016 | AC-HR-002 | Acceptance + Authorization |
-| FR-017 | AC-HR-003 | Acceptance + Authorization |
-| FR-018 | AC-HR-004 | Acceptance + Authorization |
-| FR-019 | AC-HR-005 | Acceptance + Authorization |
-| FR-020 | AC-HR-006 | Acceptance + Authorization |
-| FR-021 | AC-HR-007 | Acceptance + Authorization |
-| FR-022 | AC-HR-008 | Integration + Concurrency + Security |
-| FR-025 | AC-058 | Integration + Authorization |
+| FR-015 | AC-057, RBFV-018, RBFV-029 | Acceptance |
+| FR-009 | AC-HR-001, RBFV-005 | Acceptance + Authorization |
+| FR-016 | AC-HR-002, RBFV-005 | Acceptance + Authorization |
+| FR-017 | AC-HR-003, RBFV-018, RBFV-026 | Acceptance + Authorization |
+| FR-018 | AC-HR-004, RBFV-024 | Acceptance + Authorization |
+| FR-019 | AC-HR-005, RBFV-024 | Acceptance + Authorization |
+| FR-020 | AC-HR-006, RBFV-018 | Acceptance + Authorization |
+| FR-021 | AC-HR-007, RBFV-013, RBFV-015 | Acceptance + Authorization |
+| FR-022 | AC-HR-008, RBFV-013, RBFV-015, RBFV-016, RBFV-017 | Integration + Concurrency + Security |
+| FR-025 | AC-058, RBFV-034 | Integration + Authorization |
 | VAL-001 | AC-002, AC-043 | Validation |
 | VAL-002 | AC-001 | Validation |
 | VAL-003 | AC-038 | Validation |
@@ -553,22 +553,22 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | BR-033 | AC-054 | Domain |
 | BR-034 | AC-011 | Domain |
 | BR-035 | AC-050, AC-053 | Domain + Integration |
-| AUTHZ-001 | AC-007, AC-008 | Authorization |
-| AUTHZ-002 | AC-012, AC-050, AC-058 | Authorization |
-| AUTHZ-003 | AC-017, AC-058 | Authorization + Security |
+| AUTHZ-001 | AC-007, AC-008, RBFV-001, RBFV-002, RBFV-011 | Authorization |
+| AUTHZ-002 | AC-012, AC-050, AC-058, RBFV-003 | Authorization |
+| AUTHZ-003 | AC-017, AC-058, RBFV-014 | Authorization + Security |
 | AUTHZ-005 | AC-008, AC-017, AC-047 | Security |
 | AUTHZ-006 | AC-012, AC-020 | Authorization |
 | AUTHZ-007 | AC-012, AC-018, AC-020, AC-046, AC-050 | Authorization + Integration |
 | AUTHZ-008 | AC-038 | Authorization + Resilience |
 | AUTHZ-009 | AC-047 | Authorization + Security |
 | AUTHZ-010 | AC-047, AC-055 | Authorization |
-| AUTHZ-011 | AC-HR-001, AC-HR-002, AC-HR-003, AC-HR-004, AC-HR-005, AC-HR-006 | Authorization |
-| AUTHZ-012 | AC-HR-008 | Authorization + Integration |
-| AUTHZ-013 | AC-HR-010 | Security |
-| AUTHZ-014 | AC-HR-011 | Security |
-| AUTHZ-015 | AC-HR-012 | Security |
-| AUTHZ-016 | AC-HR-008 | Authorization + Security |
-| SEC-001 | AC-030, AC-031 | Security |
+| AUTHZ-011 | AC-HR-001, AC-HR-002, AC-HR-003, AC-HR-004, AC-HR-005, AC-HR-006, RBFV-005, RBFV-006 | Authorization |
+| AUTHZ-012 | AC-HR-008, RBFV-013, RBFV-015, RBFV-017 | Authorization + Integration |
+| AUTHZ-013 | AC-HR-010, RBFV-006 | Security |
+| AUTHZ-014 | AC-HR-011, RBFV-007 | Security |
+| AUTHZ-015 | AC-HR-012, RBFV-008 | Security |
+| AUTHZ-016 | AC-HR-008, RBFV-013 | Authorization + Security |
+| SEC-001 | AC-030, AC-031, RBFV-033 | Security |
 | SEC-002 | AC-008, AC-030, AC-057 | Security |
 | SEC-003 | AC-008 | Security |
 | SEC-004 | AC-021, AC-051 | Security + Domain |
@@ -576,7 +576,7 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | SEC-006 | AC-029 | Redaction |
 | SEC-007 | AC-032 | MVC Security |
 | SEC-008 | AC-055, AC-056 | Security |
-| SEC-009 | AC-HR-009 | Security Logging |
+| SEC-009 | AC-HR-009, RBFV-018 | Security Logging |
 | CON-001 | AC-009, EC-016 | Concurrency + Idempotency |
 | CON-002 | AC-019, AC-049 | Concurrency |
 | CON-003 | AC-019, AC-053 | Concurrency + Integration |
@@ -606,7 +606,7 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | ERR-006 | AC-048 | Acceptance |
 | CFG-001 | AC-048 | Configuration + Integration |
 | CFG-002 | AC-055 | Configuration + Security |
-| CFG-003 | AC-060 | Configuration + Integration |
+| CFG-003 | AC-060, RBFV-033 | Configuration + Integration |
 ---
 
 ## Constitution Check
