@@ -61,7 +61,7 @@ Seeded via `NovaLeave:SeedDemoUsers=true`. **Must be disabled in Production.**
 ### CR-09: LeaveType as Persisted Aggregate
 **Source conflict**: Conjunto 1 planned `LeaveType` as a full Domain entity and mutable aggregate.
 **Authority applied**: Instruction §5.10; spec.md VAL-002, VAL-003.
-**Resolution**: Only `Vacation` exists in the MVP. LeaveType is represented as a read-only enum/constant in Domain (`LeaveType.Vacation`) and a single seed row in a lookup table in Infrastructure. It is not a mutable, user-managed aggregate root.
+**Resolution**: Only `Vacation` exists in the MVP. LeaveType is represented as a read-only enum/constant in Domain (`LeaveType.Vacation`). There is no mutable LeaveType aggregate, lookup table, seed row, DbSet, or migration task because no approved source requires persisted leave-type reference data.
 **Affected**: VAL-002, VAL-003, spec.md PD-001.
 
 ### CR-10: SystemParameter as Domain Entity
@@ -115,7 +115,7 @@ Seeded via `NovaLeave:SeedDemoUsers=true`. **Must be disabled in Production.**
 | Balance negative prevention | Server-side rejection; UI may show warning but server is authoritative | spec.md BR-031; AUTHZ-007 |
 | Identity linkage | `ApplicationUser.Id` (string) stored as `UserId` on Domain User concept | Instruction §5.9 |
 | RowVersion scope | Applied to `VacationRequest`, `VacationBalance`, `ApplicationUser` (for canResolveRequests); NOT on immutable `BalanceMovement` or `AuditRecord` | Instruction §5.13 |
-| Accrual semantics (OQ-002, resolved 2026-07-27) | One whole day per completed calendar month from `EmploymentStartDate`; first partial month does not accrue; idempotent by `(UserId, AccrualPeriod)` | spec.md OQ-002 |
+| Accrual semantics (OQ-002, resolved 2026-07-27) | One whole vacation day per fully completed calendar month from `EmploymentStartDate`; first partial calendar month does not accrue; no proration; accrued days do not expire; idempotent by `(UserId, AccrualPeriod)`; catch-up processes each eligible period exactly once | spec.md OQ-002 |
 
 ## NEEDS CONFIGURATION
 

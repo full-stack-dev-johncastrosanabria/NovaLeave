@@ -1,152 +1,131 @@
 # Feature Specification: [FEATURE NAME]
+
 **Feature Branch**: `[###-feature-name]`
-**Created**: [YYYY-MM-DD]
-**Status**: [Draft | Ready for Planning | In Progress | Complete]
-**Input**: [User description or business requirements that originated this feature]
-**Governance**: This specification is subordinate to `.specify/memory/constitution.md` v4.0.0. The constitution remains authoritative for Clean Architecture, ASP.NET Core MVC, Razor Views, Bootstrap, authentication, persistence, security, testing, observability, and engineering governance. This specification defines business behavior and observable outcomes. It does not prescribe controllers, repositories, database tables, HTTP routes, framework classes, or code structure.
-**Revision Note**: [Optional: describe major revisions to this specification]
----
+
+**Created**: [DATE]
+
+**Status**: Draft
+
+**Input**: User description: "$ARGUMENTS"
 
 ## User Scenarios & Testing *(mandatory)*
-User journeys are ordered by business criticality. Each story is independently testable using prepared prerequisite data where required. Priority indicates implementation order.
 
-### User Story 1 - [User Story Title] (Priority: P1)
-As a [user role], I want to [capability] so that [business value].
+<!--
+  IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
+  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
+  you should still have a viable MVP (Minimum Viable Product) that delivers value.
 
-**Why this priority**: [Justification for P1 priority]
+  Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
+  Think of each story as a standalone slice of functionality that can be:
+  - Developed independently
+  - Tested independently
+  - Deployed independently
+  - Demonstrated to users independently
+-->
 
-**Independent Test**: [How to verify this story works independently using prepared data]
+### User Story 1 - [Brief Title] (Priority: P1)
+
+[Describe this user journey in plain language]
+
+**Why this priority**: [Explain the value and why it has this priority level]
+
+**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
 
 **Acceptance Scenarios**:
-1. **AC-001 — [Scenario title]**
-   **Related Requirements**: [FR-001, FR-002, ...]
-   **Given** [preconditions], **When** [action], **Then** [expected outcome].
 
-2. **AC-002 — [Scenario title]**
-   **Related Requirements**: [FR-003, ...]
-   **Given** [preconditions], **When** [action], **Then** [expected outcome].
+1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+2. **Given** [initial state], **When** [action], **Then** [expected outcome]
 
 ---
 
-### User Story 2 - [User Story Title] (Priority: P1 or P2)
-As a [user role], I want to [capability] so that [business value].
+### User Story 2 - [Brief Title] (Priority: P2)
 
-**Why this priority**: [Justification]
+[Describe this user journey in plain language]
 
-**Independent Test**: [How to verify this story works independently]
+**Why this priority**: [Explain the value and why it has this priority level]
+
+**Independent Test**: [Describe how this can be tested independently]
 
 **Acceptance Scenarios**:
-1. **AC-003 — [Scenario title]**
-   **Related Requirements**: [FR-004, ...]
-   **Given** [preconditions], **When** [action], **Then** [expected outcome].
+
+1. **Given** [initial state], **When** [action], **Then** [expected outcome]
 
 ---
+
+### User Story 3 - [Brief Title] (Priority: P3)
+
+[Describe this user journey in plain language]
+
+**Why this priority**: [Explain the value and why it has this priority level]
+
+**Independent Test**: [Describe how this can be tested independently]
+
+**Acceptance Scenarios**:
+
+1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+
+---
+
+[Add more user stories as needed, each with an assigned priority]
 
 ### Edge Cases
-- **EC-001 — [Edge case description]**: [How the system should handle this case]
-- **EC-002 — [Edge case description]**: [Handling behavior or clarification needed]
 
----
+<!--
+  ACTION REQUIRED: The content in this section represents placeholders.
+  Fill them out with the right edge cases.
+-->
+
+- What happens when [boundary condition]?
+- How does system handle [error scenario]?
 
 ## Requirements *(mandatory)*
+
+<!--
+  ACTION REQUIRED: The content in this section represents placeholders.
+  Fill them out with the right functional requirements.
+-->
+
 ### Functional Requirements
-Every normative requirement uses exactly one standard EARS classification:
-- **Ubiquitous**: `The system shall ...`
-- **Event-Driven**: `When <trigger>, the system shall ...`
-- **State-Driven**: `While <state>, the system shall ...`
-- **Unwanted Behavior**: `If <undesired condition>, then the system shall ...`
-- **Optional**: `Where <approved optional capability applies>, the system shall ...`
 
-#### [Functional Area 1]
-- **FR-001 — [Requirement title]** *(EARS: [classification])* — [Full requirement statement]
-- **FR-002 — [Requirement title]** *(EARS: [classification])* — [Full requirement statement]
+- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
+- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
+- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
+- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
+- **FR-005**: System MUST [behavior, e.g., "log all security events"]
 
-#### [Functional Area 2]
-- **FR-003 — [Requirement title]** *(EARS: [classification])* — [Full requirement statement]
+*Example of marking unclear requirements:*
 
-### Validation Requirements
-- **VAL-001 — [Validation rule]** *(EARS: [classification])* — [Full requirement statement]
-
-### Business Rules and Domain Invariants
-- **BR-001 — [Business rule]** *(EARS: [classification])* — [Full requirement statement]
-
-### Authorization and Resource-Ownership Requirements
-- **AUTHZ-001 — [Authorization rule]** *(EARS: [classification])* — [Full requirement statement]
-
-### Security and Privacy Requirements
-- **SEC-001 — [Security requirement]** *(EARS: [classification])* — [Full requirement statement]
-
-### Concurrency, Duplicate-Operation, and Atomicity Requirements
-- **CON-001 — [Concurrency rule]** *(EARS: [classification])* — [Full requirement statement]
-
-### Audit and Observability Requirements
-- **AUD-001 — [Audit requirement]** *(EARS: [classification])* — [Full requirement statement]
-
-### Error and Failure Requirements
-- **ERR-001 — [Error handling requirement]** *(EARS: [classification])* — [Full requirement statement]
+- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
 ### Key Entities *(include if feature involves data)*
-- **[Entity Name]**: [Description of entity and its key attributes]
-- **[Entity Name]**: [Description of entity and its key attributes]
 
----
+- **[Entity 1]**: [What it represents, key attributes without implementation]
+- **[Entity 2]**: [What it represents, relationships to other entities]
 
 ## Success Criteria *(mandatory)*
+
+<!--
+  ACTION REQUIRED: Define measurable success criteria.
+  These must be technology-agnostic and measurable.
+-->
+
 ### Measurable Outcomes
-- **SC-001 — [Success criterion title]**: [Quantifiable measurement criterion]
-  **Measurement**: [How this will be measured and validated]
 
-- **SC-002 — [Success criterion title]**: [Quantifiable measurement criterion]
-  **Measurement**: [How this will be measured and validated]
-
----
+- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
+- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
+- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
+- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
 
 ## Assumptions
-### Confirmed Assumptions and Dependencies
-- [Assumption about external systems or dependencies]
-- [Assumption about existing infrastructure]
-- [Assumption about user capabilities or context]
 
-### Required Clarifications Before Implementation
-- **CL-001 — [Clarification topic]**
-  [What needs to be clarified]
-  **Affected Requirements**: [List of affected requirement IDs]
-  **Decision Needed By**: [Milestone or phase when this must be resolved]
+<!--
+  ACTION REQUIRED: The content in this section represents placeholders.
+  Fill them out with the right assumptions based on reasonable defaults
+  chosen when the feature description did not specify certain details.
+-->
 
-- **CL-002 — [Clarification topic]**
-  [What needs to be clarified]
-  **Affected Requirements**: [List of affected requirement IDs]
-  **Decision Needed By**: [Milestone or phase when this must be resolved]
-
-### Implementation Readiness Gate
-Implementation of affected functionality must not begin until:
-- [ ] All required clarifications (CL-001, CL-002, ...) are resolved
-- [ ] Approved clarification decisions are incorporated into the affected normative requirements
-- [ ] No `[NEEDS CLARIFICATION]` marker remains on a requirement scheduled for implementation
-- [ ] The requirement traceability matrix below remains complete after clarification
-- [ ] The Constitution Check passes against `.specify/memory/constitution.md` v4.0.0
-- [ ] `plan.md`, `research.md`, `data-model.md`, and `tasks.md` are reviewed and approved
-
----
-
-## Requirement Traceability Matrix
-The following matrix maps every normative requirement to at least one acceptance scenario or a required specialized test category.
-
-| Requirement | Primary Scenario(s) | Required Test Type |
-|---|---|---|
-| FR-001 | AC-001 | [Test type] |
-| FR-002 | AC-001, AC-002 | [Test type] |
-| VAL-001 | AC-002 | [Test type] |
-
----
-
-## Constitution Check
-This specification has been checked against `.specify/memory/constitution.md` v4.0.0.
-
-| Constitutional Area | Result |
-|---|---|
-| [Area name] | [Compliant or explanation of deviation] |
-| [Area name] | [Compliant or explanation of deviation] |
-
-**Constitution Result**: [PASS | BLOCKED with reasons]
-**Implementation Result**: [READY | BLOCKED until readiness gate satisfied]
+- [Assumption about target users, e.g., "Users have stable internet connectivity"]
+- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
+- [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
+- [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]

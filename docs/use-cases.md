@@ -3,7 +3,7 @@
 **Version:** 2.0.0 (compact Markdown edition)  
 **Language:** English; approved UI labels and routes remain in Spanish  
 **Applies to:** NovaLeave Constitution v6.0.0, Feature Specification 001, Role-Based Frontend Views 002  
-**Target path in repository:** `/docs/NovaLeave_Use_Cases_MVP_EN.md`
+**Target path in repository:** `/docs/use-cases.md`
 
 ## 1. Scope
 
@@ -872,7 +872,7 @@ The system determines that a User completed a month according to an approved rul
 
 ### Controls and references
 
-- Idempotency key by User and period, `TimeProvider`/`IClock`, and atomic transaction.
+- Idempotency key by User and period, built-in .NET `TimeProvider`, and atomic transaction.
 - References: `FR-014`, `BR-032`, `BR-033`, `AC-054`, `RBFV-018`. **OQ-002 RESOLVED (2026-07-27): calendar month boundary from EmploymentStartDate**.
 
 ---
@@ -1398,5 +1398,6 @@ The following are not part of these use cases:
 
 # 7. Open Question (Resolved)
 
-- **OQ-002 — RESOLVED (2026-07-27):** Completed-month semantics for accrual defined as **calendar month** (un mes calendario sin importar el mes). A "completed month" means: for each full calendar month (e.g., January 1-31, February 1-28/29, etc.) that has fully elapsed since the User's EmploymentStartDate, add 1 day. The first partial month is not counted. Partial months at the end are not counted. Implemented in `BalanceService.AccrueOneDay()` and Monthly Accrual job.
+- **OQ-001 — RESOLVED:** User cancellation of a Pending request is OUT OF MVP SCOPE.
+- **OQ-002 — RESOLVED (2026-07-27):** One whole vacation day accrues per fully completed calendar month, calculated from `EmploymentStartDate`; the first partial calendar month does not accrue; there is no proration; accrued days do not expire; accrual is idempotent by `(UserId, AccrualPeriod)`; catch-up processes each eligible period exactly once. Example A: `EmploymentStartDate = 2026-03-15`; March is partial and does not accrue; April is the first completed calendar month; the April accrual becomes eligible on `2026-05-01`; `AccrualPeriod = 2026-04`. Example B: `EmploymentStartDate = 2026-03-01`; March is a completed calendar month; the March accrual becomes eligible on `2026-04-01`; `AccrualPeriod = 2026-03`.
 

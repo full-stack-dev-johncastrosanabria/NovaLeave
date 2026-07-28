@@ -15,8 +15,8 @@
 | `BalanceMovement` | Immutable entity (child of VacationBalance) | Append-only history of every balance effect | Immutable after creation; linked by RequestId | BR-030–035, CON-007–011, AUD-007; Instruction §5.11 |
 | `AuditRecord` | Immutable entity | Append-only business audit with all required fields | Immutable; complete fields; sensitive reasons never in Data column | AUD-001–010, CON-006–011, SEC-005–006 |
 | `ApplicationUser` | Infrastructure entity (extends IdentityUser) | Active/Inactive status; roles; canResolveRequests; EmploymentStartDate | Active status checked pre-transition; Domain User does NOT inherit IdentityUser | FR-001, FR-006, AUTHZ-001–016, Constitution §4.4, §7.1 |
-| `LeaveType` | Read-only lookup (seed constant) | Reference data for request type validation | Vacation only in MVP; not mutable by users | VAL-002, VAL-003, spec.md PD-001, research.md CR-09 |
-| `TimeProvider` | Infrastructure abstraction | Single system business date; testable clock | No DateTime.Now in Domain/Application; no per-user timezone | Constitution §VI; BR-002–003; research.md CR-08 |
+| `LeaveType` | Domain enum/constant | Request type validation | Vacation only in MVP; no persisted lookup or mutable aggregate | VAL-002, VAL-003, spec.md PD-001, research.md CR-09 |
+| `TimeProvider` | Built-in .NET service | Single system business date; testable clock | No DateTime.Now in Domain/Application; no per-user timezone; no duplicate clock abstraction | Constitution §VI; BR-002–003; research.md CR-08 |
 
 ### VacationRequest Lifecycle
 
@@ -145,15 +145,9 @@ HR access to Reason or RejectionReason creates a dedicated audit event (SEC-009,
 
 > Domain business `User` concept does **NOT** inherit from `IdentityUser`. `ApplicationUser` (Infrastructure) extends `IdentityUser` and is the stable linkage point.
 
-### LeaveType (Lookup — seed only, not mutable)
+### LeaveType (Domain enum/constant — not persisted)
 
-| Field | Type | Notes |
-|-------|------|-------|
-| Id | `Guid` (PK) | |
-| Name | `string` | "Vacation" (only MVP type) |
-| IsActive | `bool` | true |
-
-Seeded in migration. No user-managed mutations. Domain validates via `LeaveType.Vacation` constant.
+No lookup table, seed row, DbSet, or migration task is planned. Domain validates via `LeaveType.Vacation` constant.
 
 ---
 
@@ -213,5 +207,5 @@ No `SystemParameter` database entity. No seeded default timeout value. (research
 ## Diagrams
 
 - Clean Architecture dependency diagram: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
-- ER diagram: planned under `specs/001-leave-management-mvp/Diagrams/er-diagram.mermaid` (not yet created — no implementation exists)
-- Request lifecycle state machine: planned under `specs/001-leave-management-mvp/Diagrams/request-lifecycle.mermaid` (not yet created)
+- Core data relationships diagram: `specs/001-leave-management-mvp/Diagrams/core-data-relationships.md`
+- Request lifecycle state machine: `specs/001-leave-management-mvp/Diagrams/request-lifecycle.md`

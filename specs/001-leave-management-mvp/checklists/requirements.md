@@ -31,6 +31,7 @@
 
 ## Notes
 
-- All items pass. Ten policy questions (leave-calculation basis, weekend/holiday handling, leave-type/balance-consumption catalog, medical-leave treatment, multiple-pending-request policy, half-day/hourly support, accrual/expiration/carryover, retroactive adjustments, payroll integration) are intentionally left in **Open Questions** per explicit instruction in the feature request; no requirement in the spec assumes an answer to any of them, so their absence does not block `/speckit-clarify` or `/speckit-plan` — it is a deliberate scope boundary, not an omission.
-- No [NEEDS CLARIFICATION] inline markers were used: the feature request explicitly asked for unresolved policy questions to be captured in an Open Questions section rather than resolved through the interactive clarification loop, and none of them meets the bar of blocking scope/security ambiguity that would otherwise warrant a marker.
-- Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`.
+- All items pass against the restored approved MVP baseline and Constitution v6.0.0.
+- OQ-001 is resolved out of MVP scope; no User Pending cancellation requirement, route, action, transition, contract, or task is introduced.
+- OQ-002 is resolved with completed-calendar-month accrual from `EmploymentStartDate`, including the approved 2026-03-15 and 2026-03-01 examples in `spec.md` and `docs/use-cases.md`.
+- Remaining undecided values are deployment configuration only: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, and accrual scheduler cadence.
