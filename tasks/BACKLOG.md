@@ -1,4 +1,4 @@
-# Product Backlog
+﻿# Product Backlog
 
 ## Executive Summary
 
@@ -52,21 +52,7 @@ The MVP includes one leave type, `Vacation`; combinable `User`, `Approver`, and 
 - Frontend Presentation
 - Quality, Security, and Release
 
-## Epics
-
-- EPIC-001 - Foundation (EPIC-001-foundation): TASK-001 through TASK-019
-- EPIC-002 - Domain and Persistence (EPIC-002-domain-and-persistence): TASK-020 through TASK-058
-- EPIC-003 - User Request Management (EPIC-003-user-request-management): TASK-059 through TASK-077
-- EPIC-004 - Approver Resolution (EPIC-004-approver-resolution): TASK-078 through TASK-093
-- EPIC-005 - Automated Timeout (EPIC-005-automated-timeout): TASK-094 through TASK-100
-- EPIC-006 - Approved Request Deactivation (EPIC-006-approved-request-deactivation): TASK-101 through TASK-107
-- EPIC-007 - Balance and Accrual (EPIC-007-balance-and-accrual): TASK-108 through TASK-116
-- EPIC-008 - Calendars (EPIC-008-calendars): TASK-117 through TASK-122
-- EPIC-009 - HR Read Only (EPIC-009-hr-read-only): TASK-123 through TASK-136
-- EPIC-010 - Approver Capability Management (EPIC-010-approver-capability-management): TASK-137 through TASK-145
-- EPIC-011 - Quality, Security, and Release (EPIC-011-quality-security-and-release): TASK-146 through TASK-153
-
-## Features
+## Epics`r`n`r`n- EPIC-000 - NovaLeave Complete MVP System (`tasks/EPIC-000-general-system/`): contains TASK-001 through TASK-153 physically in one central folder.`r`n- EPIC-001 through EPIC-011 remain approved logical groupings inside the task metadata and central epic index, but their former physical folders were removed at user request.`r`n`r`n## Features
 
 - Authentication and role context switching.
 - User request list, create, edit, detail, balance/history, and personal calendar.
@@ -197,7 +183,7 @@ Sprint numbers, if later assigned, are provisional only. Final sprint allocation
 
 ## Maintenance Conventions
 
-Requirement changes must be made first in the official artifacts and then synchronized into `/tasks`. Do not edit `/tasks` as the source of truth. Preserve official identifiers exactly. Keep task files one-to-one with T001 through T153.
+Requirement changes must be made first in the official artifacts and then synchronized into `/tasks`. Do not edit `/tasks` as the source of truth. Preserve official identifiers exactly. Keep task files one-to-one with T001 through T153. Current physical storage is centralized under `tasks/EPIC-000-general-system/`.
 
 ## Generated Task Files
 
@@ -354,3 +340,4 @@ Requirement changes must be made first in the official artifacts and then synchr
 - TASK-151 - EPIC-011 - Quality, Security, and Release: Validate `specs/001-leave-management-mvp/quickstart.md` against the implemented application and update only if commands or paths changed
 - TASK-152 - EPIC-011 - Quality, Security, and Release: Run complete test suite from `NovaLeave.sln` and record evidence in implementation handoff notes
 - TASK-153 - EPIC-011 - Quality, Security, and Release: Review documentation references and ensure no generated artifact claims implementation evidence without inspected source
+
