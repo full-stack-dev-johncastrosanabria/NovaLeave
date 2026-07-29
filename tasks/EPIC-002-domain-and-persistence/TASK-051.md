@@ -1,4 +1,4 @@
-﻿# TASK-051 - Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses
+# TASK-051 - Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-002 - Domain and Persistence
 
 ## Objective
 
-Deliver the outcome defined by canonical task T051: Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses.
+Deliver the outcome defined by canonical task T051: Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Presentation.Web/Filters/`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=51; OfficialId=T051; TaskId=TASK-051; Raw=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Presentation.Web/Filters/`; Name=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T051 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=51; OfficialId=T051; TaskId=TASK-051; Raw=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Presentation.Web/Filters/`; Name=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=51; OfficialId=T051; TaskId=TASK-051; Raw=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Presentation.Web/Filters/`; Name=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses; IsParallel=False; US=; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T051 executable without changing the approved scope. Original canonical text: Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Presentation.Web/Filters/`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ Constitution v6.0.0 Sections 4, 5, 6, 7, 8, 9, 11; data-model.md Domain Traceabi
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=51; OfficialId=T051; TaskId=TASK-051; Raw=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Presentation.Web/Filters/`; Name=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses; IsParallel=False; US=; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T051.
 - Deliver only: Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses.
 - Expected files or folders:
 - `src/NovaLeave.Presentation.Web/Filters/`
@@ -49,9 +49,9 @@ Constitution v6.0.0 Sections 4, 5, 6, 7, 8, 9, 11; data-model.md Domain Traceabi
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=51; OfficialId=T051; TaskId=TASK-051; Raw=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Presentation.Web/Filters/`; Name=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T051 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=51; OfficialId=T051; TaskId=TASK-051; Raw=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Presentation.Web/Filters/`; Name=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T051 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `src/NovaLeave.Presentation.Web/Filters/`
-- Original task: $(@{Id=51; OfficialId=T051; TaskId=TASK-051; Raw=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Presentation.Web/Filters/`; Name=Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T051 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

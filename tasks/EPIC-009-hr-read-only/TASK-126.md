@@ -1,4 +1,4 @@
-﻿# TASK-126 - Add UC-21 HR audit access and sensitive-reason read audit tests
+# TASK-126 - Add UC-21 HR audit access and sensitive-reason read audit tests
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-009 - HR Read Only
 
 ## Objective
 
-Deliver the outcome defined by canonical task T126: Add UC-21 HR audit access and sensitive-reason read audit tests.
+Deliver the outcome defined by canonical task T126: [P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=126; OfficialId=T126; TaskId=TASK-126; Raw=[P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`; Name=Add UC-21 HR audit access and sensitive-reason read audit tests; IsParallel=True; US=US7; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T126 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=126; OfficialId=T126; TaskId=TASK-126; Raw=[P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`; Name=Add UC-21 HR audit access and sensitive-reason read audit tests; IsParallel=True; US=US7; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=126; OfficialId=T126; TaskId=TASK-126; Raw=[P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`; Name=Add UC-21 HR audit access and sensitive-reason read audit tests; IsParallel=True; US=US7; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T126 executable without changing the approved scope. Original canonical text: [P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ Constitution v6.0.0 Section 4.3; docs/use-cases.md UC-18 through UC-21; AC-HR-00
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=126; OfficialId=T126; TaskId=TASK-126; Raw=[P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`; Name=Add UC-21 HR audit access and sensitive-reason read audit tests; IsParallel=True; US=US7; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T126.
 - Deliver only: Add UC-21 HR audit access and sensitive-reason read audit tests.
 - Expected files or folders:
 - `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`
@@ -49,9 +49,9 @@ Constitution v6.0.0 Section 4.3; docs/use-cases.md UC-18 through UC-21; AC-HR-00
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=126; OfficialId=T126; TaskId=TASK-126; Raw=[P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`; Name=Add UC-21 HR audit access and sensitive-reason read audit tests; IsParallel=True; US=US7; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T126 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=126; OfficialId=T126; TaskId=TASK-126; Raw=[P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`; Name=Add UC-21 HR audit access and sensitive-reason read audit tests; IsParallel=True; US=US7; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T126 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`
-- Original task: $(@{Id=126; OfficialId=T126; TaskId=TASK-126; Raw=[P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`; Name=Add UC-21 HR audit access and sensitive-reason read audit tests; IsParallel=True; US=US7; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T126 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

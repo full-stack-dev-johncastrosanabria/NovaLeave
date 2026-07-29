@@ -9,7 +9,7 @@
 ### CR-01: Timeout Default Value
 **Source conflict**: Conjunto 1 research.md recommended a 7-day default. Instruction §5.6 prohibits inventing defaults.
 **Authority applied**: Instruction §5.6 over Conjunto 1 assumption.
-**Resolution**: `NovaLeave:PendingRequestTimeoutDays` is a required typed configuration value (NEEDS CONFIGURATION). No default is seeded or invented. The application validates presence, positive value, and non-zero at startup (`ValidateOnStart`). Timeout processing is idempotent regardless of configured value.
+**Resolution**: `NovaLeave:PendingRequestTimeoutDays` is a required typed configuration value (required configuration; official value 14 per DR-001). No default is seeded or invented in code. The application validates presence, positive value, and non-zero at startup (`ValidateOnStart`). Timeout processing is idempotent regardless of configured value.
 **Affected**: CFG-001, AC-048, UC-16.
 
 ### CR-02: Accrual Timezone Reference
@@ -20,7 +20,7 @@
 
 ### CR-03: Accrual Job Cadence
 **Source conflict**: Conjunto 1 asked for schedule/time-of-day confirmation.
-**Resolution**: Scheduler cadence and time-of-day are operational configuration (NEEDS CONFIGURATION). The job is idempotent per `(UserId, AccrualPeriod)` unique constraint. Catch-up behavior is defined: multiple runs per month apply at most one accrual per user per period. No default cadence is invented.
+**Resolution**: Scheduler cadence and time-of-day are operational configuration (required configuration; daily 00:05 UTC per DR-001). The job is idempotent per `(UserId, AccrualPeriod)` unique constraint. Catch-up behavior is defined: multiple runs per month apply at most one accrual per user per period. No default cadence is invented.
 **Affected**: FR-014, UC-17.
 
 ### CR-04: Holiday Rule
@@ -117,14 +117,16 @@ Seeded via `NovaLeave:SeedDemoUsers=true`. **Must be disabled in Production.**
 | RowVersion scope | Applied to `VacationRequest`, `VacationBalance`, `ApplicationUser` (for canResolveRequests); NOT on immutable `BalanceMovement` or `AuditRecord` | Instruction §5.13 |
 | Accrual semantics (OQ-002, resolved 2026-07-27) | One whole vacation day per fully completed calendar month from `EmploymentStartDate`; first partial calendar month does not accrue; no proration; accrued days do not expire; idempotent by `(UserId, AccrualPeriod)`; catch-up processes each eligible period exactly once | spec.md OQ-002 |
 
-## NEEDS CONFIGURATION
+## Configuration (values decided — DR-001, 2026-07-29)
 
-| Key | Description | Note |
-|-----|-------------|------|
-| `NovaLeave:PendingRequestTimeoutDays` | Days before an unresolved Pending request is cancelled (int, > 0) | No default invented |
-| `NovaLeave:SeedDemoUsers` | `true` in Development/Staging; absent or `false` in Production | CFG-003 |
-| `NovaLeave:SessionTimeoutMinutes` | Authenticated session lifetime | CFG-002 |
-| Accrual job cadence | Scheduler frequency and execution time | NEEDS CONFIGURATION |
+No value is hard-coded in application code; startup validation remains fail-fast. Official values per [`docs/decisions/DR-001-runtime-configuration-values.md`](../../docs/decisions/DR-001-runtime-configuration-values.md):
+
+| Key | Description | Official value | Note |
+|-----|-------------|----------------|------|
+| `NovaLeave:PendingRequestTimeoutDays` | Days before an unresolved Pending request is cancelled (int, > 0) | **14** | CFG-001; decided, not invented |
+| `NovaLeave:SeedDemoUsers` | `true` in Development/Staging; absent or `false` in Production | env-specific | CFG-003 |
+| `NovaLeave:SessionTimeoutMinutes` | Authenticated session lifetime | **30** | CFG-002 |
+| Accrual & timeout job cadence | Scheduler frequency and execution time (idempotent scans) | **Daily 00:05 UTC** | DR-001 |
 
 ## Design Constraints
 

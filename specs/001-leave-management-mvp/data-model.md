@@ -194,9 +194,9 @@ No lookup table, seed row, DbSet, or migration task is planned. Domain validates
 
 | Property | Type | Validation | Environment |
 |----------|------|-----------|-------------|
-| `PendingRequestTimeoutDays` | `int` | Required; > 0 | NEEDS CONFIGURATION |
+| `PendingRequestTimeoutDays` | `int` | Required; > 0 | All environments; official value 14 (DR-001) |
 | `SeedDemoUsers` | `bool` | — | Development/Staging only; `false` in Production |
-| `SessionTimeoutMinutes` | `int` | Required; > 0 | NEEDS CONFIGURATION |
+| `SessionTimeoutMinutes` | `int` | Required; > 0 | All environments; official value 30 (DR-001) |
 
 Validated at startup via `services.AddOptions<NovaLeaveOptions>().ValidateDataAnnotations().ValidateOnStart()`.
 

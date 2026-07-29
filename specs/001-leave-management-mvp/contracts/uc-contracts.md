@@ -228,7 +228,7 @@ Rules:
 | Authorization | System actor only; not triggered by any HTTP request |
 | Transaction / Audit | Per-request transaction: Pending→CancelledByTimeout + Release + BalanceMovement (Release) + AuditRecord (Timeout, actorId=System) |
 | Concurrency | Optimistic concurrency on request; idempotent (skip if not Pending); yield to concurrent human resolution |
-| Configuration | `NovaLeave:PendingRequestTimeoutDays` (NEEDS CONFIGURATION); cadence configurable |
+| Configuration | `NovaLeave:PendingRequestTimeoutDays` (= 14 per DR-001); scan cadence daily 00:05 UTC (DR-001) |
 | Notes | Bounded batch processing. Fully idempotent. System actor recorded in AuditRecord. |
 
 ---
@@ -242,7 +242,7 @@ Rules:
 | Authorization | System actor only |
 | Transaction / Audit | Per-user transaction: AccruedDays += 1 + BalanceMovement (Accrual) + AuditRecord (Accrual) |
 | Concurrency | Unique constraint on (UserId, AccrualPeriod) — idempotent |
-| Configuration | Cadence: NEEDS CONFIGURATION |
+| Configuration | Cadence: daily 00:05 UTC (DR-001) |
 | Notes | Accrual period = completed calendar month from EmploymentStartDate. First partial month excluded. |
 
 ---

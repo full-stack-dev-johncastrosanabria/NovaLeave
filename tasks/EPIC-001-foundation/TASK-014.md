@@ -1,4 +1,4 @@
-﻿# TASK-014 - Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`)
+# TASK-014 - Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`)
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-001 - Foundation
 
 ## Objective
 
-Deliver the outcome defined by canonical task T014: Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`).
+Deliver the outcome defined by canonical task T014: [P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=14; OfficialId=T014; TaskId=TASK-014; Raw=[P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`; Name=Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`); IsParallel=True; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T014 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=14; OfficialId=T014; TaskId=TASK-014; Raw=[P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`; Name=Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`); IsParallel=True; US=; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=14; OfficialId=T014; TaskId=TASK-014; Raw=[P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`; Name=Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`); IsParallel=True; US=; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T014 executable without changing the approved scope. Original canonical text: [P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ Constitution v6.0.0 Sections 1-3, 9, and 15.1; plan.md Technical Context and Pro
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=14; OfficialId=T014; TaskId=TASK-014; Raw=[P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`; Name=Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`); IsParallel=True; US=; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T014.
 - Deliver only: Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`).
 - Expected files or folders:
 - `Pending`
@@ -58,9 +58,9 @@ Constitution v6.0.0 Sections 1-3, 9, and 15.1; plan.md Technical Context and Pro
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=14; OfficialId=T014; TaskId=TASK-014; Raw=[P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`; Name=Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`); IsParallel=True; US=; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T014 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=14; OfficialId=T014; TaskId=TASK-014; Raw=[P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`; Name=Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`); IsParallel=True; US=; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T014 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -74,7 +74,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`, `Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`, `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`
-- Original task: $(@{Id=14; OfficialId=T014; TaskId=TASK-014; Raw=[P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`; Name=Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`); IsParallel=True; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T014 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

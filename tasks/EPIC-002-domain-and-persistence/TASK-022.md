@@ -1,4 +1,4 @@
-﻿# TASK-022 - Create Vacation-only leave type enum or constant
+# TASK-022 - Create Vacation-only leave type enum or constant
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-002 - Domain and Persistence
 
 ## Objective
 
-Deliver the outcome defined by canonical task T022: Create Vacation-only leave type enum or constant.
+Deliver the outcome defined by canonical task T022: Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=22; OfficialId=T022; TaskId=TASK-022; Raw=Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`; Name=Create Vacation-only leave type enum or constant; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T022 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=22; OfficialId=T022; TaskId=TASK-022; Raw=Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`; Name=Create Vacation-only leave type enum or constant; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=22; OfficialId=T022; TaskId=TASK-022; Raw=Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`; Name=Create Vacation-only leave type enum or constant; IsParallel=False; US=; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T022 executable without changing the approved scope. Original canonical text: Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ Constitution v6.0.0 Sections 4, 5, 6, 7, 8, 9, 11; data-model.md Domain Traceabi
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=22; OfficialId=T022; TaskId=TASK-022; Raw=Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`; Name=Create Vacation-only leave type enum or constant; IsParallel=False; US=; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T022.
 - Deliver only: Create Vacation-only leave type enum or constant.
 - Expected files or folders:
 - `src/NovaLeave.Domain/Enums/LeaveType.cs`
@@ -49,9 +49,9 @@ Constitution v6.0.0 Sections 4, 5, 6, 7, 8, 9, 11; data-model.md Domain Traceabi
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=22; OfficialId=T022; TaskId=TASK-022; Raw=Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`; Name=Create Vacation-only leave type enum or constant; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T022 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=22; OfficialId=T022; TaskId=TASK-022; Raw=Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`; Name=Create Vacation-only leave type enum or constant; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T022 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `src/NovaLeave.Domain/Enums/LeaveType.cs`
-- Original task: $(@{Id=22; OfficialId=T022; TaskId=TASK-022; Raw=Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`; Name=Create Vacation-only leave type enum or constant; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T022 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

@@ -1,4 +1,4 @@
-﻿# TASK-004 - Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling
+# TASK-004 - Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-001 - Foundation
 
 ## Objective
 
-Deliver the outcome defined by canonical task T004: Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling.
+Deliver the outcome defined by canonical task T004: [P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=4; OfficialId=T004; TaskId=TASK-004; Raw=[P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`; Name=Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T004 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=4; OfficialId=T004; TaskId=TASK-004; Raw=[P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`; Name=Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=4; OfficialId=T004; TaskId=TASK-004; Raw=[P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`; Name=Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling; IsParallel=True; US=; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T004 executable without changing the approved scope. Original canonical text: [P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ Constitution v6.0.0 Sections 1-3, 9, and 15.1; plan.md Technical Context and Pro
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=4; OfficialId=T004; TaskId=TASK-004; Raw=[P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`; Name=Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling; IsParallel=True; US=; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T004.
 - Deliver only: Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling.
 - Expected files or folders:
 - `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`
@@ -51,9 +51,9 @@ Constitution v6.0.0 Sections 1-3, 9, and 15.1; plan.md Technical Context and Pro
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=4; OfficialId=T004; TaskId=TASK-004; Raw=[P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`; Name=Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T004 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=4; OfficialId=T004; TaskId=TASK-004; Raw=[P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`; Name=Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T004 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -67,7 +67,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`
-- Original task: $(@{Id=4; OfficialId=T004; TaskId=TASK-004; Raw=[P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`; Name=Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T004 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

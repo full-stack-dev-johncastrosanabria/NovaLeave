@@ -1,4 +1,4 @@
-﻿# TASK-110 - Add duplicate accrual idempotency tests
+# TASK-110 - Add duplicate accrual idempotency tests
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-007 - Balance and Accrual
 
 ## Objective
 
-Deliver the outcome defined by canonical task T110: Add duplicate accrual idempotency tests.
+Deliver the outcome defined by canonical task T110: [P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=110; OfficialId=T110; TaskId=TASK-110; Raw=[P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`; Name=Add duplicate accrual idempotency tests; IsParallel=True; US=US5; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T110 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=110; OfficialId=T110; TaskId=TASK-110; Raw=[P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`; Name=Add duplicate accrual idempotency tests; IsParallel=True; US=US5; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=110; OfficialId=T110; TaskId=TASK-110; Raw=[P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`; Name=Add duplicate accrual idempotency tests; IsParallel=True; US=US5; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T110 executable without changing the approved scope. Original canonical text: [P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ BR-017, BR-030, BR-031, BR-032, BR-033; spec.md OQ-002; docs/use-cases.md UC-17
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=110; OfficialId=T110; TaskId=TASK-110; Raw=[P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`; Name=Add duplicate accrual idempotency tests; IsParallel=True; US=US5; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T110.
 - Deliver only: Add duplicate accrual idempotency tests.
 - Expected files or folders:
 - `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`
@@ -49,9 +49,9 @@ BR-017, BR-030, BR-031, BR-032, BR-033; spec.md OQ-002; docs/use-cases.md UC-17
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=110; OfficialId=T110; TaskId=TASK-110; Raw=[P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`; Name=Add duplicate accrual idempotency tests; IsParallel=True; US=US5; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T110 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=110; OfficialId=T110; TaskId=TASK-110; Raw=[P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`; Name=Add duplicate accrual idempotency tests; IsParallel=True; US=US5; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T110 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`
-- Original task: $(@{Id=110; OfficialId=T110; TaskId=TASK-110; Raw=[P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`; Name=Add duplicate accrual idempotency tests; IsParallel=True; US=US5; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T110 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

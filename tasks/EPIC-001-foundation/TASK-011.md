@@ -1,4 +1,4 @@
-﻿# TASK-011 - Add application settings placeholders with no invented defaults
+# TASK-011 - Add application settings placeholders with no invented defaults
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-001 - Foundation
 
 ## Objective
 
-Deliver the outcome defined by canonical task T011: Add application settings placeholders with no invented defaults.
+Deliver the outcome defined by canonical task T011: Add application settings placeholders with no invented defaults in `src/NovaLeave.Presentation.Web/appsettings.json`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=11; OfficialId=T011; TaskId=TASK-011; Raw=Add application settings placeholders with no invented defaults in `src/NovaLeave.Presentation.Web/appsettings.json`; Name=Add application settings placeholders with no invented defaults; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T011 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=11; OfficialId=T011; TaskId=TASK-011; Raw=Add application settings placeholders with no invented defaults in `src/NovaLeave.Presentation.Web/appsettings.json`; Name=Add application settings placeholders with no invented defaults; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=11; OfficialId=T011; TaskId=TASK-011; Raw=Add application settings placeholders with no invented defaults in `src/NovaLeave.Presentation.Web/appsettings.json`; Name=Add application settings placeholders with no invented defaults; IsParallel=False; US=; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T011 executable without changing the approved scope. Original canonical text: Add application settings placeholders with no invented defaults in `src/NovaLeave.Presentation.Web/appsettings.json`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ Constitution v6.0.0 Sections 1-3, 9, and 15.1; plan.md Technical Context and Pro
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=11; OfficialId=T011; TaskId=TASK-011; Raw=Add application settings placeholders with no invented defaults in `src/NovaLeave.Presentation.Web/appsettings.json`; Name=Add application settings placeholders with no invented defaults; IsParallel=False; US=; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T011.
 - Deliver only: Add application settings placeholders with no invented defaults.
 - Expected files or folders:
 - `src/NovaLeave.Presentation.Web/appsettings.json`
@@ -49,9 +49,9 @@ Constitution v6.0.0 Sections 1-3, 9, and 15.1; plan.md Technical Context and Pro
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=11; OfficialId=T011; TaskId=TASK-011; Raw=Add application settings placeholders with no invented defaults in `src/NovaLeave.Presentation.Web/appsettings.json`; Name=Add application settings placeholders with no invented defaults; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T011 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=11; OfficialId=T011; TaskId=TASK-011; Raw=Add application settings placeholders with no invented defaults in `src/NovaLeave.Presentation.Web/appsettings.json`; Name=Add application settings placeholders with no invented defaults; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T011 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `src/NovaLeave.Presentation.Web/appsettings.json`
-- Original task: $(@{Id=11; OfficialId=T011; TaskId=TASK-011; Raw=Add application settings placeholders with no invented defaults in `src/NovaLeave.Presentation.Web/appsettings.json`; Name=Add application settings placeholders with no invented defaults; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T011 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

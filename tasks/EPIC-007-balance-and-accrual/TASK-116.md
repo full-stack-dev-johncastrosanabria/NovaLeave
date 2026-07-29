@@ -1,4 +1,4 @@
-﻿# TASK-116 - Ensure balance history displays accrual, reservation, release, deduction, and restoration movements
+# TASK-116 - Ensure balance history displays accrual, reservation, release, deduction, and restoration movements
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-007 - Balance and Accrual
 
 ## Objective
 
-Deliver the outcome defined by canonical task T116: Ensure balance history displays accrual, reservation, release, deduction, and restoration movements.
+Deliver the outcome defined by canonical task T116: [US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=116; OfficialId=T116; TaskId=TASK-116; Raw=[US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`; Name=Ensure balance history displays accrual, reservation, release, deduction, and restoration movements; IsParallel=False; US=US5; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T116 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=116; OfficialId=T116; TaskId=TASK-116; Raw=[US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`; Name=Ensure balance history displays accrual, reservation, release, deduction, and restoration movements; IsParallel=False; US=US5; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=116; OfficialId=T116; TaskId=TASK-116; Raw=[US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`; Name=Ensure balance history displays accrual, reservation, release, deduction, and restoration movements; IsParallel=False; US=US5; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T116 executable without changing the approved scope. Original canonical text: [US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ BR-017, BR-030, BR-031, BR-032, BR-033; spec.md OQ-002; docs/use-cases.md UC-17
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=116; OfficialId=T116; TaskId=TASK-116; Raw=[US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`; Name=Ensure balance history displays accrual, reservation, release, deduction, and restoration movements; IsParallel=False; US=US5; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T116.
 - Deliver only: Ensure balance history displays accrual, reservation, release, deduction, and restoration movements.
 - Expected files or folders:
 - `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`
@@ -49,9 +49,9 @@ BR-017, BR-030, BR-031, BR-032, BR-033; spec.md OQ-002; docs/use-cases.md UC-17
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=116; OfficialId=T116; TaskId=TASK-116; Raw=[US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`; Name=Ensure balance history displays accrual, reservation, release, deduction, and restoration movements; IsParallel=False; US=US5; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T116 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=116; OfficialId=T116; TaskId=TASK-116; Raw=[US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`; Name=Ensure balance history displays accrual, reservation, release, deduction, and restoration movements; IsParallel=False; US=US5; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T116 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`
-- Original task: $(@{Id=116; OfficialId=T116; TaskId=TASK-116; Raw=[US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`; Name=Ensure balance history displays accrual, reservation, release, deduction, and restoration movements; IsParallel=False; US=US5; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T116 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

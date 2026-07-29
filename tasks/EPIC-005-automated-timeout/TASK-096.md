@@ -1,4 +1,4 @@
-﻿# TASK-096 - Add timeout versus approval concurrency tests
+# TASK-096 - Add timeout versus approval concurrency tests
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-005 - Automated Timeout
 
 ## Objective
 
-Deliver the outcome defined by canonical task T096: Add timeout versus approval concurrency tests.
+Deliver the outcome defined by canonical task T096: [P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=96; OfficialId=T096; TaskId=TASK-096; Raw=[P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`; Name=Add timeout versus approval concurrency tests; IsParallel=True; US=US3; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T096 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=96; OfficialId=T096; TaskId=TASK-096; Raw=[P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`; Name=Add timeout versus approval concurrency tests; IsParallel=True; US=US3; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=96; OfficialId=T096; TaskId=TASK-096; Raw=[P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`; Name=Add timeout versus approval concurrency tests; IsParallel=True; US=US3; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T096 executable without changing the approved scope. Original canonical text: [P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ BR-026; research.md CR-01 and CR-08; docs/use-cases.md UC-16
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=96; OfficialId=T096; TaskId=TASK-096; Raw=[P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`; Name=Add timeout versus approval concurrency tests; IsParallel=True; US=US3; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T096.
 - Deliver only: Add timeout versus approval concurrency tests.
 - Expected files or folders:
 - `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`
@@ -49,9 +49,9 @@ BR-026; research.md CR-01 and CR-08; docs/use-cases.md UC-16
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=96; OfficialId=T096; TaskId=TASK-096; Raw=[P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`; Name=Add timeout versus approval concurrency tests; IsParallel=True; US=US3; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T096 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=96; OfficialId=T096; TaskId=TASK-096; Raw=[P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`; Name=Add timeout versus approval concurrency tests; IsParallel=True; US=US3; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T096 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`
-- Original task: $(@{Id=96; OfficialId=T096; TaskId=TASK-096; Raw=[P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`; Name=Add timeout versus approval concurrency tests; IsParallel=True; US=US3; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T096 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

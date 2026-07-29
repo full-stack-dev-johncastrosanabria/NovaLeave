@@ -1,4 +1,4 @@
-﻿# TASK-079 - Add UC-10 resolution detail tests with projected balance
+# TASK-079 - Add UC-10 resolution detail tests with projected balance
 
 ## Type
 
@@ -10,19 +10,19 @@ EPIC-004 - Approver Resolution
 
 ## Objective
 
-Deliver the outcome defined by canonical task T079: Add UC-10 resolution detail tests with projected balance.
+Deliver the outcome defined by canonical task T079: [P] [US2] Add UC-10 resolution detail tests with projected balance in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=79; OfficialId=T079; TaskId=TASK-079; Raw=[P] [US2] Add UC-10 resolution detail tests with projected balance in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`; Name=Add UC-10 resolution detail tests with projected balance; IsParallel=True; US=US2; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T079 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=79; OfficialId=T079; TaskId=TASK-079; Raw=[P] [US2] Add UC-10 resolution detail tests with projected balance in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`; Name=Add UC-10 resolution detail tests with projected balance; IsParallel=True; US=US2; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=79; OfficialId=T079; TaskId=TASK-079; Raw=[P] [US2] Add UC-10 resolution detail tests with projected balance in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`; Name=Add UC-10 resolution detail tests with projected balance; IsParallel=True; US=US2; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T079 executable without changing the approved scope. Original canonical text: [P] [US2] Add UC-10 resolution detail tests with projected balance in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`.
 
 ## Related Requirements
 
-FR-006, FR-007, FR-025, AUTHZ-002, AUTHZ-003, AUTHZ-007, AUTHZ-009, AUTHZ-010, SEC-004, SEC-005, AUD-002
+FR-006, FR-007, FR-025, FR-023, AUTHZ-002, AUTHZ-003, AUTHZ-007, AUTHZ-009, AUTHZ-010, SEC-004, SEC-005, AUD-002
 
 ## Related Use Cases
 
@@ -34,7 +34,7 @@ BR-006, BR-007, BR-008, BR-009, BR-011, BR-012, BR-013, BR-014, BR-015, BR-016, 
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=79; OfficialId=T079; TaskId=TASK-079; Raw=[P] [US2] Add UC-10 resolution detail tests with projected balance in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`; Name=Add UC-10 resolution detail tests with projected balance; IsParallel=True; US=US2; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T079.
 - Deliver only: Add UC-10 resolution detail tests with projected balance.
 - Expected files or folders:
 - `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`
@@ -49,9 +49,9 @@ BR-006, BR-007, BR-008, BR-009, BR-011, BR-012, BR-013, BR-014, BR-015, BR-016, 
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=79; OfficialId=T079; TaskId=TASK-079; Raw=[P] [US2] Add UC-10 resolution detail tests with projected balance in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`; Name=Add UC-10 resolution detail tests with projected balance; IsParallel=True; US=US2; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T079 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=79; OfficialId=T079; TaskId=TASK-079; Raw=[P] [US2] Add UC-10 resolution detail tests with projected balance in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`; Name=Add UC-10 resolution detail tests with projected balance; IsParallel=True; US=US2; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T079 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`
-- Original task: $(@{Id=79; OfficialId=T079; TaskId=TASK-079; Raw=[P] [US2] Add UC-10 resolution detail tests with projected balance in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`; Name=Add UC-10 resolution detail tests with projected balance; IsParallel=True; US=US2; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T079 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.
