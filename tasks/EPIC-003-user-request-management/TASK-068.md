@@ -1,4 +1,4 @@
-﻿# TASK-068 - Implement User request query use cases
+# TASK-068 - Implement User request query use cases
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-003 - User Request Management
 
 ## Objective
 
-Deliver the outcome defined by canonical task T068: Implement User request query use cases.
+Deliver the outcome defined by canonical task T068: [P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=68; OfficialId=T068; TaskId=TASK-068; Raw=[P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`; Name=Implement User request query use cases; IsParallel=True; US=US1; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T068 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=68; OfficialId=T068; TaskId=TASK-068; Raw=[P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`; Name=Implement User request query use cases; IsParallel=True; US=US1; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=68; OfficialId=T068; TaskId=TASK-068; Raw=[P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`; Name=Implement User request query use cases; IsParallel=True; US=US1; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T068 executable without changing the approved scope. Original canonical text: [P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ BR-001, BR-002, BR-004, BR-005, BR-018, BR-019, BR-024, BR-025, BR-030, BR-031, 
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=68; OfficialId=T068; TaskId=TASK-068; Raw=[P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`; Name=Implement User request query use cases; IsParallel=True; US=US1; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T068.
 - Deliver only: Implement User request query use cases.
 - Expected files or folders:
 - `src/NovaLeave.Application/Requests/Queries/`
@@ -49,9 +49,9 @@ BR-001, BR-002, BR-004, BR-005, BR-018, BR-019, BR-024, BR-025, BR-030, BR-031, 
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=68; OfficialId=T068; TaskId=TASK-068; Raw=[P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`; Name=Implement User request query use cases; IsParallel=True; US=US1; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T068 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=68; OfficialId=T068; TaskId=TASK-068; Raw=[P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`; Name=Implement User request query use cases; IsParallel=True; US=US1; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T068 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `src/NovaLeave.Application/Requests/Queries/`
-- Original task: $(@{Id=68; OfficialId=T068; TaskId=TASK-068; Raw=[P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`; Name=Implement User request query use cases; IsParallel=True; US=US1; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T068 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

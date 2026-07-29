@@ -1,4 +1,4 @@
-﻿# TASK-147 - Add lifecycle transition matrix regression tests
+# TASK-147 - Add lifecycle transition matrix regression tests
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-011 - Quality, Security, and Release
 
 ## Objective
 
-Deliver the outcome defined by canonical task T147: Add lifecycle transition matrix regression tests.
+Deliver the outcome defined by canonical task T147: [P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=147; OfficialId=T147; TaskId=TASK-147; Raw=[P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`; Name=Add lifecycle transition matrix regression tests; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T147 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=147; OfficialId=T147; TaskId=TASK-147; Raw=[P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`; Name=Add lifecycle transition matrix regression tests; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=147; OfficialId=T147; TaskId=TASK-147; Raw=[P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`; Name=Add lifecycle transition matrix regression tests; IsParallel=True; US=; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T147 executable without changing the approved scope. Original canonical text: [P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ specs/001-leave-management-mvp/tasks.md Quality Gates; Constitution v6.0.0 Secti
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=147; OfficialId=T147; TaskId=TASK-147; Raw=[P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`; Name=Add lifecycle transition matrix regression tests; IsParallel=True; US=; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T147.
 - Deliver only: Add lifecycle transition matrix regression tests.
 - Expected files or folders:
 - `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`
@@ -49,9 +49,9 @@ specs/001-leave-management-mvp/tasks.md Quality Gates; Constitution v6.0.0 Secti
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=147; OfficialId=T147; TaskId=TASK-147; Raw=[P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`; Name=Add lifecycle transition matrix regression tests; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T147 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=147; OfficialId=T147; TaskId=TASK-147; Raw=[P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`; Name=Add lifecycle transition matrix regression tests; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T147 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`
-- Original task: $(@{Id=147; OfficialId=T147; TaskId=TASK-147; Raw=[P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`; Name=Add lifecycle transition matrix regression tests; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T147 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

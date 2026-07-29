@@ -41,18 +41,19 @@ docker/
 
 ---
 
-## Environment Configuration (NEEDS CONFIGURATION)
+## Environment Configuration
 
-These values must be set before the application can run. **No default values are seeded or assumed.**
+These values must be set before the application can run. **No value is hard-coded in application code**; the official values below were decided in [DR-001](../../docs/decisions/DR-001-runtime-configuration-values.md) (2026-07-29).
 
-| Key | Description | Required In |
-|-----|-------------|-------------|
-| `ConnectionStrings:DefaultConnection` | SQL Server connection string | All non-test environments |
-| `NovaLeave:PendingRequestTimeoutDays` | Days before a Pending request is cancelled (positive int) | All environments |
-| `NovaLeave:SessionTimeoutMinutes` | Authenticated session lifetime (positive int) | All environments |
-| `NovaLeave:SeedDemoUsers` | `true` to seed demo identities at startup | Development / Staging **only** — **must be `false` or absent in Production** |
+| Key | Description | Official value (DR-001) | Required In |
+|-----|-------------|-------------------------|-------------|
+| `ConnectionStrings:DefaultConnection` | SQL Server connection string | environment-specific | All non-test environments |
+| `NovaLeave:PendingRequestTimeoutDays` | Days before a Pending request is cancelled (positive int) | **14** | All environments |
+| `NovaLeave:SessionTimeoutMinutes` | Authenticated session lifetime (positive int) | **30** | All environments |
+| `NovaLeave:SeedDemoUsers` | `true` to seed demo identities at startup | `true` in Dev/Staging | Development / Staging **only** — **must be `false` or absent in Production** |
+| Accrual & timeout job cadence | Scheduler frequency for the idempotent accrual and timeout scans | **Daily 00:05 UTC** | All environments |
 
-Configuration validated at startup. Application will not start with missing or invalid `PendingRequestTimeoutDays` or `SessionTimeoutMinutes`.
+Configuration validated at startup. Application will not start with missing or invalid `PendingRequestTimeoutDays` or `SessionTimeoutMinutes`. Development/Staging may carry the DR-001 values in `appsettings.Development.json`; Production supplies them through its configuration/secret store.
 
 ---
 

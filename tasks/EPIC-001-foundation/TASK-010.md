@@ -1,4 +1,4 @@
-﻿# TASK-010 - Configure Bootstrap 5.3 asset management
+# TASK-010 - Configure Bootstrap 5.3 asset management
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-001 - Foundation
 
 ## Objective
 
-Deliver the outcome defined by canonical task T010: Configure Bootstrap 5.3 asset management.
+Deliver the outcome defined by canonical task T010: [P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Presentation.Web/libman.json` or `src/NovaLeave.Presentation.Web/package.json`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=10; OfficialId=T010; TaskId=TASK-010; Raw=[P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Presentation.Web/libman.json` or `src/NovaLeave.Presentation.Web/package.json`; Name=Configure Bootstrap 5.3 asset management; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T010 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=10; OfficialId=T010; TaskId=TASK-010; Raw=[P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Presentation.Web/libman.json` or `src/NovaLeave.Presentation.Web/package.json`; Name=Configure Bootstrap 5.3 asset management; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=10; OfficialId=T010; TaskId=TASK-010; Raw=[P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Presentation.Web/libman.json` or `src/NovaLeave.Presentation.Web/package.json`; Name=Configure Bootstrap 5.3 asset management; IsParallel=True; US=; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T010 executable without changing the approved scope. Original canonical text: [P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Presentation.Web/libman.json` or `src/NovaLeave.Presentation.Web/package.json`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ Constitution v6.0.0 Sections 1-3, 9, and 15.1; plan.md Technical Context and Pro
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=10; OfficialId=T010; TaskId=TASK-010; Raw=[P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Presentation.Web/libman.json` or `src/NovaLeave.Presentation.Web/package.json`; Name=Configure Bootstrap 5.3 asset management; IsParallel=True; US=; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T010.
 - Deliver only: Configure Bootstrap 5.3 asset management.
 - Expected files or folders:
 - `src/NovaLeave.Presentation.Web/libman.json`
@@ -50,9 +50,9 @@ Constitution v6.0.0 Sections 1-3, 9, and 15.1; plan.md Technical Context and Pro
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=10; OfficialId=T010; TaskId=TASK-010; Raw=[P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Presentation.Web/libman.json` or `src/NovaLeave.Presentation.Web/package.json`; Name=Configure Bootstrap 5.3 asset management; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T010 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=10; OfficialId=T010; TaskId=TASK-010; Raw=[P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Presentation.Web/libman.json` or `src/NovaLeave.Presentation.Web/package.json`; Name=Configure Bootstrap 5.3 asset management; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T010 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -66,7 +66,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `src/NovaLeave.Presentation.Web/libman.json`, `src/NovaLeave.Presentation.Web/package.json`
-- Original task: $(@{Id=10; OfficialId=T010; TaskId=TASK-010; Raw=[P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Presentation.Web/libman.json` or `src/NovaLeave.Presentation.Web/package.json`; Name=Configure Bootstrap 5.3 asset management; IsParallel=True; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T010 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

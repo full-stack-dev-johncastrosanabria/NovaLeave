@@ -1,4 +1,4 @@
-﻿# TASK-145 - Implement capability list, modal confirmation, validation, concurrency, and toast UI
+# TASK-145 - Implement capability list, modal confirmation, validation, concurrency, and toast UI
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-010 - Approver Capability Management
 
 ## Objective
 
-Deliver the outcome defined by canonical task T145: Implement capability list, modal confirmation, validation, concurrency, and toast UI.
+Deliver the outcome defined by canonical task T145: [US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=145; OfficialId=T145; TaskId=TASK-145; Raw=[US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`; Name=Implement capability list, modal confirmation, validation, concurrency, and toast UI; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T145 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=145; OfficialId=T145; TaskId=TASK-145; Raw=[US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`; Name=Implement capability list, modal confirmation, validation, concurrency, and toast UI; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=145; OfficialId=T145; TaskId=TASK-145; Raw=[US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`; Name=Implement capability list, modal confirmation, validation, concurrency, and toast UI; IsParallel=False; US=US8; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T145 executable without changing the approved scope. Original canonical text: [US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ Constitution v6.0.0 Section 4.3; docs/use-cases.md UC-22; AC-HR-007 through AC-H
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=145; OfficialId=T145; TaskId=TASK-145; Raw=[US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`; Name=Implement capability list, modal confirmation, validation, concurrency, and toast UI; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T145.
 - Deliver only: Implement capability list, modal confirmation, validation, concurrency, and toast UI.
 - Expected files or folders:
 - `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`
@@ -49,9 +49,9 @@ Constitution v6.0.0 Section 4.3; docs/use-cases.md UC-22; AC-HR-007 through AC-H
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=145; OfficialId=T145; TaskId=TASK-145; Raw=[US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`; Name=Implement capability list, modal confirmation, validation, concurrency, and toast UI; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T145 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=145; OfficialId=T145; TaskId=TASK-145; Raw=[US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`; Name=Implement capability list, modal confirmation, validation, concurrency, and toast UI; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T145 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`
-- Original task: $(@{Id=145; OfficialId=T145; TaskId=TASK-145; Raw=[US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Presentation.Web/Views/HR/ApproverCapabilities/`; Name=Implement capability list, modal confirmation, validation, concurrency, and toast UI; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T145 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

@@ -219,7 +219,7 @@
 
 - [ ] T112 [US5] Implement monthly accrual policy in `src/NovaLeave.Domain/Services/MonthlyAccrualPolicy.cs`
 - [ ] T113 [US5] Implement accrual command with unique `(UserId, AccrualPeriod)` idempotency in `src/NovaLeave.Application/System/ExecuteMonthlyAccrual/`
-- [ ] T114 [US5] Implement accrual scheduler adapter with NEEDS CONFIGURATION cadence in `src/NovaLeave.Infrastructure/Scheduling/MonthlyAccrualJob.cs`
+- [ ] T114 [US5] Implement accrual scheduler adapter with DR-001-configured cadence in `src/NovaLeave.Infrastructure/Scheduling/MonthlyAccrualJob.cs`
 - [ ] T115 [US5] Add EF Core unique index for accrual idempotency in `src/NovaLeave.Infrastructure/Persistence/Configurations/BalanceMovementConfiguration.cs`
 - [ ] T116 [US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Presentation.Web/Views/User/Balance.cshtml`
 
@@ -366,4 +366,4 @@
 - Every test task must be written before its corresponding implementation task and initially fail.
 - No task may introduce APIs, JWT, OpenAPI, email, Outbox, queues, Redis, microservices, teams, departments, managers, hierarchy, delegation, escalation, User Pending cancellation, holiday calendars, per-user timezones, HR request resolution, HR balance modification, or HR role assignment/removal.
 - No task may add a persisted LeaveType lookup table; `Vacation` remains a Domain enum/constant.
-- Configuration values `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, and accrual scheduler cadence remain required configuration with no invented defaults.
+- Configuration values `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, and accrual scheduler cadence remain required configuration with no invented defaults; official values are decided in `docs/decisions/DR-001-runtime-configuration-values.md` (14 days, 30 minutes, daily 00:05 UTC).

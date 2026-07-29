@@ -1,10 +1,11 @@
-﻿# NovaLeave Backlog Coverage Report
+# NovaLeave Backlog Coverage Report
 
 ## Metadata
 
 - Branch: `abraham-villalobos`
 - Commit: `fff4b94b47f66960efa467a703856255f909e8f8`
 - Date: `2026-07-29`
+- Re-validated: `2026-07-29` on `branch-john` after the tasks/ tree mechanical repair (1,071 template blobs expanded from canonical `tasks.md`, 155 BOMs removed — see `docs/decisions/DR-002-generated-artifact-review-rule.md`). Independent invariant checks: no template artifacts, no BOM, full `T001–T153 ↔ TASK-001–153` round-trip.
 - Analyzed sources:
   - `.specify/memory/constitution.md`
   - `specs/001-leave-management-mvp/spec.md`
@@ -33,13 +34,15 @@ Functional requirements are approved `FR-XXX` identifiers. Non-functional requir
 
 | Category | Total Identified | Covered | Not Covered | Coverage |
 |---|---:|---:|---:|---:|
-| Functional requirements | 21 | 21 | 0 | 100% |
+| Functional requirements | 23 | 23 | 0 | 100% |
 | Non-functional requirements | 120 | 120 | 0 | 100% |
 | Acceptance criteria | 72 | 72 | 0 | 100% |
 | Use cases | 22 | 22 | 0 | 100% |
 | Identified business rules | 35 | 35 | 0 | 100% |
 | Canonical tasks T001-T153 | 153 | 153 | 0 | 100% |
 | Mandatory exclusions | 28 | 28 | 0 | 100% |
+
+*Correction (2026-07-29 re-validation): the functional-requirement total was corrected from 21 to 23 — spec 001 defines 23 active FR identifiers (FR-001–FR-007, FR-009, FR-011–FR-025; FR-008 and FR-010 are retired). Independent verification initially found FR-023 untagged in the TASK tree although its behavior was already covered (T079 projected-balance detail tests; T086 Approver detail queries); the FR-023 tag was added to TASK-079 and TASK-086, after which all 23 active FRs are referenced by at least one TASK file.*
 
 ## Use Case Coverage
 

@@ -1,4 +1,4 @@
-﻿# TASK-040 - Create VacationRequest EF Core mapping
+# TASK-040 - Create VacationRequest EF Core mapping
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-002 - Domain and Persistence
 
 ## Objective
 
-Deliver the outcome defined by canonical task T040: Create VacationRequest EF Core mapping.
+Deliver the outcome defined by canonical task T040: Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=40; OfficialId=T040; TaskId=TASK-040; Raw=Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`; Name=Create VacationRequest EF Core mapping; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T040 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=40; OfficialId=T040; TaskId=TASK-040; Raw=Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`; Name=Create VacationRequest EF Core mapping; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=40; OfficialId=T040; TaskId=TASK-040; Raw=Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`; Name=Create VacationRequest EF Core mapping; IsParallel=False; US=; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T040 executable without changing the approved scope. Original canonical text: Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ Constitution v6.0.0 Sections 4, 5, 6, 7, 8, 9, 11; data-model.md Domain Traceabi
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=40; OfficialId=T040; TaskId=TASK-040; Raw=Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`; Name=Create VacationRequest EF Core mapping; IsParallel=False; US=; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T040.
 - Deliver only: Create VacationRequest EF Core mapping.
 - Expected files or folders:
 - `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`
@@ -49,9 +49,9 @@ Constitution v6.0.0 Sections 4, 5, 6, 7, 8, 9, 11; data-model.md Domain Traceabi
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=40; OfficialId=T040; TaskId=TASK-040; Raw=Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`; Name=Create VacationRequest EF Core mapping; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T040 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=40; OfficialId=T040; TaskId=TASK-040; Raw=Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`; Name=Create VacationRequest EF Core mapping; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T040 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -65,7 +65,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`
-- Original task: $(@{Id=40; OfficialId=T040; TaskId=TASK-040; Raw=Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`; Name=Create VacationRequest EF Core mapping; IsParallel=False; US=; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T040 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

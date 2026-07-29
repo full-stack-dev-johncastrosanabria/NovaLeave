@@ -1,4 +1,4 @@
-﻿# TASK-142 - Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit
+# TASK-142 - Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit
 
 ## Type
 
@@ -10,15 +10,15 @@ EPIC-010 - Approver Capability Management
 
 ## Objective
 
-Deliver the outcome defined by canonical task T142: Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit.
+Deliver the outcome defined by canonical task T142: [US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`.
 
 ## Description
 
-This task is a derived execution view of $(@{Id=142; OfficialId=T142; TaskId=TASK-142; Raw=[US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`; Name=Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
+This task is a derived execution view of T142 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
 
 ## Context
 
-The task exists to make canonical backlog item $(@{Id=142; OfficialId=T142; TaskId=TASK-142; Raw=[US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`; Name=Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId) executable without changing the approved scope. Original canonical text: $(@{Id=142; OfficialId=T142; TaskId=TASK-142; Raw=[US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`; Name=Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit; IsParallel=False; US=US8; Paths=System.Object[]}.Raw).
+The task exists to make canonical backlog item T142 executable without changing the approved scope. Original canonical text: [US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`.
 
 ## Related Requirements
 
@@ -34,7 +34,7 @@ Constitution v6.0.0 Section 4.3; docs/use-cases.md UC-22; AC-HR-007 through AC-H
 
 ## Scope
 
-- Preserve the original canonical task identifier $(@{Id=142; OfficialId=T142; TaskId=TASK-142; Raw=[US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`; Name=Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId).
+- Preserve the original canonical task identifier T142.
 - Deliver only: Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit.
 - Expected files or folders:
 - `canResolveRequests`
@@ -50,9 +50,9 @@ Constitution v6.0.0 Section 4.3; docs/use-cases.md UC-22; AC-HR-007 through AC-H
 
 ## Acceptance Criteria
 
-- [ ] The deliverable described by $(@{Id=142; OfficialId=T142; TaskId=TASK-142; Raw=[US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`; Name=Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId) exists in the planned path or documented artifact.
+- [ ] The deliverable described by T142 exists in the planned path or documented artifact.
 - [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to $(@{Id=142; OfficialId=T142; TaskId=TASK-142; Raw=[US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`; Name=Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId) and the listed requirements/use cases is preserved.
+- [ ] Traceability to T142 and the listed requirements/use cases is preserved.
 - [ ] No excluded functionality or invented identifier is introduced.
 
 ## Dependencies
@@ -66,7 +66,7 @@ No additional risks were identified beyond the general project risks.
 ## Technical Notes
 
 - Planned path: `canResolveRequests`, `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`
-- Original task: $(@{Id=142; OfficialId=T142; TaskId=TASK-142; Raw=[US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`; Name=Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit; IsParallel=False; US=US8; Paths=System.Object[]}.OfficialId) from specs/001-leave-management-mvp/tasks.md.
+- Original task: T142 from specs/001-leave-management-mvp/tasks.md.
 - Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.

@@ -136,7 +136,7 @@ NovaLeave MVP is a vacation request management system built on Clean Architectur
 | Localization | PASS | Spanish labels from approved specs used throughout |
 | Scope exclusions | PASS | Email, queues, Redis, microservices, JWT, OpenAPI, external calendar, holiday calendar, per-user timezone — all absent |
 | Retention | PASS | 7 years per Constitution §13; 2-year recommendation removed |
-| Invented values | PASS | C# version removed; scale numbers removed; 7-day timeout default removed; all marked NEEDS CONFIGURATION |
+| Invented values | PASS | C# version removed; scale numbers removed; 7-day timeout default removed; all marked NEEDS CONFIGURATION (later resolved by DR-001, docs/decisions) |
 | Domain model | PASS | LeaveType = Domain enum/constant only; no persisted lookup; SystemParameter = typed configuration; ReservationMovementId/DeductionMovementId removed; StartBusinessDateUtc removed; no Reason in BalanceMovement |
 | Quickstart evidence | PASS | Existing vs planned clearly distinguished; no non-existent files referenced |
 | Artifacts consistency | PASS | Same entity names, routes, modules, config keys across all artifacts |
@@ -456,7 +456,7 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 | Only one feature plan exists | PASS | One plan under 001-leave-management-mvp/ only |
 | Feature 002 treated as complementary only | PASS | No separate plan, no artifacts under 002/ |
 | No excluded or future functionality introduced | PASS | Email, queues, Redis, microservices, JWT, OpenAPI, holiday calendar absent |
-| No invented business or configuration value | PASS | Timeout, session timeout, and accrual cadence marked NEEDS CONFIGURATION; production scale figures not specified |
+| No invented business or configuration value | PASS | Timeout, session timeout, and accrual cadence carried as required configuration with no code defaults; official values decided in DR-001 (docs/decisions); production scale figures not specified |
 
 ### Repository Evidence
 
@@ -534,7 +534,7 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 - **Constitution Check (Initial)**: PARTIAL/FAIL — Conjunto 1 contained speculative scope, invented values, and architectural violations
 - **Constitution Check (Post-Phase-1)**: PASS — All corrections applied
 - **Repository Assessment**: 22 Missing (no implementation exists)
-- **NEEDS CONFIGURATION**: `PendingRequestTimeoutDays`, `SessionTimeoutMinutes`, accrual cadence
+- **Configuration (decided — DR-001, docs/decisions)**: `PendingRequestTimeoutDays` = 14; `SessionTimeoutMinutes` = 30; accrual & timeout job cadence daily 00:05 UTC. Required configuration, no code defaults.
 - **NEEDS CLARIFICATION**: None — all open questions resolved or documented as out of MVP scope
 - **Feature 002 treatment**: Complementary specification only; no independent plan created
 - **Status**: TASK-READY after generated `tasks.md` review; official bash wrapper was unavailable in this Windows environment, so plan/tasks/analyze workflow was completed manually against the restored approved artifacts.
