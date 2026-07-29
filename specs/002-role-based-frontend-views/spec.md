@@ -1,6 +1,6 @@
 # Role-Based Frontend Views Specification — NovaLeave MVP
 
-**Related Feature**: `002-role-based-frontend-views`
+**Related Feature**: `001-leave-management-mvp` (complementary specification; not an independent feature and no separate implementation plan)
 **Version**: 2.0.0
 **Date**: 2026-07-23
 **Status**: Ready for Planning. All 34 RBFV criteria defined and traced to MVP requirements.

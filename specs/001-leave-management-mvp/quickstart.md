@@ -179,7 +179,7 @@ dotnet ef migrations add <MigrationName> \
 
 ## Development Notes
 
-- Use `TimeProvider` for tests; see `NovaLeave.Infrastructure/Services/ClockService.cs`.
+- Use the built-in .NET `TimeProvider` directly for tests; do not introduce `IClock`, `ITimeProvider`, `ISystemDateProvider`, or a wrapper service.
 - Keep Domain project dependency-free of EF Core and ASP.NET types.
 - Use `RowVersion` in forms as a hidden field for concurrency.
 - Use structured logging (`ILogger<T>`) and enrich with `CorrelationId` middleware.

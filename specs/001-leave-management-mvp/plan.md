@@ -22,7 +22,7 @@ NovaLeave MVP is a vacation request management system built on Clean Architectur
 - Bootstrap 5.3.x (pinned, via LibMan or npm)
 - xUnit / WebApplicationFactory / Testcontainers / Playwright (testing)
 
-**Storage**: SQL Server (production); SQL Server or real SQL instance for integration tests; EF Core migrations (versioned). Tables: VacationRequests, VacationBalances, BalanceMovements, LeaveTypes (seed only: Vacation), AuditRecords, AspNetUsers (extended with IsActive, CanResolveRequests, EmploymentStartDate). No OutboxMessages, no SystemParameters table, no SecurityEvents table (security events via Serilog structured logging — research.md CR-07, CR-10, CR-11).
+**Storage**: SQL Server (production); SQL Server or real SQL instance for integration tests; EF Core migrations (versioned). Tables: VacationRequests, VacationBalances, BalanceMovements, AuditRecords, AspNetUsers (extended with IsActive, CanResolveRequests, EmploymentStartDate). No LeaveTypes lookup table, no OutboxMessages, no SystemParameters table, no SecurityEvents table (security events via Serilog structured logging — research.md CR-07, CR-09, CR-10, CR-11).
 
 **Testing**:
 - Unit: xUnit (Domain invariants, working-day calculations, balance rules, concurrency scenarios)
@@ -48,7 +48,7 @@ NovaLeave MVP is a vacation request management system built on Clean Architectur
 - No SSO, no automatic password recovery, no API surface in MVP
 
 **Scale/Scope**:
-- Production user count: NEEDS CONFIGURATION (not specified in approved sources)
+- Production scale figures are not specified in approved sources and are not MVP requirements.
 - Approved use cases: UC-01 through UC-22 (22 total)
 - Background jobs: timeout cancellation + monthly accrual (2 total)
 - Domain aggregates: VacationRequest, VacationBalance (2 aggregate roots)
@@ -126,7 +126,7 @@ NovaLeave MVP is a vacation request management system built on Clean Architectur
 | MVC, Razor Views, Bootstrap | PASS | All views use dedicated ViewModels; no Domain/EF entities in views |
 | ASP.NET Core Identity & sessions | PASS | Default Identity routes; no custom AccountController; Domain User linked via ApplicationUser.Id |
 | Roles & authorization | PASS | RequireActiveUser/Approver/HR policies; resource authz; deny-by-default; HR restrictions enforced |
-| Lifecycle invariants | PASS | 5 states; 6 transitions; terminal states; pre-start deactivation; no User Pending cancellation |
+| Lifecycle invariants | PASS | 5 states; 4 official transitions; creation and Pending editing are lifecycle operations, not official transitions; terminal states; pre-start deactivation; OQ-001 out of MVP scope |
 | Balance integrity | PASS | Non-negative invariant; reserve/deduct/release/restore; no HR adjustment; no Adjustment movement type |
 | Date and overlap rules | PASS | Mon–Fri; holidays counted; no per-user timezone; next-day minimum; zero-day rejection |
 | Security baseline | PASS | Antiforgery; IDOR denial; self-resolution denial; session expiry; security events via Serilog |
@@ -137,7 +137,7 @@ NovaLeave MVP is a vacation request management system built on Clean Architectur
 | Scope exclusions | PASS | Email, queues, Redis, microservices, JWT, OpenAPI, external calendar, holiday calendar, per-user timezone — all absent |
 | Retention | PASS | 7 years per Constitution §13; 2-year recommendation removed |
 | Invented values | PASS | C# version removed; scale numbers removed; 7-day timeout default removed; all marked NEEDS CONFIGURATION |
-| Domain model | PASS | LeaveType = read-only seed; SystemParameter = typed configuration; ReservationMovementId/DeductionMovementId removed; StartBusinessDateUtc removed; no Reason in BalanceMovement |
+| Domain model | PASS | LeaveType = Domain enum/constant only; no persisted lookup; SystemParameter = typed configuration; ReservationMovementId/DeductionMovementId removed; StartBusinessDateUtc removed; no Reason in BalanceMovement |
 | Quickstart evidence | PASS | Existing vs planned clearly distinguished; no non-existent files referenced |
 | Artifacts consistency | PASS | Same entity names, routes, modules, config keys across all artifacts |
 | Contracts | PASS | 22 UC contracts defined in contracts/uc-contracts.md |
@@ -177,7 +177,7 @@ src/
     Enums/
       RequestStatus.cs            # Pending/Approved/Rejected/CancelledByTimeout/CancelledByApprover
       MovementType.cs             # Accrual/Reservation/Release/Deduction/Restoration
-      LeaveType.cs                # Vacation (only MVP type; enum/constant, not persisted aggregate)
+      LeaveType.cs                # Vacation (only MVP type; enum/constant, not persisted)
     Services/
       WorkingDaysCalculator.cs    # Mon–Fri count; holidays counted; zero-day rejection
       AccrualService.cs           # Completed-month rule from EmploymentStartDate
@@ -229,7 +229,6 @@ src/
       ToggleApproverCapabilityValidator.cs
     Common/
       Abstractions/
-        IVacationRequestService.cs     # Application-owned abstraction (if needed)
         IAuditWriter.cs                # Application-owned abstraction for audit persistence
       DTOs/
         RequestSummaryDto.cs
@@ -245,7 +244,6 @@ src/
         VacationBalanceConfiguration.cs
         BalanceMovementConfiguration.cs
         AuditRecordConfiguration.cs
-        LeaveTypeConfiguration.cs      # Seed: one row (Vacation)
         ApplicationUserConfiguration.cs
       Migrations/
         *(versioned migrations — not yet created)
@@ -253,8 +251,6 @@ src/
         DemoUserSeeder.cs              # IHostedService; opt-in via NovaLeave:SeedDemoUsers=true
     Identity/
       ApplicationUser.cs              # Extends IdentityUser; adds IsActive, CanResolveRequests, EmploymentStartDate
-    Services/
-      ClockService.cs                 # Wraps TimeProvider for DI
     BackgroundJobs/
       TimeoutCancellationHostedService.cs
       MonthlyAccrualHostedService.cs
@@ -352,9 +348,9 @@ docs/
     ADR-003-Concurrency.md
     ADR-004-AccrualSemantics.md
   diagrams/
-    domain-class-diagram.mermaid
-    er-diagram.mermaid
-    request-lifecycle.mermaid
+    clean-architecture.md
+    request-lifecycle.md
+    core-data-relationships.md
   runbooks/
     deploy.md
     rollback.md
@@ -460,7 +456,7 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 | Only one feature plan exists | PASS | One plan under 001-leave-management-mvp/ only |
 | Feature 002 treated as complementary only | PASS | No separate plan, no artifacts under 002/ |
 | No excluded or future functionality introduced | PASS | Email, queues, Redis, microservices, JWT, OpenAPI, holiday calendar absent |
-| No invented business or configuration value | PASS | Timeout, session timeout, user count all marked NEEDS CONFIGURATION |
+| No invented business or configuration value | PASS | Timeout, session timeout, and accrual cadence marked NEEDS CONFIGURATION; production scale figures not specified |
 
 ### Repository Evidence
 
@@ -486,7 +482,7 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 | Check | Status | Notes |
 |---|---|---|
 | Every UC has an MVC/Application contract or justified N/A | PASS | UC-01–22 in contracts/uc-contracts.md |
-| Routes use correct approved paths | PASS | Identity routes, /mis-solicitudes, /aprobaciones, /rrhh all per RBFV spec |
+| Routes use correct approved paths | PASS | Identity routes, /mis-solicitudes, /aprobaciones, shared /calendario, and /rrhh all per RBFV spec |
 | GET performs no mutation | PASS | All state changes use POST |
 | Mutations use POST and antiforgery | PASS | AutoValidateAntiforgeryToken planned globally |
 | ViewModels contain no business or authorization logic | PASS | Enforced by architecture rules |
@@ -497,13 +493,13 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 
 | Check | Status | Notes |
 |---|---|---|
-| Official states and transitions used exclusively | PASS | 5 states, 6 transitions per Constitution v6.0.0 §5 |
+| Official states and transitions used exclusively | PASS | 5 states, 4 official transitions per Constitution v6.0.0 §5; creation and Pending editing are operations |
 | Working days exclude weekends and count holidays | PASS | BR-004, AC-035, research.md CR-04 |
 | Accrual uses completed calendar months and is idempotent | PASS | OQ-002 resolved; unique (UserId, AccrualPeriod) constraint |
 | No per-user timezone logic exists | PASS | Constitution invariant 4; research.md CR-02 |
 | No negative balances or manual HR adjustments exist | PASS | Domain invariant enforced; no Adjustment movement type |
 | HR restrictions remain enforced | PASS | RequireActiveHR; no approve/reject/deactivate/balance-edit |
-| User Pending cancellation not introduced | PASS | OQ-001 deferred per Constitution v4.0.0 invariant 7 |
+| OQ-001 cancellation not introduced | PASS | OQ-001 resolved out of MVP scope; no route, action, contract, requirement, or transition introduced |
 
 ### Transactions, Security, and Audit
 
@@ -529,7 +525,7 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 | Accessibility includes automated and manual validation | PASS | AccessibilitySmokeTests.cs planned; WCAG 2.1 AA |
 | Quickstart reflects actual or clearly planned repository paths | PASS | Quickstart clearly labels existing vs planned |
 | Post-Phase-1 Constitution Check passes | PASS | See Post-Phase-1 section above |
-| No production code or tasks.md generated | PASS | No src/ code created; no tasks.md created |
+| No production code generated | PASS | No src/ code created; tasks.md exists as generated planning output only |
 
 ---
 
@@ -541,4 +537,4 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 - **NEEDS CONFIGURATION**: `PendingRequestTimeoutDays`, `SessionTimeoutMinutes`, accrual cadence
 - **NEEDS CLARIFICATION**: None — all open questions resolved or documented as out of MVP scope
 - **Feature 002 treatment**: Complementary specification only; no independent plan created
-- **Status**: READY FOR /speckit-tasks
+- **Status**: TASK-READY after generated `tasks.md` review; official bash wrapper was unavailable in this Windows environment, so plan/tasks/analyze workflow was completed manually against the restored approved artifacts.

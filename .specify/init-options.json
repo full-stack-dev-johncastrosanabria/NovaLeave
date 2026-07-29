@@ -1,9 +1,10 @@
 {
-  "ai": "claude",
+  "ai": "codex",
   "ai_skills": true,
+  "context_file": "AGENTS.md",
   "feature_numbering": "sequential",
   "here": false,
-  "integration": "claude",
+  "integration": "codex",
   "script": "sh",
   "speckit_version": "0.12.13"
 }
