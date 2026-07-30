@@ -1,4 +1,4 @@
-# TASK-134 - Implement HR MVC controllers for `/rrhh/solicitudes`, `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`
+# TASK-134 - Implement HR MVC controllers for /rrhh/solicitudes, dedicated read-only /rrhh/calendario, /rrhh/saldos, and /rrhh/auditoria
 
 ## Type
 
@@ -10,7 +10,7 @@ EPIC-009 - HR Read Only
 
 ## Objective
 
-Deliver the outcome defined by canonical task T134: [US7] Implement HR MVC controllers for `/rrhh/solicitudes`, `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria` in `src/NovaLeave.Presentation.Web/Controllers/HR/`.
+Deliver the outcome defined by canonical task T134: [US7] Implement HR MVC controllers for `/rrhh/solicitudes`, dedicated read-only `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`; do not expose HR calendar behavior through `/calendario` in `src/NovaLeave.Presentation.Web/Controllers/HR/`.
 
 ## Description
 
@@ -18,7 +18,7 @@ This task is a derived execution view of T134 from specs/001-leave-management-mv
 
 ## Context
 
-The task exists to make canonical backlog item T134 executable without changing the approved scope. Original canonical text: [US7] Implement HR MVC controllers for `/rrhh/solicitudes`, `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria` in `src/NovaLeave.Presentation.Web/Controllers/HR/`.
+The task exists to make canonical backlog item T134 executable without changing the approved scope. Original canonical text: [US7] Implement HR MVC controllers for `/rrhh/solicitudes`, dedicated read-only `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`; do not expose HR calendar behavior through `/calendario` in `src/NovaLeave.Presentation.Web/Controllers/HR/`.
 
 ## Related Requirements
 
@@ -30,12 +30,12 @@ UC-18, UC-19, UC-20, UC-21
 
 ## Related Business Rules
 
-Constitution v6.0.0 Section 4.3; docs/use-cases.md UC-18 through UC-21; AC-HR-001 through AC-HR-007 and AC-HR-009 through AC-HR-012
+Constitution v6.0.1 Section 4.3; docs/use-cases.md UC-18 through UC-21; AC-HR-001 through AC-HR-007 and AC-HR-009 through AC-HR-012
 
 ## Scope
 
 - Preserve the original canonical task identifier T134.
-- Deliver only: Implement HR MVC controllers for `/rrhh/solicitudes`, `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`.
+- Deliver only: Implement HR MVC controllers for `/rrhh/solicitudes`, dedicated read-only `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`; do not expose HR calendar behavior through `/calendario`.
 - Expected files or folders:
 - `/rrhh/solicitudes`
 - `/rrhh/calendario`
@@ -70,7 +70,7 @@ No additional risks were identified beyond the general project risks.
 
 - Planned path: `/rrhh/solicitudes`, `/rrhh/calendario`, `/rrhh/saldos`, `/rrhh/auditoria`, `src/NovaLeave.Presentation.Web/Controllers/HR/`
 - Original task: T134 from specs/001-leave-management-mvp/tasks.md.
-- Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
+- Source files and sections: `.specify/memory/constitution.md` v6.0.1; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.
 - Security, concurrency, and audit: apply deny-by-default authorization, resource authorization, row-version concurrency, atomic persistence, redaction, and audit rules when applicable.

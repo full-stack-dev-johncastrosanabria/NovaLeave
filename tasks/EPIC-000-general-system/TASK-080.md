@@ -1,4 +1,4 @@
-# TASK-080 - Add UC-11 approval transaction and audit tests
+# TASK-080 - Add UC-11 approval transaction, audit, BR-037 negative projected-balance rejection, and BR-038 approval POST revalidation tests
 
 ## Type
 
@@ -10,7 +10,7 @@ EPIC-004 - Approver Resolution
 
 ## Objective
 
-Deliver the outcome defined by canonical task T080: [P] [US2] Add UC-11 approval transaction and audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC11ApproveRequestTests.cs`.
+Deliver the outcome defined by canonical task T080: [P] [US2] Add UC-11 approval transaction, audit, BR-037 negative projected-balance rejection, and BR-038 approval POST revalidation tests in `tests/NovaLeave.IntegrationTests/UseCases/UC11ApproveRequestTests.cs`.
 
 ## Description
 
@@ -18,11 +18,11 @@ This task is a derived execution view of T080 from specs/001-leave-management-mv
 
 ## Context
 
-The task exists to make canonical backlog item T080 executable without changing the approved scope. Original canonical text: [P] [US2] Add UC-11 approval transaction and audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC11ApproveRequestTests.cs`.
+The task exists to make canonical backlog item T080 executable without changing the approved scope. Original canonical text: [P] [US2] Add UC-11 approval transaction, audit, BR-037 negative projected-balance rejection, and BR-038 approval POST revalidation tests in `tests/NovaLeave.IntegrationTests/UseCases/UC11ApproveRequestTests.cs`.
 
 ## Related Requirements
 
-FR-006, FR-007, FR-025, AUTHZ-002, AUTHZ-003, AUTHZ-007, AUTHZ-009, AUTHZ-010, SEC-004, SEC-005, AUD-002
+FR-006, FR-007, FR-023, FR-025, AUTHZ-002, AUTHZ-003, AUTHZ-007, AUTHZ-009, AUTHZ-010, SEC-004, SEC-005, AUD-002
 
 ## Related Use Cases
 
@@ -30,12 +30,12 @@ UC-09, UC-10, UC-11, UC-12, UC-14, UC-15
 
 ## Related Business Rules
 
-BR-006, BR-007, BR-008, BR-009, BR-011, BR-012, BR-013, BR-014, BR-015, BR-016, BR-019, BR-020, BR-021, BR-023; docs/use-cases.md UC-09 through UC-15
+BR-006, BR-007, BR-008, BR-009, BR-011, BR-012, BR-013, BR-014, BR-015, BR-016, BR-019, BR-020, BR-021, BR-023, BR-037, BR-038; docs/use-cases.md UC-09 through UC-15
 
 ## Scope
 
 - Preserve the original canonical task identifier T080.
-- Deliver only: Add UC-11 approval transaction and audit tests.
+- Deliver only: Add UC-11 approval transaction, audit, BR-037 negative projected-balance rejection, and BR-038 approval POST revalidation tests.
 - Expected files or folders:
 - `tests/NovaLeave.IntegrationTests/UseCases/UC11ApproveRequestTests.cs`
 - Validate against the authoritative source sections listed in Technical Notes.
@@ -66,7 +66,7 @@ No additional risks were identified beyond the general project risks.
 
 - Planned path: `tests/NovaLeave.IntegrationTests/UseCases/UC11ApproveRequestTests.cs`
 - Original task: T080 from specs/001-leave-management-mvp/tasks.md.
-- Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
+- Source files and sections: `.specify/memory/constitution.md` v6.0.1; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.
 - Security, concurrency, and audit: apply deny-by-default authorization, resource authorization, row-version concurrency, atomic persistence, redaction, and audit rules when applicable.

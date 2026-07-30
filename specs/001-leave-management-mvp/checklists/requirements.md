@@ -31,7 +31,7 @@
 
 ## Notes
 
-- All items pass against the restored approved MVP baseline and Constitution v6.0.0.
+- All items pass against the restored approved MVP baseline and Constitution v6.0.1.
 - OQ-001 is resolved out of MVP scope; no User Pending cancellation requirement, route, action, transition, contract, or task is introduced.
 - OQ-002 is resolved with completed-calendar-month accrual from `EmploymentStartDate`, including the approved 2026-03-15 and 2026-03-01 examples in `spec.md` and `docs/use-cases.md`.
 - Remaining undecided values are deployment configuration only: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, and accrual scheduler cadence.

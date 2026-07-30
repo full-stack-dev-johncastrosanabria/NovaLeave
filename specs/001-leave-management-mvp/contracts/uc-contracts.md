@@ -132,7 +132,7 @@ Rules:
 | Entry point | GET `/aprobaciones` |
 | Application contract | Query approver queue by approverId, page, pageSize → paged pending request summaries |
 | Output fields | requester, dates, working days, available balance, projected balance after approval |
-| Authorization | Active Approver; excludes requests owned by Approver |
+| Authorization | Active Approver with `canResolveRequests=true`; excludes requests owned by Approver |
 | Transaction / Audit | Read-only |
 | Notes | Organization-wide; no team/department/hierarchy scope. Projected balance is informational only. |
 
@@ -145,7 +145,7 @@ Rules:
 | Entry point | GET `/aprobaciones/{id}` |
 | Application contract | Query approver request detail by approverId and requestId → approver request detail |
 | Output fields | full detail, projected balance, overlap warning, action buttons |
-| Authorization | Active Approver + approver eligible (not owner, Pending/eligible Approved) |
+| Authorization | Active Approver with `canResolveRequests=true` + approver eligible (not owner, Pending/eligible Approved) |
 | Transaction / Audit | Read-only |
 | Notes | All displayed values are server-derived. UI-level balance warning does not replace server revalidation on POST. |
 
@@ -172,7 +172,7 @@ Rules:
 | Mutation | POST `/aprobaciones/{id}/rechazar` |
 | Input fields | requestId, rejectionReason, rowVersion, antiforgery token |
 | Application contract | Reject command with approverId, requestId, rejectionReason, concurrency token → reject result |
-| Authorization | Active Approver + not owner |
+| Authorization | Active Approver with `canResolveRequests=true` + not owner |
 | Transaction / Audit | Single DB transaction: Pending→Rejected + Release + BalanceMovement (Release) + AuditRecord (Reject) |
 | Concurrency | Optimistic concurrency on request |
 | Notes | RejectionReason normalized 10–500 chars; stored on request; never in logs or audit Data. |
@@ -186,7 +186,7 @@ Rules:
 | Mutation | POST `/aprobaciones/{id}/desactivar` |
 | Input fields | requestId, rowVersion, antiforgery token |
 | Application contract | Deactivate command with approverId, requestId, concurrency token → deactivate result |
-| Authorization | Active Approver + not owner + pre-start deactivation eligible (Status=Approved + StartDate > today) |
+| Authorization | Active Approver with `canResolveRequests=true` + not owner + pre-start deactivation eligible (Status=Approved + StartDate > today) |
 | Transaction / Audit | Single DB transaction: Approved→CancelledByApprover + Restoration + BalanceMovement (Restoration) + AuditRecord (Deactivate) |
 | Concurrency | Optimistic concurrency on request and balance |
 | Notes | Start-date boundary evaluated using system time at execution time (not cached field). No human reason required in MVP. |
@@ -200,7 +200,7 @@ Rules:
 | Entry point | GET `/aprobaciones/historial` |
 | Application contract | Query approver history by approverId, page, pageSize, filters → paged resolution history |
 | Output fields | date, action, requester, status, detail link |
-| Authorization | Active Approver |
+| Authorization | Active Approver with `canResolveRequests=true` |
 | Transaction / Audit | Read-only |
 | Notes | Filterable by date range, action type, requester. Links to `/aprobaciones/{id}`. |
 
@@ -265,11 +265,11 @@ Rules:
 | Field | Value |
 |---|---|
 | Entry point | GET `/rrhh/calendario` |
-| Application contract | Query HR calendar by year, month → HR calendar data (with requester names) |
-| Output fields | month grid, event markers, requester names visible |
+| Application contract | Query HR calendar by year, month → global HR calendar data for all vacation requests (with requester names and statuses) |
+| Output fields | month grid, event markers, requester names, request statuses, working-day counts |
 | Authorization | Active HR |
 | Transaction / Audit | Read-only |
-| Notes | Requester names visible to HR (authorized). Event activation → `/rrhh/solicitudes/{id}`. |
+| Notes | Dedicated `/rrhh/calendario` route only. Requester names and statuses are visible to HR (authorized). Event activation → `/rrhh/solicitudes/{id}`. HR has no approve/reject/deactivate/cancel/modify actions. |
 
 ---
 

@@ -26,11 +26,11 @@ VAL-002, VAL-003, BR-001, BR-002, BR-004, BR-017, BR-018, BR-030, BR-031, AUD-00
 
 ## Related Use Cases
 
-N/A â€” cross-cutting task
+N/A Ã¢â‚¬â€ cross-cutting task
 
 ## Related Business Rules
 
-Constitution v6.0.0 Sections 4, 5, 6, 7, 8, 9, 11; data-model.md Domain Traceability Matrix and Concurrency and Idempotency Matrix; research.md CR-01 through CR-16
+Constitution v6.0.1 Sections 4, 5, 6, 7, 8, 9, 11; data-model.md Domain Traceability Matrix and Concurrency and Idempotency Matrix; research.md CR-01 through CR-16
 
 ## Scope
 
@@ -66,7 +66,7 @@ No additional risks were identified beyond the general project risks.
 
 - Planned path: `src/NovaLeave.Domain/Enums/RequestStatus.cs`
 - Original task: T020 from specs/001-leave-management-mvp/tasks.md.
-- Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
+- Source files and sections: `.specify/memory/constitution.md` v6.0.1; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.
 - Security, concurrency, and audit: apply deny-by-default authorization, resource authorization, row-version concurrency, atomic persistence, redaction, and audit rules when applicable.

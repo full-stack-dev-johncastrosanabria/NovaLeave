@@ -1,6 +1,20 @@
 <!--
 Sync Impact Report
 ==================
+Version change: 6.0.0 -> 6.0.1
+Change type: PATCH
+Reason: Clarify the already-approved Approver capability gate so the
+constitutional role and lifecycle text explicitly requires
+`canResolveRequests=true` for approval-related queues, details, and request
+resolution. This does not add a new role, transition, or HR permission; it
+aligns the body text with the existing HR capability-management model and
+security-test obligations.
+
+Amended sections: 4.2 (Approver), 5 (Invariants and Lifecycle), 7.4 (Security
+Tests), 17 (Risks).
+
+Prior 6.0.0 report retained below.
+--------------------------------------------------------------------------------
 Version change: 5.0.0 -> 6.0.0
 Change type: MAJOR
 Reason: Add HR as a third combinable application role with organization-wide
@@ -60,9 +74,9 @@ Amended sections: 4 (Actors), 5.1, 7.1, 7.3, 7.4, and Principle IX.
 
 # NovaLeave — Consolidated Constitution
 
-**Version:** 6.0.0  
+**Version:** 6.0.1  
 **Ratified:** 2026-07-13  
-**Last Amended:** 2026-07-23  
+**Last Amended:** 2026-07-30  
 **Status:** Binding
 
 ## 1. Purpose, Scope, and Normative Language
@@ -337,10 +351,13 @@ or modify another User's data.
 
 ### 4.2 Approver
 
-An Approver whose status is `Active` MAY approve, reject, or — before the
-vacation period begins — deactivate any eligible vacation request in the system,
-without team or organizational scope. An Approver MUST NOT approve, reject, or
-deactivate a request they own. An `Inactive` Approver MUST NOT resolve requests.
+An Approver whose status is `Active` and whose `canResolveRequests` capability
+is `true` MAY access approval-related queues and details, and MAY approve,
+reject, or - before the vacation period begins - deactivate any eligible
+vacation request in the system, without team or organizational scope. An
+Approver MUST NOT approve, reject, or deactivate a request they own. An
+`Inactive` Approver or an Approver with `canResolveRequests=false` MUST NOT view
+protected approval queues/details or resolve requests.
 
 ### 4.3 HR
 
@@ -415,12 +432,15 @@ approved API endpoint:
 6. A request starts in `Pending` and MAY be edited while `Pending` with full
    revalidation **by an Active User only**.
 7. Permitted MVP transitions:
-   - `Pending -> Approved`, by an active Approver who does not own the request.
-   - `Pending -> Rejected`, by an active Approver who does not own the request.
+   - `Pending -> Approved`, by an active Approver with `canResolveRequests=true`
+     who does not own the request.
+   - `Pending -> Rejected`, by an active Approver with `canResolveRequests=true`
+     who does not own the request.
    - `Pending -> CancelledByTimeout`, by the system after the configured
      unresolved-request timeout.
-   - `Approved -> CancelledByApprover`, by an active Approver who does not own
-     the request, only before the vacation period begins.
+   - `Approved -> CancelledByApprover`, by an active Approver with
+     `canResolveRequests=true` who does not own the request, only before the
+     vacation period begins.
    A separate User-initiated cancellation of a `Pending` request is not part of
    the MVP unless introduced by an approved specification.
 8. `Rejected`, `CancelledByTimeout`, and `CancelledByApprover` are final states.
@@ -435,8 +455,10 @@ approved API endpoint:
     reservation; a valid pre-start deactivation restores the previously deducted
     days. Creating a request never produces a permanent deduction.
 11. Every transition generates an audit record.
-12. Identity, ownership, role, **active status**, request state, and balance are
-    revalidated immediately before a state-changing operation.
+12. Identity, ownership, role, **active status**, `canResolveRequests` where an
+    Approver action or protected approval view is involved, request state, and
+    balance are revalidated immediately before a protected query or
+    state-changing operation.
 13. The requested number of working days MUST be calculated server-side according
     to an approved policy; a client-calculated value is never accepted as truth.
 
@@ -585,8 +607,9 @@ Every security specification or critical workflow MUST document:
 
 Tests MUST cover anonymous access, expired or invalid authentication cookies,
 expired-session reuse, incorrect roles, inactive-Approver resolution attempts,
-cross-user access and IDOR, forced browsing, privilege escalation,
-self-resolution, antiforgery failures, overposting attempts, duplicate form
+disabled-Approver queue/detail/resolution attempts, cross-user access and IDOR,
+forced browsing, privilege escalation, self-resolution, antiforgery failures,
+overposting attempts, duplicate form
 submissions, duplicate transitions, timeout-versus-resolution races, pre-start
 deactivation boundaries, replay, direct HTTP access that bypasses navigation
 or hidden UI controls, **HR request-resolution attempts, HR balance-editing
@@ -968,10 +991,11 @@ repeat it after the Phase 1 design.
 
 ## 17. Risks and Evolution
 
-Primary risks include incorrect balances, unauthorized approvals, lost audit
-records, PII leakage, concurrency races, stale documentation, **HR capability
-management abuse (unauthorized role assignment, balance modification, or
-request resolution)**, and overengineering. Mandatory mitigations are domain
+Primary risks include incorrect balances, unauthorized approvals, disabled
+Approver access after a capability change, lost audit records, PII leakage,
+concurrency races, stale documentation, **HR capability management abuse
+(unauthorized role assignment, balance modification, or request resolution)**,
+and overengineering. Mandatory mitigations are domain
 invariants, resource-based authorization, transactions, row versioning, tests,
 auditing, redaction, updated diagrams, and simplicity.
 
@@ -983,4 +1007,4 @@ that need exists.
 
 ---
 
-**Version:** 6.0.0 | **Ratified:** 2026-07-13 | **Last Amended:** 2026-07-23
+**Version:** 6.0.1 | **Ratified:** 2026-07-13 | **Last Amended:** 2026-07-30

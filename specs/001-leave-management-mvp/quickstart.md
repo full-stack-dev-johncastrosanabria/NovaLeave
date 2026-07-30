@@ -43,7 +43,7 @@ docker/
 
 ## Environment Configuration
 
-These values must be set before the application can run. **No value is hard-coded in application code**; the official values below were decided in [DR-001](../../docs/decisions/DR-001-runtime-configuration-values.md) (2026-07-29).
+These values must be set before the application can run. **No value is hard-coded in application code**; the official values below were decided in [DR-001](../../docs/adr/DR-001-runtime-configuration-values.md) (2026-07-29).
 
 | Key | Description | Official value (DR-001) | Required In |
 |-----|-------------|-------------------------|-------------|
@@ -138,7 +138,7 @@ The login screen includes a "Cuenta" dropdown that pre-fills the email field. It
 | `/rrhh` | GET | HR — dashboard |
 | `/rrhh/solicitudes` | GET | HR — org-wide request list |
 | `/rrhh/solicitudes/{id}` | GET | HR — request detail |
-| `/rrhh/calendario` | GET | HR — organizational calendar |
+| `/rrhh/calendario` | GET | HR — dedicated read-only organizational calendar for all vacation requests |
 | `/rrhh/saldos` | GET | HR — balances list |
 | `/rrhh/saldos/{userId}` | GET | HR — balance movements |
 | `/rrhh/auditoria` | GET | HR — audit log |

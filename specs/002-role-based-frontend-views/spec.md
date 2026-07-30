@@ -1,10 +1,10 @@
 # Role-Based Frontend Views Specification — NovaLeave MVP
 
 **Related Feature**: `001-leave-management-mvp` (complementary specification; not an independent feature and no separate implementation plan)
-**Version**: 2.0.0
+**Version**: 2.0.1
 **Date**: 2026-07-23
 **Status**: Ready for Planning. All 34 RBFV criteria defined and traced to MVP requirements.
-**Constitution**: `.specify/memory/constitution.md` v6.0.0
+**Constitution**: `.specify/memory/constitution.md` v6.0.1
 
 ---
 
@@ -12,7 +12,7 @@
 
 This specification defines the mandatory view and navigation structure for NovaLeave MVP based on the three application roles (`User`, `Approver`, `HR`) plus the automatic system actor. It complements `specs/001-leave-management-mvp/spec.md` (business behavior) and `specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0 (design tokens, components, accessibility baseline).
 
-All routes, views, and navigation elements described here MUST conform to the Constitution v6.0.0, the approved frontend design specification v1.3.0, and the authority order in Constitution §15.1.
+All routes, views, and navigation elements described here MUST conform to the Constitution v6.0.1, the approved frontend design specification v1.3.0, and the authority order in Constitution §15.1.
 
 ---
 
@@ -39,7 +39,7 @@ This specification does NOT cover:
 
 Per Constitution §15.1:
 
-1. **Constitution v6.0.0** — architecture, security, roles, cross-cutting invariants, engineering quality, governance
+1. **Constitution v6.0.1** — architecture, security, roles, cross-cutting invariants, engineering quality, governance
 2. **Approved feature specifications** — business behavior and acceptance criteria within constitutional boundaries
 3. **Approved frontend design specification v1.3.0** — design tokens, responsive behavior, accessibility, components, motion, interaction patterns
 4. **Approved ADRs** — authorized architectural exceptions
@@ -93,11 +93,11 @@ When an identity has at least two authorized contexts:
 | `/mis-solicitudes/crear` | GET, POST | `User` (Active) | Create new request |
 | `/mis-solicitudes/{id}/editar` | GET, POST | `User` (Active, Owner) | Edit own `Pending` request |
 | `/mis-solicitudes/{id}` | GET | `User` (Active, Owner) | View own request detail |
-| `/aprobaciones` | GET | `Approver` (Active) | List eligible pending requests |
-| `/aprobaciones/{id}` | GET | `Approver` (Active, Eligible) | View request detail for resolution |
-| `/aprobaciones/{id}/aprobar` | POST | `Approver` (Active, Eligible, Not Owner) | Approve request |
-| `/aprobaciones/{id}/rechazar` | POST | `Approver` (Active, Eligible, Not Owner) | Reject request |
-| `/aprobaciones/{id}/desactivar` | POST | `Approver` (Active, Eligible, Not Owner) | Deactivate approved request (pre-start) |
+| `/aprobaciones` | GET | `Approver` (Active, `canResolveRequests=true`) | List eligible pending requests |
+| `/aprobaciones/{id}` | GET | `Approver` (Active, `canResolveRequests=true`, Eligible) | View request detail for resolution |
+| `/aprobaciones/{id}/aprobar` | POST | `Approver` (Active, `canResolveRequests=true`, Eligible, Not Owner) | Approve request |
+| `/aprobaciones/{id}/rechazar` | POST | `Approver` (Active, `canResolveRequests=true`, Eligible, Not Owner) | Reject request |
+| `/aprobaciones/{id}/desactivar` | POST | `Approver` (Active, `canResolveRequests=true`, Eligible, Not Owner) | Deactivate approved request (pre-start) |
 | `/rrhh` | GET | `HR` (Active) | HR dashboard |
 | `/rrhh/solicitudes` | GET | `HR` (Active) | Read-only request list (org-wide) |
 | `/rrhh/solicitudes/{id}` | GET | `HR` (Active) | Read-only request detail |
@@ -114,7 +114,7 @@ When an identity has at least two authorized contexts:
 |---------------|---------|-------------------|-------------|
 | `/` | GET | `User` (Active) \| `Approver` (Active) \| `HR` (Active) | Dashboard redirect based on roles |
 | `/saldo` | GET | `User` (Active) | View own global balance (labeled **Mi historial** in navigation) |
-| `/calendario` | GET | `User` (Active) \| `Approver` (Active) \| `HR` (Active) | Basic vacation calendar |
+| `/calendario` | GET | `User` (Active) \| `Approver` (Active, `canResolveRequests=true`) | Basic vacation calendar for User personal scope and Approver anonymized scope only; HR MUST use `/rrhh/calendario` |
 | `/acceso-denegado` | GET | Any (including unauthenticated) | Branded 403 page |
 | `/error` | GET | Any | Branded error page |
 
@@ -150,7 +150,7 @@ When an identity has at least two authorized contexts:
 | **Pendientes de Resolución** | `/aprobaciones` | List all eligible `Pending` requests across organization | Table with requester, dates, working days, **balance available, projected balance (Disponible actual, Días solicitados, Disponible después de aprobar)**, overlap warnings, action buttons |
 | **Detalle para Resolución** | `/aprobaciones/{id}` | Detail view with resolution actions | Full request info, **balance revalidation with projected balance**, overlap revalidation, approve/reject/deactivate buttons, rejection reason textarea |
 | **Historial de Resoluciones** | `/aprobaciones/historial` | List of requests resolved by this approver | Table with date, action, requester, status, audit link |
-| **Calendario Básico** | `/calendario` | Month-view calendar showing approved periods (org-wide, anonymized per policy) | Month grid, event markers, legend |
+| **Calendario Básico** | `/calendario` | Month-view calendar showing approved periods (org-wide, anonymized per policy) for Approvers with `canResolveRequests=true` | Month grid, event markers, legend |
 
 ### 6.3 HR Context (`RRHH`)
 
@@ -159,7 +159,7 @@ When an identity has at least two authorized contexts:
 | **Dashboard RRHH** | `/rrhh` | Organization-wide summary cards | Total pending, active approvers, balance summary, quick links |
 | **Solicitudes (Solo Lectura)** | `/rrhh/solicitudes` | Filterable, paginated list of all requests | Table with requester, dates, status, working days, reservation, deduction |
 | **Detalle de Solicitud (Solo Lectura)** | `/rrhh/solicitudes/{id}` | Full request detail including audit trail | Same as Approver detail but read-only; no resolution actions |
-| **Calendario Organizacional** | `/rrhh/calendario` | Month-view calendar showing all approved periods | Month grid, event markers, legend, filter by requester name if applicable |
+| **Calendario Organizacional** | `/rrhh/calendario` | Dedicated read-only HR calendar route showing all vacation requests organization-wide; HR MUST NOT use `/calendario` | Month grid, event markers, legend, filter by requester name if applicable |
 | **Saldos (Solo Lectura)** | `/rrhh/saldos` | List all users with balance summary | Table with user, **Acumulado total, Pendientes, Días gozados, Disponible** |
 | **Movimientos de Saldo (Solo Lectura)** | `/rrhh/saldos/{userId}` | Balance history for user | Timeline of accruals, reservations, deductions, restorations |
 | **Auditoría Relevante** | `/rrhh/auditoria` | Filterable audit log | Table with timestamp, actor, role, action, entity, result |
@@ -218,6 +218,8 @@ flowchart LR
 **Context Switcher** (visible only when identity has 2+ roles): Labeled **"Mis roles"** — dropdown with available contexts (`Mi espacio`, `Aprobaciones`, `RRHH`); hidden when <2 roles; switching updates route prefix and navigation only; does not modify identity, session, roles, claims, or permissions.
 
 ### 7.3 HR Context Navigation (`RRHH`)
+
+The `RRHH` context calendar navigation MUST point only to `/rrhh/calendario`. The shared `/calendario` route has no HR behavior and MUST NOT expose HR global-calendar data.
 
 ```mermaid
 flowchart LR
@@ -415,11 +417,11 @@ Every view MUST satisfy the baseline from `frontend-design-spec.md` §8 plus the
 | Policy | Requirement |
 |--------|-------------|
 | `RequireActiveUser` | Authenticated, `Active` status, `User` claim present |
-| `RequireActiveApprover` | Authenticated, `Active` status, `Approver` claim present |
+| `RequireActiveApprover` | Authenticated, `Active` status, `Approver` claim present, `canResolveRequests=true` |
 | `RequireActiveHR` | Authenticated, `Active` status, `HR` claim present |
 | `RequireRequestOwner` | Resource owner matches current identity |
-| `RequireApproverEligible` | Active Approver, not owner, request in eligible state |
-| `RequireApproverNotOwner` | Active Approver, not owner of target request |
+| `RequireApproverEligible` | Active Approver with `canResolveRequests=true`, not owner, request in eligible state |
+| `RequireApproverNotOwner` | Active Approver with `canResolveRequests=true`, not owner of target request |
 | `RequirePreStartDeactivation` | Request `Approved` + start date > system business date |
 | `RequireHRForApproverManagement` | Active HR, target has Approver role |
 
@@ -441,8 +443,8 @@ public class AprobacionesController : Controller { }
 [Authorize(Policy = "RequireActiveHR")]
 public class RRHHController : Controller { }
 
-// Shared
-[Authorize(Policy = "RequireActiveUser", "RequireActiveApprover", "RequireActiveHR")]
+// Shared User/Approver calendar only; HR uses RRHHController at /rrhh/calendario.
+[Authorize(Policy = "RequireActiveUserOrEligibleApprover")]
 public class CalendarioController : Controller { }
 ```
 
@@ -452,6 +454,7 @@ All mutation endpoints MUST revalidate in the Application layer:
 
 - Identity is Active
 - Role matches required role for action
+- `canResolveRequests=true` for Approver queue, detail, and resolution actions
 - Ownership/eligibility for target resource
 - Request state allows the transition
 - Concurrency token matches (optimistic lock)
@@ -487,7 +490,7 @@ The following components are defined in `frontend-design-spec.md` and MUST be us
 |----|----------|-----------------|
 | RBFV-001 | Active User navigates to `/mis-solicitudes` | 200 OK, list view rendered |
 | RBFV-002 | Active User navigates to `/aprobaciones` | 403 Forbidden → `/acceso-denegado` |
-| RBFV-003 | Active Approver navigates to `/aprobaciones` | 200 OK, list view rendered |
+| RBFV-003 | Active Approver with `canResolveRequests=true` navigates to `/aprobaciones` | 200 OK, list view rendered |
 | RBFV-004 | Active Approver navigates to `/mis-solicitudes/crear` | 403 Forbidden |
 | RBFV-005 | Active HR navigates to `/rrhh/solicitudes` | 200 OK, read-only list rendered |
 | RBFV-006 | Active HR attempts `/aprobaciones/{id}/aprobar` | 403 Forbidden |
@@ -496,7 +499,7 @@ The following components are defined in `frontend-design-spec.md` and MUST be us
 | RBFV-009 | Dual-role identity switches context | Header updates, route prefix changes, no session modification |
 | RBFV-010 | Triple-role identity sees all three contexts in switcher | Dropdown shows `Mi espacio`, `Aprobaciones`, `RRHH` |
 | RBFV-011 | Inactive User attempts `/mis-solicitudes` | 403 Forbidden (policy `RequireActiveUser` fails) |
-| RBFV-012 | Inactive Approver attempts `/aprobaciones/{id}/aprobar` | 403 Forbidden (policy `RequireActiveApprover` fails) |
+| RBFV-012 | Inactive Approver or Approver with `canResolveRequests=false` attempts `/aprobaciones`, `/aprobaciones/{id}`, or a resolution POST | 403 Forbidden (policy `RequireActiveApprover` or resource eligibility fails) |
 | RBFV-013 | Inactive HR attempts `/rrhh/aprobadores/{id}/capacidad` | 403 Forbidden (policy `RequireActiveHR` fails) |
 | RBFV-014 | Approver attempts to approve own request | 403 Forbidden (policy `RequireApproverNotOwner` fails) |
 | RBFV-015 | HR toggles `canResolveRequests` for non-Approver | 400 Bad Request (validation fails) |
@@ -516,7 +519,7 @@ The following components are defined in `frontend-design-spec.md` and MUST be us
 | RBFV-029 | Weekend exclusion in working-day calculation (server + UI preview match) | Fri+1→Mon, range spanning weekend, weekend-only rejected, Sat/Sun start rejected; holidays counted |
 | RBFV-030 | Approve/Reject are mutually exclusive — UI disables conflicting action on submit, server revalidates | After one POST, other button disabled; stale/duplicate POST returns conflict; reason required for Reject |
 | RBFV-031 | Approver views: visual hierarchy, spacing, white cards, status badges, loading, empty states | Manual review against frontend-design-spec.md §20 |
-| RBFV-032 | HR views: read-only indicators, no resolution actions, pagination, calendar names, capability modal | Manual review against frontend-design-spec.md §21 |
+| RBFV-032 | HR views: read-only indicators, no resolution actions, pagination, calendar names at `/rrhh/calendario`, capability modal; HR access to `/calendario` is forbidden | Manual review against frontend-design-spec.md §21 and route authorization tests |
 | RBFV-033 | Login screen uses NovaLeave branding, Identity flow, accessible, responsive, no emojis/gradients | Manual review against frontend-design-spec.md §12 |
 | RBFV-034 | New eligible Pending request appears in `/aprobaciones` exactly once without manual sync; Approver queue excludes only owning Approver and ineligible states, never team/hierarchy/department/assigned-approver | After successful creation, redirect User shows success; next Approver open/refresh shows the request once; no organizational filter applied |
 
@@ -539,7 +542,8 @@ The following components are defined in `frontend-design-spec.md` and MUST be us
 |---------|------|--------|--------|
 | 1.0.0 | 2026-07-23 | — | Initial draft aligned with Constitution v5.0.0 |
 | 2.0.0 | 2026-07-23 | — | Added HR/RRHH context; updated to Constitution v6.0.0; removed stale HR-exclusion warnings |
+| 2.0.1 | 2026-07-30 | — | Clarified Approver `canResolveRequests` eligibility and HR-only `/rrhh/calendario` route |
 
 ---
 
-**Constitution Alignment**: This specification is subordinate to `.specify/memory/constitution.md` v6.0.0 and `specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0. Any conflict MUST be resolved by amending the authoritative source.
+**Constitution Alignment**: This specification is subordinate to `.specify/memory/constitution.md` v6.0.1 and `specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0. Any conflict MUST be resolved by amending the authoritative source.

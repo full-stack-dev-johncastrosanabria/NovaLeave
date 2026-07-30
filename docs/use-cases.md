@@ -2,7 +2,7 @@
 
 **Version:** 2.0.0 (compact Markdown edition)  
 **Language:** English; approved UI labels and routes remain in Spanish  
-**Applies to:** NovaLeave Constitution v6.0.0, Feature Specification 001, Role-Based Frontend Views 002  
+**Applies to:** NovaLeave Constitution v6.0.1, Feature Specification 001, Role-Based Frontend Views 002  
 **Target path in repository:** `/docs/use-cases.md`
 
 ## 1. Scope
@@ -12,7 +12,7 @@ This document contains the 22 observable MVP use cases for NovaLeave. It focuses
 ### Actors
 
 - **User:** Creates, views, and edits owned `Pending` vacation requests; views own balance, history, and calendar.
-- **Approver:** When `Active` and `canResolveRequests=true`, approves, rejects, or deactivates eligible requests that they do not own.
+- **Approver:** When `Active` and `canResolveRequests=true`, accesses approval queues/details and approves, rejects, or deactivates eligible requests that they do not own.
 - **HR:** Organization-wide read-only access plus limited management of `canResolveRequests` for identities that already hold the `Approver` role.
 - **System:** Executes timeout cancellation and monthly accrual.
 
@@ -504,7 +504,7 @@ The Approver selects a request from the queue or an authorized calendar event.
 
 ### Preconditions
 
-- The Approver is authenticated, `Active`, enabled, and authorized.
+- The Approver is authenticated, `Active`, has `canResolveRequests=true`, and is authorized.
 - The request is not owned by the Approver.
 
 ### Main flow
@@ -605,21 +605,21 @@ The Approver confirms `Rechazar` with a reason.
 
 ### Preconditions
 
-- Approver is authenticated, `Active`, enabled, and not the owner.
+- Approver is authenticated, `Active`, has `canResolveRequests=true`, and is not the owner.
 - Request is `Pending` with a current `RowVersion`.
 - Rejection reason contains 10–500 normalized characters.
 
 ### Main flow
 
-1. The system validates antiforgery, reason, role, and eligibility.
-2. The system revalidates request state, non-ownership, and `RowVersion`.
+1. The system validates antiforgery, reason, role, capability, and eligibility.
+2. The system revalidates request state, non-ownership, `canResolveRequests=true`, and `RowVersion`.
 3. In one transaction, the system transitions to `Rejected`, releases the reservation, stores the normalized reason, creates the balance movement, and writes the audit record.
 4. The system redirects with confirmation.
 
 ### Alternate and exception flows
 
 - Empty or invalid-length reason: reject the command and preserve `Pending`.
-- Own request or `Inactive` Approver: deny and record the event.
+- Own request, `Inactive` Approver, or disabled capability: deny and record the event.
 - Concurrent resolution: permit exactly one transition.
 - Persistence or audit failure: apply no partial changes.
 
@@ -656,7 +656,7 @@ The Approver confirms `Desactivar`.
 
 ### Preconditions
 
-- Approver is authenticated, `Active`, enabled, and not the owner.
+- Approver is authenticated, `Active`, has `canResolveRequests=true`, and is not the owner.
 - Request is `Approved`.
 - The vacation start date is after the current business date.
 - The expected concurrency version is supplied.
@@ -672,7 +672,7 @@ The Approver confirms `Desactivar`.
 
 - Vacation period already started: reject and preserve `Approved` and the deduction.
 - Partial-deactivation attempt: reject.
-- Own request or `Inactive` Approver: deny.
+- Own request, `Inactive` Approver, or disabled capability: deny.
 - Duplicate or concurrent command: restore the balance at most once.
 - Audit or persistence failure: roll back every effect.
 
@@ -938,7 +938,7 @@ HR opens the request list or a request detail.
 
 ### Objective
 
-Display all organization-wide `Approved` periods with requester identity and read-only detail navigation.
+Display all organization-wide vacation requests with requester identity, request status, and read-only detail navigation.
 
 ### Trigger
 
@@ -950,8 +950,8 @@ HR opens the calendar or changes month.
 
 ### Main flow
 
-1. The system queries every `Approved` period for the requested month.
-2. The system displays requester name, date range, and working-day count.
+1. The system queries every vacation request for the requested month across the complete organization, including all departments.
+2. The system displays requester name, date range, working-day count, and request status.
 3. The calendar supports keyboard navigation and event activation.
 4. Activating an event navigates to `/rrhh/solicitudes/{id}`.
 
@@ -967,7 +967,7 @@ HR opens the calendar or changes month.
 
 ### Controls and references
 
-- HR authorization, accessible calendar behavior, and read-only detail.
+- HR authorization, dedicated `/rrhh/calendario` route ownership, accessible calendar behavior, global read-only data scope, and read-only detail.
 - References: `FR-017`, `FR-024`, `AUTHZ-011`, `AUTHZ-017`, `AUTHZ-019`, `RBFV-026`, `RBFV-018`, `RBFV-019`, `RBFV-029`, `RBFV-032`.
 
 ---
@@ -1171,11 +1171,11 @@ Given an active HR identity and any request ID, when HR opens `/rrhh/solicitudes
 | Priority | P3 |
 
 ### Scenario
-Given an active HR identity, when HR opens `/rrhh/calendario`, then the system displays a month-view calendar of all approved vacation periods organization-wide with requester names and working-day counts.
+Given an active HR identity, when HR opens `/rrhh/calendario`, then the system displays a month-view calendar of all vacation requests organization-wide, including all departments, with requester names, statuses, and working-day counts.
 
 ### Acceptance Conditions
-- All approved periods for requested month rendered
-- Event label format: "Requester Name — N días"
+- All vacation requests for the requested month rendered
+- Event label format includes requester name, status, and working-day count
 - Multiple events per day stack with "+N más" overflow
 - Keyboard navigation: arrow keys move by day/week, Home/End jump to month boundaries, PageUp/PageDown change month
 - Event activation (Enter/Space) navigates to `/rrhh/solicitudes/{id}`

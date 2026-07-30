@@ -1,4 +1,4 @@
-# TASK-130 - Implement HR calendar query
+# TASK-130 - Implement HR calendar query returning all vacation requests across the complete organization with requester names, statuses, working-day counts, and no mutation capability
 
 ## Type
 
@@ -10,7 +10,7 @@ EPIC-009 - HR Read Only
 
 ## Objective
 
-Deliver the outcome defined by canonical task T130: [P] [US7] Implement HR calendar query in `src/NovaLeave.Application/HR/Calendar/`.
+Deliver the outcome defined by canonical task T130: [P] [US7] Implement HR calendar query returning all vacation requests across the complete organization with requester names, statuses, working-day counts, and no mutation capability in `src/NovaLeave.Application/HR/Calendar/`.
 
 ## Description
 
@@ -18,7 +18,7 @@ This task is a derived execution view of T130 from specs/001-leave-management-mv
 
 ## Context
 
-The task exists to make canonical backlog item T130 executable without changing the approved scope. Original canonical text: [P] [US7] Implement HR calendar query in `src/NovaLeave.Application/HR/Calendar/`.
+The task exists to make canonical backlog item T130 executable without changing the approved scope. Original canonical text: [P] [US7] Implement HR calendar query returning all vacation requests across the complete organization with requester names, statuses, working-day counts, and no mutation capability in `src/NovaLeave.Application/HR/Calendar/`.
 
 ## Related Requirements
 
@@ -30,12 +30,12 @@ UC-18, UC-19, UC-20, UC-21
 
 ## Related Business Rules
 
-Constitution v6.0.0 Section 4.3; docs/use-cases.md UC-18 through UC-21; AC-HR-001 through AC-HR-007 and AC-HR-009 through AC-HR-012
+Constitution v6.0.1 Section 4.3; docs/use-cases.md UC-18 through UC-21; AC-HR-001 through AC-HR-007 and AC-HR-009 through AC-HR-012
 
 ## Scope
 
 - Preserve the original canonical task identifier T130.
-- Deliver only: Implement HR calendar query.
+- Deliver only: Implement HR calendar query returning all vacation requests across the complete organization with requester names, statuses, working-day counts, and no mutation capability.
 - Expected files or folders:
 - `src/NovaLeave.Application/HR/Calendar/`
 - Validate against the authoritative source sections listed in Technical Notes.
@@ -66,7 +66,7 @@ No additional risks were identified beyond the general project risks.
 
 - Planned path: `src/NovaLeave.Application/HR/Calendar/`
 - Original task: T130 from specs/001-leave-management-mvp/tasks.md.
-- Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
+- Source files and sections: `.specify/memory/constitution.md` v6.0.1; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.
 - Security, concurrency, and audit: apply deny-by-default authorization, resource authorization, row-version concurrency, atomic persistence, redaction, and audit rules when applicable.

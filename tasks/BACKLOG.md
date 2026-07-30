@@ -1,4 +1,4 @@
-﻿# Product Backlog
+# Product Backlog
 
 ## Executive Summary
 
@@ -265,18 +265,18 @@ Requirement changes must be made first in the official artifacts and then synchr
 - TASK-076 - EPIC-003 - User Request Management: Implement User Razor views with approved Spanish labels
 - TASK-077 - EPIC-003 - User Request Management: Wire User navigation and role context switcher
 - TASK-078 - EPIC-004 - Approver Resolution: Add UC-09 eligible queue tests without team/department/hierarchy filters
-- TASK-079 - EPIC-004 - Approver Resolution: Add UC-10 resolution detail tests with projected balance
-- TASK-080 - EPIC-004 - Approver Resolution: Add UC-11 approval transaction and audit tests
+- TASK-079 - EPIC-004 - Approver Resolution: Add UC-10 resolution detail tests for BR-036/BR-037 projected-balance calculation/display and disabled Approver denial
+- TASK-080 - EPIC-004 - Approver Resolution: Add UC-11 approval transaction, audit, BR-037 negative projected-balance rejection, and BR-038 approval POST revalidation tests
 - TASK-081 - EPIC-004 - Approver Resolution: Add UC-12 rejection reason, release, and audit tests
 - TASK-082 - EPIC-004 - Approver Resolution: Add UC-14 resolution history tests
 - TASK-083 - EPIC-004 - Approver Resolution: Add UC-15 Approver calendar tests
 - TASK-084 - EPIC-004 - Approver Resolution: Add approval/rejection concurrency race tests
 - TASK-085 - EPIC-004 - Approver Resolution: Add Approver MVC E2E smoke tests
-- TASK-086 - EPIC-004 - Approver Resolution: Implement Approver queue and detail queries
+- TASK-086 - EPIC-004 - Approver Resolution: Implement Approver queue and detail queries with `canResolveRequests=true` eligibility and BR-036/BR-037 server-derived projected-balance fields
 - TASK-087 - EPIC-004 - Approver Resolution: Implement Approver history and calendar queries
-- TASK-088 - EPIC-004 - Approver Resolution: Implement approval command converting reservation to deduction atomically
+- TASK-088 - EPIC-004 - Approver Resolution: Implement approval command converting reservation to deduction atomically with `canResolveRequests=true` revalidation, BR-037 negative projected-balance rejection, and BR-038 stale/concurrent projected-balance revalidation
 - TASK-089 - EPIC-004 - Approver Resolution: Implement rejection command releasing reservation atomically
-- TASK-090 - EPIC-004 - Approver Resolution: Implement Approver authorization resource checks
+- TASK-090 - EPIC-004 - Approver Resolution: Implement Approver authorization resource checks requiring authenticated active `Approver`, `canResolveRequests=true`, non-ownership, eligible request state, and Application-layer execution-time revalidation
 - TASK-091 - EPIC-004 - Approver Resolution: Implement Approver MVC controllers for `/aprobaciones`, `/aprobaciones/{id}`, `/aprobaciones/{id}/aprobar`, `/aprobaciones/{id}/rechazar`, `/aprobaciones/historial`, and shared calendar route `/calendario`
 - TASK-092 - EPIC-004 - Approver Resolution: Implement dedicated Approver ViewModels
 - TASK-093 - EPIC-004 - Approver Resolution: Implement Approver Razor views with mutual approve/reject submission protections
@@ -304,23 +304,23 @@ Requirement changes must be made first in the official artifacts and then synchr
 - TASK-115 - EPIC-007 - Balance and Accrual: Add EF Core unique index for accrual idempotency
 - TASK-116 - EPIC-007 - Balance and Accrual: Ensure balance history displays accrual, reservation, release, deduction, and restoration movements
 - TASK-117 - EPIC-008 - Calendars: Add shared calendar ViewModel unit tests
-- TASK-118 - EPIC-008 - Calendars: Add calendar authorization integration tests
+- TASK-118 - EPIC-008 - Calendars: Add calendar authorization integration tests for User personal `/calendario`, eligible Approver anonymized `/calendario`, HR-only `/rrhh/calendario`, HR denial on `/calendario`, and disabled Approver denial
 - TASK-119 - EPIC-008 - Calendars: Add calendar accessibility E2E smoke tests
 - TASK-120 - EPIC-008 - Calendars: Implement shared calendar query models
 - TASK-121 - EPIC-008 - Calendars: Implement shared `_Calendar.cshtml` partial with Bootstrap 5.3, status colors, keyboard support, and authorized links
-- TASK-122 - EPIC-008 - Calendars: Integrate shared calendar partial into User, Approver, and HR calendar Razor views under `src/NovaLeave.Presentation.Web/Views/`
+- TASK-122 - EPIC-008 - Calendars: Integrate shared calendar partial into User and Approver `/calendario` views and the dedicated read-only HR `/rrhh/calendario` view without sharing route data scope
 - TASK-123 - EPIC-009 - HR Read Only: Add UC-18 HR request list/detail tests
-- TASK-124 - EPIC-009 - HR Read Only: Add UC-19 HR calendar tests
+- TASK-124 - EPIC-009 - HR Read Only: Add UC-19 HR calendar tests for dedicated `/rrhh/calendario`, all vacation requests across the complete organization, requester/status visibility, read-only detail links, and forbidden mutations
 - TASK-125 - EPIC-009 - HR Read Only: Add UC-20 HR balance and movement read-only tests
 - TASK-126 - EPIC-009 - HR Read Only: Add UC-21 HR audit access and sensitive-reason read audit tests
 - TASK-127 - EPIC-009 - HR Read Only: Add HR forbidden mutation tests for approve/reject/deactivate/balance/role operations
 - TASK-128 - EPIC-009 - HR Read Only: Add HR E2E read-only smoke tests
 - TASK-129 - EPIC-009 - HR Read Only: Implement HR request read queries
-- TASK-130 - EPIC-009 - HR Read Only: Implement HR calendar query
+- TASK-130 - EPIC-009 - HR Read Only: Implement HR calendar query returning all vacation requests across the complete organization with requester names, statuses, working-day counts, and no mutation capability
 - TASK-131 - EPIC-009 - HR Read Only: Implement HR balance and movement read queries
 - TASK-132 - EPIC-009 - HR Read Only: Implement HR audit read queries with sensitive-reason access auditing
 - TASK-133 - EPIC-009 - HR Read Only: Implement HR authorization policies
-- TASK-134 - EPIC-009 - HR Read Only: Implement HR MVC controllers for `/rrhh/solicitudes`, `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`
+- TASK-134 - EPIC-009 - HR Read Only: Implement HR MVC controllers for `/rrhh/solicitudes`, dedicated read-only `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`; do not expose HR calendar behavior through `/calendario`
 - TASK-135 - EPIC-009 - HR Read Only: Implement dedicated HR read-only ViewModels
 - TASK-136 - EPIC-009 - HR Read Only: Implement HR read-only Razor views with no resolution or balance modification actions
 - TASK-137 - EPIC-010 - Approver Capability Management: Add UC-22 Approver capability list tests
