@@ -1,267 +1,78 @@
-# NovaLeave Backlog Coverage Report
+# NovaLeave Coverage Report
 
-## Metadata
+**Repository**: `full-stack-dev-johncastrosanabria/NovaLeave`  
+**Branch**: `abraham-villalobos`  
+**Baseline commit**: `c2a3282995e72c9ef44a574e2c9a4c58cbf3302f`  
+**Audit date**: 2026-07-30  
+**Canonical task source**: `specs/001-leave-management-mvp/tasks.md`  
+**Generated task tree**: `tasks/EPIC-000-general-system/TASK-001.md` through `TASK-153.md`  
+**Decision-record authority**: `docs/adr/`
 
-- Branch: `abraham-villalobos`
-- Commit: `fff4b94b47f66960efa467a703856255f909e8f8`
-- Date: `2026-07-29`
-- Re-validated: `2026-07-29` on `branch-john` after the tasks/ tree mechanical repair (1,071 template blobs expanded from canonical `tasks.md`, 155 BOMs removed — see `docs/decisions/DR-002-generated-artifact-review-rule.md`). Independent invariant checks: no template artifacts, no BOM, full `T001–T153 ↔ TASK-001–153` round-trip.
-- Analyzed sources:
-  - `.specify/memory/constitution.md`
-  - `specs/001-leave-management-mvp/spec.md`
-  - `docs/use-cases.md`
-  - `specs/001-leave-management-mvp/contracts/uc-contracts.md`
-  - `specs/001-leave-management-mvp/frontend-design-spec.md`
-  - `specs/002-role-based-frontend-views/spec.md`
-  - `specs/001-leave-management-mvp/plan.md`
-  - `specs/001-leave-management-mvp/research.md`
-  - `specs/001-leave-management-mvp/data-model.md`
-  - `specs/001-leave-management-mvp/quickstart.md`
-  - `specs/001-leave-management-mvp/tasks.md`
-  - `specs/001-leave-management-mvp/checklists/requirements.md`
-  - `specs/001-leave-management-mvp/diagrams/clean-architecture.md`
-  - `specs/001-leave-management-mvp/diagrams/core-data-relationships.md`
-  - `specs/001-leave-management-mvp/diagrams/request-lifecycle.md`
-  - `AGENTS.md`
-- Canonical task count: 153
-- Generated task-file count: 153
+## Methodology
 
-## Coverage Method
+Coverage means an active identifier or normative behavior is semantically planned by an explicit canonical task and, where the behavior is security-, authorization-, concurrency-, transaction-, audit-, validation-, or user-facing, by an explicit test task. Identifier mentions alone do not count as coverage.
 
-Functional requirements are approved `FR-XXX` identifiers. Non-functional requirements are approved `VAL`, `AUTHZ`, `SEC`, `CON`, `AUD`, `ERR`, `CFG`, and `RBFV` identifiers. Acceptance criteria are approved `AC-XXX` and `AC-HR-XXX` identifiers. Use cases are UC-01 through UC-22. Business rules are approved `BR-XXX` identifiers and normative source sections. Canonical task coverage is T001 through T153. Mandatory exclusions are checked against generated backlog scope and out-of-scope sections.
+Generated artifacts are checked only after canonical sources are corrected. `tasks.md` remains authoritative; `TASK-*.md`, `BACKLOG.md`, and this report are derived.
 
-## Results
+## Inventories
 
-| Category | Total Identified | Covered | Not Covered | Coverage |
-|---|---:|---:|---:|---:|
-| Functional requirements | 23 | 23 | 0 | 100% |
-| Non-functional requirements | 120 | 120 | 0 | 100% |
-| Acceptance criteria | 72 | 72 | 0 | 100% |
-| Use cases | 22 | 22 | 0 | 100% |
-| Identified business rules | 35 | 35 | 0 | 100% |
-| Canonical tasks T001-T153 | 153 | 153 | 0 | 100% |
-| Mandatory exclusions | 28 | 28 | 0 | 100% |
+| Category | Definition | Active inventory |
+|---|---|---:|
+| Functional requirements | Active `FR-XXX` requirements in `spec.md`; `FR-008` and `FR-010` are retired/reserved and excluded | 23 |
+| Business rules | Active `BR-XXX` rules in `spec.md`, including BR-036 through BR-038; retired BR-010 and BR-022 excluded | 36 |
+| Standard acceptance criteria | Active `AC-XXX` criteria in `spec.md` | 47 |
+| HR acceptance criteria | `AC-HR-XXX` criteria in `docs/use-cases.md` | 12 |
+| RBFV criteria | `RBFV-XXX` criteria in `specs/002-role-based-frontend-views/spec.md` | 34 |
+| Use cases | UC-01 through UC-22 in `docs/use-cases.md` and UC contracts | 22 |
+| Security requirements | `SEC-001` through `SEC-009` | 9 |
+| Authorization requirements | Active `AUTHZ-XXX`; `AUTHZ-004` is retired/revised and excluded | 18 |
+| Validation requirements | Active `VAL-XXX`; `VAL-008` is not active | 8 |
+| Audit requirements | `AUD-001` through `AUD-010` | 10 |
+| Concurrency requirements | `CON-001` through `CON-012` | 12 |
+| Frontend requirements | RBFV criteria plus frontend design sections | 34 RBFV criteria + design sections |
+| Canonical tasks | `T001` through `T153` in `specs/001-leave-management-mvp/tasks.md` | 153 |
+| Generated task files | `TASK-001.md` through `TASK-153.md` | 153 |
+| Required tests | Canonical tasks whose task text explicitly adds tests covering unit, integration, E2E, security, accessibility, audit, concurrency, idempotency, and traceability | 52 |
+| Explicit exclusions | MVP out-of-scope items from `spec.md`, `docs/use-cases.md`, `tasks.md`, and generated task out-of-scope sections | 28 |
 
-*Correction (2026-07-29 re-validation): the functional-requirement total was corrected from 21 to 23 — spec 001 defines 23 active FR identifiers (FR-001–FR-007, FR-009, FR-011–FR-025; FR-008 and FR-010 are retired). Independent verification initially found FR-023 untagged in the TASK tree although its behavior was already covered (T079 projected-balance detail tests; T086 Approver detail queries); the FR-023 tag was added to TASK-079 and TASK-086, after which all 23 active FRs are referenced by at least one TASK file.*
+## Coverage Results
 
-## Use Case Coverage
+| Category | Active total | Covered | Partial | Missing | Conflict | Coverage | Notes |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Functional requirements | 23 | 23 | 0 | 0 | 0 | 100% | FR-023 is covered by T079/T080/T086/T088 after projected-balance remediation |
+| Business rules | 36 | 36 | 0 | 0 | 0 | 100% | BR-036/BR-037 covered by T079/T086; BR-037/BR-038 covered by T080/T088 |
+| Standard acceptance criteria | 47 | 47 | 0 | 0 | 0 | 100% | AC-012, AC-018, AC-020 covered by approval transaction, rejection, stale-operation, and projected-balance tests |
+| HR acceptance criteria | 12 | 12 | 0 | 0 | 0 | 100% | AC-HR-003 maps to dedicated `/rrhh/calendario` with all organization-wide vacation requests |
+| RBFV criteria | 34 | 34 | 0 | 0 | 0 | 100% | RBFV-003/RBFV-012/RBFV-032 resolved for capability and HR route behavior |
+| Use cases | 22 | 22 | 0 | 0 | 0 | 100% | UC-19 route ambiguity resolved; UC-09 through UC-13 capability gate resolved |
+| Security requirements | 9 | 9 | 0 | 0 | 0 | 100% | HR forbidden mutations and disabled-Approver access are planned by explicit tests |
+| Authorization requirements | 18 | 18 | 0 | 0 | 0 | 100% | `canResolveRequests=true` is explicit for Approver queue/detail/resolution; HR `/calendario` denied |
+| Validation requirements | 8 | 8 | 0 | 0 | 0 | 100% | Server-derived values, input modes, reasons, and stale operations remain covered |
+| Audit requirements | 10 | 10 | 0 | 0 | 0 | 100% | State changes, HR sensitive access, and capability toggles covered |
+| Concurrency requirements | 12 | 12 | 0 | 0 | 0 | 100% | BR-038 approval POST revalidation is explicitly tied to stale/concurrent projected-balance behavior |
+| Frontend requirements | 34 | 34 | 0 | 0 | 0 | 100% | Route, navigation, read-only HR views, calendar accessibility, and projected-balance UI all covered |
+| Canonical tasks | 153 | 153 | 0 | 0 | 0 | 100% structural | Task count unchanged |
+| Generated task files | 153 | 153 | 0 | 0 | 0 | 100% structural | One-to-one `T001-T153` to `TASK-001-TASK-153` preserved |
+| Required tests | 52 | 52 | 0 | 0 | 0 | 100% planned | Counted from canonical tasks that explicitly add tests; no source/tests exist yet |
+| Explicit exclusions | 28 | 28 | 0 | 0 | 0 | 100% classified | No task introduces excluded APIs, email, hierarchy, HR request resolution, HR balance edits, or User Pending cancellation |
 
-| UC | Related TASK files |
-|---|---|
-| UC-01 | TASK-059 through TASK-077; foundational TASK-001 through TASK-058 |
-| UC-02 | TASK-059 through TASK-077; foundational TASK-001 through TASK-058 |
-| UC-03 | TASK-059 through TASK-077; foundational TASK-001 through TASK-058 |
-| UC-04 | TASK-059 through TASK-077; foundational TASK-001 through TASK-058 |
-| UC-05 | TASK-059 through TASK-077; foundational TASK-001 through TASK-058 |
-| UC-06 | TASK-059 through TASK-077; foundational TASK-001 through TASK-058 |
-| UC-07 | TASK-059 through TASK-077; foundational TASK-001 through TASK-058 |
-| UC-08 | TASK-059 through TASK-077; foundational TASK-001 through TASK-058 |
-| UC-09 | TASK-078 through TASK-093; foundational TASK-001 through TASK-058 |
-| UC-10 | TASK-078 through TASK-093; foundational TASK-001 through TASK-058 |
-| UC-11 | TASK-078 through TASK-093; foundational TASK-001 through TASK-058 |
-| UC-12 | TASK-078 through TASK-093; foundational TASK-001 through TASK-058 |
-| UC-13 | TASK-101 through TASK-107; foundational TASK-001 through TASK-058 |
-| UC-14 | TASK-078 through TASK-093; foundational TASK-001 through TASK-058 |
-| UC-15 | TASK-078 through TASK-093; foundational TASK-001 through TASK-058 |
-| UC-16 | TASK-094 through TASK-100; foundational TASK-001 through TASK-058 |
-| UC-17 | TASK-108 through TASK-116; foundational TASK-001 through TASK-058 |
-| UC-18 | TASK-123 through TASK-136; calendar TASK-117 through TASK-122 where applicable; foundational TASK-001 through TASK-058 |
-| UC-19 | TASK-123 through TASK-136; calendar TASK-117 through TASK-122 where applicable; foundational TASK-001 through TASK-058 |
-| UC-20 | TASK-123 through TASK-136; calendar TASK-117 through TASK-122 where applicable; foundational TASK-001 through TASK-058 |
-| UC-21 | TASK-123 through TASK-136; calendar TASK-117 through TASK-122 where applicable; foundational TASK-001 through TASK-058 |
-| UC-22 | TASK-137 through TASK-145; foundational TASK-001 through TASK-058 |
+## Key Traceability Repairs
 
-## Requirement Coverage
+| Behavior | Canonical sources | Canonical tasks | Generated tasks |
+|---|---|---|---|
+| Approver capability required for queue/detail/resolution | Constitution v6.0.1, UC-09 through UC-13, UC contracts, RBFV policies | T017, T079, T080, T086, T088, T090 | TASK-017, TASK-079, TASK-080, TASK-086, TASK-088, TASK-090 |
+| HR calendar is `/rrhh/calendario` only | FR-017, UC-19, AC-HR-003, RBFV-032, UC-19 contract | T118, T122, T124, T130, T134 | TASK-118, TASK-122, TASK-124, TASK-130, TASK-134 |
+| HR calendar shows all organization-wide vacation requests | FR-017, UC-19, AC-HR-003, UC-19 contract | T124, T130, T134 | TASK-124, TASK-130, TASK-134 |
+| Projected-balance display and query-time evaluation | FR-023, BR-036, BR-037, UC-10 | T079, T086 | TASK-079, TASK-086 |
+| Approval POST projected-balance revalidation | BR-037, BR-038, UC-11, CON-004, CON-006 | T080, T088 | TASK-080, TASK-088 |
+| Decision-record governance | Constitution §14, DR-001, DR-002 | T019, T099, T114 | TASK-019, TASK-099, TASK-114 |
 
-| Requirement | Epic | TASK |
-|---|---|---|
-| FR-001 through FR-025 | EPIC-003 through EPIC-010 plus EPIC-011 | TASK-059 through TASK-153 |
-| VAL, AUTHZ, SEC, CON, AUD, ERR, CFG, and RBFV identifiers | Foundation, relevant workflow epics, and release validation | TASK-001 through TASK-153 |
+## Remaining Partial Or Unresolved Items
 
-## Business Rule Coverage
+None in the active planning package.
 
-| Business rule or normative section | TASK |
-|---|---|
-| BR-001 through BR-035 and documented normative sections | TASK-020 through TASK-153 |
-| Constitution v6.0.0 Sections 4-9, 11, 13, 15 | TASK-001 through TASK-153 |
-| research.md CR-01 through CR-16 | TASK-001 through TASK-116 |
+Implementation is not present, so this report does not claim executable code coverage or passing application tests.
 
-## Canonical Task Coverage
+## Validation Status
 
-| Canonical task | Generated file | Epic |
-|---|---|---|
-| T001 | TASK-001.md | EPIC-001 - Foundation |
-| T002 | TASK-002.md | EPIC-001 - Foundation |
-| T003 | TASK-003.md | EPIC-001 - Foundation |
-| T004 | TASK-004.md | EPIC-001 - Foundation |
-| T005 | TASK-005.md | EPIC-001 - Foundation |
-| T006 | TASK-006.md | EPIC-001 - Foundation |
-| T007 | TASK-007.md | EPIC-001 - Foundation |
-| T008 | TASK-008.md | EPIC-001 - Foundation |
-| T009 | TASK-009.md | EPIC-001 - Foundation |
-| T010 | TASK-010.md | EPIC-001 - Foundation |
-| T011 | TASK-011.md | EPIC-001 - Foundation |
-| T012 | TASK-012.md | EPIC-001 - Foundation |
-| T013 | TASK-013.md | EPIC-001 - Foundation |
-| T014 | TASK-014.md | EPIC-001 - Foundation |
-| T015 | TASK-015.md | EPIC-001 - Foundation |
-| T016 | TASK-016.md | EPIC-001 - Foundation |
-| T017 | TASK-017.md | EPIC-001 - Foundation |
-| T018 | TASK-018.md | EPIC-001 - Foundation |
-| T019 | TASK-019.md | EPIC-001 - Foundation |
-| T020 | TASK-020.md | EPIC-002 - Domain and Persistence |
-| T021 | TASK-021.md | EPIC-002 - Domain and Persistence |
-| T022 | TASK-022.md | EPIC-002 - Domain and Persistence |
-| T023 | TASK-023.md | EPIC-002 - Domain and Persistence |
-| T024 | TASK-024.md | EPIC-002 - Domain and Persistence |
-| T025 | TASK-025.md | EPIC-002 - Domain and Persistence |
-| T026 | TASK-026.md | EPIC-002 - Domain and Persistence |
-| T027 | TASK-027.md | EPIC-002 - Domain and Persistence |
-| T028 | TASK-028.md | EPIC-002 - Domain and Persistence |
-| T029 | TASK-029.md | EPIC-002 - Domain and Persistence |
-| T030 | TASK-030.md | EPIC-002 - Domain and Persistence |
-| T031 | TASK-031.md | EPIC-002 - Domain and Persistence |
-| T032 | TASK-032.md | EPIC-002 - Domain and Persistence |
-| T033 | TASK-033.md | EPIC-002 - Domain and Persistence |
-| T034 | TASK-034.md | EPIC-002 - Domain and Persistence |
-| T035 | TASK-035.md | EPIC-002 - Domain and Persistence |
-| T036 | TASK-036.md | EPIC-002 - Domain and Persistence |
-| T037 | TASK-037.md | EPIC-002 - Domain and Persistence |
-| T038 | TASK-038.md | EPIC-002 - Domain and Persistence |
-| T039 | TASK-039.md | EPIC-002 - Domain and Persistence |
-| T040 | TASK-040.md | EPIC-002 - Domain and Persistence |
-| T041 | TASK-041.md | EPIC-002 - Domain and Persistence |
-| T042 | TASK-042.md | EPIC-002 - Domain and Persistence |
-| T043 | TASK-043.md | EPIC-002 - Domain and Persistence |
-| T044 | TASK-044.md | EPIC-002 - Domain and Persistence |
-| T045 | TASK-045.md | EPIC-002 - Domain and Persistence |
-| T046 | TASK-046.md | EPIC-002 - Domain and Persistence |
-| T047 | TASK-047.md | EPIC-002 - Domain and Persistence |
-| T048 | TASK-048.md | EPIC-002 - Domain and Persistence |
-| T049 | TASK-049.md | EPIC-002 - Domain and Persistence |
-| T050 | TASK-050.md | EPIC-002 - Domain and Persistence |
-| T051 | TASK-051.md | EPIC-002 - Domain and Persistence |
-| T052 | TASK-052.md | EPIC-002 - Domain and Persistence |
-| T053 | TASK-053.md | EPIC-002 - Domain and Persistence |
-| T054 | TASK-054.md | EPIC-002 - Domain and Persistence |
-| T055 | TASK-055.md | EPIC-002 - Domain and Persistence |
-| T056 | TASK-056.md | EPIC-002 - Domain and Persistence |
-| T057 | TASK-057.md | EPIC-002 - Domain and Persistence |
-| T058 | TASK-058.md | EPIC-002 - Domain and Persistence |
-| T059 | TASK-059.md | EPIC-003 - User Request Management |
-| T060 | TASK-060.md | EPIC-003 - User Request Management |
-| T061 | TASK-061.md | EPIC-003 - User Request Management |
-| T062 | TASK-062.md | EPIC-003 - User Request Management |
-| T063 | TASK-063.md | EPIC-003 - User Request Management |
-| T064 | TASK-064.md | EPIC-003 - User Request Management |
-| T065 | TASK-065.md | EPIC-003 - User Request Management |
-| T066 | TASK-066.md | EPIC-003 - User Request Management |
-| T067 | TASK-067.md | EPIC-003 - User Request Management |
-| T068 | TASK-068.md | EPIC-003 - User Request Management |
-| T069 | TASK-069.md | EPIC-003 - User Request Management |
-| T070 | TASK-070.md | EPIC-003 - User Request Management |
-| T071 | TASK-071.md | EPIC-003 - User Request Management |
-| T072 | TASK-072.md | EPIC-003 - User Request Management |
-| T073 | TASK-073.md | EPIC-003 - User Request Management |
-| T074 | TASK-074.md | EPIC-003 - User Request Management |
-| T075 | TASK-075.md | EPIC-003 - User Request Management |
-| T076 | TASK-076.md | EPIC-003 - User Request Management |
-| T077 | TASK-077.md | EPIC-003 - User Request Management |
-| T078 | TASK-078.md | EPIC-004 - Approver Resolution |
-| T079 | TASK-079.md | EPIC-004 - Approver Resolution |
-| T080 | TASK-080.md | EPIC-004 - Approver Resolution |
-| T081 | TASK-081.md | EPIC-004 - Approver Resolution |
-| T082 | TASK-082.md | EPIC-004 - Approver Resolution |
-| T083 | TASK-083.md | EPIC-004 - Approver Resolution |
-| T084 | TASK-084.md | EPIC-004 - Approver Resolution |
-| T085 | TASK-085.md | EPIC-004 - Approver Resolution |
-| T086 | TASK-086.md | EPIC-004 - Approver Resolution |
-| T087 | TASK-087.md | EPIC-004 - Approver Resolution |
-| T088 | TASK-088.md | EPIC-004 - Approver Resolution |
-| T089 | TASK-089.md | EPIC-004 - Approver Resolution |
-| T090 | TASK-090.md | EPIC-004 - Approver Resolution |
-| T091 | TASK-091.md | EPIC-004 - Approver Resolution |
-| T092 | TASK-092.md | EPIC-004 - Approver Resolution |
-| T093 | TASK-093.md | EPIC-004 - Approver Resolution |
-| T094 | TASK-094.md | EPIC-005 - Automated Timeout |
-| T095 | TASK-095.md | EPIC-005 - Automated Timeout |
-| T096 | TASK-096.md | EPIC-005 - Automated Timeout |
-| T097 | TASK-097.md | EPIC-005 - Automated Timeout |
-| T098 | TASK-098.md | EPIC-005 - Automated Timeout |
-| T099 | TASK-099.md | EPIC-005 - Automated Timeout |
-| T100 | TASK-100.md | EPIC-005 - Automated Timeout |
-| T101 | TASK-101.md | EPIC-006 - Approved Request Deactivation |
-| T102 | TASK-102.md | EPIC-006 - Approved Request Deactivation |
-| T103 | TASK-103.md | EPIC-006 - Approved Request Deactivation |
-| T104 | TASK-104.md | EPIC-006 - Approved Request Deactivation |
-| T105 | TASK-105.md | EPIC-006 - Approved Request Deactivation |
-| T106 | TASK-106.md | EPIC-006 - Approved Request Deactivation |
-| T107 | TASK-107.md | EPIC-006 - Approved Request Deactivation |
-| T108 | TASK-108.md | EPIC-007 - Balance and Accrual |
-| T109 | TASK-109.md | EPIC-007 - Balance and Accrual |
-| T110 | TASK-110.md | EPIC-007 - Balance and Accrual |
-| T111 | TASK-111.md | EPIC-007 - Balance and Accrual |
-| T112 | TASK-112.md | EPIC-007 - Balance and Accrual |
-| T113 | TASK-113.md | EPIC-007 - Balance and Accrual |
-| T114 | TASK-114.md | EPIC-007 - Balance and Accrual |
-| T115 | TASK-115.md | EPIC-007 - Balance and Accrual |
-| T116 | TASK-116.md | EPIC-007 - Balance and Accrual |
-| T117 | TASK-117.md | EPIC-008 - Calendars |
-| T118 | TASK-118.md | EPIC-008 - Calendars |
-| T119 | TASK-119.md | EPIC-008 - Calendars |
-| T120 | TASK-120.md | EPIC-008 - Calendars |
-| T121 | TASK-121.md | EPIC-008 - Calendars |
-| T122 | TASK-122.md | EPIC-008 - Calendars |
-| T123 | TASK-123.md | EPIC-009 - HR Read Only |
-| T124 | TASK-124.md | EPIC-009 - HR Read Only |
-| T125 | TASK-125.md | EPIC-009 - HR Read Only |
-| T126 | TASK-126.md | EPIC-009 - HR Read Only |
-| T127 | TASK-127.md | EPIC-009 - HR Read Only |
-| T128 | TASK-128.md | EPIC-009 - HR Read Only |
-| T129 | TASK-129.md | EPIC-009 - HR Read Only |
-| T130 | TASK-130.md | EPIC-009 - HR Read Only |
-| T131 | TASK-131.md | EPIC-009 - HR Read Only |
-| T132 | TASK-132.md | EPIC-009 - HR Read Only |
-| T133 | TASK-133.md | EPIC-009 - HR Read Only |
-| T134 | TASK-134.md | EPIC-009 - HR Read Only |
-| T135 | TASK-135.md | EPIC-009 - HR Read Only |
-| T136 | TASK-136.md | EPIC-009 - HR Read Only |
-| T137 | TASK-137.md | EPIC-010 - Approver Capability Management |
-| T138 | TASK-138.md | EPIC-010 - Approver Capability Management |
-| T139 | TASK-139.md | EPIC-010 - Approver Capability Management |
-| T140 | TASK-140.md | EPIC-010 - Approver Capability Management |
-| T141 | TASK-141.md | EPIC-010 - Approver Capability Management |
-| T142 | TASK-142.md | EPIC-010 - Approver Capability Management |
-| T143 | TASK-143.md | EPIC-010 - Approver Capability Management |
-| T144 | TASK-144.md | EPIC-010 - Approver Capability Management |
-| T145 | TASK-145.md | EPIC-010 - Approver Capability Management |
-| T146 | TASK-146.md | EPIC-011 - Quality, Security, and Release |
-| T147 | TASK-147.md | EPIC-011 - Quality, Security, and Release |
-| T148 | TASK-148.md | EPIC-011 - Quality, Security, and Release |
-| T149 | TASK-149.md | EPIC-011 - Quality, Security, and Release |
-| T150 | TASK-150.md | EPIC-011 - Quality, Security, and Release |
-| T151 | TASK-151.md | EPIC-011 - Quality, Security, and Release |
-| T152 | TASK-152.md | EPIC-011 - Quality, Security, and Release |
-| T153 | TASK-153.md | EPIC-011 - Quality, Security, and Release |
-
-## Dependency Validation
-
-- Missing dependencies: None
-- Circular dependencies: None
-- Forward dependencies: None
-- Orphan tasks: None
-- Tasks without explicit paths: TASK-012, TASK-151, TASK-152, TASK-153; each is a documentation, validation, or handoff task.
-- Tasks without verifiable acceptance criteria: None
-
-## Uncovered Functionality
-
-No documented functionality remains uncovered.
-
-## Findings
-
-- LOW: TASK-012, TASK-151, TASK-152, and TASK-153 do not include explicit implementation paths in the canonical task text. This is not blocking because each is a documentation, validation, or handoff task with an approved source location or evidence target.
-- LOW: `git status --short` reports changes outside `/tasks`: deleted `AUDIT_REPORT.md`, deleted `docs/GOOGLE_AI_STUDIO_PROMPT.md`, deleted `docs/NovaLeave_Quick_Audit.md`, deleted `docs/questions_po.md`, and untracked `docs/archive/`, `docs/audits/`, `docs/decisions/`, and `docs/diagrams/`. These files were not part of the derived backlog generation scope and were not modified by this operation.
-
-## Final Result
-
-COVERAGE: 100%
+Validation commands and results are recorded in `docs/audits/NovaLeave_Post_Remediation_Audit.md`. This report was updated before the final validation pass and supersedes the stale 2026-07-29 coverage metadata.

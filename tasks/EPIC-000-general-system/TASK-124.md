@@ -1,4 +1,4 @@
-# TASK-124 - Add UC-19 HR calendar tests
+# TASK-124 - Add UC-19 HR calendar tests for dedicated /rrhh/calendario, all vacation requests across the complete organization, requester/status visibility, read-only detail links, and forbidden mutations
 
 ## Type
 
@@ -10,7 +10,7 @@ EPIC-009 - HR Read Only
 
 ## Objective
 
-Deliver the outcome defined by canonical task T124: [P] [US7] Add UC-19 HR calendar tests in `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`.
+Deliver the outcome defined by canonical task T124: [P] [US7] Add UC-19 HR calendar tests for dedicated `/rrhh/calendario`, all vacation requests across the complete organization, requester/status visibility, read-only detail links, and forbidden mutations in `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`.
 
 ## Description
 
@@ -18,7 +18,7 @@ This task is a derived execution view of T124 from specs/001-leave-management-mv
 
 ## Context
 
-The task exists to make canonical backlog item T124 executable without changing the approved scope. Original canonical text: [P] [US7] Add UC-19 HR calendar tests in `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`.
+The task exists to make canonical backlog item T124 executable without changing the approved scope. Original canonical text: [P] [US7] Add UC-19 HR calendar tests for dedicated /rrhh/calendario, all vacation requests across the complete organization, requester/status visibility, read-only detail links, and forbidden mutations in `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`.
 
 ## Related Requirements
 
@@ -30,12 +30,12 @@ UC-18, UC-19, UC-20, UC-21
 
 ## Related Business Rules
 
-Constitution v6.0.0 Section 4.3; docs/use-cases.md UC-18 through UC-21; AC-HR-001 through AC-HR-007 and AC-HR-009 through AC-HR-012
+Constitution v6.0.1 Section 4.3; docs/use-cases.md UC-18 through UC-21; AC-HR-001 through AC-HR-007 and AC-HR-009 through AC-HR-012
 
 ## Scope
 
 - Preserve the original canonical task identifier T124.
-- Deliver only: Add UC-19 HR calendar tests.
+- Deliver only: Add UC-19 HR calendar tests for dedicated /rrhh/calendario, all vacation requests across the complete organization, requester/status visibility, read-only detail links, and forbidden mutations.
 - Expected files or folders:
 - `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`
 - Validate against the authoritative source sections listed in Technical Notes.
@@ -66,7 +66,7 @@ No additional risks were identified beyond the general project risks.
 
 - Planned path: `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`
 - Original task: T124 from specs/001-leave-management-mvp/tasks.md.
-- Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
+- Source files and sections: `.specify/memory/constitution.md` v6.0.1; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.
 - Security, concurrency, and audit: apply deny-by-default authorization, resource authorization, row-version concurrency, atomic persistence, redaction, and audit rules when applicable.

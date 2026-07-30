@@ -1,4 +1,4 @@
-# TASK-086 - Implement Approver queue and detail queries
+# TASK-086 - Implement Approver queue and detail queries with canResolveRequests=true eligibility and BR-036/BR-037 server-derived projected-balance fields
 
 ## Type
 
@@ -10,7 +10,7 @@ EPIC-004 - Approver Resolution
 
 ## Objective
 
-Deliver the outcome defined by canonical task T086: [P] [US2] Implement Approver queue and detail queries in `src/NovaLeave.Application/Approvals/Queries/`.
+Deliver the outcome defined by canonical task T086: [P] [US2] Implement Approver queue and detail queries with `canResolveRequests=true` eligibility and BR-036/BR-037 server-derived projected-balance fields in `src/NovaLeave.Application/Approvals/Queries/`.
 
 ## Description
 
@@ -18,7 +18,7 @@ This task is a derived execution view of T086 from specs/001-leave-management-mv
 
 ## Context
 
-The task exists to make canonical backlog item T086 executable without changing the approved scope. Original canonical text: [P] [US2] Implement Approver queue and detail queries in `src/NovaLeave.Application/Approvals/Queries/`.
+The task exists to make canonical backlog item T086 executable without changing the approved scope. Original canonical text: [P] [US2] Implement Approver queue and detail queries with canResolveRequests=true eligibility and BR-036/BR-037 server-derived projected-balance fields in `src/NovaLeave.Application/Approvals/Queries/`.
 
 ## Related Requirements
 
@@ -30,12 +30,12 @@ UC-09, UC-10, UC-11, UC-12, UC-14, UC-15
 
 ## Related Business Rules
 
-BR-006, BR-007, BR-008, BR-009, BR-011, BR-012, BR-013, BR-014, BR-015, BR-016, BR-019, BR-020, BR-021, BR-023; docs/use-cases.md UC-09 through UC-15
+BR-006, BR-007, BR-008, BR-009, BR-011, BR-012, BR-013, BR-014, BR-015, BR-016, BR-019, BR-020, BR-021, BR-023, BR-036, BR-037; docs/use-cases.md UC-09 through UC-15
 
 ## Scope
 
 - Preserve the original canonical task identifier T086.
-- Deliver only: Implement Approver queue and detail queries.
+- Deliver only: Implement Approver queue and detail queries with canResolveRequests=true eligibility and BR-036/BR-037 server-derived projected-balance fields.
 - Expected files or folders:
 - `src/NovaLeave.Application/Approvals/Queries/`
 - Validate against the authoritative source sections listed in Technical Notes.
@@ -66,7 +66,7 @@ No additional risks were identified beyond the general project risks.
 
 - Planned path: `src/NovaLeave.Application/Approvals/Queries/`
 - Original task: T086 from specs/001-leave-management-mvp/tasks.md.
-- Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
+- Source files and sections: `.specify/memory/constitution.md` v6.0.1; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.
 - Security, concurrency, and audit: apply deny-by-default authorization, resource authorization, row-version concurrency, atomic persistence, redaction, and audit rules when applicable.

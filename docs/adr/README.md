@@ -1,6 +1,6 @@
-# Decisions
+# Architecture Decision Records
 
-This directory stores architectural and product decision records for NovaLeave.
+This directory is the canonical location for active architectural and technical decision records for NovaLeave, per the Constitution.
 
 ## Index
 

@@ -1,4 +1,4 @@
-# TASK-090 - Implement Approver authorization resource checks
+# TASK-090 - Implement Approver authorization resource checks requiring authenticated active Approver, canResolveRequests=true, non-ownership, eligible request state, and Application-layer execution-time revalidation
 
 ## Type
 
@@ -10,7 +10,7 @@ EPIC-004 - Approver Resolution
 
 ## Objective
 
-Deliver the outcome defined by canonical task T090: [US2] Implement Approver authorization resource checks in `src/NovaLeave.Application/Authorization/ApproverPolicies.cs`.
+Deliver the outcome defined by canonical task T090: [US2] Implement Approver authorization resource checks requiring authenticated active `Approver`, `canResolveRequests=true`, non-ownership, eligible request state, and Application-layer execution-time revalidation in `src/NovaLeave.Application/Authorization/ApproverPolicies.cs`.
 
 ## Description
 
@@ -18,7 +18,7 @@ This task is a derived execution view of T090 from specs/001-leave-management-mv
 
 ## Context
 
-The task exists to make canonical backlog item T090 executable without changing the approved scope. Original canonical text: [US2] Implement Approver authorization resource checks in `src/NovaLeave.Application/Authorization/ApproverPolicies.cs`.
+The task exists to make canonical backlog item T090 executable without changing the approved scope. Original canonical text: [US2] Implement Approver authorization resource checks requiring authenticated active Approver, canResolveRequests=true, non-ownership, eligible request state, and Application-layer execution-time revalidation in `src/NovaLeave.Application/Authorization/ApproverPolicies.cs`.
 
 ## Related Requirements
 
@@ -35,7 +35,7 @@ BR-006, BR-007, BR-008, BR-009, BR-011, BR-012, BR-013, BR-014, BR-015, BR-016, 
 ## Scope
 
 - Preserve the original canonical task identifier T090.
-- Deliver only: Implement Approver authorization resource checks.
+- Deliver only: Implement Approver authorization resource checks requiring authenticated active Approver, canResolveRequests=true, non-ownership, eligible request state, and Application-layer execution-time revalidation.
 - Expected files or folders:
 - `src/NovaLeave.Application/Authorization/ApproverPolicies.cs`
 - Validate against the authoritative source sections listed in Technical Notes.
@@ -66,7 +66,7 @@ No additional risks were identified beyond the general project risks.
 
 - Planned path: `src/NovaLeave.Application/Authorization/ApproverPolicies.cs`
 - Original task: T090 from specs/001-leave-management-mvp/tasks.md.
-- Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
+- Source files and sections: `.specify/memory/constitution.md` v6.0.1; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.
 - Security, concurrency, and audit: apply deny-by-default authorization, resource authorization, row-version concurrency, atomic persistence, redaction, and audit rules when applicable.

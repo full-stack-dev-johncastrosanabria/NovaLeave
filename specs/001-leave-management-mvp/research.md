@@ -14,7 +14,7 @@
 
 ### CR-02: Accrual Timezone Reference
 **Source conflict**: Conjunto 1 mentioned "accrual keyed to calendar month ending in user's employment timezone." Constitution §5 and Instruction §5.4 prohibit per-user timezone behavior.
-**Authority applied**: Constitution v6.0.0 invariant 4; Instruction §5.4.
+**Authority applied**: Constitution v6.0.1 invariant 4; Instruction §5.4.
 **Resolution**: No per-user timezone logic. Accrual period determined by calendar month boundary using a single system business date (UTC). `TimeProvider` (built-in .NET 10) is the sole time abstraction.
 **Affected**: FR-014, BR-032, BR-033, AC-054, UC-17.
 
@@ -119,7 +119,7 @@ Seeded via `NovaLeave:SeedDemoUsers=true`. **Must be disabled in Production.**
 
 ## Configuration (values decided — DR-001, 2026-07-29)
 
-No value is hard-coded in application code; startup validation remains fail-fast. Official values per [`docs/decisions/DR-001-runtime-configuration-values.md`](../../docs/decisions/DR-001-runtime-configuration-values.md):
+No value is hard-coded in application code; startup validation remains fail-fast. Official values per [`docs/adr/DR-001-runtime-configuration-values.md`](../../docs/adr/DR-001-runtime-configuration-values.md):
 
 | Key | Description | Official value | Note |
 |-----|-------------|----------------|------|

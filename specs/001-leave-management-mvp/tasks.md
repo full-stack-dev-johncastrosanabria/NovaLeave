@@ -4,7 +4,7 @@
 
 **Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/uc-contracts.md`, `docs/use-cases.md`, `frontend-design-spec.md`, `specs/002-role-based-frontend-views/spec.md`
 
-**Tests**: Required by Constitution v6.0.0 test-first governance. Write the listed tests first and verify they fail before implementation.
+**Tests**: Required by Constitution v6.0.1 test-first governance. Write the listed tests first and verify they fail before implementation.
 
 **Organization**: Tasks are grouped by independently testable MVP increments. Story labels map to the restored approved user stories and UC contracts; each task includes exact planned paths.
 
@@ -23,7 +23,7 @@
 - [ ] T009 [P] Configure Serilog package references in `src/NovaLeave.Infrastructure/NovaLeave.Infrastructure.csproj` and `src/NovaLeave.Presentation.Web/NovaLeave.Presentation.Web.csproj`
 - [ ] T010 [P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Presentation.Web/libman.json` or `src/NovaLeave.Presentation.Web/package.json`
 - [ ] T011 Add application settings placeholders with no invented defaults in `src/NovaLeave.Presentation.Web/appsettings.json`
-- [ ] T012 Update `AGENTS.md` Spec Kit section to reference `specs/001-leave-management-mvp/plan.md`
+- [ ] T012 Verify `AGENTS.md` Spec Kit section references `specs/001-leave-management-mvp/plan.md`; update only if the reference is missing or stale
 
 ---
 
@@ -133,8 +133,8 @@
 ### Tests for User Story 2
 
 - [ ] T078 [P] [US2] Add UC-09 eligible queue tests without team/department/hierarchy filters in `tests/NovaLeave.IntegrationTests/UseCases/UC09ApproverQueueTests.cs`
-- [ ] T079 [P] [US2] Add UC-10 resolution detail tests with projected balance in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`
-- [ ] T080 [P] [US2] Add UC-11 approval transaction and audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC11ApproveRequestTests.cs`
+- [ ] T079 [P] [US2] Add UC-10 resolution detail tests for BR-036/BR-037 projected-balance calculation/display and disabled Approver denial in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`
+- [ ] T080 [P] [US2] Add UC-11 approval transaction, audit, BR-037 negative projected-balance rejection, and BR-038 approval POST revalidation tests in `tests/NovaLeave.IntegrationTests/UseCases/UC11ApproveRequestTests.cs`
 - [ ] T081 [P] [US2] Add UC-12 rejection reason, release, and audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC12RejectRequestTests.cs`
 - [ ] T082 [P] [US2] Add UC-14 resolution history tests in `tests/NovaLeave.IntegrationTests/UseCases/UC14ResolutionHistoryTests.cs`
 - [ ] T083 [P] [US2] Add UC-15 Approver calendar tests in `tests/NovaLeave.IntegrationTests/UseCases/UC15ApproverCalendarTests.cs`
@@ -143,11 +143,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T086 [P] [US2] Implement Approver queue and detail queries in `src/NovaLeave.Application/Approvals/Queries/`
+- [ ] T086 [P] [US2] Implement Approver queue and detail queries with `canResolveRequests=true` eligibility and BR-036/BR-037 server-derived projected-balance fields in `src/NovaLeave.Application/Approvals/Queries/`
 - [ ] T087 [P] [US2] Implement Approver history and calendar queries in `src/NovaLeave.Application/Approvals/History/` and `src/NovaLeave.Application/Calendars/GetApproverCalendar/`
-- [ ] T088 [US2] Implement approval command converting reservation to deduction atomically in `src/NovaLeave.Application/Approvals/ApproveRequest/`
+- [ ] T088 [US2] Implement approval command converting reservation to deduction atomically with `canResolveRequests=true` revalidation, BR-037 negative projected-balance rejection, and BR-038 stale/concurrent projected-balance revalidation in `src/NovaLeave.Application/Approvals/ApproveRequest/`
 - [ ] T089 [US2] Implement rejection command releasing reservation atomically in `src/NovaLeave.Application/Approvals/RejectRequest/`
-- [ ] T090 [US2] Implement Approver authorization resource checks in `src/NovaLeave.Application/Authorization/ApproverPolicies.cs`
+- [ ] T090 [US2] Implement Approver authorization resource checks requiring authenticated active `Approver`, `canResolveRequests=true`, non-ownership, eligible request state, and Application-layer execution-time revalidation in `src/NovaLeave.Application/Authorization/ApproverPolicies.cs`
 - [ ] T091 [US2] Implement Approver MVC controllers for `/aprobaciones`, `/aprobaciones/{id}`, `/aprobaciones/{id}/aprobar`, `/aprobaciones/{id}/rechazar`, `/aprobaciones/historial`, and shared calendar route `/calendario` in `src/NovaLeave.Presentation.Web/Controllers/Approver/`
 - [ ] T092 [US2] Implement dedicated Approver ViewModels in `src/NovaLeave.Presentation.Web/Models/Approver/`
 - [ ] T093 [US2] Implement Approver Razor views with mutual approve/reject submission protections in `src/NovaLeave.Presentation.Web/Views/Approver/`
@@ -231,19 +231,19 @@
 
 **Covers**: UC-08, UC-15, and UC-19 shared calendar rendering.
 
-**Independent Test**: Render authorized User, Approver, and HR calendar views with correct event scope, colors, accessible keyboard activation, and authorized detail links only.
+**Independent Test**: Render authorized User and Approver `/calendario` views plus dedicated HR `/rrhh/calendario` view with correct event scope, colors, accessible keyboard activation, and authorized detail links only; verify HR receives no `/calendario` behavior and no role inherits another role's data scope.
 
 ### Tests for User Story 6
 
 - [ ] T117 [P] [US6] Add shared calendar ViewModel unit tests in `tests/NovaLeave.UnitTests/Presentation/CalendarViewModelTests.cs`
-- [ ] T118 [P] [US6] Add calendar authorization integration tests in `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`
+- [ ] T118 [P] [US6] Add calendar authorization integration tests for User personal `/calendario`, eligible Approver anonymized `/calendario`, HR-only `/rrhh/calendario`, HR denial on `/calendario`, and disabled Approver denial in `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`
 - [ ] T119 [P] [US6] Add calendar accessibility E2E smoke tests in `tests/NovaLeave.EndToEndTests/Calendar/CalendarAccessibilityTests.cs`
 
 ### Implementation for User Story 6
 
 - [ ] T120 [P] [US6] Implement shared calendar query models in `src/NovaLeave.Application/Calendars/CalendarModels.cs`
 - [ ] T121 [US6] Implement shared `_Calendar.cshtml` partial with Bootstrap 5.3, status colors, keyboard support, and authorized links in `src/NovaLeave.Presentation.Web/Views/Shared/_Calendar.cshtml`
-- [ ] T122 [US6] Integrate shared calendar partial into User, Approver, and HR calendar Razor views under `src/NovaLeave.Presentation.Web/Views/`
+- [ ] T122 [US6] Integrate shared calendar partial into User and Approver `/calendario` views and the dedicated read-only HR `/rrhh/calendario` view without sharing route data scope under `src/NovaLeave.Presentation.Web/Views/`
 
 **Checkpoint**: Calendar behavior for UC-08, UC-15, and UC-19 independently passes.
 
@@ -258,7 +258,7 @@
 ### Tests for User Story 7
 
 - [ ] T123 [P] [US7] Add UC-18 HR request list/detail tests in `tests/NovaLeave.IntegrationTests/UseCases/UC18HRRequestsTests.cs`
-- [ ] T124 [P] [US7] Add UC-19 HR calendar tests in `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`
+- [ ] T124 [P] [US7] Add UC-19 HR calendar tests for dedicated `/rrhh/calendario`, all vacation requests across the complete organization, requester/status visibility, read-only detail links, and forbidden mutations in `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`
 - [ ] T125 [P] [US7] Add UC-20 HR balance and movement read-only tests in `tests/NovaLeave.IntegrationTests/UseCases/UC20HRBalancesTests.cs`
 - [ ] T126 [P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`
 - [ ] T127 [P] [US7] Add HR forbidden mutation tests for approve/reject/deactivate/balance/role operations in `tests/NovaLeave.IntegrationTests/Security/HRRestrictionTests.cs`
@@ -267,11 +267,11 @@
 ### Implementation for User Story 7
 
 - [ ] T129 [P] [US7] Implement HR request read queries in `src/NovaLeave.Application/HR/Requests/`
-- [ ] T130 [P] [US7] Implement HR calendar query in `src/NovaLeave.Application/HR/Calendar/`
+- [ ] T130 [P] [US7] Implement HR calendar query returning all vacation requests across the complete organization with requester names, statuses, working-day counts, and no mutation capability in `src/NovaLeave.Application/HR/Calendar/`
 - [ ] T131 [P] [US7] Implement HR balance and movement read queries in `src/NovaLeave.Application/HR/Balances/`
 - [ ] T132 [P] [US7] Implement HR audit read queries with sensitive-reason access auditing in `src/NovaLeave.Application/HR/Audit/`
 - [ ] T133 [US7] Implement HR authorization policies in `src/NovaLeave.Application/Authorization/HRPolicies.cs`
-- [ ] T134 [US7] Implement HR MVC controllers for `/rrhh/solicitudes`, `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria` in `src/NovaLeave.Presentation.Web/Controllers/HR/`
+- [ ] T134 [US7] Implement HR MVC controllers for `/rrhh/solicitudes`, dedicated read-only `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`; do not expose HR calendar behavior through `/calendario` in `src/NovaLeave.Presentation.Web/Controllers/HR/`
 - [ ] T135 [US7] Implement dedicated HR read-only ViewModels in `src/NovaLeave.Presentation.Web/Models/HR/`
 - [ ] T136 [US7] Implement HR read-only Razor views with no resolution or balance modification actions in `src/NovaLeave.Presentation.Web/Views/HR/`
 
@@ -366,4 +366,4 @@
 - Every test task must be written before its corresponding implementation task and initially fail.
 - No task may introduce APIs, JWT, OpenAPI, email, Outbox, queues, Redis, microservices, teams, departments, managers, hierarchy, delegation, escalation, User Pending cancellation, holiday calendars, per-user timezones, HR request resolution, HR balance modification, or HR role assignment/removal.
 - No task may add a persisted LeaveType lookup table; `Vacation` remains a Domain enum/constant.
-- Configuration values `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, and accrual scheduler cadence remain required configuration with no invented defaults; official values are decided in `docs/decisions/DR-001-runtime-configuration-values.md` (14 days, 30 minutes, daily 00:05 UTC).
+- Configuration values `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, and accrual scheduler cadence remain required configuration with no invented defaults; official values are decided in `docs/adr/DR-001-runtime-configuration-values.md` (14 days, 30 minutes, daily 00:05 UTC).

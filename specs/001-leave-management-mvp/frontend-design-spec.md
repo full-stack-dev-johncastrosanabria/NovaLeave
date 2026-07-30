@@ -8,7 +8,7 @@
 ## 1. Purpose
 
 This document defines the mandatory frontend design rules for NovaLeave MVP, including visual language, UX/UI standards, responsive behavior, accessibility, colors, shadows, transitions, and animations.
-It complements `spec.md` and aligns with `.specify/memory/constitution.md` v6.0.0 under the MVC, Razor Views, Bootstrap, security, and accessibility baseline.
+It complements `spec.md` and aligns with `.specify/memory/constitution.md` v6.0.1 under the MVC, Razor Views, Bootstrap, security, and accessibility baseline.
 
 ## 2. Scope
 

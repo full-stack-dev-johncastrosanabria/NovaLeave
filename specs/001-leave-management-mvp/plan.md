@@ -63,7 +63,7 @@ NovaLeave MVP is a vacation request management system built on Clean Architectur
 | MVC, Razor Views, Bootstrap | PASS | Specified correctly |
 | ASP.NET Core Identity & sessions | PARTIAL | Custom AccountController planned without justification; Identity routes should remain at `/Identity/Account/...` |
 | Roles & authorization (User/Approver/HR) | PASS | Three roles, deny-by-default, HR restrictions correctly specified |
-| Lifecycle invariants (v6.0.0) | PASS | Transitions match amended invariants |
+| Lifecycle invariants (v6.0.1) | PASS | Transitions match amended invariants and Approver capability eligibility |
 | Balance integrity | PARTIAL | HR balance adjustment excluded, but Adjustment movement type was implied |
 | Date and overlap rules | PASS | Weekends excluded, holidays counted, no per-user timezone |
 | Security baseline | PARTIAL | SecurityEvent entity planned as DB table (research.md CR-07 — structured logs sufficient) |
@@ -136,7 +136,7 @@ NovaLeave MVP is a vacation request management system built on Clean Architectur
 | Localization | PASS | Spanish labels from approved specs used throughout |
 | Scope exclusions | PASS | Email, queues, Redis, microservices, JWT, OpenAPI, external calendar, holiday calendar, per-user timezone — all absent |
 | Retention | PASS | 7 years per Constitution §13; 2-year recommendation removed |
-| Invented values | PASS | C# version removed; scale numbers removed; 7-day timeout default removed; all marked NEEDS CONFIGURATION (later resolved by DR-001, docs/decisions) |
+| Invented values | PASS | C# version removed; scale numbers removed; 7-day timeout default removed; all marked NEEDS CONFIGURATION (later resolved by DR-001, docs/adr) |
 | Domain model | PASS | LeaveType = Domain enum/constant only; no persisted lookup; SystemParameter = typed configuration; ReservationMovementId/DeductionMovementId removed; StartBusinessDateUtc removed; no Reason in BalanceMovement |
 | Quickstart evidence | PASS | Existing vs planned clearly distinguished; no non-existent files referenced |
 | Artifacts consistency | PASS | Same entity names, routes, modules, config keys across all artifacts |
@@ -215,11 +215,11 @@ src/
       GetMyBalanceQuery.cs
       AccrueMonthlyBalancesJob.cs      # Background job use case
     Calendar/
-      GetCalendarQuery.cs              # Supports UC-08 (User) and UC-15 (Approver) via role context
+      GetCalendarQuery.cs              # Supports UC-08 (User) and UC-15 (eligible Approver) via shared /calendario role context
     HR/
       GetHRRequestListQuery.cs
       GetHRRequestDetailQuery.cs
-      GetHRCalendarQuery.cs            # Supports UC-19 (HR organizational calendar)
+      GetHRCalendarQuery.cs            # Supports UC-19 dedicated read-only /rrhh/calendario with all organization-wide requests
       GetHRBalancesQuery.cs
       GetHRBalanceMovementsQuery.cs
       GetHRAuditLogQuery.cs
@@ -260,7 +260,7 @@ src/
     Controllers/
       MisSolicitudesController.cs     # User context (RequireActiveUser)
       SaldoController.cs              # User balance (RequireActiveUser)
-      CalendarioController.cs         # Calendar — User + Approver + HR via role context
+      CalendarioController.cs         # Shared /calendario — User personal scope + eligible Approver anonymized scope only
       AprobacionesController.cs       # Approver context (RequireActiveApprover)
       RRHHController.cs               # HR context (RequireActiveHR)
     Areas/
@@ -290,7 +290,7 @@ src/
       RRHH/
         Dashboard.cshtml
         Solicitudes/Index.cshtml, Detail.cshtml
-        Calendario/Index.cshtml
+        Calendario/Index.cshtml        # HR-only /rrhh/calendario, global read-only scope
         Saldos/Index.cshtml, Detail.cshtml
         Auditoria/Index.cshtml
         Aprobadores/Index.cshtml, Capacidad.cshtml
@@ -428,7 +428,7 @@ Full UC-to-route-to-contract mapping for all UC-01 through UC-22 is defined in:
 
 ## Clean-Architecture Dependency Diagram
 
-See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
+See: `specs/001-leave-management-mvp/diagrams/clean-architecture.md`
 
 > Note: Conjunto 1 had an incorrect dependency (`Application -->|depends on| Infrastructure`). This is corrected in the diagram — Infrastructure implements Application abstractions, not the reverse.
 
@@ -439,7 +439,7 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 - [x] data-model.md complete — domain traceability matrix, module matrix, entity definitions, concurrency matrix
 - [x] quickstart.md complete — existing vs planned clearly distinguished
 - [x] contracts/uc-contracts.md created — UC-01 through UC-22 all covered
-- [x] Diagrams/clean-architecture.md corrected — Application→Infrastructure dependency removed
+- [x] diagrams/clean-architecture.md corrected — Application→Infrastructure dependency removed
 - [x] Initial Constitution Check documented
 - [x] Post-Phase-1 Constitution Check: PASS
 - [x] `002-role-based-frontend-views` treated as complementary only; no separate plan created
@@ -456,7 +456,7 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 | Only one feature plan exists | PASS | One plan under 001-leave-management-mvp/ only |
 | Feature 002 treated as complementary only | PASS | No separate plan, no artifacts under 002/ |
 | No excluded or future functionality introduced | PASS | Email, queues, Redis, microservices, JWT, OpenAPI, holiday calendar absent |
-| No invented business or configuration value | PASS | Timeout, session timeout, and accrual cadence carried as required configuration with no code defaults; official values decided in DR-001 (docs/decisions); production scale figures not specified |
+| No invented business or configuration value | PASS | Timeout, session timeout, and accrual cadence carried as required configuration with no code defaults; official values decided in DR-001 (docs/adr); production scale figures not specified |
 
 ### Repository Evidence
 
@@ -482,18 +482,18 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 | Check | Status | Notes |
 |---|---|---|
 | Every UC has an MVC/Application contract or justified N/A | PASS | UC-01–22 in contracts/uc-contracts.md |
-| Routes use correct approved paths | PASS | Identity routes, /mis-solicitudes, /aprobaciones, shared /calendario, and /rrhh all per RBFV spec |
+| Routes use correct approved paths | PASS | Identity routes, /mis-solicitudes, /aprobaciones, shared /calendario for User/eligible Approver only, and dedicated HR /rrhh/calendario plus /rrhh routes all per RBFV spec |
 | GET performs no mutation | PASS | All state changes use POST |
 | Mutations use POST and antiforgery | PASS | AutoValidateAntiforgeryToken planned globally |
 | ViewModels contain no business or authorization logic | PASS | Enforced by architecture rules |
 | Controllers and Views do not access persistence directly | PASS | Controllers call Application use cases only |
-| The Mermaid dependency diagram exists and is valid | PASS | Diagrams/clean-architecture.md corrected |
+| The Mermaid dependency diagram exists and is valid | PASS | diagrams/clean-architecture.md corrected |
 
 ### Business Correctness
 
 | Check | Status | Notes |
 |---|---|---|
-| Official states and transitions used exclusively | PASS | 5 states, 4 official transitions per Constitution v6.0.0 §5; creation and Pending editing are operations |
+| Official states and transitions used exclusively | PASS | 5 states, 4 official transitions per Constitution v6.0.1 §5; creation and Pending editing are operations |
 | Working days exclude weekends and count holidays | PASS | BR-004, AC-035, research.md CR-04 |
 | Accrual uses completed calendar months and is idempotent | PASS | OQ-002 resolved; unique (UserId, AccrualPeriod) constraint |
 | No per-user timezone logic exists | PASS | Constitution invariant 4; research.md CR-02 |
@@ -534,7 +534,7 @@ See: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
 - **Constitution Check (Initial)**: PARTIAL/FAIL — Conjunto 1 contained speculative scope, invented values, and architectural violations
 - **Constitution Check (Post-Phase-1)**: PASS — All corrections applied
 - **Repository Assessment**: 22 Missing (no implementation exists)
-- **Configuration (decided — DR-001, docs/decisions)**: `PendingRequestTimeoutDays` = 14; `SessionTimeoutMinutes` = 30; accrual & timeout job cadence daily 00:05 UTC. Required configuration, no code defaults.
+- **Configuration (decided — DR-001, docs/adr)**: `PendingRequestTimeoutDays` = 14; `SessionTimeoutMinutes` = 30; accrual & timeout job cadence daily 00:05 UTC. Required configuration, no code defaults.
 - **NEEDS CLARIFICATION**: None — all open questions resolved or documented as out of MVP scope
 - **Feature 002 treatment**: Complementary specification only; no independent plan created
 - **Status**: TASK-READY after generated `tasks.md` review; official bash wrapper was unavailable in this Windows environment, so plan/tasks/analyze workflow was completed manually against the restored approved artifacts.

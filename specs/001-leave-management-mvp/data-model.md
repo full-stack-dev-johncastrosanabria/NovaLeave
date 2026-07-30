@@ -206,6 +206,6 @@ No `SystemParameter` database entity. No seeded default timeout value. (research
 
 ## Diagrams
 
-- Clean Architecture dependency diagram: `specs/001-leave-management-mvp/Diagrams/clean-architecture.md`
-- Core data relationships diagram: `specs/001-leave-management-mvp/Diagrams/core-data-relationships.md`
-- Request lifecycle state machine: `specs/001-leave-management-mvp/Diagrams/request-lifecycle.md`
+- Clean Architecture dependency diagram: `specs/001-leave-management-mvp/diagrams/clean-architecture.md`
+- Core data relationships diagram: `specs/001-leave-management-mvp/diagrams/core-data-relationships.md`
+- Request lifecycle state machine: `specs/001-leave-management-mvp/diagrams/request-lifecycle.md`

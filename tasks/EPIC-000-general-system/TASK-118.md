@@ -1,4 +1,4 @@
-# TASK-118 - Add calendar authorization integration tests
+# TASK-118 - Add calendar authorization integration tests for User personal /calendario, eligible Approver anonymized /calendario, HR-only /rrhh/calendario, HR denial on /calendario, and disabled Approver denial
 
 ## Type
 
@@ -10,7 +10,7 @@ EPIC-008 - Calendars
 
 ## Objective
 
-Deliver the outcome defined by canonical task T118: [P] [US6] Add calendar authorization integration tests in `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`.
+Deliver the outcome defined by canonical task T118: [P] [US6] Add calendar authorization integration tests for User personal `/calendario`, eligible Approver anonymized `/calendario`, HR-only `/rrhh/calendario`, HR denial on `/calendario`, and disabled Approver denial in `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`.
 
 ## Description
 
@@ -18,7 +18,7 @@ This task is a derived execution view of T118 from specs/001-leave-management-mv
 
 ## Context
 
-The task exists to make canonical backlog item T118 executable without changing the approved scope. Original canonical text: [P] [US6] Add calendar authorization integration tests in `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`.
+The task exists to make canonical backlog item T118 executable without changing the approved scope. Original canonical text: [P] [US6] Add calendar authorization integration tests for User personal /calendario, eligible Approver anonymized /calendario, HR-only /rrhh/calendario, HR denial on /calendario, and disabled Approver denial in `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`.
 
 ## Related Requirements
 
@@ -35,7 +35,7 @@ frontend-design-spec.md Sections 22 and 25; specs/002-role-based-frontend-views/
 ## Scope
 
 - Preserve the original canonical task identifier T118.
-- Deliver only: Add calendar authorization integration tests.
+- Deliver only: Add calendar authorization integration tests for User personal /calendario, eligible Approver anonymized /calendario, HR-only /rrhh/calendario, HR denial on /calendario, and disabled Approver denial.
 - Expected files or folders:
 - `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`
 - Validate against the authoritative source sections listed in Technical Notes.
@@ -66,7 +66,7 @@ No additional risks were identified beyond the general project risks.
 
 - Planned path: `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`
 - Original task: T118 from specs/001-leave-management-mvp/tasks.md.
-- Source files and sections: `.specify/memory/constitution.md` v6.0.0; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
+- Source files and sections: `.specify/memory/constitution.md` v6.0.1; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
 - Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
 - Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.
 - Security, concurrency, and audit: apply deny-by-default authorization, resource authorization, row-version concurrency, atomic persistence, redaction, and audit rules when applicable.

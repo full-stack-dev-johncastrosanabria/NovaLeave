@@ -1,4 +1,4 @@
-﻿# EPIC-000 - NovaLeave Complete MVP System
+# EPIC-000 - NovaLeave Complete MVP System
 
 ## Purpose
 
