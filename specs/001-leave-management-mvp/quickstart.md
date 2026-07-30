@@ -27,7 +27,7 @@ src/
   NovaLeave.Domain/
   NovaLeave.Application/
   NovaLeave.Infrastructure/
-  NovaLeave.Presentation.Web/
+  NovaLeave.Web/
 tests/
   NovaLeave.UnitTests/
   NovaLeave.IntegrationTests/
@@ -71,12 +71,12 @@ dotnet build
 ```
 dotnet ef database update \
   --project src/NovaLeave.Infrastructure \
-  --startup-project src/NovaLeave.Presentation.Web
+  --startup-project src/NovaLeave.Web
 ```
 
 ### 3. Run the web application (planned)
 ```
-dotnet run --project src/NovaLeave.Presentation.Web
+dotnet run --project src/NovaLeave.Web
 ```
 Then browse to `https://localhost:5001` and log in at `/Identity/Account/Login`.
 
@@ -96,6 +96,12 @@ Integration tests use a real SQL Server database (connection string required). T
 dotnet test tests/NovaLeave.EndToEndTests
 ```
 Requires `NovaLeave:SeedDemoUsers=true` in the test environment and a running application instance.
+
+### 7. Manual Quality and Security Gate (planned — blocking)
+
+NovaLeave MVP does not use CI/CD or automated deployment pipelines. Before merge, handoff, release, or acceptance, execute and document the Manual Quality and Security Gate in `docs/operations/manual-quality-gate.md`.
+
+If Bash, Python, Mermaid validation, static security analysis, dependency scanning, or license-review tooling is unavailable, record the affected check as `NOT EXECUTED`. Do not report an unavailable official validator as `PASS`; PowerShell or manual equivalents are equivalent checks only.
 
 ---
 
@@ -164,7 +170,7 @@ Full UC-to-route mapping: `specs/001-leave-management-mvp/contracts/uc-contracts
 ```
 dotnet ef migrations add <MigrationName> \
   --project src/NovaLeave.Infrastructure \
-  --startup-project src/NovaLeave.Presentation.Web
+  --startup-project src/NovaLeave.Web
 ```
 
 ---
@@ -190,7 +196,7 @@ dotnet ef migrations add <MigrationName> \
 ## Useful Commands (Planned)
 
 - Create migration:
-  - `dotnet ef migrations add <Name> --project src/NovaLeave.Infrastructure --startup-project src/NovaLeave.Presentation.Web`
+  - `dotnet ef migrations add <Name> --project src/NovaLeave.Infrastructure --startup-project src/NovaLeave.Web`
 - Build container image:
   - `docker build -t novelave:web -f docker/Dockerfile .`
 

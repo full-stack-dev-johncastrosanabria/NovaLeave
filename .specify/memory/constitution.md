@@ -1,6 +1,21 @@
 <!--
 Sync Impact Report
 ==================
+Version change: 6.0.1 -> 7.0.0
+Change type: MAJOR
+Reason: Replace the prior mandatory automated CI gate with a mandatory,
+reproducible, manually executed quality and security gate for the NovaLeave MVP.
+CI/CD, automated deployment pipelines, and production deployment automation are
+outside the MVP delivery model. This amendment preserves all quality, security,
+testing, validation, and evidence obligations while removing automated pipeline
+configuration as a constitutional requirement.
+
+Amended sections: 3.2 (Approved Stack), 9.3 (Manual Quality and Security Gate),
+12.3 (Production Operational Targets), 16.1 (Git Workflow), 16.2 (Minimum Pull
+Request Checklist).
+
+Prior 6.0.1 report retained below.
+--------------------------------------------------------------------------------
 Version change: 6.0.0 -> 6.0.1
 Change type: PATCH
 Reason: Clarify the already-approved Approver capability gate so the
@@ -74,7 +89,7 @@ Amended sections: 4 (Actors), 5.1, 7.1, 7.3, 7.4, and Principle IX.
 
 # NovaLeave — Consolidated Constitution
 
-**Version:** 6.0.1  
+**Version:** 7.0.0  
 **Ratified:** 2026-07-13  
 **Last Amended:** 2026-07-30  
 **Status:** Binding
@@ -84,7 +99,7 @@ Amended sections: 4 (Actors), 5.1, 7.1, 7.3, 7.4, and Principle IX.
 This constitution establishes the engineering, security, quality, operations,
 and governance rules for **NovaLeave**, a system for managing leave and vacation
 requests. It applies to specifications, plans, ADRs, tasks, code, tests,
-migrations, documentation, diagrams, pipelines, pull requests, and changes
+migrations, documentation, diagrams, pull requests, and changes
 produced by humans or AI tools.
 
 In this document:
@@ -245,7 +260,7 @@ src/
   NovaLeave.Domain/
   NovaLeave.Application/
   NovaLeave.Infrastructure/
-  NovaLeave.Presentation.Web/
+  NovaLeave.Web/
     Controllers/
     Views/
       Shared/
@@ -264,9 +279,8 @@ tests/
 docs/
   adr/
   diagrams/
-  runbooks/
+  operations/
 docker/
-.github/
 ```
 
 Any additional top-level folder requires justification in the pull request.
@@ -304,7 +318,8 @@ DTO, mapping, and related tests.
   integration.
 - **Alternative frontends:** React, Blazor, or another client technology are not
   project defaults and require an ADR before adoption.
-- **Infrastructure:** Docker, GitHub Actions, and Azure-ready deployment.
+- **Infrastructure:** Docker and Azure-ready deployment. CI/CD and automated
+  deployment pipelines are outside the NovaLeave MVP delivery model.
 - **Testing:** xUnit; `WebApplicationFactory` for MVC integration tests;
   Playwright or an approved equivalent for critical browser journeys; mocks/fakes
   only where they provide useful isolation.
@@ -674,23 +689,39 @@ The line-coverage target for critical Domain and Application modules is
 **>= 80%**. Coverage does not replace the obligation to test every invariant and
 every rejection scenario.
 
-### 9.3 CI Gate
+### 9.3 Manual Quality and Security Gate
 
-Before merge, CI MUST execute and pass:
+NovaLeave MVP does not use CI/CD, automated deployment pipelines, automated
+release pipelines, continuous deployment, or continuous delivery configuration.
+Automated pipeline configuration is not required for MVP acceptance.
 
-1. restore and build;
-2. formatting and `.editorconfig` checks;
-3. Roslyn analyzers and nullable analysis;
-4. applicable unit and integration tests;
-5. coverage measurement;
-6. SAST, SCA, and vulnerable-dependency scanning;
-7. license verification where applicable;
-8. migration and modified-Mermaid validation when tooling exists;
-9. browser asset vulnerability checks and critical MVC end-to-end tests when
-   affected by the change.
+The absence of CI/CD does not waive quality, security, testing, validation, or
+evidence obligations. Before merge, handoff, release, or acceptance, a developer
+or reviewer MUST manually execute and document all applicable checks:
 
-High/Critical findings block merge unless a formal exception includes a
-mitigation, accountable owner, and expiration date.
+1. restore dependencies;
+2. compile the complete solution;
+3. verify formatting and `.editorconfig` compliance;
+4. run configured analyzers, including nullable analysis where configured;
+5. run all unit tests;
+6. run all integration tests;
+7. run all applicable end-to-end tests;
+8. produce and inspect test coverage;
+9. perform static security analysis when compatible tooling is available;
+10. scan dependencies for known vulnerabilities;
+11. review third-party dependency licenses;
+12. validate database migrations;
+13. validate modified Mermaid diagrams when applicable tooling is available;
+14. review configuration and secrets handling;
+15. record commands, results, failures, exceptions, and reviewer identity.
+
+All manual gate checks are blocking. Failed required checks prevent merge,
+handoff, release, or acceptance. An unavailable tool MUST be recorded as
+`NOT EXECUTED`, never as `PASS`. Any accepted exception requires written
+rationale, approval, mitigation, accountable owner, and expiration or removal
+condition.
+
+Production deployment automation remains out of scope for the MVP.
 
 ## 10. Code Quality and Maintainability
 
@@ -862,7 +893,7 @@ the approved frontend specifications per the Authority Order (§15.1).
 - RPO target: <= 15 minutes for transactional data.
 - Automated backups: at least daily.
 - Restore and disaster recovery: documented and exercised at least annually.
-- Runbooks: stored under `docs/runbooks/` and linked from critical alerts.
+- Runbooks: stored under `docs/operations/` and linked from critical alerts.
 
 These values are production targets. During the MVP, every unimplemented
 requirement MUST be recorded as a gap, risk, and evolution plan.
@@ -945,7 +976,8 @@ before merge.
 - One feature or fix per branch and pull request.
 - Conventional Commits is mandatory.
 - Direct pushes to `main` are prohibited.
-- Every pull request requires review and a green CI pipeline.
+- Every pull request requires review and documented passing evidence from the
+  Manual Quality and Security Gate.
 - Applicable architecture, rules, security, migrations, tests, documentation,
   and diagrams are part of code review.
 
@@ -1007,4 +1039,4 @@ that need exists.
 
 ---
 
-**Version:** 6.0.1 | **Ratified:** 2026-07-13 | **Last Amended:** 2026-07-30
+**Version:** 7.0.0 | **Ratified:** 2026-07-13 | **Last Amended:** 2026-07-30

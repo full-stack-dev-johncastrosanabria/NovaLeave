@@ -1,12 +1,12 @@
-# TASK-025 - Create AccrualPeriod value object
+# TASK-025 - Derived execution task
 
 ## Type
 
-Backend
+Derived Execution Artifact
 
 ## Epic
 
-EPIC-002 - Domain and Persistence
+EPIC-000 - NovaLeave Complete MVP System
 
 ## Objective
 
@@ -14,82 +14,19 @@ Deliver the outcome defined by canonical task T025: Create AccrualPeriod value o
 
 ## Description
 
-This task is a derived execution view of T025 from specs/001-leave-management-mvp/tasks.md. Implement or produce only the work explicitly described by the canonical task and the approved source artifacts.
-
-## Context
-
-The task exists to make canonical backlog item T025 executable without changing the approved scope. Original canonical text: Create AccrualPeriod value object in `src/NovaLeave.Domain/ValueObjects/AccrualPeriod.cs`.
+This file is a generated or synchronized execution view of T025 from specs/001-leave-management-mvp/tasks.md. The canonical task source must be edited first; this file must never override canonical task IDs, objectives, dependencies, or coverage.
 
 ## Related Requirements
 
-VAL-002, VAL-003, BR-001, BR-002, BR-004, BR-017, BR-018, BR-030, BR-031, AUD-001, AUD-002, CON-001, CON-002, CFG-001, CFG-002
-
-## Related Use Cases
-
-N/A Ã¢â‚¬â€ cross-cutting task
-
-## Related Business Rules
-
-Constitution v6.0.1 Sections 4, 5, 6, 7, 8, 9, 11; data-model.md Domain Traceability Matrix and Concurrency and Idempotency Matrix; research.md CR-01 through CR-16
-
-## Scope
-
-- Preserve the original canonical task identifier T025.
-- Deliver only: Create AccrualPeriod value object.
-- Expected files or folders:
-- `src/NovaLeave.Domain/ValueObjects/AccrualPeriod.cs`
-- Validate against the authoritative source sections listed in Technical Notes.
-- Add or run applicable tests when the canonical task is a testing or implementation task.
-
-## Out of Scope
-
-- Any requirement, route, integration, component, state, transition, role, or behavior not present in the approved artifacts.
-- Public API, JWT, OpenAPI, email, outbox, Redis, message queues, microservices, Teams, departments, managers, organizational hierarchy, delegation, escalation, external holiday calendar, per-user time zones, and User Pending cancellation.
-- Modifying official specifications, contracts, plan, data model, quickstart, Constitution, or canonical `tasks.md` as part of this derived task file.
-
-## Acceptance Criteria
-
-- [ ] The deliverable described by T025 exists in the planned path or documented artifact.
-- [ ] Required test or evidence demonstrates the deliverable matches the approved source artifacts.
-- [ ] Traceability to T025 and the listed requirements/use cases is preserved.
-- [ ] No excluded functionality or invented identifier is introduced.
+FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-018, FR-019, FR-020, FR-021, FR-022, FR-023, FR-024, FR-025, SC-003, SC-007
 
 ## Dependencies
 
-TASK-013, TASK-014, TASK-015, TASK-016, TASK-017, TASK-018, TASK-019
-
-## Risks
-
-No additional risks were identified beyond the general project risks.
-
-## Technical Notes
-
-- Planned path: `src/NovaLeave.Domain/ValueObjects/AccrualPeriod.cs`
-- Original task: T025 from specs/001-leave-management-mvp/tasks.md.
-- Source files and sections: `.specify/memory/constitution.md` v6.0.1; `specs/001-leave-management-mvp/spec.md`; `docs/use-cases.md`; `specs/001-leave-management-mvp/contracts/uc-contracts.md`; `specs/001-leave-management-mvp/plan.md`; applicable frontend/design/data-model/research sections by epic.
-- Architectural restrictions: Clean Architecture; MVC and Razor Views; Bootstrap 5.3; EF Core and SQL Server; ASP.NET Core Identity cookie authentication; FluentValidation; Serilog; xUnit/WebApplicationFactory/approved E2E testing; built-in .NET `TimeProvider` only.
-- Configuration: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, `NovaLeave:SeedDemoUsers`, and accrual cadence remain explicitly configured where applicable; no defaults are invented.
-- Security, concurrency, and audit: apply deny-by-default authorization, resource authorization, row-version concurrency, atomic persistence, redaction, and audit rules when applicable.
-
-## Priority
-
-P1
-
-## Complexity
-
-S
-
-## Estimate
-
-2 Story Points
+See specs/001-leave-management-mvp/tasks.md Dependencies and Execution Order. Preserve test-first ordering and dependency sequencing.
 
 ## Definition of Done
 
-- [ ] Deliverable implemented or document produced
-- [ ] Peer review completed
-- [ ] Applicable unit tests passed
-- [ ] Applicable integration tests passed
-- [ ] Acceptance criteria verified
-- [ ] Security and authorization verified when applicable
-- [ ] Documentation and traceability updated
-- [ ] No known regressions
+- Canonical task outcome is complete.
+- Applicable tests or verification evidence exist.
+- Manual Quality and Security Gate evidence is recorded where applicable.
+- No CI/CD, deployment pipeline, or source behavior outside approved scope is introduced.

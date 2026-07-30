@@ -256,12 +256,12 @@ src/
       MonthlyAccrualHostedService.cs
     HealthChecks/
       DatabaseHealthCheck.cs
-  NovaLeave.Presentation.Web/
+  NovaLeave.Web/
     Controllers/
-      MisSolicitudesController.cs     # User context (RequireActiveUser)
-      SaldoController.cs              # User balance (RequireActiveUser)
-      CalendarioController.cs         # Shared /calendario — User personal scope + eligible Approver anonymized scope only
+      HomeController.cs               # Role-aware dashboard and redirects
+      MisSolicitudesController.cs     # User requests and /saldo context (RequireActiveUser)
       AprobacionesController.cs       # Approver context (RequireActiveApprover)
+      CalendarioController.cs         # Shared /calendario — User personal scope + eligible Approver anonymized scope only
       RRHHController.cs               # HR context (RequireActiveHR)
     Areas/
       Identity/                        # ASP.NET Core Identity UI overrides (login page branding only)
@@ -274,13 +274,12 @@ src/
         _ContextSwitcher.cshtml
         _UserMenu.cshtml
         _ValidationSummary.cshtml
+      Home/
       MisSolicitudes/
         Index.cshtml
         Create.cshtml
         Edit.cshtml
         Detail.cshtml
-      Saldo/
-        Index.cshtml
       Calendario/
         Index.cshtml
       Aprobaciones/
@@ -295,6 +294,10 @@ src/
         Auditoria/Index.cshtml
         Aprobadores/Index.cshtml, Capacidad.cshtml
     ViewModels/
+      MisSolicitudes/
+      Aprobaciones/
+      Calendario/
+      RRHH/
       *(dedicated ViewModels per view — no Domain or EF entities in views)
     Filters/
       ValidationMappingFilter.cs      # Maps FluentValidation results to ModelState
@@ -343,28 +346,29 @@ tests/
       PlaywrightFixture.cs
 docs/
   adr/
-    ADR-001-Architecture.md
-    ADR-002-Auth.md
-    ADR-003-Concurrency.md
-    ADR-004-AccrualSemantics.md
+    DR-001-runtime-configuration-values.md
+    DR-002-generated-artifact-review-rule.md
+    DR-003-manual-quality-gate-no-ci-cd.md
   diagrams/
     clean-architecture.md
     request-lifecycle.md
     core-data-relationships.md
-  runbooks/
-    deploy.md
-    rollback.md
-    migration.md
-    seeding.md
-    disaster-recovery.md
+  operations/
+    README.md
+    deployment-runbook.md
+    incident-response-runbook.md
+    backup-and-restore-runbook.md
+    database-migration-runbook.md
+    scheduled-jobs-runbook.md
+    observability-runbook.md
+    manual-quality-gate.md
 docker/
   Dockerfile
   docker-compose.yml
   docker-compose.override.yml (dev)
-.github/
-  workflows/
-    ci.yml
-    cd.yml
+No `.github/workflows/`, Azure DevOps, Jenkins, continuous delivery, continuous
+deployment, automated release, or automated deployment pipeline configuration is
+planned for the MVP. Manual quality gate evidence is required instead.
 
 **Structure Decision**: Clean Architecture with 4 projects (Domain, Application, Infrastructure, Presentation.Web) + 3 test projects (Unit, Integration, E2E), matching Constitution §3.1 exactly. Vertical slices in Application per feature area. No API project (MVP is MVC-only per Constitution §3.2).
 
@@ -388,8 +392,8 @@ docker/
 8. Automatic workflows (UC-16, UC-17) — background hosted services
 9. HR workflows (UC-18..UC-22)
 10. Shared MVC frontend, accessibility, responsive behavior
-11. Migrations, seeded demo identities, diagrams, quickstart, CI
-12. Final traceability, post-design Constitution Check, and handoff to implementation
+11. Migrations, seeded demo identities, diagrams, quickstart, and manual quality gate preparation
+12. Observability, operational readiness, invariant monitoring, and final handoff to implementation
 
 ## Atomic Operations Matrix (compact)
 
@@ -493,7 +497,7 @@ See: `specs/001-leave-management-mvp/diagrams/clean-architecture.md`
 
 | Check | Status | Notes |
 |---|---|---|
-| Official states and transitions used exclusively | PASS | 5 states, 4 official transitions per Constitution v6.0.1 §5; creation and Pending editing are operations |
+| Official states and transitions used exclusively | PASS | 5 states, 4 official transitions per Constitution v7.0.0 §5; creation and Pending editing are operations |
 | Working days exclude weekends and count holidays | PASS | BR-004, AC-035, research.md CR-04 |
 | Accrual uses completed calendar months and is idempotent | PASS | OQ-002 resolved; unique (UserId, AccrualPeriod) constraint |
 | No per-user timezone logic exists | PASS | Constitution invariant 4; research.md CR-02 |
@@ -511,6 +515,7 @@ See: `specs/001-leave-management-mvp/diagrams/clean-architecture.md`
 | Sensitive reasons are redacted | PASS | AuditRecord.Data never contains Reason/RejectionReason |
 | HR reason access audited without storing reason content | PASS | SEC-009, AUD-009 — field name audited, not content |
 | Identity, antiforgery, overposting, IDOR, forced browsing planned | PASS | Security & Authorization section; RBFV spec references |
+| Observability, invariant monitoring, and redaction coverage planned | PASS | Phase 12 tasks cover structured logging, correlation IDs, metrics, tracing, health checks, alerts, invariant monitoring, and observability redaction verification |
 
 ### Testing and Delivery
 
@@ -524,6 +529,7 @@ See: `specs/001-leave-management-mvp/diagrams/clean-architecture.md`
 | Critical browser workflows have E2E coverage | PASS | EndToEndTests/CriticalJourneys/ planned |
 | Accessibility includes automated and manual validation | PASS | AccessibilitySmokeTests.cs planned; WCAG 2.1 AA |
 | Quickstart reflects actual or clearly planned repository paths | PASS | Quickstart clearly labels existing vs planned |
+| Manual Quality and Security Gate is blocking | PASS | Constitution v7.0.0 and DR-003 replace CI/CD obligations with a reproducible manual gate |
 | Post-Phase-1 Constitution Check passes | PASS | See Post-Phase-1 section above |
 | No production code generated | PASS | No src/ code created; tasks.md exists as generated planning output only |
 
@@ -535,6 +541,7 @@ See: `specs/001-leave-management-mvp/diagrams/clean-architecture.md`
 - **Constitution Check (Post-Phase-1)**: PASS — All corrections applied
 - **Repository Assessment**: 22 Missing (no implementation exists)
 - **Configuration (decided — DR-001, docs/adr)**: `PendingRequestTimeoutDays` = 14; `SessionTimeoutMinutes` = 30; accrual & timeout job cadence daily 00:05 UTC. Required configuration, no code defaults.
+- **Delivery gate (decided — DR-003, docs/adr)**: CI/CD, automated release pipelines, automated deployment pipelines, continuous delivery, and continuous deployment are outside the MVP delivery model. The Manual Quality and Security Gate is required and blocking.
 - **NEEDS CLARIFICATION**: None — all open questions resolved or documented as out of MVP scope
 - **Feature 002 treatment**: Complementary specification only; no independent plan created
-- **Status**: TASK-READY after generated `tasks.md` review; official bash wrapper was unavailable in this Windows environment, so plan/tasks/analyze workflow was completed manually against the restored approved artifacts.
+- **Status**: TASK-READY after generated `tasks.md` review. Official Bash prerequisite wrapper results must be reported as `NOT EXECUTED` when Bash is unavailable; manual or PowerShell equivalents are equivalent checks only and must not be reported as official validator `PASS`.
