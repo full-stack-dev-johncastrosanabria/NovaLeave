@@ -1,0 +1,35 @@
+# Backup and Restore Runbook
+
+## Assumptions
+
+- SQL Server is the approved persistence technology.
+- Backup storage, retention, encryption, and exact commands are environment-specific.
+- This runbook does not create infrastructure or promise capabilities unavailable in the target environment.
+
+## Backup Procedure
+
+1. Identify environment, database name, source revision, and responsible role.
+2. Confirm no unsafe migration or manual data operation is in progress.
+3. Execute the environment-approved SQL Server backup command.
+4. Store the backup according to environment-approved retention and access controls.
+5. Record backup timestamp, command, operator, storage location reference, and result.
+
+## Restore Procedure
+
+1. Select the backup by timestamp and environment.
+2. Confirm restore approval and expected target database.
+3. Restore using environment-approved SQL Server commands.
+4. Apply any required migration validation from `database-migration-runbook.md`.
+5. Restart or reconnect the application as required by the environment.
+
+## Restore Verification
+
+- Verify database connectivity health check.
+- Verify expected schema version.
+- Run balance and request lifecycle invariant checks.
+- Validate critical User, Approver, and HR read paths.
+- Record failures, exceptions, reviewer, and evidence location.
+
+## Recovery Limitations
+
+Actual recovery capability depends on configured backup frequency, retention, storage durability, and environment access. Unvalidated capabilities must be recorded as operational risks.

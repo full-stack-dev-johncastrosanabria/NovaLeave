@@ -2,15 +2,15 @@
 
 ## Purpose
 
-This roll-up epic provides a single navigable execution view for the complete NovaLeave MVP backlog. It includes all 153 derived task files without changing the canonical scope, task identifiers, dependency rules, or approved epics.
+This roll-up epic provides a single navigable execution view for the complete NovaLeave MVP backlog. It includes all 178 derived task files without changing the canonical scope, task identifiers, dependency rules, or approved epics.
 
 `specs/001-leave-management-mvp/tasks.md` remains the canonical task source. This file is only a derived index.
 
 ## Scope
 
 - Complete MVP implementation readiness for UC-01 through UC-22.
-- All generated tasks from `TASK-001` through `TASK-153`.
-- All existing epics from `EPIC-001` through `EPIC-011`.
+- All generated tasks from `TASK-001` through `TASK-178`.
+- All existing epics from `EPIC-001` through `EPIC-012`.
 - No new requirements, features, integrations, states, transitions, or identifiers.
 
 ## Included Tasks
@@ -201,10 +201,39 @@ This roll-up epic provides a single navigable execution view for the complete No
 - [TASK-152](TASK-152.md)
 - [TASK-153](TASK-153.md)
 
+### EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness
+
+- [TASK-154](TASK-154.md)
+- [TASK-155](TASK-155.md)
+- [TASK-156](TASK-156.md)
+- [TASK-157](TASK-157.md)
+- [TASK-158](TASK-158.md)
+- [TASK-159](TASK-159.md)
+- [TASK-160](TASK-160.md)
+- [TASK-161](TASK-161.md)
+- [TASK-162](TASK-162.md)
+- [TASK-163](TASK-163.md)
+- [TASK-164](TASK-164.md)
+- [TASK-165](TASK-165.md)
+- [TASK-166](TASK-166.md)
+- [TASK-167](TASK-167.md)
+- [TASK-168](TASK-168.md)
+- [TASK-169](TASK-169.md)
+- [TASK-170](TASK-170.md)
+- [TASK-171](TASK-171.md)
+- [TASK-172](TASK-172.md)
+- [TASK-173](TASK-173.md)
+- [TASK-174](TASK-174.md)
+- [TASK-175](TASK-175.md)
+- [TASK-176](TASK-176.md)
+- [TASK-177](TASK-177.md)
+- [TASK-178](TASK-178.md)
+
 ## Validation
 
-- Task count included: 153.
-- Task range included: `TASK-001` through `TASK-153`.
-- Canonical source unchanged: `specs/001-leave-management-mvp/tasks.md`.
+- Task count included: 178.
+- Task range included: `TASK-001` through `TASK-178`.
+- Canonical source remains authoritative: `specs/001-leave-management-mvp/tasks.md`.
 - Scope changes introduced: none.
+
 

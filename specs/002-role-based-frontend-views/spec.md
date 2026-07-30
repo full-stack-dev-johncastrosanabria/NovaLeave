@@ -12,7 +12,7 @@
 
 This specification defines the mandatory view and navigation structure for NovaLeave MVP based on the three application roles (`User`, `Approver`, `HR`) plus the automatic system actor. It complements `specs/001-leave-management-mvp/spec.md` (business behavior) and `specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0 (design tokens, components, accessibility baseline).
 
-All routes, views, and navigation elements described here MUST conform to the Constitution v6.0.1, the approved frontend design specification v1.3.0, and the authority order in Constitution §15.1.
+All routes, views, and navigation elements described here MUST conform to the Constitution v7.0.0, the approved frontend design specification v1.3.0, and the authority order in Constitution §15.1.
 
 ---
 
@@ -39,12 +39,22 @@ This specification does NOT cover:
 
 Per Constitution §15.1:
 
-1. **Constitution v6.0.1** — architecture, security, roles, cross-cutting invariants, engineering quality, governance
+1. **Constitution v7.0.0** — architecture, security, roles, cross-cutting invariants, engineering quality, governance
 2. **Approved feature specifications** — business behavior and acceptance criteria within constitutional boundaries
 3. **Approved frontend design specification v1.3.0** — design tokens, responsive behavior, accessibility, components, motion, interaction patterns
 4. **Approved ADRs** — authorized architectural exceptions
 5. **Code and tests** — implement approved requirements but do not override them
 6. **Prototypes, screen-construction guides, OKF, Mermaid, Graphify** — derived or reference artifacts; cannot introduce requirements, roles, or permissions
+
+### 3.1 Complementary Authority Boundary
+
+This specification complements `specs/001-leave-management-mvp/spec.md`. It is
+authoritative only for frontend routes, navigation, role-based view behavior,
+accessibility, and presentation.
+
+It must not redefine domain rules, lifecycle states, balance semantics, backend
+authorization invariants, or MVP scope. In any conflict, the Constitution and
+the primary MVP specification prevail.
 
 ---
 

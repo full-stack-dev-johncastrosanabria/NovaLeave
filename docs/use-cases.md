@@ -2,8 +2,21 @@
 
 **Version:** 2.0.0 (compact Markdown edition)  
 **Language:** English; approved UI labels and routes remain in Spanish  
-**Applies to:** NovaLeave Constitution v6.0.1, Feature Specification 001, Role-Based Frontend Views 002  
+**Applies to:** NovaLeave Constitution v7.0.0, Feature Specification 001, Role-Based Frontend Views 002  
 **Target path in repository:** `/docs/use-cases.md`
+
+## Authority
+
+This file remains global because the UC-01 through UC-22 use cases are shared
+by the primary MVP specification, complementary frontend specification,
+contracts, canonical tasks, audits, and derived `/tasks` reporting artifacts.
+It is authoritative only as the approved use-case catalog for
+`specs/001-leave-management-mvp/spec.md`.
+
+It must not redefine roles, request states, balance semantics, lifecycle
+transitions, backend authorization invariants, or MVP scope. In any conflict,
+`.specify/memory/constitution.md` and
+`specs/001-leave-management-mvp/spec.md` prevail.
 
 ## 1. Scope
 

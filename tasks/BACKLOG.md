@@ -4,6 +4,8 @@
 
 NovaLeave MVP is a server-rendered ASP.NET Core MVC vacation request management system derived from the official Spec Kit planning artifacts. `specs/001-leave-management-mvp/tasks.md` remains the canonical task source. `/tasks` is only a derived execution view for navigation, traceability, dependency review, and execution readiness.
 
+Canonical task changes must be made first in `specs/001-leave-management-mvp/tasks.md`. After any canonical task change, regenerate or synchronize this root `/tasks` tree. Generated task files must never override the canonical task source, and canonical/generated task IDs, objectives, dependencies, and coverage must remain synchronized one-to-one.
+
 ## Project Scope
 
 The MVP includes one leave type, `Vacation`; combinable `User`, `Approver`, and `HR` roles; the automatic `System` actor; UC-01 through UC-22; five request states; and four official transitions. HR has organization-wide read access and limited `canResolveRequests` management for identities that already hold `Approver`.
@@ -52,7 +54,12 @@ The MVP includes one leave type, `Vacation`; combinable `User`, `Approver`, and 
 - Frontend Presentation
 - Quality, Security, and Release
 
-## Epics`r`n`r`n- EPIC-000 - NovaLeave Complete MVP System (`tasks/EPIC-000-general-system/`): contains TASK-001 through TASK-153 physically in one central folder.`r`n- EPIC-001 through EPIC-011 remain approved logical groupings inside the task metadata and central epic index, but their former physical folders were removed at user request.`r`n`r`n## Features
+## Epics
+
+- EPIC-000 - NovaLeave Complete MVP System (`tasks/EPIC-000-general-system/`): contains TASK-001 through TASK-178 physically in one central folder.
+- EPIC-001 through EPIC-012 remain approved logical groupings inside the task metadata and central epic index, but their former physical folders were removed at user request.
+
+## Features
 
 - Authentication and role context switching.
 - User request list, create, edit, detail, balance/history, and personal calendar.
@@ -61,7 +68,7 @@ The MVP includes one leave type, `Vacation`; combinable `User`, `Approver`, and 
 
 ## MVP
 
-The MVP implements UC-01 through UC-22 and canonical tasks T001 through T153 only. `specs/001-leave-management-mvp/tasks.md` remains the canonical task source. `/tasks` is only a derived execution view.
+The MVP implements UC-01 through UC-22 and canonical tasks T001 through T178. `specs/001-leave-management-mvp/tasks.md` remains the canonical task source. `/tasks` is only a derived execution view.
 
 ## Out of MVP
 
@@ -124,7 +131,7 @@ Business rules are preserved through the `BR-XXX` identifiers and normative sour
 
 ## Identified Architecture
 
-Clean Architecture with `NovaLeave.Domain`, `NovaLeave.Application`, `NovaLeave.Infrastructure`, and `NovaLeave.Presentation.Web`; Application organized by vertical slice; MVC/Razor Views; Bootstrap 5.3; EF Core SQL Server; Identity; Serilog; and built-in .NET `TimeProvider`.
+Clean Architecture with `NovaLeave.Domain`, `NovaLeave.Application`, `NovaLeave.Infrastructure`, and `NovaLeave.Web`; Application organized by vertical slice; MVC/Razor Views; Bootstrap 5.3; EF Core SQL Server; Identity; Serilog; and built-in .NET `TimeProvider`.
 
 ## Integrations
 
@@ -183,11 +190,11 @@ Sprint numbers, if later assigned, are provisional only. Final sprint allocation
 
 ## Maintenance Conventions
 
-Requirement changes must be made first in the official artifacts and then synchronized into `/tasks`. Do not edit `/tasks` as the source of truth. Preserve official identifiers exactly. Keep task files one-to-one with T001 through T153. Current physical storage is centralized under `tasks/EPIC-000-general-system/`.
+Requirement changes must be made first in the official artifacts and then synchronized into `/tasks`. Do not edit `/tasks` as the source of truth. Preserve official identifiers exactly. Keep task files one-to-one with T001 through T178. Current physical storage is centralized under `tasks/EPIC-000-general-system/`.
 
 ## Generated Task Files
 
-- TASK-001 - EPIC-001 - Foundation: Create solution file `NovaLeave.sln` and planned project directories `src/NovaLeave.Domain/`, `src/NovaLeave.Application/`, `src/NovaLeave.Infrastructure/`, `src/NovaLeave.Presentation.Web/`, `tests/NovaLeave.UnitTests/`, `tests/NovaLeave.IntegrationTests/`, and `tests/NovaLeave.EndToEndTests/`
+- TASK-001 - EPIC-001 - Foundation: Create solution file `NovaLeave.sln` and planned project directories `src/NovaLeave.Domain/`, `src/NovaLeave.Application/`, `src/NovaLeave.Infrastructure/`, `src/NovaLeave.Web/`, `tests/NovaLeave.UnitTests/`, `tests/NovaLeave.IntegrationTests/`, and `tests/NovaLeave.EndToEndTests/`
 - TASK-002 - EPIC-001 - Foundation: Initialize .NET 10 projects and references matching Clean Architecture
 - TASK-003 - EPIC-001 - Foundation: Add shared build settings, nullable reference types, analyzers, and formatting configuration
 - TASK-004 - EPIC-001 - Foundation: Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling
@@ -340,4 +347,30 @@ Requirement changes must be made first in the official artifacts and then synchr
 - TASK-151 - EPIC-011 - Quality, Security, and Release: Validate `specs/001-leave-management-mvp/quickstart.md` against the implemented application and update only if commands or paths changed
 - TASK-152 - EPIC-011 - Quality, Security, and Release: Run complete test suite from `NovaLeave.sln` and record evidence in implementation handoff notes
 - TASK-153 - EPIC-011 - Quality, Security, and Release: Review documentation references and ensure no generated artifact claims implementation evidence without inspected source
+- TASK-154 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Document the Manual Quality and Security Gate procedure
+- TASK-155 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Create the operations documentation index and ownership model
+- TASK-156 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Add the manual gate evidence checklist
+- TASK-157 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Add structured logging and correlation verification tests
+- TASK-158 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Implement request correlation ID generation or propagation
+- TASK-159 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Add metrics instrumentation tests
+- TASK-160 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Implement application metrics instrumentation
+- TASK-161 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Add tracing and redaction tests
+- TASK-162 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Implement application tracing
+- TASK-163 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Add health-check endpoint tests
+- TASK-164 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Implement liveness, readiness, and database connectivity health checks
+- TASK-165 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Add invariant-monitoring tests
+- TASK-166 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Implement read-only business invariant evaluation
+- TASK-167 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Add observability redaction inspection tests
+- TASK-168 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Document the manual observability redaction inspection procedure
+- TASK-169 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Document alert definitions, thresholds, owners, and response procedures
+- TASK-170 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Implement alertable structured events and metrics
+- TASK-171 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Create deployment and incident response runbooks
+- TASK-172 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Create backup and restore runbook
+- TASK-173 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Create database migration and scheduled jobs runbooks
+- TASK-174 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Document load and concurrency readiness procedure
+- TASK-175 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Execute load and concurrency readiness verification
+- TASK-176 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Execute the final Manual Quality and Security Gate
+- TASK-177 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Validate no CI/CD configuration or false validator claim exists
+- TASK-178 - EPIC-012 - Observability, Manual Quality Gates, and Operational Readiness: Synchronize canonical and derived task artifacts
+
 

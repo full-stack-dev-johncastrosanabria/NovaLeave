@@ -5,14 +5,14 @@
 **Baseline commit**: `c2a3282995e72c9ef44a574e2c9a4c58cbf3302f`  
 **Audit date**: 2026-07-30  
 **Canonical task source**: `specs/001-leave-management-mvp/tasks.md`  
-**Generated task tree**: `tasks/EPIC-000-general-system/TASK-001.md` through `TASK-153.md`  
+**Generated task tree**: `tasks/EPIC-000-general-system/TASK-001.md` through `TASK-178.md`  
 **Decision-record authority**: `docs/adr/`
 
 ## Methodology
 
 Coverage means an active identifier or normative behavior is semantically planned by an explicit canonical task and, where the behavior is security-, authorization-, concurrency-, transaction-, audit-, validation-, or user-facing, by an explicit test task. Identifier mentions alone do not count as coverage.
 
-Generated artifacts are checked only after canonical sources are corrected. `tasks.md` remains authoritative; `TASK-*.md`, `BACKLOG.md`, and this report are derived.
+Generated artifacts are checked only after canonical sources are corrected. `specs/001-leave-management-mvp/tasks.md` remains authoritative; `TASK-*.md`, `BACKLOG.md`, and this report are derived. Canonical task edits must happen first in `specs/001-leave-management-mvp/tasks.md`, then this report and the root `/tasks` tree must be regenerated or synchronized. Generated task IDs, objectives, dependencies, and coverage must never override or drift from the canonical source.
 
 ## Inventories
 
@@ -30,8 +30,8 @@ Generated artifacts are checked only after canonical sources are corrected. `tas
 | Audit requirements | `AUD-001` through `AUD-010` | 10 |
 | Concurrency requirements | `CON-001` through `CON-012` | 12 |
 | Frontend requirements | RBFV criteria plus frontend design sections | 34 RBFV criteria + design sections |
-| Canonical tasks | `T001` through `T153` in `specs/001-leave-management-mvp/tasks.md` | 153 |
-| Generated task files | `TASK-001.md` through `TASK-153.md` | 153 |
+| Canonical tasks | `T001` through `T178` in `specs/001-leave-management-mvp/tasks.md` | 178 |
+| Generated task files | `TASK-001.md` through `TASK-178.md` | 178 |
 | Required tests | Canonical tasks whose task text explicitly adds tests covering unit, integration, E2E, security, accessibility, audit, concurrency, idempotency, and traceability | 52 |
 | Explicit exclusions | MVP out-of-scope items from `spec.md`, `docs/use-cases.md`, `tasks.md`, and generated task out-of-scope sections | 28 |
 
@@ -51,21 +51,26 @@ Generated artifacts are checked only after canonical sources are corrected. `tas
 | Audit requirements | 10 | 10 | 0 | 0 | 0 | 100% | State changes, HR sensitive access, and capability toggles covered |
 | Concurrency requirements | 12 | 12 | 0 | 0 | 0 | 100% | BR-038 approval POST revalidation is explicitly tied to stale/concurrent projected-balance behavior |
 | Frontend requirements | 34 | 34 | 0 | 0 | 0 | 100% | Route, navigation, read-only HR views, calendar accessibility, and projected-balance UI all covered |
-| Canonical tasks | 153 | 153 | 0 | 0 | 0 | 100% structural | Task count unchanged |
-| Generated task files | 153 | 153 | 0 | 0 | 0 | 100% structural | One-to-one `T001-T153` to `TASK-001-TASK-153` preserved |
-| Required tests | 52 | 52 | 0 | 0 | 0 | 100% planned | Counted from canonical tasks that explicitly add tests; no source/tests exist yet |
+| Canonical tasks | 178 | 178 | 0 | 0 | 0 | 100% structural | T001-T153 preserved; T154-T178 added sequentially |
+| Generated task files | 178 | 178 | 0 | 0 | 0 | 100% structural | One-to-one `T001-T178` to `TASK-001-TASK-178` preserved |
+| Required tests | 58 | 58 | 0 | 0 | 0 | 100% planned | Counted from canonical tasks that explicitly add tests; no source/tests exist yet |
+| Observability coverage | 5 capability groups | 5 | 0 | 0 | 0 | 100% planned | Structured logging/correlation, metrics, tracing, health checks, and alerts covered by T157-T164 and T169-T170 |
+| Production invariant monitoring | 10 invariants | 10 | 0 | 0 | 0 | 100% planned | SC-003 covered by read-only invariant monitoring tests and implementation in T165-T166 |
+| Observability redaction coverage | 6 output types | 6 | 0 | 0 | 0 | 100% planned | Logs, traces, metrics labels, error payloads, audit payloads, and health responses covered by T161-T168 |
+| Operational readiness | 8 documents/procedures | 8 | 0 | 0 | 0 | 100% planned | `docs/operations/` runbooks and manual gate covered by T154-T156 and T168-T176 |
+| Manual quality gate | 1 blocking delivery gate | 1 | 0 | 0 | 0 | 100% planned | Constitution v7.0.0 and DR-003 reflected by T154-T156, T176-T177 |
 | Explicit exclusions | 28 | 28 | 0 | 0 | 0 | 100% classified | No task introduces excluded APIs, email, hierarchy, HR request resolution, HR balance edits, or User Pending cancellation |
 
 ## Key Traceability Repairs
 
 | Behavior | Canonical sources | Canonical tasks | Generated tasks |
 |---|---|---|---|
-| Approver capability required for queue/detail/resolution | Constitution v6.0.1, UC-09 through UC-13, UC contracts, RBFV policies | T017, T079, T080, T086, T088, T090 | TASK-017, TASK-079, TASK-080, TASK-086, TASK-088, TASK-090 |
+| Approver capability required for queue/detail/resolution | Constitution v7.0.0, UC-09 through UC-13, UC contracts, RBFV policies | T017, T079, T080, T086, T088, T090 | TASK-017, TASK-079, TASK-080, TASK-086, TASK-088, TASK-090 |
 | HR calendar is `/rrhh/calendario` only | FR-017, UC-19, AC-HR-003, RBFV-032, UC-19 contract | T118, T122, T124, T130, T134 | TASK-118, TASK-122, TASK-124, TASK-130, TASK-134 |
 | HR calendar shows all organization-wide vacation requests | FR-017, UC-19, AC-HR-003, UC-19 contract | T124, T130, T134 | TASK-124, TASK-130, TASK-134 |
 | Projected-balance display and query-time evaluation | FR-023, BR-036, BR-037, UC-10 | T079, T086 | TASK-079, TASK-086 |
 | Approval POST projected-balance revalidation | BR-037, BR-038, UC-11, CON-004, CON-006 | T080, T088 | TASK-080, TASK-088 |
-| Decision-record governance | Constitution §14, DR-001, DR-002 | T019, T099, T114 | TASK-019, TASK-099, TASK-114 |
+| Decision-record governance | Constitution Â§14, DR-001, DR-002 | T019, T099, T114 | TASK-019, TASK-099, TASK-114 |
 
 ## Remaining Partial Or Unresolved Items
 
@@ -76,3 +81,4 @@ Implementation is not present, so this report does not claim executable code cov
 ## Validation Status
 
 Validation commands and results are recorded in `docs/audits/NovaLeave_Post_Remediation_Audit.md`. This report was updated before the final validation pass and supersedes the stale 2026-07-29 coverage metadata.
+

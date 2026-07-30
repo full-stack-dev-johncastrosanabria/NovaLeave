@@ -14,7 +14,7 @@
 
 ### CR-02: Accrual Timezone Reference
 **Source conflict**: Conjunto 1 mentioned "accrual keyed to calendar month ending in user's employment timezone." Constitution §5 and Instruction §5.4 prohibit per-user timezone behavior.
-**Authority applied**: Constitution v6.0.1 invariant 4; Instruction §5.4.
+**Authority applied**: Constitution v7.0.0 invariant 4; Instruction §5.4.
 **Resolution**: No per-user timezone logic. Accrual period determined by calendar month boundary using a single system business date (UTC). `TimeProvider` (built-in .NET 10) is the sole time abstraction.
 **Affected**: FR-014, BR-032, BR-033, AC-054, UC-17.
 
@@ -81,6 +81,12 @@ Seeded via `NovaLeave:SeedDemoUsers=true`. **Must be disabled in Production.**
 **Authority applied**: Instruction §5.3; Constitution Principle II.
 **Resolution**: MediatR is not introduced. Application use cases are explicit service classes registered via DI. FluentValidation validators invoked explicitly via `IValidator<T>` in handlers. No pipeline behaviors.
 **Affected**: Plan.md project structure.
+
+### CR-12A: Manual Quality Gate and No CI/CD
+**Source conflict**: Earlier constitutional wording required automated CI/CD gates, but the authoritative project decision excludes CI/CD from the NovaLeave MVP delivery model.
+**Authority applied**: Constitution v7.0.0 §9.3; `docs/adr/DR-003-manual-quality-gate-no-ci-cd.md`.
+**Resolution**: NovaLeave MVP uses a mandatory Manual Quality and Security Gate. No GitHub Actions, Azure DevOps, Jenkins, continuous delivery, continuous deployment, automated release, or automated deployment pipeline configuration is planned for MVP implementation. Manual gate evidence is blocking before merge, handoff, release, or acceptance. Unavailable tooling is recorded as `NOT EXECUTED`, never as `PASS`; manual or PowerShell equivalents are not official Spec Kit wrapper success.
+**Affected**: Constitution §9.3, plan.md, quickstart.md, tasks.md, docs/operations/.
 
 ### CR-13: ReservationMovementId / DeductionMovementId on VacationRequest
 **Source conflict**: Conjunto 1 planned these FK fields on `VacationRequest`.
