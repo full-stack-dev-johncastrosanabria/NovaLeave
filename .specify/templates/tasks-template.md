@@ -9,7 +9,7 @@ description: "Task list template for feature implementation"
 
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: Per the project constitution (Principle VI, NON-NEGOTIABLE), tests are MANDATORY, not optional: every Domain business rule MUST have unit tests, and every critical API endpoint (auth, leave request submission/approval/cancellation, balance queries, payroll-relevant data) MUST have integration tests. Include these test tasks explicitly for any story touching business rules or critical endpoints.
+**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 

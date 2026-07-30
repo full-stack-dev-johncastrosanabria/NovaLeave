@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(cat)",
+      "Bash(gh pr *)",
+      "Bash(gh auth *)",
+      "Bash(.specify/scripts/bash/setup-plan.sh *)",
+      "Bash(/c/Users/AbrahamVillalobosUga/Desktop/AI-NOVA/NovaLeave/.specify/scripts/bash/setup-tasks.sh *)",
+      "Bash(git fetch *)",
+      "Bash(git merge *)"
+    ]
+  }
+}
