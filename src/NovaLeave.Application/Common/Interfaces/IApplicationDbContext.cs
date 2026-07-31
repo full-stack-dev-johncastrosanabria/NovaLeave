@@ -12,5 +12,11 @@ public interface IApplicationDbContext
 
     IQueryable<AuditRecord> AuditRecords { get; }
 
+    void AddVacationRequest(VacationRequest request);
+
+    void AddBalanceMovement(BalanceMovement movement);
+
+    void AddAuditRecord(AuditRecord auditRecord);
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

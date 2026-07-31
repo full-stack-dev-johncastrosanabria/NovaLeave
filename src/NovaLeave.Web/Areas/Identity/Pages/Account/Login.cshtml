@@ -1,0 +1,21 @@
+@page
+@model NovaLeave.Web.Areas.Identity.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Iniciar sesion";
+}
+
+<h1>Iniciar sesion</h1>
+<form method="post" class="needs-validation" novalidate>
+  <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+  <div class="mb-3">
+    <label asp-for="Input.Email" class="form-label">Correo</label>
+    <input asp-for="Input.Email" class="form-control" autocomplete="username" />
+    <span asp-validation-for="Input.Email" class="text-danger"></span>
+  </div>
+  <div class="mb-3">
+    <label asp-for="Input.Password" class="form-label">Contrasena</label>
+    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+    <span asp-validation-for="Input.Password" class="text-danger"></span>
+  </div>
+  <button type="submit" class="btn btn-primary">Iniciar sesion</button>
+</form>

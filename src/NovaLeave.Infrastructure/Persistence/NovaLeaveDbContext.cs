@@ -29,6 +29,21 @@ public sealed class NovaLeaveDbContext : IdentityDbContext<ApplicationUser>, IAp
 
     IQueryable<AuditRecord> IApplicationDbContext.AuditRecords => AuditRecords;
 
+    public void AddVacationRequest(VacationRequest request)
+    {
+        VacationRequests.Add(request);
+    }
+
+    public void AddBalanceMovement(BalanceMovement movement)
+    {
+        BalanceMovements.Add(movement);
+    }
+
+    public void AddAuditRecord(AuditRecord auditRecord)
+    {
+        AuditRecords.Add(auditRecord);
+    }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

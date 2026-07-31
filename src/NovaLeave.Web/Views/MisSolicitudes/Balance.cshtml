@@ -1,0 +1,37 @@
+@model NovaLeave.Web.ViewModels.MisSolicitudes.SaldoViewModel
+@{
+    ViewData["Title"] = "Mi saldo";
+}
+
+<h1 class="h3 mb-4">Mi saldo</h1>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="border rounded p-3"><strong>Acumulado</strong><div>@Model.Balance.AccruedDays</div></div></div>
+  <div class="col-md-3"><div class="border rounded p-3"><strong>Reservado</strong><div>@Model.Balance.ReservedDays</div></div></div>
+  <div class="col-md-3"><div class="border rounded p-3"><strong>Deducido</strong><div>@Model.Balance.DeductedDays</div></div></div>
+  <div class="col-md-3"><div class="border rounded p-3"><strong>Disponible</strong><div>@Model.Balance.AvailableDays</div></div></div>
+</div>
+
+<h2 class="h5">Historial de movimientos</h2>
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <caption>Movimientos de saldo propios</caption>
+    <thead>
+      <tr>
+        <th scope="col">Fecha</th>
+        <th scope="col">Tipo</th>
+        <th scope="col">Dias</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var movement in Model.Balance.Movements)
+      {
+        <tr>
+          <td>@movement.EffectiveAt</td>
+          <td>@movement.Type</td>
+          <td>@movement.Amount</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

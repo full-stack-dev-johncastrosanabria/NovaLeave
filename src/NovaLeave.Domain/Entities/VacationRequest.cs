@@ -86,6 +86,16 @@ public sealed class VacationRequest
         Touch(timestampUtc);
     }
 
+    public void EditPending(DateRange dateRange, WorkingDayCount workingDays, string reason, DateTimeOffset timestampUtc)
+    {
+        EnsureStatus(RequestStatus.Pending);
+        StartDate = dateRange.Start;
+        EndDate = dateRange.End;
+        WorkingDays = workingDays.Value;
+        Reason = RequireText(reason, nameof(reason));
+        Touch(timestampUtc);
+    }
+
     public void CancelByTimeout(DateTimeOffset timestampUtc)
     {
         EnsureStatus(RequestStatus.Pending);
