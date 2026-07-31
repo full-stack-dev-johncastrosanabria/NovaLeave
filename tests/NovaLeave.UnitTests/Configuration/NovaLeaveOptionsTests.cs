@@ -12,7 +12,8 @@ public sealed class NovaLeaveOptionsTests
         {
             PendingRequestTimeoutDays = 14,
             SessionTimeoutMinutes = 30,
-            AccrualSchedulerCadence = "Daily 00:05 UTC"
+            AccrualSchedulerCadence = "Daily 00:05 UTC",
+            TimeoutSchedulerCadence = "Daily 00:05 UTC"
         };
 
         var results = Validate(options);
@@ -21,16 +22,18 @@ public sealed class NovaLeaveOptionsTests
     }
 
     [Theory]
-    [InlineData(0, 30, "Daily 00:05 UTC")]
-    [InlineData(14, 0, "Daily 00:05 UTC")]
-    [InlineData(14, 30, "")]
-    public void Invalid_Options_Fail_Fast(int timeoutDays, int sessionMinutes, string cadence)
+    [InlineData(0, 30, "Daily 00:05 UTC", "Daily 00:05 UTC")]
+    [InlineData(14, 0, "Daily 00:05 UTC", "Daily 00:05 UTC")]
+    [InlineData(14, 30, "", "Daily 00:05 UTC")]
+    [InlineData(14, 30, "Daily 00:05 UTC", "")]
+    public void Invalid_Options_Fail_Fast(int timeoutDays, int sessionMinutes, string accrualCadence, string timeoutCadence)
     {
         var options = new NovaLeaveOptions
         {
             PendingRequestTimeoutDays = timeoutDays,
             SessionTimeoutMinutes = sessionMinutes,
-            AccrualSchedulerCadence = cadence
+            AccrualSchedulerCadence = accrualCadence,
+            TimeoutSchedulerCadence = timeoutCadence
         };
 
         var results = Validate(options);
