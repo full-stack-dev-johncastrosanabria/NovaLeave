@@ -187,16 +187,16 @@
 
 ### Tests for User Story 4
 
-- [ ] T101 [P] [US4] Add UC-13 pre-start deactivation tests in `tests/NovaLeave.IntegrationTests/UseCases/UC13DeactivateApprovedRequestTests.cs`
-- [ ] T102 [P] [US4] Add post-start and partial-deactivation denial tests in `tests/NovaLeave.IntegrationTests/UseCases/UC13DeactivateDenialTests.cs`
-- [ ] T103 [P] [US4] Add duplicate deactivation concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/DeactivationConcurrencyTests.cs`
+- [X] T101 [P] [US4] Add UC-13 pre-start deactivation tests in `tests/NovaLeave.IntegrationTests/UseCases/UC13DeactivateApprovedRequestTests.cs`
+- [X] T102 [P] [US4] Add post-start and partial-deactivation denial tests in `tests/NovaLeave.IntegrationTests/UseCases/UC13DeactivateDenialTests.cs`
+- [X] T103 [P] [US4] Add duplicate deactivation concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/DeactivationConcurrencyTests.cs`
 
 ### Implementation for User Story 4
 
-- [ ] T104 [US4] Implement pre-start deactivation command with restoration transaction in `src/NovaLeave.Application/Approvals/DeactivateApprovedRequest/`
-- [ ] T105 [US4] Extend Approver detail command surface for deactivation eligibility in `src/NovaLeave.Application/Approvals/Queries/GetApprovalDetail/`
-- [ ] T106 [US4] Add Approver POST route `/aprobaciones/{id}/desactivar` in `src/NovaLeave.Web/Controllers/AprobacionesController.cs`
-- [ ] T107 [US4] Add deactivation confirmation UI and denial messages in `src/NovaLeave.Web/Views/Aprobaciones/Detail.cshtml`
+- [X] T104 [US4] Implement pre-start deactivation command with restoration transaction in `src/NovaLeave.Application/Approvals/DeactivateApprovedRequest/`
+- [X] T105 [US4] Extend Approver detail command surface for deactivation eligibility in `src/NovaLeave.Application/Approvals/Queries/GetApprovalDetail/`
+- [X] T106 [US4] Add Approver POST route `/aprobaciones/{id}/desactivar` in `src/NovaLeave.Web/Controllers/AprobacionesController.cs`
+- [X] T107 [US4] Add deactivation confirmation UI and denial messages in `src/NovaLeave.Web/Views/Aprobaciones/Detail.cshtml`
 
 **Checkpoint**: UC-13 independently passes.
 

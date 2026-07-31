@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using NovaLeave.Application.Approvals.ApproveRequest;
+using NovaLeave.Application.Approvals.DeactivateApprovedRequest;
 using NovaLeave.Application.Approvals.History;
 using NovaLeave.Application.Approvals.Queries;
 using NovaLeave.Application.Approvals.RejectRequest;
@@ -30,6 +31,7 @@ public static class DependencyInjection
         services.AddScoped<GetApproverRequestDetailQueryHandler>();
         services.AddScoped<GetApproverHistoryQueryHandler>();
         services.AddScoped<ApproveRequestHandler>();
+        services.AddScoped<DeactivateApprovedRequestHandler>();
         services.AddScoped<RejectRequestHandler>();
         services.AddScoped<SystemAuditWriter>();
         services.AddScoped<CancelTimedOutRequestsHandler>();

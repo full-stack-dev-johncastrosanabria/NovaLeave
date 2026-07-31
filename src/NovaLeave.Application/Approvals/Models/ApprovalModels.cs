@@ -20,6 +20,8 @@ public sealed record ApproverRequestDetail(
     RequestStatus Status,
     int AvailableDays,
     int ProjectedBalanceAfterApproval,
+    bool CanApproveOrReject,
+    bool CanDeactivate,
     bool HasOverlapWarning,
     byte[] RowVersion);
 

@@ -26,7 +26,7 @@ public sealed class GetApproverHistoryQueryHandler
         }
 
         var items = _dbContext.AuditRecords
-            .Where(audit => audit.ActorId == approverId && (audit.Action == "Approve" || audit.Action == "Reject"))
+            .Where(audit => audit.ActorId == approverId && (audit.Action == "Approve" || audit.Action == "Reject" || audit.Action == "Deactivate"))
             .OrderByDescending(audit => audit.TimestampUtc)
             .Take(50)
             .AsEnumerable()

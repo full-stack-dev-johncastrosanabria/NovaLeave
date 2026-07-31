@@ -54,4 +54,11 @@ internal static class ApproverTestData
         var db = scope.ServiceProvider.GetRequiredService<NovaLeaveDbContext>();
         return Convert.ToBase64String(db.VacationRequests.Single(request => request.Id == requestId).RowVersion);
     }
+
+    public static byte[] RowVersionBytesFor(NovaLeaveWebApplicationFactory factory, Guid requestId)
+    {
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<NovaLeaveDbContext>();
+        return db.VacationRequests.Single(request => request.Id == requestId).RowVersion;
+    }
 }

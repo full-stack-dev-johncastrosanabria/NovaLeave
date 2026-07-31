@@ -13,12 +13,14 @@ public sealed class GetApproverRequestDetailQueryHandler
     private readonly IApplicationDbContext _dbContext;
     private readonly IApproverIdentityService _identityService;
     private readonly OverlapPolicy _overlapPolicy;
+    private readonly TimeProvider _timeProvider;
 
-    public GetApproverRequestDetailQueryHandler(IApplicationDbContext dbContext, IApproverIdentityService identityService, OverlapPolicy overlapPolicy)
+    public GetApproverRequestDetailQueryHandler(IApplicationDbContext dbContext, IApproverIdentityService identityService, OverlapPolicy overlapPolicy, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
         _identityService = identityService;
         _overlapPolicy = overlapPolicy;
+        _timeProvider = timeProvider;
     }
 
     public async Task<Result<ApproverRequestDetail>> HandleAsync(string approverId, Guid requestId, CancellationToken cancellationToken)
@@ -35,9 +37,19 @@ public sealed class GetApproverRequestDetailQueryHandler
             return Result<ApproverRequestDetail>.Failure(new Error(ErrorCodes.NotFound, "Solicitud no encontrada."));
         }
 
-        if (ApproverPolicies.CanResolve(approver, request) is { } resolveError)
+        if (request.Status == RequestStatus.Pending && ApproverPolicies.CanResolvePending(approver, request) is { } resolveError)
         {
             return Result<ApproverRequestDetail>.Failure(resolveError);
+        }
+
+        if (request.Status == RequestStatus.Approved && ApproverPolicies.CanDeactivateApproved(approver, request) is { } deactivateError)
+        {
+            return Result<ApproverRequestDetail>.Failure(deactivateError);
+        }
+
+        if (request.Status is not (RequestStatus.Pending or RequestStatus.Approved))
+        {
+            return Result<ApproverRequestDetail>.Failure(Error.Conflict("La solicitud ya no es elegible para resolucion."));
         }
 
         var balance = _dbContext.VacationBalances.Single(candidate => candidate.UserId == request.OwnerId);
@@ -45,6 +57,9 @@ public sealed class GetApproverRequestDetailQueryHandler
             .Where(candidate => candidate.OwnerId == request.OwnerId && candidate.Id != request.Id)
             .ToList();
         var hasOverlapWarning = _overlapPolicy.HasBlockingOverlap(otherRequests, request.DateRange);
+
+        var businessDate = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime);
+        var canDeactivate = request.Status == RequestStatus.Approved && request.StartDate > businessDate;
 
         return Result<ApproverRequestDetail>.Success(new ApproverRequestDetail(
             request.Id,
@@ -55,6 +70,8 @@ public sealed class GetApproverRequestDetailQueryHandler
             request.Status,
             balance.AvailableDays,
             balance.AccruedDays - balance.DeductedDays - (balance.ReservedDays - request.WorkingDays),
+            request.Status == RequestStatus.Pending,
+            canDeactivate,
             hasOverlapWarning,
             request.RowVersion));
     }
