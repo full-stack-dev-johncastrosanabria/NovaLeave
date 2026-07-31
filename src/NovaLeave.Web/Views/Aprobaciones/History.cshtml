@@ -1,0 +1,33 @@
+@model NovaLeave.Web.ViewModels.Aprobaciones.AprobacionesHistorialViewModel
+@{
+    ViewData["Title"] = "Historial de resoluciones";
+}
+
+<h1 class="h3 mb-4">Historial de resoluciones</h1>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <caption>Historial de acciones del aprobador</caption>
+    <thead>
+      <tr>
+        <th scope="col">Fecha</th>
+        <th scope="col">Accion</th>
+        <th scope="col">Solicitud</th>
+        <th scope="col">Solicitante</th>
+        <th scope="col">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var item in Model.Items)
+      {
+        <tr>
+          <td>@item.TimestampUtc</td>
+          <td>@item.Action</td>
+          <td><a href="/aprobaciones/@item.RequestId">@item.RequestId</a></td>
+          <td>@item.RequesterId</td>
+          <td>@item.Status</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
