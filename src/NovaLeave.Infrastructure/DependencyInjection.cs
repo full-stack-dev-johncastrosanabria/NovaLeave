@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NovaLeave.Application.Authorization;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Infrastructure.Identity;
 using NovaLeave.Infrastructure.Persistence;
@@ -26,6 +27,7 @@ public static class DependencyInjection
             .AddDefaultTokenProviders();
 
         services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
+        services.AddScoped<IApproverIdentityService, ApproverIdentityService>();
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<NovaLeaveDbContext>());
 
         return services;

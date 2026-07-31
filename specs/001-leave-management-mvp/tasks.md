@@ -132,25 +132,25 @@
 
 ### Tests for User Story 2
 
-- [ ] T078 [P] [US2] Add UC-09 eligible queue tests without team/department/hierarchy filters in `tests/NovaLeave.IntegrationTests/UseCases/UC09ApproverQueueTests.cs`
-- [ ] T079 [P] [US2] Add UC-10 resolution detail tests for BR-036/BR-037 projected-balance calculation/display and disabled Approver denial in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`
-- [ ] T080 [P] [US2] Add UC-11 approval transaction, audit, BR-037 negative projected-balance rejection, and BR-038 approval POST revalidation tests in `tests/NovaLeave.IntegrationTests/UseCases/UC11ApproveRequestTests.cs`
-- [ ] T081 [P] [US2] Add UC-12 rejection reason, release, and audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC12RejectRequestTests.cs`
-- [ ] T082 [P] [US2] Add UC-14 resolution history tests in `tests/NovaLeave.IntegrationTests/UseCases/UC14ResolutionHistoryTests.cs`
-- [ ] T083 [P] [US2] Add UC-15 Approver calendar tests in `tests/NovaLeave.IntegrationTests/UseCases/UC15ApproverCalendarTests.cs`
-- [ ] T084 [P] [US2] Add approval/rejection concurrency race tests in `tests/NovaLeave.IntegrationTests/Concurrency/ApprovalConcurrencyTests.cs`
-- [ ] T085 [P] [US2] Add Approver MVC E2E smoke tests in `tests/NovaLeave.EndToEndTests/Approver/ApproverJourneySmokeTests.cs`
+- [X] T078 [P] [US2] Add UC-09 eligible queue tests without team/department/hierarchy filters in `tests/NovaLeave.IntegrationTests/UseCases/UC09ApproverQueueTests.cs`
+- [X] T079 [P] [US2] Add UC-10 resolution detail tests for BR-036/BR-037 projected-balance calculation/display and disabled Approver denial in `tests/NovaLeave.IntegrationTests/UseCases/UC10ApproverDetailTests.cs`
+- [X] T080 [P] [US2] Add UC-11 approval transaction, audit, BR-037 negative projected-balance rejection, and BR-038 approval POST revalidation tests in `tests/NovaLeave.IntegrationTests/UseCases/UC11ApproveRequestTests.cs`
+- [X] T081 [P] [US2] Add UC-12 rejection reason, release, and audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC12RejectRequestTests.cs`
+- [X] T082 [P] [US2] Add UC-14 resolution history tests in `tests/NovaLeave.IntegrationTests/UseCases/UC14ResolutionHistoryTests.cs`
+- [X] T083 [P] [US2] Add UC-15 Approver calendar tests in `tests/NovaLeave.IntegrationTests/UseCases/UC15ApproverCalendarTests.cs`
+- [X] T084 [P] [US2] Add approval/rejection concurrency race tests in `tests/NovaLeave.IntegrationTests/Concurrency/ApprovalConcurrencyTests.cs`
+- [X] T085 [P] [US2] Add Approver MVC E2E smoke tests in `tests/NovaLeave.EndToEndTests/Approver/ApproverJourneySmokeTests.cs`
 
 ### Implementation for User Story 2
 
-- [ ] T086 [P] [US2] Implement Approver queue and detail queries with `canResolveRequests=true` eligibility and BR-036/BR-037 server-derived projected-balance fields in `src/NovaLeave.Application/Approvals/Queries/`
-- [ ] T087 [P] [US2] Implement Approver history and calendar queries in `src/NovaLeave.Application/Approvals/History/` and `src/NovaLeave.Application/Calendars/GetApproverCalendar/`
-- [ ] T088 [US2] Implement approval command converting reservation to deduction atomically with `canResolveRequests=true` revalidation, BR-037 negative projected-balance rejection, and BR-038 stale/concurrent projected-balance revalidation in `src/NovaLeave.Application/Approvals/ApproveRequest/`
-- [ ] T089 [US2] Implement rejection command releasing reservation atomically in `src/NovaLeave.Application/Approvals/RejectRequest/`
-- [ ] T090 [US2] Implement Approver authorization resource checks requiring authenticated active `Approver`, `canResolveRequests=true`, non-ownership, eligible request state, and Application-layer execution-time revalidation in `src/NovaLeave.Application/Authorization/ApproverPolicies.cs`
-- [ ] T091 [US2] Implement resource-oriented Approver MVC controller actions for `/aprobaciones`, `/aprobaciones/{id}`, `/aprobaciones/{id}/aprobar`, `/aprobaciones/{id}/rechazar`, `/aprobaciones/historial`, and shared calendar route `/calendario` in `src/NovaLeave.Web/Controllers/AprobacionesController.cs` and `src/NovaLeave.Web/Controllers/CalendarioController.cs`
-- [ ] T092 [US2] Implement dedicated Approver ViewModels in `src/NovaLeave.Web/ViewModels/Aprobaciones/` and `src/NovaLeave.Web/ViewModels/Calendario/`
-- [ ] T093 [US2] Implement Approver Razor views with mutual approve/reject submission protections in `src/NovaLeave.Web/Views/Aprobaciones/`
+- [X] T086 [P] [US2] Implement Approver queue and detail queries with `canResolveRequests=true` eligibility and BR-036/BR-037 server-derived projected-balance fields in `src/NovaLeave.Application/Approvals/Queries/`
+- [X] T087 [P] [US2] Implement Approver history and calendar queries in `src/NovaLeave.Application/Approvals/History/` and `src/NovaLeave.Application/Calendars/GetApproverCalendar/`
+- [X] T088 [US2] Implement approval command converting reservation to deduction atomically with `canResolveRequests=true` revalidation, BR-037 negative projected-balance rejection, and BR-038 stale/concurrent projected-balance revalidation in `src/NovaLeave.Application/Approvals/ApproveRequest/`
+- [X] T089 [US2] Implement rejection command releasing reservation atomically in `src/NovaLeave.Application/Approvals/RejectRequest/`
+- [X] T090 [US2] Implement Approver authorization resource checks requiring authenticated active `Approver`, `canResolveRequests=true`, non-ownership, eligible request state, and Application-layer execution-time revalidation in `src/NovaLeave.Application/Authorization/ApproverPolicies.cs`
+- [X] T091 [US2] Implement resource-oriented Approver MVC controller actions for `/aprobaciones`, `/aprobaciones/{id}`, `/aprobaciones/{id}/aprobar`, `/aprobaciones/{id}/rechazar`, `/aprobaciones/historial`, and shared calendar route `/calendario` in `src/NovaLeave.Web/Controllers/AprobacionesController.cs` and `src/NovaLeave.Web/Controllers/CalendarioController.cs`
+- [X] T092 [US2] Implement dedicated Approver ViewModels in `src/NovaLeave.Web/ViewModels/Aprobaciones/` and `src/NovaLeave.Web/ViewModels/Calendario/`
+- [X] T093 [US2] Implement Approver Razor views with mutual approve/reject submission protections in `src/NovaLeave.Web/Views/Aprobaciones/`
 
 **Checkpoint**: UC-09 through UC-12, UC-14, and UC-15 independently pass.
 

@@ -1,0 +1,32 @@
+@model NovaLeave.Web.ViewModels.Calendario.CalendarioAprobadorViewModel
+@{
+    ViewData["Title"] = "Calendario de aprobaciones";
+}
+
+<h1 class="h3 mb-1">Calendario de aprobaciones</h1>
+<p class="text-body-secondary">Eventos aprobados anonimizados.</p>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <caption>Calendario de vacaciones aprobadas</caption>
+    <thead>
+      <tr>
+        <th scope="col">Evento</th>
+        <th scope="col">Inicio</th>
+        <th scope="col">Fin</th>
+        <th scope="col">Dias</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var item in Model.Events)
+      {
+        <tr>
+          <td>Evento aprobado</td>
+          <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
+          <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
+          <td>@item.WorkingDays</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
