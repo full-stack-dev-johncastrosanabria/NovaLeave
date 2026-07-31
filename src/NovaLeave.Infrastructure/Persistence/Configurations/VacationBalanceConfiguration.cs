@@ -18,7 +18,8 @@ public sealed class VacationBalanceConfiguration : IEntityTypeConfiguration<Vaca
             .IsRequired();
 
         builder.Property(balance => balance.RowVersion)
-            .IsRowVersion();
+            .IsRowVersion()
+            .IsConcurrencyToken(false);
 
         builder.Ignore(balance => balance.AvailableDays);
 

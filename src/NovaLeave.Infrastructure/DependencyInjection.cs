@@ -25,6 +25,7 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<NovaLeaveDbContext>()
             .AddDefaultTokenProviders();
 
+        services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<NovaLeaveDbContext>());
 
         return services;

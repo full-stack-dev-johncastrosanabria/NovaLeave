@@ -1,5 +1,6 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using NovaLeave.Infrastructure.Persistence;
 using NovaLeave.IntegrationTests.Support;
 
@@ -12,6 +13,7 @@ public sealed class InitialMigrationValidationTests
     {
         var options = new DbContextOptionsBuilder<NovaLeaveDbContext>()
             .UseSqlServer(SqlServerFixture.DefaultConnectionString)
+            .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))
             .Options;
 
         await using var context = new NovaLeaveDbContext(options);

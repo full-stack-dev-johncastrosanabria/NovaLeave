@@ -97,28 +97,28 @@
 
 ### Tests for User Story 1
 
-- [ ] T059 [P] [US1] Add UC-01 authentication integration tests in `tests/NovaLeave.IntegrationTests/UseCases/UC01AuthenticateTests.cs`
-- [ ] T060 [P] [US1] Add UC-02 role context switching integration tests in `tests/NovaLeave.IntegrationTests/UseCases/UC02SwitchRoleContextTests.cs`
-- [ ] T061 [P] [US1] Add UC-03 own request list integration tests in `tests/NovaLeave.IntegrationTests/UseCases/UC03ViewOwnRequestsTests.cs`
-- [ ] T062 [P] [US1] Add UC-04 create request validation, reservation, audit, and overlap tests in `tests/NovaLeave.IntegrationTests/UseCases/UC04CreateVacationRequestTests.cs`
-- [ ] T063 [P] [US1] Add UC-05 Pending edit revalidation and reservation-adjustment tests in `tests/NovaLeave.IntegrationTests/UseCases/UC05EditPendingRequestTests.cs`
-- [ ] T064 [P] [US1] Add UC-06 owned detail authorization tests in `tests/NovaLeave.IntegrationTests/UseCases/UC06ViewOwnedRequestDetailTests.cs`
-- [ ] T065 [P] [US1] Add UC-07 balance and movement history tests in `tests/NovaLeave.IntegrationTests/UseCases/UC07ViewOwnBalanceTests.cs`
-- [ ] T066 [P] [US1] Add UC-08 personal calendar tests in `tests/NovaLeave.IntegrationTests/UseCases/UC08PersonalCalendarTests.cs`
-- [ ] T067 [P] [US1] Add User MVC accessibility and route smoke tests in `tests/NovaLeave.EndToEndTests/User/UserJourneySmokeTests.cs`
+- [X] T059 [P] [US1] Add UC-01 authentication integration tests in `tests/NovaLeave.IntegrationTests/UseCases/UC01AuthenticateTests.cs`
+- [X] T060 [P] [US1] Add UC-02 role context switching integration tests in `tests/NovaLeave.IntegrationTests/UseCases/UC02SwitchRoleContextTests.cs`
+- [X] T061 [P] [US1] Add UC-03 own request list integration tests in `tests/NovaLeave.IntegrationTests/UseCases/UC03ViewOwnRequestsTests.cs`
+- [X] T062 [P] [US1] Add UC-04 create request validation, reservation, audit, and overlap tests in `tests/NovaLeave.IntegrationTests/UseCases/UC04CreateVacationRequestTests.cs`
+- [X] T063 [P] [US1] Add UC-05 Pending edit revalidation and reservation-adjustment tests in `tests/NovaLeave.IntegrationTests/UseCases/UC05EditPendingRequestTests.cs`
+- [X] T064 [P] [US1] Add UC-06 owned detail authorization tests in `tests/NovaLeave.IntegrationTests/UseCases/UC06ViewOwnedRequestDetailTests.cs`
+- [X] T065 [P] [US1] Add UC-07 balance and movement history tests in `tests/NovaLeave.IntegrationTests/UseCases/UC07ViewOwnBalanceTests.cs`
+- [X] T066 [P] [US1] Add UC-08 personal calendar tests in `tests/NovaLeave.IntegrationTests/UseCases/UC08PersonalCalendarTests.cs`
+- [X] T067 [P] [US1] Add User MVC accessibility and route smoke tests in `tests/NovaLeave.EndToEndTests/User/UserJourneySmokeTests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T068 [P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`
-- [ ] T069 [P] [US1] Implement User balance query use cases in `src/NovaLeave.Application/Balances/Queries/`
-- [ ] T070 [P] [US1] Implement personal calendar query use case in `src/NovaLeave.Application/Calendars/GetPersonalCalendar/`
-- [ ] T071 [US1] Implement create vacation request command with reservation and audit transaction in `src/NovaLeave.Application/Requests/CreateVacationRequest/`
-- [ ] T072 [US1] Implement edit Pending request command with full revalidation, reservation adjustment, rowversion, and audit in `src/NovaLeave.Application/Requests/EditPendingRequest/`
-- [ ] T073 [US1] Implement FluentValidation validators for User request commands in `src/NovaLeave.Application/Requests/Validation/`
-- [ ] T074 [US1] Implement resource-oriented MVC controllers for `/mis-solicitudes`, `/mis-solicitudes/crear`, `/mis-solicitudes/{id}`, `/saldo`, and User `/calendario` actions in `src/NovaLeave.Web/Controllers/MisSolicitudesController.cs` and `src/NovaLeave.Web/Controllers/CalendarioController.cs`
-- [ ] T075 [US1] Implement dedicated User ViewModels in `src/NovaLeave.Web/ViewModels/MisSolicitudes/` and `src/NovaLeave.Web/ViewModels/Calendario/`
-- [ ] T076 [US1] Implement User Razor views with approved Spanish labels in `src/NovaLeave.Web/Views/MisSolicitudes/` and `src/NovaLeave.Web/Views/Calendario/`
-- [ ] T077 [US1] Wire User navigation and role context switcher in `src/NovaLeave.Web/Views/Shared/_Layout.cshtml`
+- [X] T068 [P] [US1] Implement User request query use cases in `src/NovaLeave.Application/Requests/Queries/`
+- [X] T069 [P] [US1] Implement User balance query use cases in `src/NovaLeave.Application/Balances/Queries/`
+- [X] T070 [P] [US1] Implement personal calendar query use case in `src/NovaLeave.Application/Calendars/GetPersonalCalendar/`
+- [X] T071 [US1] Implement create vacation request command with reservation and audit transaction in `src/NovaLeave.Application/Requests/CreateVacationRequest/`
+- [X] T072 [US1] Implement edit Pending request command with full revalidation, reservation adjustment, rowversion, and audit in `src/NovaLeave.Application/Requests/EditPendingRequest/`
+- [X] T073 [US1] Implement FluentValidation validators for User request commands in `src/NovaLeave.Application/Requests/Validation/`
+- [X] T074 [US1] Implement resource-oriented MVC controllers for `/mis-solicitudes`, `/mis-solicitudes/crear`, `/mis-solicitudes/{id}`, `/saldo`, and User `/calendario` actions in `src/NovaLeave.Web/Controllers/MisSolicitudesController.cs` and `src/NovaLeave.Web/Controllers/CalendarioController.cs`
+- [X] T075 [US1] Implement dedicated User ViewModels in `src/NovaLeave.Web/ViewModels/MisSolicitudes/` and `src/NovaLeave.Web/ViewModels/Calendario/`
+- [X] T076 [US1] Implement User Razor views with approved Spanish labels in `src/NovaLeave.Web/Views/MisSolicitudes/` and `src/NovaLeave.Web/Views/Calendario/`
+- [X] T077 [US1] Wire User navigation and role context switcher in `src/NovaLeave.Web/Views/Shared/_Layout.cshtml`
 
 **Checkpoint**: UC-01 through UC-08 independently pass.
 
