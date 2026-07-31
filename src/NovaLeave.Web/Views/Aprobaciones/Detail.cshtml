@@ -29,6 +29,8 @@
 }
 
 <div class="row g-3">
+  @if (Model.Request.CanApproveOrReject)
+  {
   <div class="col-md-4">
     <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar">
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
@@ -43,4 +45,20 @@
       <button type="submit" class="btn btn-danger">Rechazar</button>
     </form>
   </div>
+  }
+  @if (Model.Request.CanDeactivate)
+  {
+  <div class="col-md-4">
+    <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar">
+      <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
+      <button type="submit" class="btn btn-warning w-100">Desactivar solicitud</button>
+    </form>
+  </div>
+  }
+  @if (!Model.Request.CanApproveOrReject && !Model.Request.CanDeactivate)
+  {
+  <div class="col-12">
+    <div class="alert alert-secondary" role="alert">La solicitud no tiene acciones disponibles.</div>
+  </div>
+  }
 </div>

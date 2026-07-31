@@ -22,6 +22,11 @@ public static class ApproverPolicies
 
     public static Error? CanResolve(ApproverIdentity? approver, VacationRequest request)
     {
+        return CanResolvePending(approver, request);
+    }
+
+    public static Error? CanResolvePending(ApproverIdentity? approver, VacationRequest request)
+    {
         var queueError = CanViewQueue(approver);
         if (queueError is not null)
         {
@@ -36,6 +41,27 @@ public static class ApproverPolicies
         if (request.Status != RequestStatus.Pending)
         {
             return Error.Conflict("La solicitud ya no esta pendiente.");
+        }
+
+        return null;
+    }
+
+    public static Error? CanDeactivateApproved(ApproverIdentity? approver, VacationRequest request)
+    {
+        var queueError = CanViewQueue(approver);
+        if (queueError is not null)
+        {
+            return queueError;
+        }
+
+        if (request.OwnerId == approver!.UserId)
+        {
+            return new Error(ErrorCodes.NotFound, "Solicitud no encontrada.");
+        }
+
+        if (request.Status != RequestStatus.Approved)
+        {
+            return Error.Conflict("La solicitud no esta aprobada.");
         }
 
         return null;

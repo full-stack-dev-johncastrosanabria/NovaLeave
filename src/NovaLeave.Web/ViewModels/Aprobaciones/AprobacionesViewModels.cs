@@ -14,3 +14,8 @@ public sealed class RechazarSolicitudViewModel
 
     public string RowVersion { get; set; } = string.Empty;
 }
+
+public sealed class DesactivarSolicitudViewModel
+{
+    public string RowVersion { get; set; } = string.Empty;
+}

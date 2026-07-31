@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NovaLeave.Application.Approvals.ApproveRequest;
+using NovaLeave.Application.Approvals.DeactivateApprovedRequest;
 using NovaLeave.Application.Approvals.History;
 using NovaLeave.Application.Approvals.Queries;
 using NovaLeave.Application.Approvals.RejectRequest;
@@ -18,6 +19,7 @@ public sealed class AprobacionesController : Controller
     private readonly GetApproverRequestDetailQueryHandler _getDetail;
     private readonly GetApproverHistoryQueryHandler _getHistory;
     private readonly ApproveRequestHandler _approve;
+    private readonly DeactivateApprovedRequestHandler _deactivate;
     private readonly RejectRequestHandler _reject;
 
     public AprobacionesController(
@@ -26,6 +28,7 @@ public sealed class AprobacionesController : Controller
         GetApproverRequestDetailQueryHandler getDetail,
         GetApproverHistoryQueryHandler getHistory,
         ApproveRequestHandler approve,
+        DeactivateApprovedRequestHandler deactivate,
         RejectRequestHandler reject)
     {
         _currentUser = currentUser;
@@ -33,6 +36,7 @@ public sealed class AprobacionesController : Controller
         _getDetail = getDetail;
         _getHistory = getHistory;
         _approve = approve;
+        _deactivate = deactivate;
         _reject = reject;
     }
 
@@ -78,6 +82,23 @@ public sealed class AprobacionesController : Controller
         }
 
         var result = await _reject.HandleAsync(new RejectRequestCommand(RequireUserId(), id, viewModel.RejectionReason, decoded), cancellationToken);
+        return result.IsFailure ? ToActionResult(result.Error) : RedirectToAction(nameof(History));
+    }
+
+    [HttpPost("/aprobaciones/{id:guid}/desactivar")]
+    public async Task<IActionResult> Deactivate(Guid id, DesactivarSolicitudViewModel viewModel, CancellationToken cancellationToken)
+    {
+        if (Request.Form.Keys.Any(key => key is not ("__RequestVerificationToken" or "RowVersion")))
+        {
+            return BadRequest("La desactivacion aplica a la solicitud completa.");
+        }
+
+        if (!TryDecode(viewModel.RowVersion, out var decoded))
+        {
+            return BadRequest("RowVersion no valida.");
+        }
+
+        var result = await _deactivate.HandleAsync(new DeactivateApprovedRequestCommand(RequireUserId(), id, decoded), cancellationToken);
         return result.IsFailure ? ToActionResult(result.Error) : RedirectToAction(nameof(History));
     }
 
