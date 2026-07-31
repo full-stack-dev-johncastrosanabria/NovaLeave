@@ -12,18 +12,18 @@
 
 **Purpose**: Create the planned solution skeleton and baseline tooling without implementing feature behavior.
 
-- [ ] T001 Create solution file `NovaLeave.sln` and planned project directories `src/NovaLeave.Domain/`, `src/NovaLeave.Application/`, `src/NovaLeave.Infrastructure/`, `src/NovaLeave.Web/`, `tests/NovaLeave.UnitTests/`, `tests/NovaLeave.IntegrationTests/`, and `tests/NovaLeave.EndToEndTests/`
-- [ ] T002 Initialize .NET 10 projects and references matching Clean Architecture in `NovaLeave.sln`
-- [ ] T003 [P] Add shared build settings, nullable reference types, analyzers, and formatting configuration in `Directory.Build.props` and `.editorconfig`
-- [ ] T004 [P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`
-- [ ] T005 [P] Configure MVC and Razor Views package references in `src/NovaLeave.Web/NovaLeave.Web.csproj`
-- [ ] T006 [P] Configure ASP.NET Core Identity UI package references in `src/NovaLeave.Web/NovaLeave.Web.csproj`
-- [ ] T007 [P] Configure FluentValidation package references in `src/NovaLeave.Application/NovaLeave.Application.csproj` and `src/NovaLeave.Web/NovaLeave.Web.csproj`
-- [ ] T008 [P] Configure EF Core SQL Server package references in `src/NovaLeave.Infrastructure/NovaLeave.Infrastructure.csproj`
-- [ ] T009 [P] Configure Serilog package references in `src/NovaLeave.Infrastructure/NovaLeave.Infrastructure.csproj` and `src/NovaLeave.Web/NovaLeave.Web.csproj`
-- [ ] T010 [P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Web/libman.json` or `src/NovaLeave.Web/package.json`
-- [ ] T011 Add application settings placeholders with no invented defaults in `src/NovaLeave.Web/appsettings.json`
-- [ ] T012 Verify `AGENTS.md` Spec Kit section references `specs/001-leave-management-mvp/plan.md`; update only if the reference is missing or stale
+- [X] T001 Create solution file `NovaLeave.sln` and planned project directories `src/NovaLeave.Domain/`, `src/NovaLeave.Application/`, `src/NovaLeave.Infrastructure/`, `src/NovaLeave.Web/`, `tests/NovaLeave.UnitTests/`, `tests/NovaLeave.IntegrationTests/`, and `tests/NovaLeave.EndToEndTests/`
+- [X] T002 Initialize .NET 10 projects and references matching Clean Architecture in `NovaLeave.sln`
+- [X] T003 [P] Add shared build settings, nullable reference types, analyzers, and formatting configuration in `Directory.Build.props` and `.editorconfig`
+- [X] T004 [P] Configure test project packages for xUnit, WebApplicationFactory, EF Core SQL Server integration tests, and approved E2E tooling in `tests/NovaLeave.UnitTests/NovaLeave.UnitTests.csproj`, `tests/NovaLeave.IntegrationTests/NovaLeave.IntegrationTests.csproj`, and `tests/NovaLeave.EndToEndTests/NovaLeave.EndToEndTests.csproj`
+- [X] T005 [P] Configure MVC and Razor Views package references in `src/NovaLeave.Web/NovaLeave.Web.csproj`
+- [X] T006 [P] Configure ASP.NET Core Identity UI package references in `src/NovaLeave.Web/NovaLeave.Web.csproj`
+- [X] T007 [P] Configure FluentValidation package references in `src/NovaLeave.Application/NovaLeave.Application.csproj` and `src/NovaLeave.Web/NovaLeave.Web.csproj`
+- [X] T008 [P] Configure EF Core SQL Server package references in `src/NovaLeave.Infrastructure/NovaLeave.Infrastructure.csproj`
+- [X] T009 [P] Configure Serilog package references in `src/NovaLeave.Infrastructure/NovaLeave.Infrastructure.csproj` and `src/NovaLeave.Web/NovaLeave.Web.csproj`
+- [X] T010 [P] Configure Bootstrap 5.3 asset management in `src/NovaLeave.Web/libman.json` or `src/NovaLeave.Web/package.json`
+- [X] T011 Add application settings placeholders with no invented defaults in `src/NovaLeave.Web/appsettings.json`
+- [X] T012 Verify `AGENTS.md` Spec Kit section references `specs/001-leave-management-mvp/plan.md`; update only if the reference is missing or stale
 
 ---
 

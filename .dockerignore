@@ -1,0 +1,14 @@
+.git/
+.vs/
+.vscode/
+.idea/
+bin/
+obj/
+TestResults/
+coverage/
+node_modules/
+*.log*
+.env*
+Dockerfile*
+.dockerignore
+README.md
