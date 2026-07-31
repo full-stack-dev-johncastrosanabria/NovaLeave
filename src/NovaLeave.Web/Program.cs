@@ -7,6 +7,7 @@ using NovaLeave.Infrastructure;
 using NovaLeave.Web.Filters;
 using NovaLeave.Web.Services;
 using Serilog;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +24,11 @@ builder.Services
     .Bind(builder.Configuration.GetSection(NovaLeaveOptions.SectionName))
     .ValidateDataAnnotations()
     .Validate(options => !string.IsNullOrWhiteSpace(options.AccrualSchedulerCadence), "Accrual scheduler cadence is required.")
+    .Validate(options => NovaLeaveOptions.TryGetDailyUtcTime(options.TimeoutSchedulerCadence, out _), "Timeout scheduler cadence must use format 'Daily HH:mm UTC'.")
     .ValidateOnStart();
 
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton(provider => provider.GetRequiredService<IOptions<NovaLeaveOptions>>().Value);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddApplication();

@@ -4,8 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NovaLeave.Application.Authorization;
 using NovaLeave.Application.Common.Interfaces;
+using NovaLeave.Application.Configuration;
 using NovaLeave.Infrastructure.Identity;
 using NovaLeave.Infrastructure.Persistence;
+using NovaLeave.Infrastructure.Scheduling;
 
 namespace NovaLeave.Infrastructure;
 
@@ -29,6 +31,16 @@ public static class DependencyInjection
         services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
         services.AddScoped<IApproverIdentityService, ApproverIdentityService>();
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<NovaLeaveDbContext>());
+
+        var timeoutCadence = configuration.GetSection(NovaLeaveOptions.SectionName)[nameof(NovaLeaveOptions.TimeoutSchedulerCadence)];
+        var timeoutDays = configuration.GetSection(NovaLeaveOptions.SectionName)[nameof(NovaLeaveOptions.PendingRequestTimeoutDays)];
+        if (int.TryParse(timeoutDays, out var parsedTimeoutDays) &&
+            parsedTimeoutDays > 0 &&
+            timeoutCadence is not null &&
+            NovaLeaveOptions.TryGetDailyUtcTime(timeoutCadence, out _))
+        {
+            services.AddHostedService<PendingRequestTimeoutJob>();
+        }
 
         return services;
     }

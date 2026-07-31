@@ -164,16 +164,16 @@
 
 ### Tests for User Story 3
 
-- [ ] T094 [P] [US3] Add UC-16 timeout transition tests in `tests/NovaLeave.IntegrationTests/UseCases/UC16TimeoutCancellationTests.cs`
-- [ ] T095 [P] [US3] Add timeout idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/TimeoutIdempotencyTests.cs`
-- [ ] T096 [P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`
+- [X] T094 [P] [US3] Add UC-16 timeout transition tests in `tests/NovaLeave.IntegrationTests/UseCases/UC16TimeoutCancellationTests.cs`
+- [X] T095 [P] [US3] Add timeout idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/TimeoutIdempotencyTests.cs`
+- [X] T096 [P] [US3] Add timeout versus approval concurrency tests in `tests/NovaLeave.IntegrationTests/Concurrency/TimeoutApprovalRaceTests.cs`
 
 ### Implementation for User Story 3
 
-- [ ] T097 [US3] Implement timeout cancellation command in `src/NovaLeave.Application/System/CancelTimedOutRequests/`
-- [ ] T098 [US3] Implement system actor audit writer support in `src/NovaLeave.Application/Audit/SystemAuditWriter.cs`
-- [ ] T099 [US3] Implement configured timeout hosted-job adapter without default cadence in `src/NovaLeave.Infrastructure/Scheduling/PendingRequestTimeoutJob.cs`
-- [ ] T100 [US3] Register timeout job only when required configuration is present and valid in `src/NovaLeave.Infrastructure/DependencyInjection.cs`
+- [X] T097 [US3] Implement timeout cancellation command in `src/NovaLeave.Application/System/CancelTimedOutRequests/`
+- [X] T098 [US3] Implement system actor audit writer support in `src/NovaLeave.Application/Audit/SystemAuditWriter.cs`
+- [X] T099 [US3] Implement configured timeout hosted-job adapter without default cadence in `src/NovaLeave.Infrastructure/Scheduling/PendingRequestTimeoutJob.cs`
+- [X] T100 [US3] Register timeout job only when required configuration is present and valid in `src/NovaLeave.Infrastructure/DependencyInjection.cs`
 
 **Checkpoint**: UC-16 independently passes.
 

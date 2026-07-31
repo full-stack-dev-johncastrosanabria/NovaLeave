@@ -10,6 +10,8 @@ using NovaLeave.Application.Calendars.GetApproverCalendar;
 using NovaLeave.Application.Requests.CreateVacationRequest;
 using NovaLeave.Application.Requests.EditPendingRequest;
 using NovaLeave.Application.Requests.Queries;
+using NovaLeave.Application.Audit;
+using NovaLeave.Application.System.CancelTimedOutRequests;
 using NovaLeave.Domain.Services;
 
 namespace NovaLeave.Application;
@@ -29,6 +31,8 @@ public static class DependencyInjection
         services.AddScoped<GetApproverHistoryQueryHandler>();
         services.AddScoped<ApproveRequestHandler>();
         services.AddScoped<RejectRequestHandler>();
+        services.AddScoped<SystemAuditWriter>();
+        services.AddScoped<CancelTimedOutRequestsHandler>();
         services.AddScoped<CreateVacationRequestHandler>();
         services.AddScoped<EditPendingRequestHandler>();
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);

@@ -31,7 +31,8 @@ public sealed class NovaLeaveWebApplicationFactory : WebApplicationFactory<Progr
                 ["ConnectionStrings:DefaultConnection"] = SqlServerFixture.DefaultConnectionString,
                 ["NovaLeave:PendingRequestTimeoutDays"] = "14",
                 ["NovaLeave:SessionTimeoutMinutes"] = "30",
-                ["NovaLeave:AccrualSchedulerCadence"] = "Daily 00:05 UTC"
+                ["NovaLeave:AccrualSchedulerCadence"] = "Daily 00:05 UTC",
+                ["NovaLeave:TimeoutSchedulerCadence"] = "Daily 00:05 UTC"
             };
 
             configuration.AddInMemoryCollection(values);
