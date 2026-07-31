@@ -35,55 +35,55 @@
 
 ### Tests First
 
-- [ ] T013 [P] Add Clean Architecture dependency tests in `tests/NovaLeave.UnitTests/Architecture/CleanArchitectureTests.cs`
-- [ ] T014 [P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`
-- [ ] T015 [P] Add working-day calculation tests for Mon-Fri, weekend exclusion, and holiday-as-working-day behavior in `tests/NovaLeave.UnitTests/Domain/WorkingDaysCalculatorTests.cs`
-- [ ] T016 [P] Add balance invariant tests for non-negative accrued/reserved/deducted/available totals in `tests/NovaLeave.UnitTests/Domain/VacationBalanceTests.cs`
-- [ ] T017 [P] Add authorization policy tests for User, Approver, HR, Active/Inactive, self-resolution denial, and `canResolveRequests` in `tests/NovaLeave.IntegrationTests/Security/AuthorizationPolicyTests.cs`
-- [ ] T018 [P] Add audit schema and redaction tests in `tests/NovaLeave.UnitTests/Domain/AuditRecordTests.cs`
-- [ ] T019 [P] Add configuration validation tests for `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, and accrual scheduler cadence in `tests/NovaLeave.UnitTests/Configuration/NovaLeaveOptionsTests.cs`
+- [X] T013 [P] Add Clean Architecture dependency tests in `tests/NovaLeave.UnitTests/Architecture/CleanArchitectureTests.cs`
+- [X] T014 [P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`
+- [X] T015 [P] Add working-day calculation tests for Mon-Fri, weekend exclusion, and holiday-as-working-day behavior in `tests/NovaLeave.UnitTests/Domain/WorkingDaysCalculatorTests.cs`
+- [X] T016 [P] Add balance invariant tests for non-negative accrued/reserved/deducted/available totals in `tests/NovaLeave.UnitTests/Domain/VacationBalanceTests.cs`
+- [X] T017 [P] Add authorization policy tests for User, Approver, HR, Active/Inactive, self-resolution denial, and `canResolveRequests` in `tests/NovaLeave.IntegrationTests/Security/AuthorizationPolicyTests.cs`
+- [X] T018 [P] Add audit schema and redaction tests in `tests/NovaLeave.UnitTests/Domain/AuditRecordTests.cs`
+- [X] T019 [P] Add configuration validation tests for `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, and accrual scheduler cadence in `tests/NovaLeave.UnitTests/Configuration/NovaLeaveOptionsTests.cs`
 
 ### Implementation
 
-- [ ] T020 Create request status enum with exactly five states in `src/NovaLeave.Domain/Enums/RequestStatus.cs`
-- [ ] T021 Create movement type enum in `src/NovaLeave.Domain/Enums/MovementType.cs`
-- [ ] T022 Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`
-- [ ] T023 Create DateRange value object in `src/NovaLeave.Domain/ValueObjects/DateRange.cs`
-- [ ] T024 Create WorkingDayCount value object in `src/NovaLeave.Domain/ValueObjects/WorkingDayCount.cs`
-- [ ] T025 Create AccrualPeriod value object in `src/NovaLeave.Domain/ValueObjects/AccrualPeriod.cs`
-- [ ] T026 Create WorkingDaysCalculator domain service using built-in .NET `TimeProvider` inputs where current date is needed in `src/NovaLeave.Domain/Services/WorkingDaysCalculator.cs`
-- [ ] T027 Create OverlapPolicy domain service in `src/NovaLeave.Domain/Services/OverlapPolicy.cs`
-- [ ] T028 Create VacationRequest aggregate with states `Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, and `CancelledByApprover`, and only the official transitions `Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, and `Approved -> CancelledByApprover` in `src/NovaLeave.Domain/Entities/VacationRequest.cs`
-- [ ] T029 Create VacationBalance aggregate with non-negative balance invariants in `src/NovaLeave.Domain/Entities/VacationBalance.cs`
-- [ ] T030 Create immutable BalanceMovement entity in `src/NovaLeave.Domain/Entities/BalanceMovement.cs`
-- [ ] T031 Create immutable AuditRecord entity with redaction-ready Data field in `src/NovaLeave.Domain/Entities/AuditRecord.cs`
-- [ ] T032 Create Application DbContext abstraction in `src/NovaLeave.Application/Common/Interfaces/IApplicationDbContext.cs`
-- [ ] T033 Create Application authorization facade abstraction in `src/NovaLeave.Application/Common/Interfaces/IAuthorizationServiceFacade.cs`
-- [ ] T034 Create Application audit writer abstraction in `src/NovaLeave.Application/Common/Interfaces/IAuditWriter.cs`
-- [ ] T035 Create Application current-user abstraction in `src/NovaLeave.Application/Common/Interfaces/ICurrentUser.cs`
-- [ ] T036 Create Application result and error types for MVC/Razor outcomes in `src/NovaLeave.Application/Common/Results/Result.cs` and `src/NovaLeave.Application/Common/Errors/ErrorCodes.cs`
-- [ ] T037 Create typed configuration model in `src/NovaLeave.Application/Configuration/NovaLeaveOptions.cs`
-- [ ] T038 Create Infrastructure Identity user extension in `src/NovaLeave.Infrastructure/Identity/ApplicationUser.cs`
-- [ ] T039 Create EF Core DbContext shell in `src/NovaLeave.Infrastructure/Persistence/NovaLeaveDbContext.cs`
-- [ ] T040 Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`
-- [ ] T041 Create VacationBalance EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationBalanceConfiguration.cs`
-- [ ] T042 Create BalanceMovement EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/BalanceMovementConfiguration.cs`
-- [ ] T043 Create AuditRecord EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/AuditRecordConfiguration.cs`
-- [ ] T044 Create ApplicationUser EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/ApplicationUserConfiguration.cs`
-- [ ] T045 Create initial EF Core migration plan implementation in `src/NovaLeave.Infrastructure/Persistence/Migrations/`
-- [ ] T046 Register ASP.NET Core Identity in `src/NovaLeave.Infrastructure/DependencyInjection.cs`
-- [ ] T047 Register EF Core SQL Server DbContext in `src/NovaLeave.Infrastructure/DependencyInjection.cs`
-- [ ] T048 Register Serilog request logging and structured logging enrichment in `src/NovaLeave.Web/Program.cs`
-- [ ] T049 Register built-in .NET `TimeProvider` directly in `src/NovaLeave.Web/Program.cs`
-- [ ] T050 Register `NovaLeaveOptions` validation with startup failure for missing/invalid values in `src/NovaLeave.Web/Program.cs`
-- [ ] T051 Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Web/Filters/`
-- [ ] T052 Create shared Razor layout shell in `src/NovaLeave.Web/Views/Shared/_Layout.cshtml`
-- [ ] T053 Create shared status badge partial in `src/NovaLeave.Web/Views/Shared/_StatusBadge.cshtml`
-- [ ] T054 Create shared toast partial in `src/NovaLeave.Web/Views/Shared/_Toast.cshtml`
-- [ ] T055 Create shared validation summary partial in `src/NovaLeave.Web/Views/Shared/_ValidationSummary.cshtml`
-- [ ] T056 Create shared calendar partial shell in `src/NovaLeave.Web/Views/Shared/_Calendar.cshtml`
-- [ ] T057 Create integration test factory in `tests/NovaLeave.IntegrationTests/Support/NovaLeaveWebApplicationFactory.cs`
-- [ ] T058 Create SQL Server test fixture in `tests/NovaLeave.IntegrationTests/Support/SqlServerFixture.cs`
+- [X] T020 Create request status enum with exactly five states in `src/NovaLeave.Domain/Enums/RequestStatus.cs`
+- [X] T021 Create movement type enum in `src/NovaLeave.Domain/Enums/MovementType.cs`
+- [X] T022 Create Vacation-only leave type enum or constant in `src/NovaLeave.Domain/Enums/LeaveType.cs`
+- [X] T023 Create DateRange value object in `src/NovaLeave.Domain/ValueObjects/DateRange.cs`
+- [X] T024 Create WorkingDayCount value object in `src/NovaLeave.Domain/ValueObjects/WorkingDayCount.cs`
+- [X] T025 Create AccrualPeriod value object in `src/NovaLeave.Domain/ValueObjects/AccrualPeriod.cs`
+- [X] T026 Create WorkingDaysCalculator domain service using built-in .NET `TimeProvider` inputs where current date is needed in `src/NovaLeave.Domain/Services/WorkingDaysCalculator.cs`
+- [X] T027 Create OverlapPolicy domain service in `src/NovaLeave.Domain/Services/OverlapPolicy.cs`
+- [X] T028 Create VacationRequest aggregate with states `Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, and `CancelledByApprover`, and only the official transitions `Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, and `Approved -> CancelledByApprover` in `src/NovaLeave.Domain/Entities/VacationRequest.cs`
+- [X] T029 Create VacationBalance aggregate with non-negative balance invariants in `src/NovaLeave.Domain/Entities/VacationBalance.cs`
+- [X] T030 Create immutable BalanceMovement entity in `src/NovaLeave.Domain/Entities/BalanceMovement.cs`
+- [X] T031 Create immutable AuditRecord entity with redaction-ready Data field in `src/NovaLeave.Domain/Entities/AuditRecord.cs`
+- [X] T032 Create Application DbContext abstraction in `src/NovaLeave.Application/Common/Interfaces/IApplicationDbContext.cs`
+- [X] T033 Create Application authorization facade abstraction in `src/NovaLeave.Application/Common/Interfaces/IAuthorizationServiceFacade.cs`
+- [X] T034 Create Application audit writer abstraction in `src/NovaLeave.Application/Common/Interfaces/IAuditWriter.cs`
+- [X] T035 Create Application current-user abstraction in `src/NovaLeave.Application/Common/Interfaces/ICurrentUser.cs`
+- [X] T036 Create Application result and error types for MVC/Razor outcomes in `src/NovaLeave.Application/Common/Results/Result.cs` and `src/NovaLeave.Application/Common/Errors/ErrorCodes.cs`
+- [X] T037 Create typed configuration model in `src/NovaLeave.Application/Configuration/NovaLeaveOptions.cs`
+- [X] T038 Create Infrastructure Identity user extension in `src/NovaLeave.Infrastructure/Identity/ApplicationUser.cs`
+- [X] T039 Create EF Core DbContext shell in `src/NovaLeave.Infrastructure/Persistence/NovaLeaveDbContext.cs`
+- [X] T040 Create VacationRequest EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationRequestConfiguration.cs`
+- [X] T041 Create VacationBalance EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/VacationBalanceConfiguration.cs`
+- [X] T042 Create BalanceMovement EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/BalanceMovementConfiguration.cs`
+- [X] T043 Create AuditRecord EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/AuditRecordConfiguration.cs`
+- [X] T044 Create ApplicationUser EF Core mapping in `src/NovaLeave.Infrastructure/Persistence/Configurations/ApplicationUserConfiguration.cs`
+- [X] T045 Create initial EF Core migration plan implementation in `src/NovaLeave.Infrastructure/Persistence/Migrations/`
+- [X] T046 Register ASP.NET Core Identity in `src/NovaLeave.Infrastructure/DependencyInjection.cs`
+- [X] T047 Register EF Core SQL Server DbContext in `src/NovaLeave.Infrastructure/DependencyInjection.cs`
+- [X] T048 Register Serilog request logging and structured logging enrichment in `src/NovaLeave.Web/Program.cs`
+- [X] T049 Register built-in .NET `TimeProvider` directly in `src/NovaLeave.Web/Program.cs`
+- [X] T050 Register `NovaLeaveOptions` validation with startup failure for missing/invalid values in `src/NovaLeave.Web/Program.cs`
+- [X] T051 Create MVC filters for antiforgery, deny-by-default authorization, overposting prevention, ModelState validation feedback, safe error pages, and 403/404/409 responses in `src/NovaLeave.Web/Filters/`
+- [X] T052 Create shared Razor layout shell in `src/NovaLeave.Web/Views/Shared/_Layout.cshtml`
+- [X] T053 Create shared status badge partial in `src/NovaLeave.Web/Views/Shared/_StatusBadge.cshtml`
+- [X] T054 Create shared toast partial in `src/NovaLeave.Web/Views/Shared/_Toast.cshtml`
+- [X] T055 Create shared validation summary partial in `src/NovaLeave.Web/Views/Shared/_ValidationSummary.cshtml`
+- [X] T056 Create shared calendar partial shell in `src/NovaLeave.Web/Views/Shared/_Calendar.cshtml`
+- [X] T057 Create integration test factory in `tests/NovaLeave.IntegrationTests/Support/NovaLeaveWebApplicationFactory.cs`
+- [X] T058 Create SQL Server test fixture in `tests/NovaLeave.IntegrationTests/Support/SqlServerFixture.cs`
 
 **Checkpoint**: Foundation ready; user-story phases can begin.
 
