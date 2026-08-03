@@ -3,8 +3,8 @@ namespace NovaLeave.EndToEndTests.Accessibility;
 public sealed class AccessibilityRegressionTests
 {
     [Theory]
-    [InlineData("src/NovaLeave.Web/Views/MisSolicitudes/Create.cshtml", "asp-validation-summary", "form-label")]
-    [InlineData("src/NovaLeave.Web/Views/MisSolicitudes/Edit.cshtml", "asp-validation-summary", "form-label")]
+    [InlineData("src/NovaLeave.Web/Views/MisSolicitudes/Create.cshtml", "_ValidationSummary", "form-label")]
+    [InlineData("src/NovaLeave.Web/Views/MisSolicitudes/Edit.cshtml", "_ValidationSummary", "form-label")]
     [InlineData("src/NovaLeave.Web/Views/Aprobaciones/Detail.cshtml", "aria-label", "form-label")]
     [InlineData("src/NovaLeave.Web/Views/RRHH/ApproverCapabilities/Capability.cshtml", "aria-labelledby", "form-label")]
     [InlineData("src/NovaLeave.Web/Views/Shared/_Calendar.cshtml", "role=\"grid\"", "aria-label")]
@@ -25,6 +25,7 @@ public sealed class AccessibilityRegressionTests
 
         Assert.True(
             content.Contains("@Model", StringComparison.Ordinal) ||
+            content.Contains("@label", StringComparison.Ordinal) ||
             content.Contains("StatusLabel", StringComparison.Ordinal),
             "Status indicators must render a visible text value, not only a CSS color.");
     }

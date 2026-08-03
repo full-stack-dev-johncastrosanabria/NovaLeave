@@ -12,11 +12,11 @@
   </div>
 </div>
 
-<section class="nl-card">
+<section class="nl-card nl-form-card">
   <div class="nl-card-body">
-<form method="post" class="row g-3">
+<form method="post" class="row g-3" data-submit-once>
   <input asp-for="RowVersion" type="hidden" />
-  <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+  <partial name="_ValidationSummary" />
   <div class="col-md-4">
     <label asp-for="InputMode" class="form-label">Modo de ingreso</label>
     <select asp-for="InputMode" class="form-select">
@@ -38,10 +38,12 @@
   </div>
   <div class="col-12">
     <label asp-for="Reason" class="form-label">Motivo</label>
-    <textarea asp-for="Reason" class="form-control" rows="4" maxlength="500"></textarea>
+    <textarea asp-for="Reason" class="form-control" rows="4" maxlength="500" data-character-source></textarea>
+    <span asp-validation-for="Reason" class="text-danger"></span>
+    <div class="d-flex justify-content-between"><span class="form-text">Mantenga el motivo claro y concreto.</span><span class="form-text" data-character-count>0 / 500</span></div>
   </div>
   <div class="col-12 d-flex gap-2">
-    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <button type="submit" class="btn btn-primary" data-submit-button>Guardar cambios</button>
     <a class="btn btn-outline-secondary" href="/mis-solicitudes/@Model.Id">Volver</a>
   </div>
 </form>
