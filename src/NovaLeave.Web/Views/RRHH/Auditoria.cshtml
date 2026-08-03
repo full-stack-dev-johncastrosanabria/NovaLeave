@@ -1,0 +1,42 @@
+@model NovaLeave.Web.ViewModels.RRHH.RRHHAuditoriaViewModel
+@{
+    ViewData["Title"] = "Auditoria RRHH";
+}
+
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+  <h1 class="h3 mb-0">Auditoria RRHH</h1>
+  <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <caption>Registros de auditoria relevantes para RRHH</caption>
+    <thead>
+      <tr>
+        <th scope="col">Fecha</th>
+        <th scope="col">Actor</th>
+        <th scope="col">Rol</th>
+        <th scope="col">Accion</th>
+        <th scope="col">Entidad</th>
+        <th scope="col">Resultado</th>
+        <th scope="col">Datos</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var record in Model.Records.Items)
+      {
+        <tr>
+          <td>@record.TimestampUtc</td>
+          <td>@record.ActorId</td>
+          <td>@record.ActorRole</td>
+          <td>@record.Action</td>
+          <td>@record.EntityType @record.EntityId</td>
+          <td>@record.Result</td>
+          <td>@record.Data</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<p class="text-body-secondary">Pagina @Model.Records.Page de @Math.Max(1, (int)Math.Ceiling(Model.Records.TotalCount / (double)Model.Records.PageSize))</p>

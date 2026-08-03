@@ -257,23 +257,23 @@
 
 ### Tests for User Story 7
 
-- [ ] T123 [P] [US7] Add UC-18 HR request list/detail tests in `tests/NovaLeave.IntegrationTests/UseCases/UC18HRRequestsTests.cs`
-- [ ] T124 [P] [US7] Add UC-19 HR calendar tests for dedicated `/rrhh/calendario`, all vacation requests across the complete organization, requester/status visibility, read-only detail links, and forbidden mutations in `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`
-- [ ] T125 [P] [US7] Add UC-20 HR balance and movement read-only tests in `tests/NovaLeave.IntegrationTests/UseCases/UC20HRBalancesTests.cs`
-- [ ] T126 [P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`
-- [ ] T127 [P] [US7] Add HR forbidden mutation tests for approve/reject/deactivate/balance/role operations in `tests/NovaLeave.IntegrationTests/Security/HRRestrictionTests.cs`
-- [ ] T128 [P] [US7] Add HR E2E read-only smoke tests in `tests/NovaLeave.EndToEndTests/HR/HRReadOnlySmokeTests.cs`
+- [X] T123 [P] [US7] Add UC-18 HR request list/detail tests in `tests/NovaLeave.IntegrationTests/UseCases/UC18HRRequestsTests.cs`
+- [X] T124 [P] [US7] Add UC-19 HR calendar tests for dedicated `/rrhh/calendario`, all vacation requests across the complete organization, requester/status visibility, read-only detail links, and forbidden mutations in `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`
+- [X] T125 [P] [US7] Add UC-20 HR balance and movement read-only tests in `tests/NovaLeave.IntegrationTests/UseCases/UC20HRBalancesTests.cs`
+- [X] T126 [P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`
+- [X] T127 [P] [US7] Add HR forbidden mutation tests for approve/reject/deactivate/balance/role operations in `tests/NovaLeave.IntegrationTests/Security/HRRestrictionTests.cs`
+- [X] T128 [P] [US7] Add HR E2E read-only smoke tests in `tests/NovaLeave.EndToEndTests/HR/HRReadOnlySmokeTests.cs`
 
 ### Implementation for User Story 7
 
-- [ ] T129 [P] [US7] Implement HR request read queries in `src/NovaLeave.Application/HR/Requests/`
-- [ ] T130 [P] [US7] Implement HR calendar query returning all vacation requests across the complete organization with requester names, statuses, working-day counts, and no mutation capability in `src/NovaLeave.Application/HR/Calendar/`
-- [ ] T131 [P] [US7] Implement HR balance and movement read queries in `src/NovaLeave.Application/HR/Balances/`
-- [ ] T132 [P] [US7] Implement HR audit read queries with sensitive-reason access auditing in `src/NovaLeave.Application/HR/Audit/`
-- [ ] T133 [US7] Implement HR authorization policies in `src/NovaLeave.Application/Authorization/HRPolicies.cs`
-- [ ] T134 [US7] Implement resource-oriented HR MVC controller actions for `/rrhh/solicitudes`, dedicated read-only `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`; do not expose HR calendar behavior through `/calendario` in `src/NovaLeave.Web/Controllers/RRHHController.cs`
-- [ ] T135 [US7] Implement dedicated HR read-only ViewModels in `src/NovaLeave.Web/ViewModels/RRHH/`
-- [ ] T136 [US7] Implement HR read-only Razor views with no resolution or balance modification actions in `src/NovaLeave.Web/Views/RRHH/`
+- [X] T129 [P] [US7] Implement HR request read queries in `src/NovaLeave.Application/HR/Requests/`
+- [X] T130 [P] [US7] Implement HR calendar query returning all vacation requests across the complete organization with requester names, statuses, working-day counts, and no mutation capability in `src/NovaLeave.Application/HR/Calendar/`
+- [X] T131 [P] [US7] Implement HR balance and movement read queries in `src/NovaLeave.Application/HR/Balances/`
+- [X] T132 [P] [US7] Implement HR audit read queries with sensitive-reason access auditing in `src/NovaLeave.Application/HR/Audit/`
+- [X] T133 [US7] Implement HR authorization policies in `src/NovaLeave.Application/Authorization/HRPolicies.cs`
+- [X] T134 [US7] Implement resource-oriented HR MVC controller actions for `/rrhh/solicitudes`, dedicated read-only `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`; do not expose HR calendar behavior through `/calendario` in `src/NovaLeave.Web/Controllers/RRHHController.cs`
+- [X] T135 [US7] Implement dedicated HR read-only ViewModels in `src/NovaLeave.Web/ViewModels/RRHH/`
+- [X] T136 [US7] Implement HR read-only Razor views with no resolution or balance modification actions in `src/NovaLeave.Web/Views/RRHH/`
 
 **Checkpoint**: UC-18 through UC-21 independently pass.
 

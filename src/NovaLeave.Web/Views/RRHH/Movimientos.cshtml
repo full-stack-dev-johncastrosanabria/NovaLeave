@@ -1,0 +1,49 @@
+@model NovaLeave.Web.ViewModels.RRHH.RRHHMovimientosViewModel
+@{
+    ViewData["Title"] = "Movimientos RRHH";
+}
+
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+  <h1 class="h3 mb-0">Movimientos RRHH</h1>
+  <a class="btn btn-outline-secondary" href="/rrhh/saldos">Volver</a>
+</div>
+
+<dl class="row">
+  <dt class="col-sm-3">Usuario</dt>
+  <dd class="col-sm-9">@Model.Balance.UserName</dd>
+  <dt class="col-sm-3">Acumulado</dt>
+  <dd class="col-sm-9">@Model.Balance.AccruedDays</dd>
+  <dt class="col-sm-3">Reservado</dt>
+  <dd class="col-sm-9">@Model.Balance.ReservedDays</dd>
+  <dt class="col-sm-3">Deducido</dt>
+  <dd class="col-sm-9">@Model.Balance.DeductedDays</dd>
+  <dt class="col-sm-3">Disponible</dt>
+  <dd class="col-sm-9">@Model.Balance.AvailableDays</dd>
+</dl>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <caption>Movimientos de saldo</caption>
+    <thead>
+      <tr>
+        <th scope="col">Fecha</th>
+        <th scope="col">Tipo</th>
+        <th scope="col">Dias</th>
+        <th scope="col">Solicitud</th>
+        <th scope="col">Periodo</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var movement in Model.Balance.Movements)
+      {
+        <tr>
+          <td>@movement.EffectiveAtUtc</td>
+          <td>@movement.Type</td>
+          <td>@movement.Amount</td>
+          <td>@movement.RequestId</td>
+          <td>@movement.AccrualPeriod</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

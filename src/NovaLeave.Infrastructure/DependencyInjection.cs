@@ -31,6 +31,7 @@ public static class DependencyInjection
         services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
         services.AddScoped<IApproverIdentityService, ApproverIdentityService>();
         services.AddScoped<IAccrualUserSource, AccrualUserSource>();
+        services.AddScoped<IUserDirectory, UserDirectory>();
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<NovaLeaveDbContext>());
 
         var timeoutCadence = configuration.GetSection(NovaLeaveOptions.SectionName)[nameof(NovaLeaveOptions.TimeoutSchedulerCadence)];

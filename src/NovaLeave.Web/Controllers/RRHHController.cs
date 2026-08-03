@@ -1,0 +1,114 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using NovaLeave.Application.Common.Errors;
+using NovaLeave.Application.Common.Interfaces;
+using NovaLeave.Application.HR.Audit;
+using NovaLeave.Application.HR.Balances;
+using NovaLeave.Application.HR.Calendar;
+using NovaLeave.Application.HR.Requests;
+using NovaLeave.Domain.Enums;
+using NovaLeave.Web.ViewModels.RRHH;
+
+namespace NovaLeave.Web.Controllers;
+
+[Authorize(Policy = "RequireActiveHR")]
+public sealed class RRHHController : Controller
+{
+    private readonly ICurrentUser _currentUser;
+    private readonly GetHRRequestListQueryHandler _getRequests;
+    private readonly GetHRRequestDetailQueryHandler _getRequestDetail;
+    private readonly GetHRCalendarQueryHandler _getCalendar;
+    private readonly GetHRBalancesQueryHandler _getBalances;
+    private readonly GetHRBalanceMovementsQueryHandler _getMovements;
+    private readonly GetHRAuditLogQueryHandler _getAudit;
+
+    public RRHHController(
+        ICurrentUser currentUser,
+        GetHRRequestListQueryHandler getRequests,
+        GetHRRequestDetailQueryHandler getRequestDetail,
+        GetHRCalendarQueryHandler getCalendar,
+        GetHRBalancesQueryHandler getBalances,
+        GetHRBalanceMovementsQueryHandler getMovements,
+        GetHRAuditLogQueryHandler getAudit)
+    {
+        _currentUser = currentUser;
+        _getRequests = getRequests;
+        _getRequestDetail = getRequestDetail;
+        _getCalendar = getCalendar;
+        _getBalances = getBalances;
+        _getMovements = getMovements;
+        _getAudit = getAudit;
+    }
+
+    [HttpGet("/rrhh")]
+    public IActionResult Index()
+    {
+        return View(new RRHHDashboardViewModel());
+    }
+
+    [HttpGet("/rrhh/solicitudes")]
+    public async Task<IActionResult> Requests(int page = 1, int pageSize = 50, RequestStatus? status = null, CancellationToken cancellationToken = default)
+    {
+        var result = await _getRequests.HandleAsync(new GetHRRequestListQuery(page, pageSize, status), cancellationToken);
+        return View("Solicitudes", new RRHHSolicitudesIndexViewModel(result));
+    }
+
+    [HttpGet("/rrhh/solicitudes/{id:guid}")]
+    public async Task<IActionResult> RequestDetail(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _getRequestDetail.HandleAsync(RequireUserId(), id, cancellationToken);
+        return result.IsFailure ? ToActionResult(result.Error) : View("SolicitudDetalle", new RRHHSolicitudDetalleViewModel(result.Value!));
+    }
+
+    [HttpGet("/rrhh/calendario")]
+    public async Task<IActionResult> Calendar(int? year = null, int? month = null, CancellationToken cancellationToken = default)
+    {
+        var events = await _getCalendar.HandleAsync(new GetHRCalendarQuery(year, month), cancellationToken);
+        return View("Calendario", new RRHHCalendarioViewModel(events));
+    }
+
+    [HttpGet("/rrhh/saldos")]
+    public async Task<IActionResult> Balances(int page = 1, int pageSize = 50, CancellationToken cancellationToken = default)
+    {
+        var result = await _getBalances.HandleAsync(new GetHRBalancesQuery(page, pageSize), cancellationToken);
+        return View("Saldos", new RRHHSaldosIndexViewModel(result));
+    }
+
+    [HttpGet("/rrhh/saldos/{userId}")]
+    public async Task<IActionResult> BalanceMovements(string userId, CancellationToken cancellationToken)
+    {
+        var result = await _getMovements.HandleAsync(userId, cancellationToken);
+        return result.IsFailure ? ToActionResult(result.Error) : View("Movimientos", new RRHHMovimientosViewModel(result.Value!));
+    }
+
+    [HttpGet("/rrhh/auditoria")]
+    public async Task<IActionResult> Audit(int page = 1, int pageSize = 50, [FromQuery(Name = "action")] string? auditAction = null, CancellationToken cancellationToken = default)
+    {
+        var result = await _getAudit.HandleAsync(new GetHRAuditLogQuery(page, pageSize, auditAction), cancellationToken);
+        return View("Auditoria", new RRHHAuditoriaViewModel(result));
+    }
+
+    [HttpPost("/rrhh/saldos/{userId}")]
+    [HttpPost("/rrhh/roles/{userId}")]
+    [HttpPost("/rrhh/usuarios/{userId}/roles")]
+    public IActionResult DenyForgedMutations(string userId)
+    {
+        return Forbid();
+    }
+
+    private string RequireUserId()
+    {
+        return _currentUser.UserId ?? throw new InvalidOperationException("Usuario autenticado requerido.");
+    }
+
+    private IActionResult ToActionResult(Error? error)
+    {
+        return error?.Code switch
+        {
+            ErrorCodes.NotFound => NotFound(),
+            ErrorCodes.Forbidden => Forbid(),
+            ErrorCodes.Conflict => Conflict(error.Message),
+            _ => BadRequest(error?.Message ?? "Solicitud invalida.")
+        };
+    }
+}
