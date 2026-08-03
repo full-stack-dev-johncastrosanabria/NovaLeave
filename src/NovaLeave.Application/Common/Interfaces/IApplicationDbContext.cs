@@ -14,6 +14,8 @@ public interface IApplicationDbContext
 
     void AddVacationRequest(VacationRequest request);
 
+    void AddVacationBalance(VacationBalance balance);
+
     void AddBalanceMovement(BalanceMovement movement);
 
     void AddAuditRecord(AuditRecord auditRecord);

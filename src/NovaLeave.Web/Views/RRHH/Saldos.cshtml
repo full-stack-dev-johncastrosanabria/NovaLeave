@@ -1,0 +1,40 @@
+@model NovaLeave.Web.ViewModels.RRHH.RRHHSaldosIndexViewModel
+@{
+    ViewData["Title"] = "Saldos RRHH";
+}
+
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+  <h1 class="h3 mb-0">Saldos RRHH</h1>
+  <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <caption>Saldos globales de vacaciones</caption>
+    <thead>
+      <tr>
+        <th scope="col">Usuario</th>
+        <th scope="col">Acumulado</th>
+        <th scope="col">Reservado</th>
+        <th scope="col">Deducido</th>
+        <th scope="col">Disponible</th>
+        <th scope="col">Movimientos</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var balance in Model.Balances.Items)
+      {
+        <tr>
+          <td>@balance.UserName</td>
+          <td>@balance.AccruedDays</td>
+          <td>@balance.ReservedDays</td>
+          <td>@balance.DeductedDays</td>
+          <td>@balance.AvailableDays</td>
+          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/saldos/@balance.UserId">Ver</a></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<p class="text-body-secondary">Pagina @Model.Balances.Page de @Math.Max(1, (int)Math.Ceiling(Model.Balances.TotalCount / (double)Model.Balances.PageSize))</p>

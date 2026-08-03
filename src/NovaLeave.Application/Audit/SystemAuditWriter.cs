@@ -21,4 +21,19 @@ public sealed class SystemAuditWriter
             $"{{\"Rule\":\"PendingRequestTimeout\",\"PendingRequestTimeoutDays\":{timeoutDays}}}",
             timestampUtc);
     }
+
+    public AuditRecord Accrual(Guid balanceId, string userId, DateOnly accrualPeriod, DateTimeOffset timestampUtc)
+    {
+        return AuditRecord.Create(
+            ActorId,
+            ActorRole,
+            "Accrual",
+            "VacationBalance",
+            balanceId,
+            "Success",
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            $"{{\"Rule\":\"MonthlyAccrual\",\"UserId\":\"{userId}\",\"AccrualPeriod\":\"{accrualPeriod:yyyy-MM}\"}}",
+            timestampUtc);
+    }
 }

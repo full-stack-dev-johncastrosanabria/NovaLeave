@@ -34,6 +34,11 @@ public sealed class NovaLeaveDbContext : IdentityDbContext<ApplicationUser>, IAp
         VacationRequests.Add(request);
     }
 
+    public void AddVacationBalance(VacationBalance balance)
+    {
+        VacationBalances.Add(balance);
+    }
+
     public void AddBalanceMovement(BalanceMovement movement)
     {
         BalanceMovements.Add(movement);

@@ -210,18 +210,18 @@
 
 ### Tests for User Story 5
 
-- [ ] T108 [P] [US5] Add OQ-002 accrual examples A and B tests in `tests/NovaLeave.UnitTests/Domain/MonthlyAccrualPolicyTests.cs`
-- [ ] T109 [P] [US5] Add UC-17 accrual integration tests in `tests/NovaLeave.IntegrationTests/UseCases/UC17MonthlyAccrualTests.cs`
-- [ ] T110 [P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`
-- [ ] T111 [P] [US5] Add catch-up accrual tests in `tests/NovaLeave.IntegrationTests/UseCases/UC17AccrualCatchUpTests.cs`
+- [X] T108 [P] [US5] Add OQ-002 accrual examples A and B tests in `tests/NovaLeave.UnitTests/Domain/MonthlyAccrualPolicyTests.cs`
+- [X] T109 [P] [US5] Add UC-17 accrual integration tests in `tests/NovaLeave.IntegrationTests/UseCases/UC17MonthlyAccrualTests.cs`
+- [X] T110 [P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`
+- [X] T111 [P] [US5] Add catch-up accrual tests in `tests/NovaLeave.IntegrationTests/UseCases/UC17AccrualCatchUpTests.cs`
 
 ### Implementation for User Story 5
 
-- [ ] T112 [US5] Implement monthly accrual policy in `src/NovaLeave.Domain/Services/MonthlyAccrualPolicy.cs`
-- [ ] T113 [US5] Implement accrual command with unique `(UserId, AccrualPeriod)` idempotency in `src/NovaLeave.Application/System/ExecuteMonthlyAccrual/`
-- [ ] T114 [US5] Implement accrual scheduler adapter with DR-001-configured cadence in `src/NovaLeave.Infrastructure/Scheduling/MonthlyAccrualJob.cs`
-- [ ] T115 [US5] Add EF Core unique index for accrual idempotency in `src/NovaLeave.Infrastructure/Persistence/Configurations/BalanceMovementConfiguration.cs`
-- [ ] T116 [US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Web/Views/MisSolicitudes/Balance.cshtml`
+- [X] T112 [US5] Implement monthly accrual policy in `src/NovaLeave.Domain/Services/MonthlyAccrualPolicy.cs`
+- [X] T113 [US5] Implement accrual command with unique `(UserId, AccrualPeriod)` idempotency in `src/NovaLeave.Application/System/ExecuteMonthlyAccrual/`
+- [X] T114 [US5] Implement accrual scheduler adapter with DR-001-configured cadence in `src/NovaLeave.Infrastructure/Scheduling/MonthlyAccrualJob.cs`
+- [X] T115 [US5] Add EF Core unique index for accrual idempotency in `src/NovaLeave.Infrastructure/Persistence/Configurations/BalanceMovementConfiguration.cs`
+- [X] T116 [US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Web/Views/MisSolicitudes/Balance.cshtml`
 
 **Checkpoint**: UC-07 and UC-17 balance/accrual behavior independently pass.
 
@@ -235,15 +235,15 @@
 
 ### Tests for User Story 6
 
-- [ ] T117 [P] [US6] Add shared calendar ViewModel unit tests in `tests/NovaLeave.UnitTests/Presentation/CalendarViewModelTests.cs`
-- [ ] T118 [P] [US6] Add calendar authorization integration tests for User personal `/calendario`, eligible Approver anonymized `/calendario`, HR-only `/rrhh/calendario`, HR denial on `/calendario`, and disabled Approver denial in `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`
-- [ ] T119 [P] [US6] Add calendar accessibility E2E smoke tests in `tests/NovaLeave.EndToEndTests/Calendar/CalendarAccessibilityTests.cs`
+- [X] T117 [P] [US6] Add shared calendar ViewModel unit tests in `tests/NovaLeave.UnitTests/Presentation/CalendarViewModelTests.cs`
+- [X] T118 [P] [US6] Add calendar authorization integration tests for User personal `/calendario`, eligible Approver anonymized `/calendario`, HR-only `/rrhh/calendario`, HR denial on `/calendario`, and disabled Approver denial in `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`
+- [X] T119 [P] [US6] Add calendar accessibility E2E smoke tests in `tests/NovaLeave.EndToEndTests/Calendar/CalendarAccessibilityTests.cs`
 
 ### Implementation for User Story 6
 
-- [ ] T120 [P] [US6] Implement shared calendar query models in `src/NovaLeave.Application/Calendars/CalendarModels.cs`
-- [ ] T121 [US6] Implement shared `_Calendar.cshtml` partial with Bootstrap 5.3, status colors, keyboard support, and authorized links in `src/NovaLeave.Web/Views/Shared/_Calendar.cshtml`
-- [ ] T122 [US6] Integrate shared calendar partial into User and Approver `/calendario` views and the dedicated read-only HR `/rrhh/calendario` view without sharing route data scope under `src/NovaLeave.Web/Views/`
+- [X] T120 [P] [US6] Implement shared calendar query models in `src/NovaLeave.Application/Calendars/CalendarModels.cs`
+- [X] T121 [US6] Implement shared `_Calendar.cshtml` partial with Bootstrap 5.3, status colors, keyboard support, and authorized links in `src/NovaLeave.Web/Views/Shared/_Calendar.cshtml`
+- [X] T122 [US6] Integrate shared calendar partial into User and Approver `/calendario` views and the dedicated read-only HR `/rrhh/calendario` view without sharing route data scope under `src/NovaLeave.Web/Views/`
 
 **Checkpoint**: Calendar behavior for UC-08, UC-15, and UC-19 independently passes.
 
@@ -257,23 +257,23 @@
 
 ### Tests for User Story 7
 
-- [ ] T123 [P] [US7] Add UC-18 HR request list/detail tests in `tests/NovaLeave.IntegrationTests/UseCases/UC18HRRequestsTests.cs`
-- [ ] T124 [P] [US7] Add UC-19 HR calendar tests for dedicated `/rrhh/calendario`, all vacation requests across the complete organization, requester/status visibility, read-only detail links, and forbidden mutations in `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`
-- [ ] T125 [P] [US7] Add UC-20 HR balance and movement read-only tests in `tests/NovaLeave.IntegrationTests/UseCases/UC20HRBalancesTests.cs`
-- [ ] T126 [P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`
-- [ ] T127 [P] [US7] Add HR forbidden mutation tests for approve/reject/deactivate/balance/role operations in `tests/NovaLeave.IntegrationTests/Security/HRRestrictionTests.cs`
-- [ ] T128 [P] [US7] Add HR E2E read-only smoke tests in `tests/NovaLeave.EndToEndTests/HR/HRReadOnlySmokeTests.cs`
+- [X] T123 [P] [US7] Add UC-18 HR request list/detail tests in `tests/NovaLeave.IntegrationTests/UseCases/UC18HRRequestsTests.cs`
+- [X] T124 [P] [US7] Add UC-19 HR calendar tests for dedicated `/rrhh/calendario`, all vacation requests across the complete organization, requester/status visibility, read-only detail links, and forbidden mutations in `tests/NovaLeave.IntegrationTests/UseCases/UC19HRCalendarTests.cs`
+- [X] T125 [P] [US7] Add UC-20 HR balance and movement read-only tests in `tests/NovaLeave.IntegrationTests/UseCases/UC20HRBalancesTests.cs`
+- [X] T126 [P] [US7] Add UC-21 HR audit access and sensitive-reason read audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC21HRAuditTests.cs`
+- [X] T127 [P] [US7] Add HR forbidden mutation tests for approve/reject/deactivate/balance/role operations in `tests/NovaLeave.IntegrationTests/Security/HRRestrictionTests.cs`
+- [X] T128 [P] [US7] Add HR E2E read-only smoke tests in `tests/NovaLeave.EndToEndTests/HR/HRReadOnlySmokeTests.cs`
 
 ### Implementation for User Story 7
 
-- [ ] T129 [P] [US7] Implement HR request read queries in `src/NovaLeave.Application/HR/Requests/`
-- [ ] T130 [P] [US7] Implement HR calendar query returning all vacation requests across the complete organization with requester names, statuses, working-day counts, and no mutation capability in `src/NovaLeave.Application/HR/Calendar/`
-- [ ] T131 [P] [US7] Implement HR balance and movement read queries in `src/NovaLeave.Application/HR/Balances/`
-- [ ] T132 [P] [US7] Implement HR audit read queries with sensitive-reason access auditing in `src/NovaLeave.Application/HR/Audit/`
-- [ ] T133 [US7] Implement HR authorization policies in `src/NovaLeave.Application/Authorization/HRPolicies.cs`
-- [ ] T134 [US7] Implement resource-oriented HR MVC controller actions for `/rrhh/solicitudes`, dedicated read-only `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`; do not expose HR calendar behavior through `/calendario` in `src/NovaLeave.Web/Controllers/RRHHController.cs`
-- [ ] T135 [US7] Implement dedicated HR read-only ViewModels in `src/NovaLeave.Web/ViewModels/RRHH/`
-- [ ] T136 [US7] Implement HR read-only Razor views with no resolution or balance modification actions in `src/NovaLeave.Web/Views/RRHH/`
+- [X] T129 [P] [US7] Implement HR request read queries in `src/NovaLeave.Application/HR/Requests/`
+- [X] T130 [P] [US7] Implement HR calendar query returning all vacation requests across the complete organization with requester names, statuses, working-day counts, and no mutation capability in `src/NovaLeave.Application/HR/Calendar/`
+- [X] T131 [P] [US7] Implement HR balance and movement read queries in `src/NovaLeave.Application/HR/Balances/`
+- [X] T132 [P] [US7] Implement HR audit read queries with sensitive-reason access auditing in `src/NovaLeave.Application/HR/Audit/`
+- [X] T133 [US7] Implement HR authorization policies in `src/NovaLeave.Application/Authorization/HRPolicies.cs`
+- [X] T134 [US7] Implement resource-oriented HR MVC controller actions for `/rrhh/solicitudes`, dedicated read-only `/rrhh/calendario`, `/rrhh/saldos`, and `/rrhh/auditoria`; do not expose HR calendar behavior through `/calendario` in `src/NovaLeave.Web/Controllers/RRHHController.cs`
+- [X] T135 [US7] Implement dedicated HR read-only ViewModels in `src/NovaLeave.Web/ViewModels/RRHH/`
+- [X] T136 [US7] Implement HR read-only Razor views with no resolution or balance modification actions in `src/NovaLeave.Web/Views/RRHH/`
 
 **Checkpoint**: UC-18 through UC-21 independently pass.
 
@@ -287,18 +287,18 @@
 
 ### Tests for User Story 8
 
-- [ ] T137 [P] [US8] Add UC-22 Approver capability list tests in `tests/NovaLeave.IntegrationTests/UseCases/UC22ApproverCapabilityListTests.cs`
-- [ ] T138 [P] [US8] Add UC-22 capability toggle validation, rowversion, and audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC22ApproverCapabilityToggleTests.cs`
-- [ ] T139 [P] [US8] Add inactive HR and non-Approver target denial tests in `tests/NovaLeave.IntegrationTests/Security/HRCapabilityAuthorizationTests.cs`
-- [ ] T140 [P] [US8] Add HR capability E2E smoke tests in `tests/NovaLeave.EndToEndTests/HR/HRCapabilitySmokeTests.cs`
+- [X] T137 [P] [US8] Add UC-22 Approver capability list tests in `tests/NovaLeave.IntegrationTests/UseCases/UC22ApproverCapabilityListTests.cs`
+- [X] T138 [P] [US8] Add UC-22 capability toggle validation, rowversion, and audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC22ApproverCapabilityToggleTests.cs`
+- [X] T139 [P] [US8] Add inactive HR and non-Approver target denial tests in `tests/NovaLeave.IntegrationTests/Security/HRCapabilityAuthorizationTests.cs`
+- [X] T140 [P] [US8] Add HR capability E2E smoke tests in `tests/NovaLeave.EndToEndTests/HR/HRCapabilitySmokeTests.cs`
 
 ### Implementation for User Story 8
 
-- [ ] T141 [P] [US8] Implement Approver capability list query in `src/NovaLeave.Application/HR/ApproverCapabilities/ListApproverCapabilities/`
-- [ ] T142 [US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`
-- [ ] T143 [US8] Implement HR Approver capability MVC controller routes `/rrhh/aprobadores` and `/rrhh/aprobadores/{id}/capacidad` in `src/NovaLeave.Web/Controllers/RRHHController.cs`
-- [ ] T144 [US8] Implement capability management ViewModels in `src/NovaLeave.Web/ViewModels/RRHH/ApproverCapabilities/`
-- [ ] T145 [US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Web/Views/RRHH/ApproverCapabilities/`
+- [X] T141 [P] [US8] Implement Approver capability list query in `src/NovaLeave.Application/HR/ApproverCapabilities/ListApproverCapabilities/`
+- [X] T142 [US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`
+- [X] T143 [US8] Implement HR Approver capability MVC controller routes `/rrhh/aprobadores` and `/rrhh/aprobadores/{id}/capacidad` in `src/NovaLeave.Web/Controllers/RRHHController.cs`
+- [X] T144 [US8] Implement capability management ViewModels in `src/NovaLeave.Web/ViewModels/RRHH/ApproverCapabilities/`
+- [X] T145 [US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Web/Views/RRHH/ApproverCapabilities/`
 
 **Checkpoint**: UC-22 independently passes.
 
