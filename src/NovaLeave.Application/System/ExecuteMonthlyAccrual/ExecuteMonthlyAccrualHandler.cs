@@ -1,6 +1,7 @@
 using NovaLeave.Application.Audit;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Common.Results;
+using NovaLeave.Application.Observability;
 using NovaLeave.Domain.Entities;
 using NovaLeave.Domain.Enums;
 using NovaLeave.Domain.Services;
@@ -14,19 +15,22 @@ public sealed class ExecuteMonthlyAccrualHandler
     private readonly MonthlyAccrualPolicy _policy;
     private readonly SystemAuditWriter _auditWriter;
     private readonly TimeProvider _timeProvider;
+    private readonly IOperationalTelemetry _telemetry;
 
     public ExecuteMonthlyAccrualHandler(
         IApplicationDbContext dbContext,
         IAccrualUserSource userSource,
         MonthlyAccrualPolicy policy,
         SystemAuditWriter auditWriter,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IOperationalTelemetry telemetry)
     {
         _dbContext = dbContext;
         _userSource = userSource;
         _policy = policy;
         _auditWriter = auditWriter;
         _timeProvider = timeProvider;
+        _telemetry = telemetry;
     }
 
     public async Task<Result> HandleAsync(ExecuteMonthlyAccrualCommand command, CancellationToken cancellationToken)
@@ -58,9 +62,12 @@ public sealed class ExecuteMonthlyAccrualHandler
                     _dbContext.AddBalanceMovement(movement);
                     _dbContext.AddAuditRecord(_auditWriter.Accrual(balance.Id, user.UserId, accrualPeriod, timestamp));
                     await _dbContext.SaveChangesAsync(cancellationToken);
+                    _telemetry.RecordAccrualExecution(true);
                 }
                 catch (Exception exception) when (IsDuplicateAccrualOrConcurrency(exception))
                 {
+                    _telemetry.RecordAccrualExecution(false);
+                    _telemetry.RecordConcurrencyConflict("accrual.idempotency");
                     // A parallel job already applied this user-period; accrual remains idempotent.
                 }
             }

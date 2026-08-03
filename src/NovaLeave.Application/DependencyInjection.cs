@@ -20,6 +20,7 @@ using NovaLeave.Application.Requests.Queries;
 using NovaLeave.Application.Audit;
 using NovaLeave.Application.System.CancelTimedOutRequests;
 using NovaLeave.Application.System.ExecuteMonthlyAccrual;
+using NovaLeave.Application.Observability;
 using NovaLeave.Domain.Services;
 
 namespace NovaLeave.Application;
@@ -55,6 +56,7 @@ public static class DependencyInjection
         services.AddScoped<ExecuteMonthlyAccrualHandler>();
         services.AddScoped<CreateVacationRequestHandler>();
         services.AddScoped<EditPendingRequestHandler>();
+        services.AddScoped<IBusinessInvariantMonitor, BusinessInvariantMonitor>();
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
         return services;

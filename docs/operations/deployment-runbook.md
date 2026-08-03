@@ -22,6 +22,36 @@ This runbook documents manual deployment readiness for the MVP. It does not crea
 7. Run smoke checks for critical User, Approver, and HR routes.
 8. Record commands, results, reviewer, and exceptions.
 
+## Required Configuration Review
+
+Confirm the target environment provides these values through approved
+configuration or secret storage. Do not place secrets in evidence.
+
+- `ConnectionStrings:DefaultConnection`
+- `NovaLeave:PendingRequestTimeoutDays`
+- `NovaLeave:SessionTimeoutMinutes`
+- `NovaLeave:AccrualSchedulerCadence`
+- `NovaLeave:TimeoutSchedulerCadence`
+- Optional demo seeding flag only for non-production environments.
+
+## Manual Smoke Checks
+
+| Check | Expected Result |
+| --- | --- |
+| `/health/live` | Healthy response without secrets |
+| `/health/ready` | Healthy when app and database are reachable |
+| `/Identity/Account/Login` | Login page renders without internal details |
+| `/mis-solicitudes` as active User | Authorized User view |
+| `/aprobaciones` as active enabled Approver | Authorized Approver queue |
+| `/rrhh` as active HR | Authorized HR dashboard |
+| HR access to `/calendario` | Forbidden |
+
+## Evidence Record
+
+Record source SHA, environment name, operator, reviewer, timestamp, commands,
+health results, smoke results, migration result, backup reference, failures, and
+accepted exceptions.
+
 ## Load and Concurrency Readiness
 
 Use a local or test environment; production deployment is not required for implementation readiness.

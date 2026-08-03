@@ -325,40 +325,40 @@
 
 ### Governance and Manual Gate
 
-- [ ] T154 [P] Document the Manual Quality and Security Gate procedure in `docs/operations/manual-quality-gate.md` per Constitution v7.0.0 and `docs/adr/DR-003-manual-quality-gate-no-ci-cd.md`
-- [ ] T155 [P] Create the operations documentation index and ownership model in `docs/operations/README.md`
-- [ ] T156 [P] Add the manual gate evidence checklist in `docs/operations/manual-quality-gate.md` covering commands, results, failures, exceptions, reviewer identity, and `NOT EXECUTED` handling
+- [X] T154 [P] Document the Manual Quality and Security Gate procedure in `docs/operations/manual-quality-gate.md` per Constitution v7.0.0 and `docs/adr/DR-003-manual-quality-gate-no-ci-cd.md`
+- [X] T155 [P] Create the operations documentation index and ownership model in `docs/operations/README.md`
+- [X] T156 [P] Add the manual gate evidence checklist in `docs/operations/manual-quality-gate.md` covering commands, results, failures, exceptions, reviewer identity, and `NOT EXECUTED` handling
 
 ### Observability Implementation and Verification
 
-- [ ] T157 [P] Add structured logging and correlation verification tests in `tests/NovaLeave.IntegrationTests/Observability/CorrelationLoggingTests.cs`
-- [ ] T158 Implement request correlation ID generation or propagation, safe error correlation display, and structured log enrichment in `src/NovaLeave.Web/Program.cs`, `src/NovaLeave.Web/Middleware/`, and `src/NovaLeave.Infrastructure/Observability/`
-- [ ] T159 [P] Add metrics instrumentation tests for request count, latency, error count, vacation request creation, approval, rejection, timeout cancellation, accrual execution, concurrency conflicts, and invariant violations in `tests/NovaLeave.IntegrationTests/Observability/MetricsTests.cs`
-- [ ] T160 Implement application metrics instrumentation without paid external services in `src/NovaLeave.Infrastructure/Observability/` and application use cases
-- [ ] T161 [P] Add tracing and redaction tests covering request, application operation, persistence action, and error handling spans in `tests/NovaLeave.IntegrationTests/Observability/TracingRedactionTests.cs`
-- [ ] T162 Implement application tracing with correlation-safe spans and no sensitive reasons, secrets, tokens, or unapproved personal data in `src/NovaLeave.Infrastructure/Observability/`
-- [ ] T163 [P] Add health-check endpoint tests for liveness, readiness, database connectivity, and secret-free responses in `tests/NovaLeave.IntegrationTests/Observability/HealthCheckTests.cs`
-- [ ] T164 Implement liveness, readiness, and database connectivity health checks with safe responses in `src/NovaLeave.Web/Program.cs` and `src/NovaLeave.Infrastructure/HealthChecks/`
+- [X] T157 [P] Add structured logging and correlation verification tests in `tests/NovaLeave.IntegrationTests/Observability/CorrelationLoggingTests.cs`
+- [X] T158 Implement request correlation ID generation or propagation, safe error correlation display, and structured log enrichment in `src/NovaLeave.Web/Program.cs`, `src/NovaLeave.Web/Middleware/`, and `src/NovaLeave.Infrastructure/Observability/`
+- [X] T159 [P] Add metrics instrumentation tests for request count, latency, error count, vacation request creation, approval, rejection, timeout cancellation, accrual execution, concurrency conflicts, and invariant violations in `tests/NovaLeave.IntegrationTests/Observability/MetricsTests.cs`
+- [X] T160 Implement application metrics instrumentation without paid external services in `src/NovaLeave.Infrastructure/Observability/` and application use cases
+- [X] T161 [P] Add tracing and redaction tests covering request, application operation, persistence action, and error handling spans in `tests/NovaLeave.IntegrationTests/Observability/TracingRedactionTests.cs`
+- [X] T162 Implement application tracing with correlation-safe spans and no sensitive reasons, secrets, tokens, or unapproved personal data in `src/NovaLeave.Infrastructure/Observability/`
+- [X] T163 [P] Add health-check endpoint tests for liveness, readiness, database connectivity, and secret-free responses in `tests/NovaLeave.IntegrationTests/Observability/HealthCheckTests.cs`
+- [X] T164 Implement liveness, readiness, and database connectivity health checks with safe responses in `src/NovaLeave.Web/Program.cs` and `src/NovaLeave.Infrastructure/HealthChecks/`
 
 ### Invariant Monitoring and Redaction
 
-- [ ] T165 [P] Add invariant-monitoring tests for non-negative available balance, reservation and deduction consistency, terminal-state immutability, self-approval denial, HR resolution denial, disabled Approver denial, accrual idempotency, timeout idempotency, audit completeness, and duplicate movement prevention in `tests/NovaLeave.IntegrationTests/Observability/BusinessInvariantMonitoringTests.cs`
-- [ ] T166 Implement read-only business invariant evaluation that emits metrics and structured events without self-healing or silent production data mutation in `src/NovaLeave.Application/Observability/` and `src/NovaLeave.Infrastructure/Observability/`
-- [ ] T167 [P] Add observability redaction inspection tests for logs, traces, metrics labels, error payloads, audit payloads, and health-check responses in `tests/NovaLeave.IntegrationTests/Observability/ObservabilityRedactionTests.cs`
-- [ ] T168 Document the manual observability redaction inspection procedure in `docs/operations/observability-runbook.md`
+- [X] T165 [P] Add invariant-monitoring tests for non-negative available balance, reservation and deduction consistency, terminal-state immutability, self-approval denial, HR resolution denial, disabled Approver denial, accrual idempotency, timeout idempotency, audit completeness, and duplicate movement prevention in `tests/NovaLeave.IntegrationTests/Observability/BusinessInvariantMonitoringTests.cs`
+- [X] T166 Implement read-only business invariant evaluation that emits metrics and structured events without self-healing or silent production data mutation in `src/NovaLeave.Application/Observability/` and `src/NovaLeave.Infrastructure/Observability/`
+- [X] T167 [P] Add observability redaction inspection tests for logs, traces, metrics labels, error payloads, audit payloads, and health-check responses in `tests/NovaLeave.IntegrationTests/Observability/ObservabilityRedactionTests.cs`
+- [X] T168 Document the manual observability redaction inspection procedure in `docs/operations/observability-runbook.md`
 
 ### Alerts and Operations
 
-- [ ] T169 [P] Document alert definitions, thresholds, owners, and response procedures for repeated application errors, database health failure, accrual job failure, timeout job failure, persistent concurrency failures, failed invariant checks, and abnormal authentication or authorization denial patterns in `docs/operations/observability-runbook.md`
-- [ ] T170 Implement alertable structured events and metrics for operational alert conditions without binding to a paid provider in `src/NovaLeave.Infrastructure/Observability/`
-- [ ] T171 [P] Create deployment and incident response runbooks in `docs/operations/deployment-runbook.md` and `docs/operations/incident-response-runbook.md` without CI/CD or deployment automation
-- [ ] T172 [P] Create backup and restore runbook in `docs/operations/backup-and-restore-runbook.md` covering assumptions, backup, restore, verification, responsible role, evidence, limitations, and configurable environment-specific commands
-- [ ] T173 [P] Create database migration and scheduled jobs runbooks in `docs/operations/database-migration-runbook.md` and `docs/operations/scheduled-jobs-runbook.md`
-- [ ] T174 [P] Document load and concurrency readiness procedure with representative dataset, concurrent request scenario, approval contention, accrual and timeout job behavior, expected measurements, and result recording in `docs/operations/observability-runbook.md`
-- [ ] T175 Execute load and concurrency readiness verification in a local or test environment and record evidence without requiring production deployment
-- [ ] T176 Execute the final Manual Quality and Security Gate and record restore, build, format, analyzer, test, coverage, security, dependency, license, migration, Mermaid, configuration, and secrets-handling results or `NOT EXECUTED` statuses in implementation handoff evidence
-- [ ] T177 Validate no CI/CD pipeline configuration, automated deployment automation, or false official validator success claim exists in active docs or repository configuration
-- [ ] T178 Synchronize canonical and derived task artifacts, rerun available task-tree validation or safe equivalent, and record results in handoff notes
+- [X] T169 [P] Document alert definitions, thresholds, owners, and response procedures for repeated application errors, database health failure, accrual job failure, timeout job failure, persistent concurrency failures, failed invariant checks, and abnormal authentication or authorization denial patterns in `docs/operations/observability-runbook.md`
+- [X] T170 Implement alertable structured events and metrics for operational alert conditions without binding to a paid provider in `src/NovaLeave.Infrastructure/Observability/`
+- [X] T171 [P] Create deployment and incident response runbooks in `docs/operations/deployment-runbook.md` and `docs/operations/incident-response-runbook.md` without CI/CD or deployment automation
+- [X] T172 [P] Create backup and restore runbook in `docs/operations/backup-and-restore-runbook.md` covering assumptions, backup, restore, verification, responsible role, evidence, limitations, and configurable environment-specific commands
+- [X] T173 [P] Create database migration and scheduled jobs runbooks in `docs/operations/database-migration-runbook.md` and `docs/operations/scheduled-jobs-runbook.md`
+- [X] T174 [P] Document load and concurrency readiness procedure with representative dataset, concurrent request scenario, approval contention, accrual and timeout job behavior, expected measurements, and result recording in `docs/operations/observability-runbook.md`
+- [X] T175 Execute load and concurrency readiness verification in a local or test environment and record evidence without requiring production deployment
+- [X] T176 Execute the final Manual Quality and Security Gate and record restore, build, format, analyzer, test, coverage, security, dependency, license, migration, Mermaid, configuration, and secrets-handling results or `NOT EXECUTED` statuses in implementation handoff evidence
+- [X] T177 Validate no CI/CD pipeline configuration, automated deployment automation, or false official validator success claim exists in active docs or repository configuration
+- [X] T178 Synchronize canonical and derived task artifacts, rerun available task-tree validation or safe equivalent, and record results in handoff notes
 
 ---
 

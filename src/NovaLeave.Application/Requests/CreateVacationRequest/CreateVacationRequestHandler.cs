@@ -1,6 +1,7 @@
 using NovaLeave.Application.Common.Errors;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Common.Results;
+using NovaLeave.Application.Observability;
 using NovaLeave.Domain.Entities;
 using NovaLeave.Domain.Services;
 using NovaLeave.Domain.ValueObjects;
@@ -12,12 +13,18 @@ public sealed class CreateVacationRequestHandler
     private readonly IApplicationDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
     private readonly OverlapPolicy _overlapPolicy;
+    private readonly IOperationalTelemetry _telemetry;
 
-    public CreateVacationRequestHandler(IApplicationDbContext dbContext, TimeProvider timeProvider, OverlapPolicy overlapPolicy)
+    public CreateVacationRequestHandler(
+        IApplicationDbContext dbContext,
+        TimeProvider timeProvider,
+        OverlapPolicy overlapPolicy,
+        IOperationalTelemetry telemetry)
     {
         _dbContext = dbContext;
         _timeProvider = timeProvider;
         _overlapPolicy = overlapPolicy;
+        _telemetry = telemetry;
     }
 
     public async Task<Result<Guid>> HandleAsync(CreateVacationRequestCommand command, CancellationToken cancellationToken)
@@ -63,14 +70,17 @@ public sealed class CreateVacationRequestHandler
                 timestamp));
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+            _telemetry.RecordRequestCreated(true);
             return Result<Guid>.Success(request.Id);
         }
         catch (ArgumentException exception)
         {
+            _telemetry.RecordRequestCreated(false);
             return Result<Guid>.Failure(Error.Validation(exception.Message));
         }
         catch (InvalidOperationException exception)
         {
+            _telemetry.RecordRequestCreated(false);
             return Result<Guid>.Failure(Error.Validation(exception.Message));
         }
     }
