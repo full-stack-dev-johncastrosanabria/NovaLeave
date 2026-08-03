@@ -16,7 +16,7 @@
 | .NET 10 SDK | **Required** | Install before any development begins |
 | SQL Server (local or container) | **Required** | Needed for integration tests and local development |
 | Bootstrap assets | **Present** | Managed under `src/NovaLeave.Web/wwwroot/lib/bootstrap/` |
-| Docker | **Optional / NOT EXECUTED in Phase 11** | Containerized development remains environment-specific |
+| Docker | **Required on macOS / Linux** | Hosts the local SQL Server; Windows hosts may use LocalDB instead (see below) |
 
 ---
 
@@ -58,6 +58,27 @@ Configuration validated at startup. Application will not start with missing or i
 
 ---
 
+## Local database with Docker (macOS / Linux)
+
+The team runs a mix of macOS (Apple Silicon) and Windows hosts. Windows developers may use
+SQL Server LocalDB and skip this section — the integration-test fixture falls back to LocalDB.
+LocalDB does not exist on macOS or Linux, so use the committed `docker-compose.yml`:
+
+```bash
+cp .env.example .env          # then set MSSQL_SA_PASSWORD to a value of your own
+docker compose up -d          # starts SQL on ${NOVALEAVE_SQL_PORT}, default 14333
+```
+
+| Setting | Notes |
+|---|---|
+| `MSSQL_SA_PASSWORD` | Local development only. `.env` is gitignored — never commit it. |
+| `NOVALEAVE_SQL_PORT` | Defaults to **14333**, not 1433, so it cannot collide with another local SQL instance. |
+| `NOVALEAVE_SQL_IMAGE` | `azure-sql-edge` on Apple Silicon (arm64-native); `mssql/server:2022-latest` on amd64. |
+
+Stop with `docker compose down` (keeps data) or `docker compose down -v` (deletes the volume).
+
+---
+
 ## Setup Commands
 
 ### 1. Restore and build
@@ -89,6 +110,13 @@ dotnet test tests/NovaLeave.UnitTests
 dotnet test tests/NovaLeave.IntegrationTests
 ```
 Integration tests use a real SQL Server database (connection string required). Testcontainers MAY be used when the test objective requires it; it is not mandatory.
+
+On macOS and Linux the fixture's LocalDB fallback is unavailable, so point it at the Docker
+container by exporting the connection string first:
+
+```bash
+export NOVALEAVE_TEST_SQLSERVER="Server=localhost,14333;Database=NovaLeave_Test;User Id=sa;Password=<your MSSQL_SA_PASSWORD>;TrustServerCertificate=True;MultipleActiveResultSets=true;Pooling=false"
+```
 
 ### 6. Run E2E tests
 ```

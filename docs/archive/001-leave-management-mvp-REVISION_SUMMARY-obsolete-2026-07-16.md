@@ -4,7 +4,7 @@
 > evidence of a superseded 2026-07-16 revision. It references obsolete roles,
 > leave types, request states, constitution version v3.0.0, scope assumptions,
 > and implementation-readiness claims. Do not use it as active implementation
-> context. Current authority is `.specify/memory/constitution.md` v6.0.1 and
+> context. Current authority is `.specify/memory/constitution.md` v7.0.0 and
 > `specs/001-leave-management-mvp/spec.md`.
 
 **Date**: 2026-07-16  
