@@ -1,29 +1,29 @@
 @page
 @model NovaLeave.Web.Areas.Identity.Pages.Account.LoginModel
 @{
-    ViewData["Title"] = "Iniciar sesion";
+    ViewData["Title"] = "Iniciar sesión";
 }
 
 <div class="nl-login-page">
   <section class="nl-card nl-login-card" aria-labelledby="login-title">
     <div class="nl-card-body">
       <div class="text-center mb-4">
-        <span class="nl-brand-mark mx-auto mb-3" aria-hidden="true">N</span>
-        <p class="nl-page-kicker mb-1">NovaLeave</p>
-        <h1 id="login-title" class="nl-page-title">Iniciar sesion</h1>
+        <span class="nl-brand-mark nl-brand-mark-lg mx-auto mb-3" aria-hidden="true">N</span>
+        <h1 id="login-title" class="nl-page-title">Bienvenido a NovaLeave</h1>
+        <p class="nl-page-description">Gestione vacaciones, aprobaciones y consultas de RRHH en un solo lugar.</p>
       </div>
 
       <form method="post" class="needs-validation" novalidate>
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <partial name="_ValidationSummary" />
         <div class="mb-3">
-          <label asp-for="Input.Email" class="form-label">Correo</label>
+          <label asp-for="Input.Email" class="form-label">Correo electrónico</label>
           <input asp-for="Input.Email" class="form-control" autocomplete="username" data-login-email />
           <span asp-validation-for="Input.Email" class="text-danger"></span>
         </div>
         @if (Model.DemoAccounts.Count > 0)
         {
           <div class="mb-3">
-            <label class="form-label" for="DemoAccount">Cuenta</label>
+            <label class="form-label" for="DemoAccount">Cuenta de demostración</label>
             <select class="form-select" id="DemoAccount" aria-label="Seleccionar cuenta de demostración" aria-describedby="DemoAccountHelp" data-demo-account-select>
               <option value="">Seleccionar cuenta</option>
               @foreach (var account in Model.DemoAccounts)
@@ -35,11 +35,15 @@
           </div>
         }
         <div class="mb-4">
-          <label asp-for="Input.Password" class="form-label">Contrasena</label>
+          <label asp-for="Input.Password" class="form-label">Contraseña</label>
           <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
           <span asp-validation-for="Input.Password" class="text-danger"></span>
         </div>
-        <button type="submit" class="btn btn-primary w-100">Iniciar sesion</button>
+        <div class="form-check mb-4">
+          <input asp-for="Input.RememberMe" class="form-check-input" />
+          <label asp-for="Input.RememberMe" class="form-check-label">Mantener mi sesión iniciada</label>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Iniciar sesión</button>
       </form>
     </div>
   </section>

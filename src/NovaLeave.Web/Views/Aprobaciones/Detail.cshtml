@@ -12,70 +12,70 @@
   <a class="btn btn-outline-secondary" href="/aprobaciones">Volver</a>
 </div>
 
-<section class="nl-card mb-4">
-  <div class="nl-card-body">
-<div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" aria-live="polite"></div>
-<dl class="row mb-0">
-  <dt class="col-sm-3">Solicitante</dt>
-  <dd class="col-sm-9">@Model.Request.RequesterId</dd>
-  <dt class="col-sm-3">Inicio</dt>
-  <dd class="col-sm-9">@Model.Request.StartDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Fin</dt>
-  <dd class="col-sm-9">@Model.Request.EndDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Dias habiles</dt>
-  <dd class="col-sm-9">@Model.Request.WorkingDays</dd>
-  <dt class="col-sm-3">Saldo proyectado</dt>
-  <dd class="col-sm-9">@Model.Request.ProjectedBalanceAfterApproval</dd>
-</dl>
-  </div>
-</section>
+<partial name="_ValidationSummary" />
 
-@* RowVersion is a concurrency token, not business data: it travels as a hidden
-   field in each form below and is never displayed. *@
+<div class="nl-detail-grid mb-4">
+  <section class="nl-card"><div class="nl-card-body">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-3"><div><span class="nl-summary-label">Solicitante</span><h2 class="h5 mb-0">@Model.Request.RequesterName</h2></div><partial name="_StatusBadge" model="Model.Request.Status.ToString()" /></div>
+    <dl class="nl-detail-list mb-0">
+      <div><dt>Fecha de inicio</dt><dd>@Model.Request.StartDate.ToString("dd/MM/yyyy")</dd></div>
+      <div><dt>Fecha de fin</dt><dd>@Model.Request.EndDate.ToString("dd/MM/yyyy")</dd></div>
+      <div><dt>Días hábiles</dt><dd><strong>@Model.Request.WorkingDays</strong></dd></div>
+    </dl>
+  </div></section>
+  <section class="nl-card"><div class="nl-card-body"><h2 class="h5 mb-3">Motivo</h2><p class="nl-reason mb-0">@Model.Request.Reason</p></div></section>
+</div>
+
+<div class="nl-summary-grid mb-4" aria-label="Impacto en el saldo">
+  <section class="nl-card nl-summary-card"><div class="nl-summary-label">Disponible actual</div><div class="nl-summary-value">@Model.Request.AvailableDays</div></section>
+  <section class="nl-card nl-summary-card"><div class="nl-summary-label">Días solicitados</div><div class="nl-summary-value">@Model.Request.WorkingDays</div></section>
+  <section class="nl-card nl-summary-card" data-projected-balance="@Model.Request.ProjectedBalanceAfterApproval"><div class="nl-summary-label">Disponible después de aprobar</div><div class="nl-summary-value @(Model.Request.ProjectedBalanceAfterApproval < 0 ? "text-danger" : string.Empty)">@Model.Request.ProjectedBalanceAfterApproval</div></section>
+</div>
 
 @if (Model.Request.HasOverlapWarning)
 {
   <div class="alert alert-warning" role="alert">Existe una advertencia de traslape.</div>
 }
+@if (!Model.Request.CanApprove && Model.Request.CanApproveOrReject)
+{
+  <div class="alert alert-warning" role="alert"><strong>No es posible aprobar.</strong> El saldo disponible cambió y el resultado sería negativo. Actualice la información o rechace la solicitud.</div>
+}
 
 <section class="nl-card">
   <div class="nl-card-body">
-<div class="row g-3">
+<h2 class="h5 mb-3">Resolver solicitud</h2>
+<div class="nl-form-actions">
   @if (Model.Request.CanApproveOrReject)
   {
-  <div class="col-md-4">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar">
-      @Html.AntiForgeryToken()
-      <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <button type="submit" class="btn btn-success w-100" aria-label="Aprobar solicitud">Aprobar</button>
-    </form>
-  </div>
-  <div class="col-md-8">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar">
-      @Html.AntiForgeryToken()
-      <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <label class="form-label" for="RejectionReason">Razon de rechazo</label>
-      <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-2" rows="3" maxlength="500">@Model.RejectionReason</textarea>
-      <button type="submit" class="btn btn-danger" aria-label="Rechazar solicitud">Rechazar</button>
-    </form>
-  </div>
+    @if (Model.Request.CanApprove)
+    {
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">Aprobar solicitud</button>
+    }
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">Rechazar solicitud</button>
   }
   @if (Model.Request.CanDeactivate)
   {
-  <div class="col-md-4">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar">
-      @Html.AntiForgeryToken()
-      <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <button type="submit" class="btn btn-warning w-100" aria-label="Desactivar solicitud aprobada">Desactivar solicitud</button>
-    </form>
-  </div>
+    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#deactivateModal">Desactivar solicitud</button>
   }
   @if (!Model.Request.CanApproveOrReject && !Model.Request.CanDeactivate)
   {
-  <div class="col-12">
-    <div class="alert alert-secondary" role="alert">La solicitud no tiene acciones disponibles.</div>
-  </div>
+    <div class="alert alert-secondary mb-0" role="status">La solicitud no tiene acciones disponibles.</div>
   }
 </div>
   </div>
 </section>
+
+@if (Model.Request.CanApprove)
+{
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalTitle" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h2 class="modal-title h5" id="approveModalTitle">Confirmar aprobación</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div><div class="modal-body">Se aprobarán @Model.Request.WorkingDays días hábiles para @Model.Request.RequesterName. Esta acción actualizará el saldo.</div><div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button><form method="post" action="/aprobaciones/@Model.Request.Id/aprobar" data-submit-once>@Html.AntiForgeryToken()<input type="hidden" name="RowVersion" value="@Model.RowVersion" /><button type="submit" class="btn btn-success" data-submit-button>Confirmar aprobación</button></form></div></div></div></div>
+}
+
+@if (Model.Request.CanApproveOrReject)
+{
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalTitle" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><form method="post" action="/aprobaciones/@Model.Request.Id/rechazar" data-submit-once>@Html.AntiForgeryToken()<input type="hidden" name="RowVersion" value="@Model.RowVersion" /><div class="modal-header"><h2 class="modal-title h5" id="rejectModalTitle">Rechazar solicitud</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div><div class="modal-body"><label class="form-label" for="RejectionReason">Razón del rechazo</label><textarea id="RejectionReason" name="RejectionReason" class="form-control" rows="4" minlength="10" maxlength="500" required data-character-source>@Model.RejectionReason</textarea><div class="d-flex justify-content-between"><span class="form-text">Entre 10 y 500 caracteres.</span><span class="form-text" data-character-count>0 / 500</span></div></div><div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-danger" data-submit-button>Confirmar rechazo</button></div></form></div></div></div>
+}
+
+@if (Model.Request.CanDeactivate)
+{
+<div class="modal fade" id="deactivateModal" tabindex="-1" aria-labelledby="deactivateModalTitle" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h2 class="modal-title h5" id="deactivateModalTitle">Confirmar desactivación</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div><div class="modal-body">La solicitud aprobada se desactivará y los días serán restaurados al saldo.</div><div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button><form method="post" action="/aprobaciones/@Model.Request.Id/desactivar" data-submit-once>@Html.AntiForgeryToken()<input type="hidden" name="RowVersion" value="@Model.RowVersion" /><button type="submit" class="btn btn-warning" data-submit-button>Confirmar desactivación</button></form></div></div></div></div>
+}

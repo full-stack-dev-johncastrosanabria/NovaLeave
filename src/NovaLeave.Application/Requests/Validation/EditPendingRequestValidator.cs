@@ -12,7 +12,10 @@ public sealed class EditPendingRequestValidator : AbstractValidator<EditPendingR
         RuleFor(command => command.RequestId).NotEmpty();
         RuleFor(command => command.RowVersion).NotEmpty();
         RuleFor(command => command.StartDate).NotEmpty();
-        RuleFor(command => command.Reason).NotEmpty().MaximumLength(500);
+        RuleFor(command => command.Reason)
+            .NotEmpty()
+            .Must(reason => !string.IsNullOrWhiteSpace(reason) && reason.Trim().Length is >= 10 and <= 500)
+            .WithMessage("El motivo debe contener entre 10 y 500 caracteres.");
         RuleFor(command => command.WorkingDays)
             .GreaterThan(0)
             .When(command => command.InputMode == RequestInputMode.StartPlusDays);

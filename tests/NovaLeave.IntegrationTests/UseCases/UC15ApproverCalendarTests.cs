@@ -35,11 +35,11 @@ public sealed class UC15ApproverCalendarTests
         var pendingApprovalId = await ApproverTestData.CreatePendingRequestAsync(factory, client, "user-1");
         var ownPendingId = await ApproverTestData.CreatePendingRequestAsync(factory, client, "multi-1");
 
-        var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedGet("/calendario?context=Approver", "multi-1", "User,Approver", canResolveRequests: true));
+        var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedGet("/calendario?context=Approver&year=2027&month=1", "multi-1", "User,Approver", canResolveRequests: true));
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Pendientes de aprobacion", html);
+        Assert.Contains("Pendientes de aprobaci", html);
         Assert.Contains("Mis solicitudes", html);
         Assert.Contains($"/aprobaciones/{pendingApprovalId}", html);
         Assert.Contains($"/mis-solicitudes/{ownPendingId}", html);

@@ -6,7 +6,7 @@ using NovaLeave.Domain.Enums;
 
 namespace NovaLeave.Application.HR.Requests;
 
-public sealed record HRAuditTrailItem(DateTime TimestampUtc, string ActorId, string ActorRole, string Action, string Result, string? Data);
+public sealed record HRAuditTrailItem(DateTime TimestampUtc, string ActorId, string ActorName, string ActorRole, string Action, string Result, string? Data);
 
 public sealed record HRRequestDetail(
     Guid Id,
@@ -46,12 +46,20 @@ public sealed class GetHRRequestDetailQueryHandler
         AuditSensitiveAccess(hrUserId, request);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var users = await _userDirectory.GetUsersByIdsAsync([request.OwnerId], cancellationToken);
-        var auditTrail = _dbContext.AuditRecords
+        var auditRecords = _dbContext.AuditRecords
             .Where(record => record.EntityType == nameof(VacationRequest) && record.EntityId == request.Id)
             .OrderByDescending(record => record.TimestampUtc)
-            .Select(record => new HRAuditTrailItem(record.TimestampUtc, record.ActorId, record.ActorRole, record.Action, record.Result, record.Data))
             .ToList();
+        var userIds = auditRecords.Select(record => record.ActorId).Append(request.OwnerId).Distinct().ToArray();
+        var users = await _userDirectory.GetUsersByIdsAsync(userIds, cancellationToken);
+        var auditTrail = auditRecords.Select(record => new HRAuditTrailItem(
+            record.TimestampUtc,
+            record.ActorId,
+            users.TryGetValue(record.ActorId, out var actor) ? actor.DisplayName : record.ActorRole,
+            record.ActorRole,
+            record.Action,
+            record.Result,
+            record.Data)).ToList();
 
         return Result<HRRequestDetail>.Success(new HRRequestDetail(
             request.Id,

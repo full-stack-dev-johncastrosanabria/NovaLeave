@@ -15,35 +15,31 @@
   </div>
 </div>
 
-<section class="nl-card mb-4">
+<div class="nl-detail-grid mb-4">
+<section class="nl-card">
   <div class="nl-card-body">
 <dl class="row mb-0">
   <dt class="col-sm-3">Solicitante</dt>
   <dd class="col-sm-9">@Model.Request.RequesterName</dd>
   <dt class="col-sm-3">Inicio</dt>
-  <dd class="col-sm-9">@Model.Request.StartDate.ToString("yyyy-MM-dd")</dd>
+  <dd class="col-sm-9">@Model.Request.StartDate.ToString("dd/MM/yyyy")</dd>
   <dt class="col-sm-3">Fin</dt>
-  <dd class="col-sm-9">@Model.Request.EndDate.ToString("yyyy-MM-dd")</dd>
+  <dd class="col-sm-9">@Model.Request.EndDate.ToString("dd/MM/yyyy")</dd>
   <dt class="col-sm-3">Dias habiles</dt>
   <dd class="col-sm-9">@Model.Request.WorkingDays</dd>
   <dt class="col-sm-3">Estado</dt>
   <dd class="col-sm-9"><partial name="_StatusBadge" model="Model.Request.Status.ToString()" /></dd>
-  <dt class="col-sm-3">Razon</dt>
-  <dd class="col-sm-9">@Model.Request.Reason</dd>
-  @if (!string.IsNullOrWhiteSpace(Model.Request.RejectionReason))
-  {
-    <dt class="col-sm-3">Razon de rechazo</dt>
-    <dd class="col-sm-9">@Model.Request.RejectionReason</dd>
-  }
 </dl>
   </div>
 </section>
+<section class="nl-card"><div class="nl-card-body"><h2 class="h5 mb-3">Motivo</h2><p class="nl-reason">@Model.Request.Reason</p>@if (!string.IsNullOrWhiteSpace(Model.Request.RejectionReason)){<h3 class="h6">Razón de rechazo</h3><p class="nl-reason mb-0">@Model.Request.RejectionReason</p>}</div></section>
+</div>
 
 <section class="nl-card">
   <div class="nl-card-body">
 <h2 class="h5 mb-3">Auditoria</h2>
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Auditoria de la solicitud</caption>
     <thead>
       <tr>
@@ -58,11 +54,11 @@
       @foreach (var item in Model.Request.AuditTrail)
       {
         <tr>
-          <td>@item.TimestampUtc</td>
-          <td>@item.ActorId</td>
-          <td>@item.ActorRole</td>
-          <td>@item.Action</td>
-          <td>@item.Result</td>
+          <td data-label="Fecha">@item.TimestampUtc.ToString("dd/MM/yyyy HH:mm")</td>
+          <td data-label="Actor">@item.ActorName</td>
+          <td data-label="Rol">@item.ActorRole</td>
+          <td data-label="Acción">@item.Action</td>
+          <td data-label="Resultado">@item.Result</td>
         </tr>
       }
     </tbody>

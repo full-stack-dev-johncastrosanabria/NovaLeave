@@ -30,8 +30,8 @@ public sealed class UC03ViewOwnRequestsTests
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("2027-01-04", html);
-        Assert.DoesNotContain("2027-02-01", html);
+        Assert.Contains("04/01/2027", html);
+        Assert.DoesNotContain("01/02/2027", html);
     }
 
     private static FormUrlEncodedContent Form(params (string Key, string Value)[] values)

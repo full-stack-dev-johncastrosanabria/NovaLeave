@@ -45,20 +45,23 @@ public sealed class MisSolicitudesController : Controller
     {
         var userId = RequireUserId();
         var requests = await _getMyRequests.HandleAsync(userId, cancellationToken);
-        return View(new MisSolicitudesIndexViewModel(requests));
+        var balance = await _getMyBalance.HandleAsync(userId, cancellationToken);
+        return View(new MisSolicitudesIndexViewModel(requests, balance.Value));
     }
 
     [HttpGet("/mis-solicitudes/crear")]
-    public IActionResult Create()
+    public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
         // The earliest valid start is the day after the current business date (BR-002), so the
         // form opens on that date instead of DateOnly.MinValue, which rendered as 01/01/0001.
         var earliestStart = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime).AddDays(1);
 
+        var balance = await _getMyBalance.HandleAsync(RequireUserId(), cancellationToken);
         return View(new CreateVacationRequestViewModel
         {
             StartDate = earliestStart,
-            EndDate = earliestStart
+            EndDate = earliestStart,
+            AvailableDays = balance.Value?.AvailableDays
         });
     }
 
@@ -67,6 +70,7 @@ public sealed class MisSolicitudesController : Controller
     {
         if (!ModelState.IsValid)
         {
+            await PopulateAvailableDaysAsync(viewModel, cancellationToken);
             return InvalidForm(viewModel);
         }
 
@@ -86,6 +90,7 @@ public sealed class MisSolicitudesController : Controller
                 return ToActionResult(result.Error);
             }
 
+            await PopulateAvailableDaysAsync(viewModel, cancellationToken);
             return WorkflowError(viewModel, result.Error);
         }
 
@@ -114,13 +119,16 @@ public sealed class MisSolicitudesController : Controller
         }
 
         var request = result.Value!;
+        var balance = await _getMyBalance.HandleAsync(RequireUserId(), cancellationToken);
         return View(new EditVacationRequestViewModel
         {
             Id = request.Id,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
+            WorkingDays = request.WorkingDays,
             Reason = request.Reason,
-            RowVersion = Convert.ToBase64String(request.RowVersion)
+            RowVersion = Convert.ToBase64String(request.RowVersion),
+            AvailableDays = balance.Value is null ? null : balance.Value.AvailableDays + request.WorkingDays
         });
     }
 
@@ -130,6 +138,7 @@ public sealed class MisSolicitudesController : Controller
         viewModel.Id = id;
         if (!ModelState.IsValid)
         {
+            await PopulateAvailableDaysAsync(viewModel, cancellationToken, includeCurrentRequest: true);
             Response.StatusCode = StatusCodes.Status400BadRequest;
             return View(viewModel);
         }
@@ -142,6 +151,7 @@ public sealed class MisSolicitudesController : Controller
         catch (FormatException)
         {
             ModelState.AddModelError(string.Empty, ConflictMessage);
+            await PopulateAvailableDaysAsync(viewModel, cancellationToken, includeCurrentRequest: true);
             Response.StatusCode = StatusCodes.Status409Conflict;
             return View(viewModel);
         }
@@ -164,6 +174,7 @@ public sealed class MisSolicitudesController : Controller
                 return ToActionResult(result.Error);
             }
 
+            await PopulateAvailableDaysAsync(viewModel, cancellationToken, includeCurrentRequest: true);
             return WorkflowError(viewModel, result.Error);
         }
 
@@ -215,6 +226,17 @@ public sealed class MisSolicitudesController : Controller
         ModelState.AddModelError(string.Empty, isConflict ? ConflictMessage : error?.Message ?? "No fue posible completar la solicitud.");
         Response.StatusCode = isConflict ? StatusCodes.Status409Conflict : StatusCodes.Status400BadRequest;
         return View(viewModel);
+    }
+
+    private async Task PopulateAvailableDaysAsync(
+        VacationRequestFormViewModel viewModel,
+        CancellationToken cancellationToken,
+        bool includeCurrentRequest = false)
+    {
+        var balance = await _getMyBalance.HandleAsync(RequireUserId(), cancellationToken);
+        viewModel.AvailableDays = balance.Value is null
+            ? null
+            : balance.Value.AvailableDays + (includeCurrentRequest ? viewModel.WorkingDays ?? 0 : 0);
     }
 
     private const string ConflictMessage = "La informacion cambio mientras realizaba la operacion. Actualice la pagina e intentelo nuevamente.";

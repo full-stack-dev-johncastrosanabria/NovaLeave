@@ -18,7 +18,7 @@
 <section class="nl-card">
   <div class="nl-card-body">
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Saldos globales de vacaciones</caption>
     <thead>
       <tr>
@@ -34,12 +34,12 @@
       @foreach (var balance in Model.Balances.Items)
       {
         <tr>
-          <td>@balance.UserName</td>
-          <td>@balance.AccruedDays</td>
-          <td>@balance.ReservedDays</td>
-          <td>@balance.DeductedDays</td>
-          <td>@balance.AvailableDays</td>
-          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/saldos/@balance.UserId">Ver</a></td>
+          <td data-label="Persona"><strong>@balance.UserName</strong></td>
+          <td data-label="Acumulado total">@balance.AccruedDays</td>
+          <td data-label="Pendientes">@balance.ReservedDays</td>
+          <td data-label="Días gozados">@balance.DeductedDays</td>
+          <td data-label="Disponible"><strong>@balance.AvailableDays</strong></td>
+          <td data-label="Movimientos"><a class="btn btn-sm btn-outline-primary" href="/rrhh/saldos/@balance.UserId">Ver movimientos</a></td>
         </tr>
       }
     </tbody>

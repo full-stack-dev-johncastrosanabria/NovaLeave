@@ -7,14 +7,14 @@
   <div>
     <p class="nl-page-kicker">Aprobaciones</p>
     <h1 class="nl-page-title">Solicitudes pendientes</h1>
-    <p class="nl-page-description">Solicitudes elegibles para resolucion.</p>
+    <p class="nl-page-description">Revise solicitudes elegibles y su impacto de saldo antes de resolver.</p>
   </div>
   <a class="btn btn-outline-secondary" href="/aprobaciones/historial">Historial</a>
 </div>
 
 <section class="nl-card" aria-labelledby="approvals-title">
   <div class="nl-card-body">
-    <h2 id="approvals-title" class="h5 mb-3">Pendientes</h2>
+    <div class="nl-section-heading"><div><h2 id="approvals-title" class="h5 mb-1">Pendientes</h2><p class="text-body-secondary mb-0">@Model.Requests.Count solicitudes requieren revisión</p></div></div>
     @if (!Model.Requests.Any())
     {
       <div class="nl-empty" role="status">No hay solicitudes pendientes de resolucion.</div>
@@ -22,7 +22,7 @@
     else
     {
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Solicitudes pendientes de resolucion</caption>
     <thead>
       <tr>
@@ -30,8 +30,9 @@
         <th scope="col">Inicio</th>
         <th scope="col">Fin</th>
         <th scope="col">Dias</th>
-        <th scope="col">Disponible</th>
-        <th scope="col">Saldo proyectado</th>
+        <th scope="col">Disponible actual</th>
+        <th scope="col">Días solicitados</th>
+        <th scope="col">Disponible después de aprobar</th>
         <th scope="col">Acciones</th>
       </tr>
     </thead>
@@ -39,13 +40,14 @@
       @foreach (var request in Model.Requests)
       {
         <tr>
-          <td>@request.RequesterId</td>
-          <td>@request.StartDate.ToString("yyyy-MM-dd")</td>
-          <td>@request.EndDate.ToString("yyyy-MM-dd")</td>
-          <td>@request.WorkingDays</td>
-          <td>@request.AvailableDays</td>
-          <td>@request.ProjectedBalanceAfterApproval</td>
-          <td><a class="btn btn-sm btn-outline-primary" href="/aprobaciones/@request.Id">Resolver</a></td>
+          <td data-label="Solicitante"><strong>@request.RequesterName</strong></td>
+          <td data-label="Inicio">@request.StartDate.ToString("dd/MM/yyyy")</td>
+          <td data-label="Fin">@request.EndDate.ToString("dd/MM/yyyy")</td>
+          <td data-label="Días">@request.WorkingDays</td>
+          <td data-label="Disponible actual">@request.AvailableDays</td>
+          <td data-label="Días solicitados">@request.WorkingDays</td>
+          <td data-label="Disponible después de aprobar" data-projected-balance="@request.ProjectedBalanceAfterApproval"><strong class="@(request.ProjectedBalanceAfterApproval < 0 ? "text-danger" : string.Empty)">@request.ProjectedBalanceAfterApproval</strong></td>
+          <td data-label="Acciones"><a class="btn btn-sm btn-outline-primary" href="/aprobaciones/@request.Id">Revisar solicitud</a></td>
         </tr>
       }
     </tbody>

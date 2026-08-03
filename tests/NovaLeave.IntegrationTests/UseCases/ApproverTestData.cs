@@ -8,12 +8,17 @@ namespace NovaLeave.IntegrationTests.UseCases;
 
 internal static class ApproverTestData
 {
-    public static async Task<Guid> CreatePendingRequestAsync(NovaLeaveWebApplicationFactory factory, HttpClient client, string userId = "user-1")
+    public static async Task<Guid> CreatePendingRequestAsync(
+        NovaLeaveWebApplicationFactory factory,
+        HttpClient client,
+        string userId = "user-1",
+        string startDate = "2027-01-04",
+        string endDate = "2027-01-06")
     {
         var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedPost("/mis-solicitudes/crear", Form(
             ("InputMode", "dateRange"),
-            ("StartDate", "2027-01-04"),
-            ("EndDate", "2027-01-06"),
+            ("StartDate", startDate),
+            ("EndDate", endDate),
             ("Reason", "Vacaciones familiares de inicio de ano.")), userId));
 
         if (response.StatusCode != HttpStatusCode.Redirect)
@@ -23,7 +28,7 @@ internal static class ApproverTestData
 
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<NovaLeaveDbContext>();
-        return db.VacationRequests.Single(request => request.OwnerId == userId).Id;
+        return db.VacationRequests.Single(request => request.OwnerId == userId && request.StartDate == DateOnly.Parse(startDate)).Id;
     }
 
     public static async Task SeedUserAndApproverAsync(NovaLeaveWebApplicationFactory factory, bool approverActive = true, bool canResolve = true)

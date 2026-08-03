@@ -40,7 +40,7 @@ public sealed class UC20HRBalancesTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Movimientos RRHH", html);
-        Assert.Contains("Accrual", html);
+        Assert.Contains("Acumulaci", html);
         Assert.DoesNotContain("Editar saldo", html);
         Assert.DoesNotContain("Ajustar", html);
     }

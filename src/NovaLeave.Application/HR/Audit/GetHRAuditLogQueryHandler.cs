@@ -8,6 +8,7 @@ public sealed record GetHRAuditLogQuery(int Page = 1, int PageSize = 50, string?
 public sealed record HRAuditLogItem(
     DateTime TimestampUtc,
     string ActorId,
+    string ActorName,
     string ActorRole,
     string Action,
     string EntityType,
@@ -18,13 +19,15 @@ public sealed record HRAuditLogItem(
 public sealed class GetHRAuditLogQueryHandler
 {
     private readonly IApplicationDbContext _dbContext;
+    private readonly IUserDirectory _userDirectory;
 
-    public GetHRAuditLogQueryHandler(IApplicationDbContext dbContext)
+    public GetHRAuditLogQueryHandler(IApplicationDbContext dbContext, IUserDirectory userDirectory)
     {
         _dbContext = dbContext;
+        _userDirectory = userDirectory;
     }
 
-    public Task<PagedResult<HRAuditLogItem>> HandleAsync(GetHRAuditLogQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResult<HRAuditLogItem>> HandleAsync(GetHRAuditLogQuery query, CancellationToken cancellationToken)
     {
         var page = Math.Max(1, query.Page);
         var pageSize = Math.Max(1, query.PageSize);
@@ -35,13 +38,16 @@ public sealed class GetHRAuditLogQueryHandler
         }
 
         var totalCount = auditQuery.Count();
-        var items = auditQuery
+        var records = auditQuery
             .OrderByDescending(record => record.TimestampUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(record => new HRAuditLogItem(
+            .ToList();
+        var users = await _userDirectory.GetUsersByIdsAsync(records.Select(record => record.ActorId).Distinct().ToArray(), cancellationToken);
+        var items = records.Select(record => new HRAuditLogItem(
                 record.TimestampUtc,
                 record.ActorId,
+                users.TryGetValue(record.ActorId, out var user) ? user.DisplayName : record.ActorRole,
                 record.ActorRole,
                 record.Action,
                 record.EntityType,
@@ -50,6 +56,6 @@ public sealed class GetHRAuditLogQueryHandler
                 record.Data))
             .ToList();
 
-        return Task.FromResult(new PagedResult<HRAuditLogItem>(items, page, pageSize, totalCount));
+        return new PagedResult<HRAuditLogItem>(items, page, pageSize, totalCount);
     }
 }
