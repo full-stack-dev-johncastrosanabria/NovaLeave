@@ -1,3 +1,60 @@
+@{
+    // Navigation is derived from the authenticated identity's roles (RBFV 4.1, 5.x, 7.x).
+    // It is a usability affordance only: every route is still authorized server-side, and
+    // hiding a link is never treated as a security control (constitution 7.1).
+    var currentUser = User;
+    var isAuthenticated = currentUser?.Identity?.IsAuthenticated ?? false;
+    var isUser = isAuthenticated && currentUser!.IsInRole("User");
+    var isApprover = isAuthenticated && currentUser!.IsInRole("Approver");
+    var isHR = isAuthenticated && currentUser!.IsInRole("HR");
+
+    // Only an Approver whose capability is enabled may reach the approver context
+    // (constitution 4.2; RBFV 5.2 for /calendario).
+    var canResolve = isApprover && currentUser!.HasClaim("CanResolveRequests", "true");
+
+    // "Mis roles" lists only contexts the identity actually holds, and is hidden below two
+    // contexts (RBFV 4.2 display condition, RBFV-020).
+    var contexts = new List<(string Key, string Label, string Href)>();
+    if (isUser) { contexts.Add(("user", "Mi espacio", "/mis-solicitudes")); }
+    if (isApprover) { contexts.Add(("approver", "Aprobaciones", "/aprobaciones")); }
+    if (isHR) { contexts.Add(("hr", "RRHH", "/rrhh")); }
+    var showContextSwitcher = contexts.Count >= 2;
+
+    // Each context owns its navigation bar (RBFV 7.1, 7.2, 7.3); the active one is derived from
+    // the current route prefix, so switching context changes only the prefix and the visible
+    // navigation. Notably the RRHH context links the calendar to /rrhh/calendario and never to
+    // the shared /calendario, which carries no HR behaviour (RBFV 7.3).
+    var path = Context.Request.Path.Value ?? string.Empty;
+    var activeContext =
+        isHR && path.StartsWith("/rrhh", StringComparison.OrdinalIgnoreCase) ? "hr"
+        : isApprover && path.StartsWith("/aprobaciones", StringComparison.OrdinalIgnoreCase) ? "approver"
+        : contexts.Count > 0 ? contexts[0].Key
+        : string.Empty;
+
+    var navItems = new List<(string Label, string Href)>();
+    switch (activeContext)
+    {
+        case "hr":
+            navItems.Add(("Solicitudes", "/rrhh/solicitudes"));
+            navItems.Add(("Calendario", "/rrhh/calendario"));
+            navItems.Add(("Saldos", "/rrhh/saldos"));
+            navItems.Add(("Auditoria", "/rrhh/auditoria"));
+            navItems.Add(("Aprobadores", "/rrhh/aprobadores"));
+            break;
+        case "approver":
+            navItems.Add(("Pendientes", "/aprobaciones"));
+            navItems.Add(("Historial", "/aprobaciones/historial"));
+            if (canResolve) { navItems.Add(("Calendario", "/calendario")); }
+            break;
+        case "user":
+            navItems.Add(("Mis solicitudes", "/mis-solicitudes"));
+            navItems.Add(("Mi historial", "/saldo"));
+            navItems.Add(("Calendario", "/calendario"));
+            break;
+    }
+
+    var brandHref = contexts.FirstOrDefault(c => c.Key == activeContext).Href ?? "/";
+}
 <!doctype html>
 <html lang="es">
 <head>
@@ -10,26 +67,40 @@
   <header class="border-bottom">
     <nav class="navbar navbar-expand-lg bg-body">
       <div class="container">
-        <a class="navbar-brand" href="/mis-solicitudes">NovaLeave</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Abrir navegacion">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="mainNavigation">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link" href="/mis-solicitudes">Mis solicitudes</a></li>
-            <li class="nav-item"><a class="nav-link" href="/aprobaciones">Aprobaciones</a></li>
-            <li class="nav-item"><a class="nav-link" href="/saldo">Mi saldo</a></li>
-            <li class="nav-item"><a class="nav-link" href="/calendario">Mi calendario</a></li>
-          </ul>
-          <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Mis roles</button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="/mis-solicitudes">Usuario</a></li>
-              <li><a class="dropdown-item" href="/aprobaciones">Aprobador</a></li>
-              <li><a class="dropdown-item" href="/rrhh">RRHH</a></li>
+        <a class="navbar-brand" href="@brandHref">NovaLeave</a>
+        @if (isAuthenticated)
+        {
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Abrir navegacion">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="mainNavigation">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              @foreach (var item in navItems)
+              {
+                <li class="nav-item"><a class="nav-link" href="@item.Href">@item.Label</a></li>
+              }
             </ul>
+
+            <div class="d-flex align-items-center gap-2">
+              @if (showContextSwitcher)
+              {
+                <div class="dropdown">
+                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="misRoles" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mis roles</button>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="misRoles">
+                    @foreach (var context in contexts)
+                    {
+                      <li><a class="dropdown-item" href="@context.Href">@context.Label</a></li>
+                    }
+                  </ul>
+                </div>
+              }
+              <form method="post" action="/Identity/Account/Logout" class="m-0">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-secondary">Cerrar sesion</button>
+              </form>
+            </div>
           </div>
-        </div>
+        }
       </div>
     </nav>
   </header>

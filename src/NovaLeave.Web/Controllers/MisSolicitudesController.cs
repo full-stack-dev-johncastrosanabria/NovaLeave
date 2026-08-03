@@ -7,6 +7,7 @@ using NovaLeave.Application.Requests.CreateVacationRequest;
 using NovaLeave.Application.Requests.EditPendingRequest;
 using NovaLeave.Application.Requests.Models;
 using NovaLeave.Application.Requests.Queries;
+using NovaLeave.Web.Filters;
 using NovaLeave.Web.ViewModels.MisSolicitudes;
 
 namespace NovaLeave.Web.Controllers;
@@ -20,6 +21,7 @@ public sealed class MisSolicitudesController : Controller
     private readonly GetMyBalanceQueryHandler _getMyBalance;
     private readonly CreateVacationRequestHandler _createVacationRequest;
     private readonly EditPendingRequestHandler _editPendingRequest;
+    private readonly TimeProvider _timeProvider;
 
     public MisSolicitudesController(
         ICurrentUser currentUser,
@@ -27,7 +29,8 @@ public sealed class MisSolicitudesController : Controller
         GetMyRequestDetailQueryHandler getMyRequestDetail,
         GetMyBalanceQueryHandler getMyBalance,
         CreateVacationRequestHandler createVacationRequest,
-        EditPendingRequestHandler editPendingRequest)
+        EditPendingRequestHandler editPendingRequest,
+        TimeProvider timeProvider)
     {
         _currentUser = currentUser;
         _getMyRequests = getMyRequests;
@@ -35,6 +38,7 @@ public sealed class MisSolicitudesController : Controller
         _getMyBalance = getMyBalance;
         _createVacationRequest = createVacationRequest;
         _editPendingRequest = editPendingRequest;
+        _timeProvider = timeProvider;
     }
 
     [HttpGet("/mis-solicitudes")]
@@ -48,12 +52,26 @@ public sealed class MisSolicitudesController : Controller
     [HttpGet("/mis-solicitudes/crear")]
     public IActionResult Create()
     {
-        return View(new CreateVacationRequestViewModel());
+        // The earliest valid start is the day after the current business date (BR-002), so the
+        // form opens on that date instead of DateOnly.MinValue, which rendered as 01/01/0001.
+        var earliestStart = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime).AddDays(1);
+
+        return View(new CreateVacationRequestViewModel
+        {
+            StartDate = earliestStart,
+            EndDate = earliestStart
+        });
     }
 
     [HttpPost("/mis-solicitudes/crear")]
+    [RedisplayFormOnInvalidModel]
     public async Task<IActionResult> Create(CreateVacationRequestViewModel viewModel, CancellationToken cancellationToken)
     {
+        if (!ModelState.IsValid)
+        {
+            return InvalidForm(viewModel);
+        }
+
         var command = new CreateVacationRequestCommand(
             RequireUserId(),
             viewModel.InputMode,
@@ -65,6 +83,14 @@ public sealed class MisSolicitudesController : Controller
         var result = await _createVacationRequest.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
         {
+            // A business-rule failure (overlap, balance, date policy) belongs on the form the
+            // person is looking at, with their input preserved.
+            if (result.Error is null || result.Error.Code == ErrorCodes.Validation)
+            {
+                ModelState.AddModelError(string.Empty, result.Error?.Message ?? "Solicitud invalida.");
+                return InvalidForm(viewModel);
+            }
+
             return ToActionResult(result.Error);
         }
 
@@ -150,6 +176,17 @@ public sealed class MisSolicitudesController : Controller
     private string RequireUserId()
     {
         return _currentUser.UserId ?? throw new InvalidOperationException("Usuario autenticado requerido.");
+    }
+
+    /// <summary>
+    /// Redisplays a form whose input was rejected, keeping the person's entries and attaching the
+    /// messages to the offending fields, while still reporting the failure as 400 so automated
+    /// callers and tests observe an unambiguous status (constitution §11.3, §11.4).
+    /// </summary>
+    private IActionResult InvalidForm<TViewModel>(TViewModel viewModel)
+    {
+        Response.StatusCode = StatusCodes.Status400BadRequest;
+        return View(viewModel);
     }
 
     private IActionResult ToActionResult(Error? error)
