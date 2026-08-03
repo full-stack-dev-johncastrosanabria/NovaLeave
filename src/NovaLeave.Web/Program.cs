@@ -4,6 +4,7 @@ using NovaLeave.Application;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Configuration;
 using NovaLeave.Infrastructure;
+using NovaLeave.Infrastructure.Seeding;
 using NovaLeave.Web.Filters;
 using NovaLeave.Web.Services;
 using Serilog;
@@ -68,6 +69,11 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+// Composition root only: seeds the documented demo identities when
+// NovaLeave:SeedDemoUsers is enabled. No-ops in Production and when the flag is
+// off, and is idempotent across restarts.
+await DemoDataSeeder.SeedAsync(app.Services, app.Environment.IsProduction());
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
@@ -81,6 +87,15 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// The MVP defines no landing page, so "/" had no route and returned 404 after
+// sign-in (the login ReturnUrl is "/"). Send each identity to the first entry
+// point its roles allow. Presentation-level routing only: no business rules.
+app.MapGet("/", (HttpContext http) =>
+    http.User.IsInRole("User") ? Results.Redirect("/mis-solicitudes")
+    : http.User.IsInRole("Approver") ? Results.Redirect("/aprobaciones")
+    : http.User.IsInRole("HR") ? Results.Redirect("/rrhh")
+    : Results.Redirect("/Identity/Account/AccessDenied"));
 
 app.MapRazorPages();
 app.MapGet("/health/live", () => Results.Json(new
