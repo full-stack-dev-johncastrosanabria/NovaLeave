@@ -1,0 +1,38 @@
+@model NovaLeave.Web.ViewModels.RRHH.RRHHCalendarioViewModel
+@{
+    ViewData["Title"] = "Calendario RRHH";
+}
+
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+  <h1 class="h3 mb-0">Calendario RRHH</h1>
+  <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <caption>Calendario organizacional de vacaciones</caption>
+    <thead>
+      <tr>
+        <th scope="col">Solicitante</th>
+        <th scope="col">Inicio</th>
+        <th scope="col">Fin</th>
+        <th scope="col">Dias</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Detalle</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var item in Model.Events)
+      {
+        <tr>
+          <td>@item.RequesterName</td>
+          <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
+          <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
+          <td>@item.WorkingDays</td>
+          <td>@item.Status</td>
+          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/solicitudes/@item.RequestId">Ver</a></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

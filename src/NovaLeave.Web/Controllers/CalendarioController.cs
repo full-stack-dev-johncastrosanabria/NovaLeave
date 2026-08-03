@@ -25,6 +25,11 @@ public sealed class CalendarioController : Controller
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         var userId = _currentUser.UserId ?? throw new InvalidOperationException("Usuario autenticado requerido.");
+        if (User.IsInRole("HR"))
+        {
+            return Forbid();
+        }
+
         if (User.IsInRole("Approver") && User.HasClaim("CanResolveRequests", "true"))
         {
             var approverResult = await _getApproverCalendar.HandleAsync(userId, cancellationToken);

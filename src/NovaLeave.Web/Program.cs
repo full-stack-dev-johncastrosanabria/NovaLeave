@@ -8,6 +8,7 @@ using NovaLeave.Web.Filters;
 using NovaLeave.Web.Services;
 using Serilog;
 using Microsoft.Extensions.Options;
+using NovaLeave.Application.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,7 +57,7 @@ builder.Services.AddAuthorization(options =>
         .Build();
     options.AddPolicy("RequireActiveUser", policy => policy.RequireAuthenticatedUser().RequireRole("User").RequireClaim("IsActive", "true"));
     options.AddPolicy("RequireActiveApprover", policy => policy.RequireAuthenticatedUser().RequireRole("Approver").RequireClaim("IsActive", "true").RequireClaim("CanResolveRequests", "true"));
-    options.AddPolicy("RequireActiveHR", policy => policy.RequireAuthenticatedUser().RequireRole("HR").RequireClaim("IsActive", "true"));
+    options.AddPolicy(HRPolicies.RequireActiveHR, policy => policy.RequireAuthenticatedUser().RequireRole("HR").RequireClaim("IsActive", "true"));
 });
 
 var app = builder.Build();
