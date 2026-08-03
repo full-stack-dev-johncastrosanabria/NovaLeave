@@ -32,9 +32,15 @@ services:
     volumes:
       - novaleave-sqldata:/var/opt/mssql
     healthcheck:
-      # sqlcmd lives in different paths across the mssql/edge images, so probe
-      # the listener instead of depending on a specific tool location.
-      test: ["CMD-SHELL", "(</dev/tcp/localhost/1433) >/dev/null 2>&1 || exit 1"]
+      # azure-sql-edge ships no mssql-tools (no sqlcmd) and no netcat, so probe
+      # the listener with python3, which every mssql/edge image provides.
+      # Note: a `/dev/tcp` redirect cannot be used here — that is a bash-ism and
+      # CMD-SHELL runs under POSIX sh.
+      test:
+        - CMD
+        - python3
+        - -c
+        - "import socket; socket.create_connection(('127.0.0.1', 1433), 3).close()"
       interval: 10s
       timeout: 5s
       retries: 12
