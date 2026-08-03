@@ -17,9 +17,23 @@
         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
         <div class="mb-3">
           <label asp-for="Input.Email" class="form-label">Correo</label>
-          <input asp-for="Input.Email" class="form-control" autocomplete="username" />
+          <input asp-for="Input.Email" class="form-control" autocomplete="username" data-login-email />
           <span asp-validation-for="Input.Email" class="text-danger"></span>
         </div>
+        @if (Model.DemoAccounts.Count > 0)
+        {
+          <div class="mb-3">
+            <label class="form-label" for="DemoAccount">Cuenta</label>
+            <select class="form-select" id="DemoAccount" aria-label="Seleccionar cuenta de demostración" aria-describedby="DemoAccountHelp" data-demo-account-select>
+              <option value="">Seleccionar cuenta</option>
+              @foreach (var account in Model.DemoAccounts)
+              {
+                <option value="@account.Email">@account.Label - @account.Email</option>
+              }
+            </select>
+            <div id="DemoAccountHelp" class="form-text">Seleccione una cuenta preconfigurada para acceso rápido.</div>
+          </div>
+        }
         <div class="mb-4">
           <label asp-for="Input.Password" class="form-label">Contrasena</label>
           <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />

@@ -10,6 +10,14 @@ public enum RoleContext
     HR
 }
 
+public enum CalendarEventCategory
+{
+    OwnRequest,
+    PendingApproval,
+    ApprovedOrganization,
+    ResolvedByMe
+}
+
 public sealed record YearMonth(int Year, int Month)
 {
     public DateOnly FirstDay => new(Year, Month, 1);
@@ -25,7 +33,9 @@ public sealed record CalendarEvent(
     DateOnly EndDate,
     int WorkingDays,
     RequestStatus Status,
-    bool CanNavigateToDetail)
+    bool CanNavigateToDetail,
+    CalendarEventCategory Category = CalendarEventCategory.ApprovedOrganization,
+    string? DetailUrlOverride = null)
 {
     public string AccessibleName
     {
@@ -54,9 +64,28 @@ public sealed record CalendarEvent(
         _ => "text-secondary-emphasis bg-secondary-subtle border-secondary-subtle"
     };
 
+    public string CategoryLabel => Category switch
+    {
+        CalendarEventCategory.OwnRequest => "Mis solicitudes",
+        CalendarEventCategory.PendingApproval => "Pendientes de aprobacion",
+        CalendarEventCategory.ApprovedOrganization => "Aprobadas",
+        CalendarEventCategory.ResolvedByMe => "Resueltas por mi",
+        _ => Category.ToString()
+    };
+
+    public string CategoryCssClass => Category switch
+    {
+        CalendarEventCategory.OwnRequest => "nl-calendar-event-own",
+        CalendarEventCategory.PendingApproval => "nl-calendar-event-pending",
+        CalendarEventCategory.ResolvedByMe => "nl-calendar-event-resolved",
+        _ => "nl-calendar-event-approved"
+    };
+
     public string? DetailUrl(string detailRouteTemplate)
     {
-        return CanNavigateToDetail ? detailRouteTemplate.Replace("{id}", RequestId.ToString(), StringComparison.Ordinal) : null;
+        return CanNavigateToDetail
+            ? (DetailUrlOverride ?? detailRouteTemplate).Replace("{id}", RequestId.ToString(), StringComparison.Ordinal)
+            : null;
     }
 }
 

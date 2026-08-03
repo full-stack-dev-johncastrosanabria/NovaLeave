@@ -91,9 +91,23 @@ a:hover {
 }
 
 .nl-topbar .nav-link:hover,
-.nl-topbar .nav-link:focus {
+.nl-topbar .nav-link:focus,
+.nl-topbar .nav-link.active {
   background: var(--nl-color-navy-800);
   color: #fff;
+}
+
+.nl-context-chip {
+  align-items: center;
+  min-height: 34px;
+  margin-left: 12px;
+  padding: 4px 10px;
+  border: 1px solid rgba(232, 242, 248, 0.42);
+  border-radius: 999px;
+  color: #fff;
+  background: var(--nl-color-navy-800);
+  font-size: 0.8125rem;
+  font-weight: 700;
 }
 
 .nl-brand-mark {
@@ -373,6 +387,26 @@ a:hover {
 
 .nl-calendar-event .nl-badge {
   width: fit-content;
+}
+
+.nl-calendar-event-pending {
+  background: #875A00;
+  border-color: #6E4800;
+}
+
+.nl-calendar-event-own {
+  background: var(--nl-color-blue-600);
+  border-color: var(--nl-color-blue-700);
+}
+
+.nl-calendar-event-approved {
+  background: var(--nl-color-navy-800);
+  border-color: var(--nl-color-navy-900);
+}
+
+.nl-calendar-event-resolved {
+  background: #35546B;
+  border-color: #243D50;
 }
 
 .nl-calendar-list {
