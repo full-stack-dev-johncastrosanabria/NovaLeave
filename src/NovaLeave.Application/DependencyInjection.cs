@@ -9,6 +9,8 @@ using NovaLeave.Application.Balances.Queries;
 using NovaLeave.Application.Calendars.GetPersonalCalendar;
 using NovaLeave.Application.Calendars.GetApproverCalendar;
 using NovaLeave.Application.HR.Audit;
+using NovaLeave.Application.HR.ApproverCapabilities.ListApproverCapabilities;
+using NovaLeave.Application.HR.ApproverCapabilities.ToggleApproverCapability;
 using NovaLeave.Application.HR.Balances;
 using NovaLeave.Application.HR.Calendar;
 using NovaLeave.Application.HR.Requests;
@@ -42,6 +44,9 @@ public static class DependencyInjection
         services.AddScoped<GetHRBalancesQueryHandler>();
         services.AddScoped<GetHRBalanceMovementsQueryHandler>();
         services.AddScoped<GetHRAuditLogQueryHandler>();
+        services.AddScoped<ListApproverCapabilitiesQueryHandler>();
+        services.AddScoped<GetApproverCapabilityQueryHandler>();
+        services.AddScoped<ToggleApproverCapabilityCommandHandler>();
         services.AddScoped<ApproveRequestHandler>();
         services.AddScoped<DeactivateApprovedRequestHandler>();
         services.AddScoped<RejectRequestHandler>();
