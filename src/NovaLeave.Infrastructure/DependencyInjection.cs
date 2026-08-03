@@ -30,6 +30,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
         services.AddScoped<IApproverIdentityService, ApproverIdentityService>();
+        services.AddScoped<IAccrualUserSource, AccrualUserSource>();
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<NovaLeaveDbContext>());
 
         var timeoutCadence = configuration.GetSection(NovaLeaveOptions.SectionName)[nameof(NovaLeaveOptions.TimeoutSchedulerCadence)];
@@ -40,6 +41,13 @@ public static class DependencyInjection
             NovaLeaveOptions.TryGetDailyUtcTime(timeoutCadence, out _))
         {
             services.AddHostedService<PendingRequestTimeoutJob>();
+        }
+
+        var accrualCadence = configuration.GetSection(NovaLeaveOptions.SectionName)[nameof(NovaLeaveOptions.AccrualSchedulerCadence)];
+        if (accrualCadence is not null &&
+            NovaLeaveOptions.TryGetDailyUtcTime(accrualCadence, out _))
+        {
+            services.AddHostedService<MonthlyAccrualJob>();
         }
 
         return services;

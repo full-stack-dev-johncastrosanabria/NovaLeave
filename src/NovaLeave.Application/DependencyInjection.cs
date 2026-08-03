@@ -13,6 +13,7 @@ using NovaLeave.Application.Requests.EditPendingRequest;
 using NovaLeave.Application.Requests.Queries;
 using NovaLeave.Application.Audit;
 using NovaLeave.Application.System.CancelTimedOutRequests;
+using NovaLeave.Application.System.ExecuteMonthlyAccrual;
 using NovaLeave.Domain.Services;
 
 namespace NovaLeave.Application;
@@ -22,6 +23,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<OverlapPolicy>();
+        services.AddScoped<MonthlyAccrualPolicy>();
         services.AddScoped<GetMyRequestsQueryHandler>();
         services.AddScoped<GetMyRequestDetailQueryHandler>();
         services.AddScoped<GetMyBalanceQueryHandler>();
@@ -35,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<RejectRequestHandler>();
         services.AddScoped<SystemAuditWriter>();
         services.AddScoped<CancelTimedOutRequestsHandler>();
+        services.AddScoped<ExecuteMonthlyAccrualHandler>();
         services.AddScoped<CreateVacationRequestHandler>();
         services.AddScoped<EditPendingRequestHandler>();
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
