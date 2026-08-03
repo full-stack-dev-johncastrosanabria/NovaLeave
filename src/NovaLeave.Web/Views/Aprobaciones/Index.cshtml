@@ -17,12 +17,12 @@
     <h2 id="approvals-title" class="h5 mb-3">Pendientes</h2>
     @if (!Model.Requests.Any())
     {
-      <div class="nl-empty" role="status">No hay solicitudes pendientes de resolucion.</div>
+      <div class="nl-empty" role="status"><strong>No hay solicitudes pendientes.</strong><span>Las nuevas solicitudes elegibles aparecerán aquí.</span></div>
     }
     else
     {
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Solicitudes pendientes de resolucion</caption>
     <thead>
       <tr>
@@ -31,7 +31,7 @@
         <th scope="col">Fin</th>
         <th scope="col">Dias</th>
         <th scope="col">Disponible</th>
-        <th scope="col">Saldo proyectado</th>
+        <th scope="col">Disponible después de aprobar</th>
         <th scope="col">Acciones</th>
       </tr>
     </thead>
@@ -39,13 +39,13 @@
       @foreach (var request in Model.Requests)
       {
         <tr>
-          <td>@request.RequesterId</td>
-          <td>@request.StartDate.ToString("yyyy-MM-dd")</td>
-          <td>@request.EndDate.ToString("yyyy-MM-dd")</td>
-          <td>@request.WorkingDays</td>
-          <td>@request.AvailableDays</td>
-          <td>@request.ProjectedBalanceAfterApproval</td>
-          <td><a class="btn btn-sm btn-outline-primary" href="/aprobaciones/@request.Id">Resolver</a></td>
+          <td data-label="Solicitante"><strong>Usuario solicitante</strong><div class="small text-body-secondary">Identidad protegida</div></td>
+          <td data-label="Inicio">@request.StartDate.ToString("dd/MM/yyyy")</td>
+          <td data-label="Fin">@request.EndDate.ToString("dd/MM/yyyy")</td>
+          <td data-label="Días solicitados">@request.WorkingDays</td>
+          <td data-label="Disponible actual">@request.AvailableDays</td>
+          <td data-label="Disponible después de aprobar"><strong>@request.ProjectedBalanceAfterApproval</strong></td>
+          <td data-label="Acción"><a class="btn btn-sm btn-outline-primary" href="/aprobaciones/@request.Id">Revisar solicitud</a></td>
         </tr>
       }
     </tbody>

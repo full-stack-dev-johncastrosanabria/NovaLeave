@@ -14,7 +14,8 @@ public sealed class CalendarAccessibilityTests
         Assert.Contains("data-calendar-keyboard=\"true\"", partial);
         Assert.Contains("tabindex=\"0\"", partial);
         Assert.Contains("aria-label", partial);
-        Assert.Contains("Solicitud", partial);
+        Assert.Contains("data-status=", partial);
+        Assert.Contains("StatusLabel", partial);
     }
 
     private static string FindRepositoryRoot()

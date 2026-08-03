@@ -14,21 +14,22 @@
 
 <section class="nl-card mb-4">
   <div class="nl-card-body">
-<div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" aria-live="polite"></div>
-<dl class="row mb-0">
-  <dt class="col-sm-3">Solicitante</dt>
-  <dd class="col-sm-9">@Model.Request.RequesterId</dd>
-  <dt class="col-sm-3">Inicio</dt>
-  <dd class="col-sm-9">@Model.Request.StartDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Fin</dt>
-  <dd class="col-sm-9">@Model.Request.EndDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Dias habiles</dt>
-  <dd class="col-sm-9">@Model.Request.WorkingDays</dd>
-  <dt class="col-sm-3">Saldo proyectado</dt>
-  <dd class="col-sm-9">@Model.Request.ProjectedBalanceAfterApproval</dd>
+<partial name="_ValidationSummary" />
+<h2 class="h5 mb-3">Información de la solicitud</h2>
+<dl class="nl-detail-grid mb-0">
+  <div><dt>Solicitante</dt><dd>Usuario solicitante</dd></div>
+  <div><dt>Inicio</dt><dd>@Model.Request.StartDate.ToString("dd/MM/yyyy")</dd></div>
+  <div><dt>Fin</dt><dd>@Model.Request.EndDate.ToString("dd/MM/yyyy")</dd></div>
+  <div><dt>Días hábiles</dt><dd>@Model.Request.WorkingDays</dd></div>
 </dl>
   </div>
 </section>
+
+<div class="nl-summary-grid mb-4" aria-label="Impacto en saldo">
+  <section class="nl-card nl-summary-card"><div class="nl-summary-label">Disponible actual</div><div class="nl-summary-value">@Model.Request.AvailableDays</div></section>
+  <section class="nl-card nl-summary-card"><div class="nl-summary-label">Días solicitados</div><div class="nl-summary-value">@Model.Request.WorkingDays</div></section>
+  <section class="nl-card nl-summary-card"><div class="nl-summary-label">Disponible después de aprobar</div><div class="nl-summary-value">@Model.Request.ProjectedBalanceAfterApproval</div></section>
+</div>
 
 @* RowVersion is a concurrency token, not business data: it travels as a hidden
    field in each form below and is never displayed. *@
@@ -40,30 +41,32 @@
 
 <section class="nl-card">
   <div class="nl-card-body">
+<div class="nl-section-heading"><div><h2 class="h5 mb-1">Decisión</h2><p class="text-body-secondary mb-0">Revise el impacto antes de confirmar una acción.</p></div></div>
 <div class="row g-3">
   @if (Model.Request.CanApproveOrReject)
   {
   <div class="col-md-4">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar">
+    <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar" data-submit-once>
       @Html.AntiForgeryToken()
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <button type="submit" class="btn btn-success w-100" aria-label="Aprobar solicitud">Aprobar</button>
+      <button type="submit" class="btn btn-success w-100" aria-label="Aprobar solicitud" data-submit-button>Aprobar solicitud</button>
     </form>
   </div>
   <div class="col-md-8">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar">
+    <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar" data-submit-once>
       @Html.AntiForgeryToken()
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <label class="form-label" for="RejectionReason">Razon de rechazo</label>
-      <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-2" rows="3" maxlength="500">@Model.RejectionReason</textarea>
-      <button type="submit" class="btn btn-danger" aria-label="Rechazar solicitud">Rechazar</button>
+      <label class="form-label" for="RejectionReason">Razón de rechazo</label>
+      <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-2" rows="3" minlength="10" maxlength="500" required data-character-source>@Model.RejectionReason</textarea>
+      <div class="d-flex justify-content-between mb-2"><span class="form-text">Entre 10 y 500 caracteres.</span><span class="form-text" data-character-count>0 / 500</span></div>
+      <button type="submit" class="btn btn-danger" aria-label="Rechazar solicitud" data-submit-button>Rechazar solicitud</button>
     </form>
   </div>
   }
   @if (Model.Request.CanDeactivate)
   {
   <div class="col-md-4">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar">
+    <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar" data-submit-once>
       @Html.AntiForgeryToken()
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
       <button type="submit" class="btn btn-warning w-100" aria-label="Desactivar solicitud aprobada">Desactivar solicitud</button>
