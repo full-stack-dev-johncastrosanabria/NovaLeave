@@ -49,6 +49,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Identity/Account/Login";
     options.LogoutPath = "/Identity/Account/Logout";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(builder.Configuration.GetValue<int>("NovaLeave:SessionTimeoutMinutes"));
+    options.SlidingExpiration = true;
 });
 builder.Services.AddAuthorization(options =>
 {
