@@ -308,14 +308,14 @@
 
 **Purpose**: Full regression, security, accessibility, traceability, and documentation checks after all selected user stories are complete.
 
-- [ ] T146 [P] Add full traceability smoke test asserting UC-01 through UC-22 routes and authorization policies in `tests/NovaLeave.IntegrationTests/Traceability/UseCaseRouteTraceabilityTests.cs`
-- [ ] T147 [P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`
-- [ ] T148 [P] Add audit completeness regression tests for all successful state changes and Pending edits in `tests/NovaLeave.IntegrationTests/Audit/AuditCompletenessTests.cs`
-- [ ] T149 [P] Add security regression tests for CSRF, IDOR, forced browsing, overposting, and session timeout in `tests/NovaLeave.IntegrationTests/Security/SecurityRegressionTests.cs`
-- [ ] T150 [P] Add accessibility regression tests for User, Approver, and HR critical pages in `tests/NovaLeave.EndToEndTests/Accessibility/AccessibilityRegressionTests.cs`
-- [ ] T151 Validate `specs/001-leave-management-mvp/quickstart.md` against the implemented application and update only if commands or paths changed
-- [ ] T152 Run complete test suite from `NovaLeave.sln` and record evidence in implementation handoff notes
-- [ ] T153 Review documentation references and ensure no generated artifact claims implementation evidence without inspected source in `specs/001-leave-management-mvp/`
+- [X] T146 [P] Add full traceability smoke test asserting UC-01 through UC-22 routes and authorization policies in `tests/NovaLeave.IntegrationTests/Traceability/UseCaseRouteTraceabilityTests.cs`
+- [X] T147 [P] Add lifecycle transition matrix regression tests in `tests/NovaLeave.UnitTests/Domain/RequestStateTransitionMatrixTests.cs`
+- [X] T148 [P] Add audit completeness regression tests for all successful state changes and Pending edits in `tests/NovaLeave.IntegrationTests/Audit/AuditCompletenessTests.cs`
+- [X] T149 [P] Add security regression tests for CSRF, IDOR, forced browsing, overposting, and session timeout in `tests/NovaLeave.IntegrationTests/Security/SecurityRegressionTests.cs`
+- [X] T150 [P] Add accessibility regression tests for User, Approver, and HR critical pages in `tests/NovaLeave.EndToEndTests/Accessibility/AccessibilityRegressionTests.cs`
+- [X] T151 Validate `specs/001-leave-management-mvp/quickstart.md` against the implemented application and update only if commands or paths changed
+- [X] T152 Run complete test suite from `NovaLeave.sln` and record evidence in implementation handoff notes
+- [X] T153 Review documentation references and ensure no generated artifact claims implementation evidence without inspected source in `specs/001-leave-management-mvp/`
 
 ---
 
