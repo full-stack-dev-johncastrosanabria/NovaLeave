@@ -1,42 +1,122 @@
+@{
+    var path = Context.Request.Path.Value ?? "/";
+    var hasUserContext = User.IsInRole("User");
+    var hasApproverContext = User.IsInRole("Approver") && User.HasClaim("CanResolveRequests", "true");
+    var hasHrContext = User.IsInRole("HR");
+    var contextCount = (hasUserContext ? 1 : 0) + (hasApproverContext ? 1 : 0) + (hasHrContext ? 1 : 0);
+    var requestedContext = Context.Request.Query["context"].ToString();
+    var activeContext = path.StartsWith("/rrhh", StringComparison.OrdinalIgnoreCase)
+        ? "HR"
+        : path.StartsWith("/aprobaciones", StringComparison.OrdinalIgnoreCase) || string.Equals(requestedContext, "Approver", StringComparison.OrdinalIgnoreCase)
+            ? "Approver"
+            : "User";
+    var activeRoot = activeContext == "HR" && hasHrContext
+        ? "/rrhh"
+        : activeContext == "Approver" && hasApproverContext
+            ? "/aprobaciones"
+            : "/";
+}
 <!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>@ViewData["Title"] - NovaLeave</title>
-  <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" asp-append-version="true" />
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-  <header class="border-bottom">
-    <nav class="navbar navbar-expand-lg bg-body">
+  <div class="nl-shell">
+  <header class="nl-topbar">
+    <nav class="navbar navbar-expand-lg" aria-label="Navegacion principal">
       <div class="container">
-        <a class="navbar-brand" href="/mis-solicitudes">NovaLeave</a>
+        <a class="navbar-brand d-inline-flex align-items-center gap-2 fw-bold" href="@activeRoot">
+          <span class="nl-brand-mark" aria-hidden="true">N</span>
+          <span>NovaLeave</span>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Abrir navegacion">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNavigation">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link" href="/mis-solicitudes">Mis solicitudes</a></li>
-            <li class="nav-item"><a class="nav-link" href="/aprobaciones">Aprobaciones</a></li>
-            <li class="nav-item"><a class="nav-link" href="/saldo">Mi saldo</a></li>
-            <li class="nav-item"><a class="nav-link" href="/calendario">Mi calendario</a></li>
+            @if (hasUserContext && activeContext == "User")
+            {
+              <li class="nav-item"><a class="nav-link" href="/mis-solicitudes">Mi espacio</a></li>
+              <li class="nav-item"><a class="nav-link" href="/mis-solicitudes/crear">Nueva solicitud</a></li>
+              <li class="nav-item"><a class="nav-link" href="/mis-solicitudes">Mi historial</a></li>
+              <li class="nav-item"><a class="nav-link" href="/saldo">Mi saldo</a></li>
+              <li class="nav-item"><a class="nav-link" href="/calendario">Calendario</a></li>
+            }
+            @if (hasApproverContext && activeContext == "Approver")
+            {
+              <li class="nav-item"><a class="nav-link" href="/aprobaciones">Aprobaciones</a></li>
+              <li class="nav-item"><a class="nav-link" href="/aprobaciones">Solicitudes pendientes</a></li>
+              <li class="nav-item"><a class="nav-link" href="/aprobaciones/historial">Historial</a></li>
+              <li class="nav-item"><a class="nav-link" href="/calendario?context=Approver">Calendario aprobador</a></li>
+            }
+            @if (hasHrContext && activeContext == "HR")
+            {
+              <li class="nav-item"><a class="nav-link" href="/rrhh">RRHH</a></li>
+              <li class="nav-item"><a class="nav-link" href="/rrhh/solicitudes">Solicitudes</a></li>
+              <li class="nav-item"><a class="nav-link" href="/rrhh/calendario">Calendario organizacional</a></li>
+              <li class="nav-item"><a class="nav-link" href="/rrhh/saldos">Saldos</a></li>
+              <li class="nav-item"><a class="nav-link" href="/rrhh/auditoria">Auditoria</a></li>
+              <li class="nav-item"><a class="nav-link" href="/rrhh/aprobadores">Aprobadores</a></li>
+            }
           </ul>
-          <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Mis roles</button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="/mis-solicitudes">Usuario</a></li>
-              <li><a class="dropdown-item" href="/aprobaciones">Aprobador</a></li>
-              <li><a class="dropdown-item" href="/rrhh">RRHH</a></li>
-            </ul>
-          </div>
+          @if (User.Identity?.IsAuthenticated == true)
+          {
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+              @if (contextCount > 1)
+              {
+                <div class="dropdown">
+                  <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Mis roles</button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                  @if (hasUserContext)
+                  {
+                    <li><a class="dropdown-item" href="/mis-solicitudes">Mi espacio</a></li>
+                  }
+                  @if (hasApproverContext)
+                  {
+                    <li><a class="dropdown-item" href="/aprobaciones">Aprobaciones</a></li>
+                  }
+                  @if (hasHrContext)
+                  {
+                    <li><a class="dropdown-item" href="/rrhh">RRHH</a></li>
+                  }
+                  </ul>
+                </div>
+              }
+              <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu de usuario">
+                  @(User.Identity.Name ?? "Usuario")
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><span class="dropdown-item-text text-body-secondary">@(User.Identity.Name ?? "Usuario autenticado")</span></li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <form method="post" asp-area="Identity" asp-page="/Account/Logout">
+                      <button type="submit" class="dropdown-item">Cerrar sesion</button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          }
         </div>
       </div>
     </nav>
   </header>
-  <main class="container py-4" role="main">
+  <main class="nl-main" role="main">
+    <div class="container">
     @RenderBody()
+    </div>
   </main>
-  <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <footer class="border-top py-3 bg-white">
+    <div class="container small text-secondary">NovaLeave</div>
+  </footer>
+  <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
   @await RenderSectionAsync("Scripts", required: false)
+  </div>
 </body>
 </html>

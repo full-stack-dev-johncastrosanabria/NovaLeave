@@ -4,18 +4,29 @@
     ViewData["Title"] = "Iniciar sesion";
 }
 
-<h1>Iniciar sesion</h1>
-<form method="post" class="needs-validation" novalidate>
-  <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-  <div class="mb-3">
-    <label asp-for="Input.Email" class="form-label">Correo</label>
-    <input asp-for="Input.Email" class="form-control" autocomplete="username" />
-    <span asp-validation-for="Input.Email" class="text-danger"></span>
-  </div>
-  <div class="mb-3">
-    <label asp-for="Input.Password" class="form-label">Contrasena</label>
-    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
-    <span asp-validation-for="Input.Password" class="text-danger"></span>
-  </div>
-  <button type="submit" class="btn btn-primary">Iniciar sesion</button>
-</form>
+<div class="nl-login-page">
+  <section class="nl-card nl-login-card" aria-labelledby="login-title">
+    <div class="nl-card-body">
+      <div class="text-center mb-4">
+        <span class="nl-brand-mark mx-auto mb-3" aria-hidden="true">N</span>
+        <p class="nl-page-kicker mb-1">NovaLeave</p>
+        <h1 id="login-title" class="nl-page-title">Iniciar sesion</h1>
+      </div>
+
+      <form method="post" class="needs-validation" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="mb-3">
+          <label asp-for="Input.Email" class="form-label">Correo</label>
+          <input asp-for="Input.Email" class="form-control" autocomplete="username" />
+          <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="mb-4">
+          <label asp-for="Input.Password" class="form-label">Contrasena</label>
+          <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+          <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Iniciar sesion</button>
+      </form>
+    </div>
+  </section>
+</div>

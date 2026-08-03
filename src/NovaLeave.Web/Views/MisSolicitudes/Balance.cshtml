@@ -18,18 +18,26 @@
     }
 }
 
-<h1 class="h3 mb-4">Mi saldo</h1>
-
-<div class="row g-3 mb-4">
-  <div class="col-md-3"><div class="border rounded p-3"><strong>Acumulado</strong><div>@Model.Balance.AccruedDays</div></div></div>
-  <div class="col-md-3"><div class="border rounded p-3"><strong>Reservado</strong><div>@Model.Balance.ReservedDays</div></div></div>
-  <div class="col-md-3"><div class="border rounded p-3"><strong>Deducido</strong><div>@Model.Balance.DeductedDays</div></div></div>
-  <div class="col-md-3"><div class="border rounded p-3"><strong>Disponible</strong><div>@Model.Balance.AvailableDays</div></div></div>
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">Mi espacio</p>
+    <h1 class="nl-page-title">Mi saldo</h1>
+    <p class="nl-page-description">Resumen e historial de movimientos de vacaciones.</p>
+  </div>
 </div>
 
-<h2 class="h5">Historial de movimientos</h2>
+<div class="nl-summary-grid mb-4">
+  <section class="nl-card nl-summary-card" aria-label="Acumulado total"><div class="nl-summary-label">Acumulado total</div><div class="nl-summary-value">@Model.Balance.AccruedDays</div></section>
+  <section class="nl-card nl-summary-card" aria-label="Pendientes"><div class="nl-summary-label">Pendientes</div><div class="nl-summary-value">@Model.Balance.ReservedDays</div></section>
+  <section class="nl-card nl-summary-card" aria-label="Días gozados"><div class="nl-summary-label">Días gozados</div><div class="nl-summary-value">@Model.Balance.DeductedDays</div></section>
+  <section class="nl-card nl-summary-card" aria-label="Disponible"><div class="nl-summary-label">Disponible</div><div class="nl-summary-value">@Model.Balance.AvailableDays</div></section>
+</div>
+
+<section class="nl-card" aria-labelledby="movements-title">
+  <div class="nl-card-body">
+<h2 id="movements-title" class="h5 mb-3">Historial de movimientos</h2>
 <div class="table-responsive">
-  <table class="table table-striped align-middle">
+  <table class="table nl-table nl-table-card align-middle">
     <caption>Movimientos de saldo propios</caption>
     <thead>
       <tr>
@@ -50,3 +58,5 @@
     </tbody>
   </table>
 </div>
+  </div>
+</section>

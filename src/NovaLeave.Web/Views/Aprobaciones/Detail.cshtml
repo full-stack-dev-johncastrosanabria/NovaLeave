@@ -3,12 +3,18 @@
     ViewData["Title"] = "Detalle para resolucion";
 }
 
-<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-  <h1 class="h3 mb-0">Detalle para resolucion</h1>
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">Aprobaciones</p>
+    <h1 class="nl-page-title">Detalle para resolucion</h1>
+    <p class="nl-page-description">Revisa la solicitud y el saldo proyectado antes de resolver.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/aprobaciones">Volver</a>
 </div>
 
-<dl class="row">
+<section class="nl-card mb-4">
+  <div class="nl-card-body">
+<dl class="row mb-0">
   <dt class="col-sm-3">Solicitante</dt>
   <dd class="col-sm-9">@Model.Request.RequesterId</dd>
   <dt class="col-sm-3">Inicio</dt>
@@ -22,12 +28,16 @@
   <dt class="col-sm-3">RowVersion</dt>
   <dd class="col-sm-9"><code>@Model.RowVersion</code></dd>
 </dl>
+  </div>
+</section>
 
 @if (Model.Request.HasOverlapWarning)
 {
   <div class="alert alert-warning" role="alert">Existe una advertencia de traslape.</div>
 }
 
+<section class="nl-card">
+  <div class="nl-card-body">
 <div class="row g-3">
   @if (Model.Request.CanApproveOrReject)
   {
@@ -62,3 +72,5 @@
   </div>
   }
 </div>
+  </div>
+</section>

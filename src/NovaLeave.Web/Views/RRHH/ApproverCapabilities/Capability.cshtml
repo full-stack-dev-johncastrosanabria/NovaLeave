@@ -3,20 +3,30 @@
     ViewData["Title"] = "Capacidad de aprobador";
 }
 
-<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-  <h1 class="h3 mb-0">Capacidad de aprobador</h1>
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">RRHH</p>
+    <h1 class="nl-page-title">Capacidad de aprobador</h1>
+    <p class="nl-page-description">Cambio controlado de canResolveRequests para un aprobador existente.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/rrhh/aprobadores">Volver</a>
 </div>
 
-<dl class="row">
+<section class="nl-card mb-4">
+  <div class="nl-card-body">
+<dl class="row mb-0">
   <dt class="col-sm-3">Aprobador</dt>
   <dd class="col-sm-9">@Model.Approver.DisplayName</dd>
   <dt class="col-sm-3">Estado actual</dt>
-  <dd class="col-sm-9">@(Model.Approver.CanResolveRequests ? "Habilitado" : "Deshabilitado")</dd>
+  <dd class="col-sm-9"><span class="nl-badge @(Model.Approver.CanResolveRequests ? "nl-badge-approved" : "nl-badge-neutral")">@(Model.Approver.CanResolveRequests ? "Habilitado" : "Deshabilitado")</span></dd>
   <dt class="col-sm-3">RowVersion</dt>
   <dd class="col-sm-9"><code>@Model.RowVersion</code></dd>
 </dl>
+  </div>
+</section>
 
+<section class="nl-card">
+  <div class="nl-card-body">
 <form method="post" action="/rrhh/aprobadores/@Model.Approver.UserId/capacidad" class="vstack gap-3">
   <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
 
@@ -60,3 +70,5 @@
     </div>
   </div>
 </form>
+  </div>
+</section>

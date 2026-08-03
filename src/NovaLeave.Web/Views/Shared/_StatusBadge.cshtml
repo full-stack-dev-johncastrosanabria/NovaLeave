@@ -1,3 +1,24 @@
 @model string
+@{
+    var normalized = Model?.Trim() ?? string.Empty;
+    var cssClass = normalized switch
+    {
+        "Pending" or "Pendiente" => "nl-badge-pending",
+        "Approved" or "Aprobada" => "nl-badge-approved",
+        "Rejected" or "Rechazada" => "nl-badge-rejected",
+        "CancelledByTimeout" or "Cancelada automaticamente" => "nl-badge-neutral",
+        "CancelledByApprover" or "Cancelada por aprobador" => "nl-badge-neutral",
+        _ => "nl-badge-neutral"
+    };
+    var label = normalized switch
+    {
+        "Pending" => "Pendiente",
+        "Approved" => "Aprobada",
+        "Rejected" => "Rechazada",
+        "CancelledByTimeout" => "Cancelada automaticamente",
+        "CancelledByApprover" => "Cancelada por aprobador",
+        _ => normalized
+    };
+}
 
-<span class="badge text-bg-secondary">@Model</span>
+<span class="nl-badge @cssClass" aria-label="@Model">@label</span>

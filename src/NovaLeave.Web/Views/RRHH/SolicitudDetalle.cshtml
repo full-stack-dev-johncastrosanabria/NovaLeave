@@ -3,12 +3,21 @@
     ViewData["Title"] = "Detalle RRHH";
 }
 
-<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-  <h1 class="h3 mb-0">Detalle RRHH</h1>
-  <a class="btn btn-outline-secondary" href="/rrhh/solicitudes">Volver</a>
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">RRHH</p>
+    <h1 class="nl-page-title">Detalle de solicitud</h1>
+    <p class="nl-page-description">Vista de consulta de la solicitud y su auditoria.</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <span class="nl-badge nl-readonly">Solo lectura</span>
+    <a class="btn btn-outline-secondary" href="/rrhh/solicitudes">Volver</a>
+  </div>
 </div>
 
-<dl class="row">
+<section class="nl-card mb-4">
+  <div class="nl-card-body">
+<dl class="row mb-0">
   <dt class="col-sm-3">Solicitante</dt>
   <dd class="col-sm-9">@Model.Request.RequesterName</dd>
   <dt class="col-sm-3">Inicio</dt>
@@ -18,7 +27,7 @@
   <dt class="col-sm-3">Dias habiles</dt>
   <dd class="col-sm-9">@Model.Request.WorkingDays</dd>
   <dt class="col-sm-3">Estado</dt>
-  <dd class="col-sm-9">@Model.Request.Status</dd>
+  <dd class="col-sm-9"><partial name="_StatusBadge" model="Model.Request.Status.ToString()" /></dd>
   <dt class="col-sm-3">Razon</dt>
   <dd class="col-sm-9">@Model.Request.Reason</dd>
   @if (!string.IsNullOrWhiteSpace(Model.Request.RejectionReason))
@@ -27,10 +36,14 @@
     <dd class="col-sm-9">@Model.Request.RejectionReason</dd>
   }
 </dl>
+  </div>
+</section>
 
-<h2 class="h5">Auditoria</h2>
+<section class="nl-card">
+  <div class="nl-card-body">
+<h2 class="h5 mb-3">Auditoria</h2>
 <div class="table-responsive">
-  <table class="table table-striped align-middle">
+  <table class="table nl-table nl-table-card align-middle">
     <caption>Auditoria de la solicitud</caption>
     <thead>
       <tr>
@@ -55,3 +68,5 @@
     </tbody>
   </table>
 </div>
+  </div>
+</section>

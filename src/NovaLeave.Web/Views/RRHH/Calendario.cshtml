@@ -3,10 +3,16 @@
     ViewData["Title"] = "Calendario RRHH";
 }
 
-<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-  <h1 class="h3 mb-0">Calendario RRHH</h1>
-  <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">RRHH</p>
+    <h1 class="nl-page-title">Calendario organizacional</h1>
+    <p class="nl-page-description">Periodos de vacaciones visibles para RRHH.</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <span class="nl-badge nl-readonly">Solo lectura</span>
+    <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
+  </div>
 </div>
 
-<span class="badge text-bg-light border mb-3">Solo lectura</span>
 <partial name="_Calendar" model="Model.Calendar" />

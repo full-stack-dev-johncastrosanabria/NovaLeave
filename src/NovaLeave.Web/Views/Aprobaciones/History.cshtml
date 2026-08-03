@@ -3,10 +3,18 @@
     ViewData["Title"] = "Historial de resoluciones";
 }
 
-<h1 class="h3 mb-4">Historial de resoluciones</h1>
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">Aprobaciones</p>
+    <h1 class="nl-page-title">Historial de resoluciones</h1>
+    <p class="nl-page-description">Acciones registradas para el aprobador actual.</p>
+  </div>
+</div>
 
+<section class="nl-card">
+  <div class="nl-card-body">
 <div class="table-responsive">
-  <table class="table table-striped align-middle">
+  <table class="table nl-table nl-table-card align-middle">
     <caption>Historial de acciones del aprobador</caption>
     <thead>
       <tr>
@@ -25,9 +33,11 @@
           <td>@item.Action</td>
           <td><a href="/aprobaciones/@item.RequestId">@item.RequestId</a></td>
           <td>@item.RequesterId</td>
-          <td>@item.Status</td>
+          <td><partial name="_StatusBadge" model="item.Status.ToString()" /></td>
         </tr>
       }
     </tbody>
   </table>
 </div>
+  </div>
+</section>

@@ -3,13 +3,22 @@
     ViewData["Title"] = "Auditoria RRHH";
 }
 
-<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-  <h1 class="h3 mb-0">Auditoria RRHH</h1>
-  <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">RRHH</p>
+    <h1 class="nl-page-title">Auditoria</h1>
+    <p class="nl-page-description">Registros relevantes para consulta de RRHH.</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <span class="nl-badge nl-readonly">Solo lectura</span>
+    <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
+  </div>
 </div>
 
+<section class="nl-card">
+  <div class="nl-card-body">
 <div class="table-responsive">
-  <table class="table table-striped align-middle">
+  <table class="table nl-table nl-table-card align-middle">
     <caption>Registros de auditoria relevantes para RRHH</caption>
     <thead>
       <tr>
@@ -38,5 +47,7 @@
     </tbody>
   </table>
 </div>
+  </div>
+</section>
 
 <p class="text-body-secondary">Pagina @Model.Records.Page de @Math.Max(1, (int)Math.Ceiling(Model.Records.TotalCount / (double)Model.Records.PageSize))</p>
