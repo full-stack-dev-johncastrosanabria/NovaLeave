@@ -9,6 +9,25 @@ namespace NovaLeave.IntegrationTests.UseCases;
 public sealed class UC04CreateVacationRequestTests
 {
     [Fact]
+    public async Task Create_Rejects_A_Reason_Shorter_Than_The_Approved_Minimum()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await IntegrationTestDatabase.ResetAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "user-1", "user1@example.test", 10);
+        var client = factory.CreateClient();
+
+        var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedPost("/mis-solicitudes/crear", Form(
+            ("InputMode", "dateRange"),
+            ("StartDate", "2027-01-04"),
+            ("EndDate", "2027-01-06"),
+            ("Reason", "Corto"))));
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("entre 10 y 500 caracteres", html);
+    }
+
+    [Fact]
     public async Task DateRange_Create_Reserves_Balance_And_Audits_Atomically()
     {
         await using var factory = new NovaLeaveWebApplicationFactory();

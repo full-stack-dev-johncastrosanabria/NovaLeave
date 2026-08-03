@@ -17,8 +17,9 @@
 
 <section class="nl-card">
   <div class="nl-card-body">
+<form method="get" class="nl-filter-bar mb-3"><div><label class="form-label" for="action">Acción</label><input class="form-control" id="action" name="action" value="@Context.Request.Query["action"]" placeholder="Ej. Approve" /></div><button class="btn btn-outline-primary" type="submit">Aplicar filtro</button></form>
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Registros de auditoria relevantes para RRHH</caption>
     <thead>
       <tr>
@@ -35,13 +36,13 @@
       @foreach (var record in Model.Records.Items)
       {
         <tr>
-          <td>@record.TimestampUtc</td>
-          <td>@record.ActorId</td>
-          <td>@record.ActorRole</td>
-          <td>@record.Action</td>
-          <td>@record.EntityType @record.EntityId</td>
-          <td>@record.Result</td>
-          <td>@record.Data</td>
+          <td data-label="Fecha">@record.TimestampUtc.ToString("dd/MM/yyyy HH:mm")</td>
+          <td data-label="Actor"><strong>@record.ActorName</strong></td>
+          <td data-label="Rol">@record.ActorRole</td>
+          <td data-label="Acción">@record.Action</td>
+          <td data-label="Entidad">@record.EntityType</td>
+          <td data-label="Resultado">@record.Result</td>
+          <td data-label="Detalle"><span class="text-body-secondary">@(string.IsNullOrWhiteSpace(record.Data) ? "Sin detalle adicional" : "Información operativa protegida")</span></td>
         </tr>
       }
     </tbody>

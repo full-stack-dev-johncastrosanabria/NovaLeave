@@ -18,7 +18,7 @@
 <section class="nl-card">
   <div class="nl-card-body">
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Identidades con rol Aprobador</caption>
     <thead>
       <tr>
@@ -32,10 +32,10 @@
       @foreach (var approver in Model.Approvers)
       {
         <tr>
-          <td>@approver.DisplayName</td>
-          <td><span class="nl-badge @(approver.IsActive ? "nl-badge-approved" : "nl-badge-neutral")">@(approver.IsActive ? "Activo" : "Inactivo")</span></td>
-          <td><span class="nl-badge @(approver.CanResolveRequests ? "nl-badge-approved" : "nl-badge-neutral")">@(approver.CanResolveRequests ? "Habilitado" : "Deshabilitado")</span></td>
-          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/aprobadores/@approver.UserId/capacidad">Cambiar capacidad</a></td>
+          <td data-label="Aprobador">@approver.DisplayName</td>
+          <td data-label="Estado"><span class="nl-badge @(approver.IsActive ? "nl-badge-approved" : "nl-badge-neutral")">@(approver.IsActive ? "Cuenta activa" : "Cuenta inactiva")</span></td>
+          <td data-label="Capacidad"><span class="nl-badge @(approver.CanResolveRequests ? "nl-badge-approved" : "nl-badge-neutral")">@(approver.CanResolveRequests ? "Habilitado para resolver" : "Deshabilitado para resolver")</span></td>
+          <td data-label="Accion"><a class="btn btn-sm btn-outline-primary" href="/rrhh/aprobadores/@approver.UserId/capacidad">Cambiar capacidad</a></td>
         </tr>
       }
     </tbody>

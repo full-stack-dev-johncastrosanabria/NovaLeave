@@ -10,11 +10,13 @@ public sealed class GetApproverHistoryQueryHandler
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly IApproverIdentityService _identityService;
+    private readonly IUserDirectory _userDirectory;
 
-    public GetApproverHistoryQueryHandler(IApplicationDbContext dbContext, IApproverIdentityService identityService)
+    public GetApproverHistoryQueryHandler(IApplicationDbContext dbContext, IApproverIdentityService identityService, IUserDirectory userDirectory)
     {
         _dbContext = dbContext;
         _identityService = identityService;
+        _userDirectory = userDirectory;
     }
 
     public async Task<Result<IReadOnlyList<ResolutionHistoryItem>>> HandleAsync(string approverId, CancellationToken cancellationToken)
@@ -25,7 +27,7 @@ public sealed class GetApproverHistoryQueryHandler
             return Result<IReadOnlyList<ResolutionHistoryItem>>.Failure(authorization);
         }
 
-        var items = _dbContext.AuditRecords
+        var rows = _dbContext.AuditRecords
             .Where(audit => audit.ActorId == approverId && (audit.Action == "Approve" || audit.Action == "Reject" || audit.Action == "Deactivate"))
             .OrderByDescending(audit => audit.TimestampUtc)
             .Take(50)
@@ -33,9 +35,21 @@ public sealed class GetApproverHistoryQueryHandler
             .Select(audit =>
             {
                 var request = _dbContext.VacationRequests.Single(request => request.Id == audit.EntityId);
-                return new ResolutionHistoryItem(audit.TimestampUtc, audit.Action, request.Id, request.OwnerId, request.Status);
+                return new { Audit = audit, Request = request };
             })
             .ToList();
+        var users = await _userDirectory.GetUsersByIdsAsync(rows.Select(item => item.Request.OwnerId).Distinct().ToArray(), cancellationToken);
+        var items = rows.Select(item => new ResolutionHistoryItem(
+            item.Audit.TimestampUtc,
+            item.Audit.Action,
+            item.Request.Id,
+            item.Request.OwnerId,
+            users.TryGetValue(item.Request.OwnerId, out var user) ? user.DisplayName : "Usuario",
+            item.Request.StartDate,
+            item.Request.EndDate,
+            item.Request.WorkingDays,
+            item.Request.Status,
+            item.Request.RejectionReason)).ToList();
 
         return Result<IReadOnlyList<ResolutionHistoryItem>>.Success(items);
     }

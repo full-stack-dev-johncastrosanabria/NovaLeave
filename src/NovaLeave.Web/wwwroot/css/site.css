@@ -67,6 +67,13 @@ a:hover {
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.nl-shell-container,
+.nl-content-container {
+  width: min(100%, 1480px);
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3vw, 40px);
+}
+
 .nl-topbar .navbar-brand,
 .nl-topbar .nav-link,
 .nl-topbar .navbar-toggler,
@@ -110,6 +117,32 @@ a:hover {
   font-weight: 700;
 }
 
+.nl-user-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+.nl-user-avatar {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--nl-color-blue-100);
+  color: var(--nl-color-navy-900);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.nl-user-email {
+  max-width: 210px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .nl-brand-mark {
   width: 34px;
   height: 34px;
@@ -119,6 +152,12 @@ a:hover {
   background: var(--nl-color-blue-100);
   color: var(--nl-color-navy-900);
   font-weight: 800;
+}
+
+.nl-brand-mark-lg {
+  width: 48px;
+  height: 48px;
+  font-size: 1.25rem;
 }
 
 .nl-main {
@@ -167,6 +206,23 @@ a:hover {
   padding: 20px;
 }
 
+.nl-form-card {
+  max-width: 960px;
+}
+
+.nl-section-heading,
+.nl-calendar-header,
+.nl-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.nl-section-heading {
+  margin-bottom: 16px;
+}
+
 .nl-summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -188,6 +244,41 @@ a:hover {
   font-size: 2rem;
   font-weight: 700;
   line-height: 1.15;
+}
+
+.nl-module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.nl-module-card {
+  display: block;
+  min-height: 190px;
+  padding: 22px;
+  color: var(--nl-color-text-primary);
+  text-decoration: none;
+}
+
+.nl-module-card h2 {
+  margin: 8px 0;
+  font-size: 1.125rem;
+}
+
+.nl-module-card p {
+  color: var(--nl-color-text-secondary);
+}
+
+.nl-module-card > span:last-child {
+  color: var(--nl-color-blue-700);
+  font-weight: 700;
+}
+
+.nl-module-card:hover,
+.nl-module-card:focus-visible {
+  color: var(--nl-color-text-primary);
+  border-color: #9AB7C9;
+  background: var(--nl-color-blue-050);
 }
 
 .nl-table {
@@ -279,6 +370,135 @@ a:hover {
   box-shadow: 0 0 0 0.2rem rgba(30, 90, 133, 0.18);
 }
 
+.nl-segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 680px;
+  padding: 4px;
+  border: 1px solid var(--nl-color-border);
+  border-radius: 8px;
+  background: var(--nl-color-blue-050);
+}
+
+.nl-segmented input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nl-segmented label {
+  display: grid;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 12px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--nl-color-text-secondary);
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+}
+
+.nl-segmented input:checked + label {
+  border-color: #A8CBDF;
+  background: #fff;
+  color: var(--nl-color-navy-900);
+  box-shadow: 0 1px 2px rgba(16, 42, 67, 0.08);
+}
+
+.nl-segmented input:focus-visible + label {
+  outline: 3px solid rgba(30, 90, 133, 0.45);
+  outline-offset: 2px;
+}
+
+.nl-calculation-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--nl-color-border);
+  border-radius: 8px;
+  background: var(--nl-color-border);
+}
+
+.nl-calculation-panel > div {
+  display: grid;
+  gap: 4px;
+  min-height: 76px;
+  padding: 14px;
+  background: var(--nl-color-blue-050);
+}
+
+.nl-calculation-panel span {
+  color: var(--nl-color-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.nl-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.nl-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.nl-detail-list > div {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.7fr) 1fr;
+  gap: 16px;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--nl-color-border-subtle);
+}
+
+.nl-detail-list > div:last-child {
+  border-bottom: 0;
+}
+
+.nl-detail-list dt {
+  color: var(--nl-color-text-secondary);
+  font-weight: 600;
+}
+
+.nl-detail-list dd {
+  margin: 0;
+}
+
+.nl-reason {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.nl-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--nl-color-border-subtle);
+  border-radius: 8px;
+  background: var(--nl-color-blue-050);
+}
+
+.nl-filter-bar > div {
+  min-width: min(100%, 220px);
+}
+
+.nl-pagination {
+  margin-top: 16px;
+  color: var(--nl-color-text-secondary);
+}
+
+.nl-pagination > div {
+  display: flex;
+  gap: 8px;
+}
+
 .nl-badge {
   display: inline-flex;
   align-items: center;
@@ -323,6 +543,8 @@ a:hover {
 }
 
 .nl-empty {
+  display: grid;
+  gap: 6px;
   padding: 32px;
   text-align: center;
   color: var(--nl-color-text-secondary);
@@ -333,10 +555,21 @@ a:hover {
   display: grid;
   place-items: center;
   padding: 24px;
+  min-width: 0;
 }
 
 .nl-login-card {
-  width: min(100%, 440px);
+  width: 100%;
+  max-width: 440px;
+  min-width: 0;
+}
+
+.nl-login-card .nl-card-body {
+  padding: clamp(24px, 5vw, 38px);
+}
+
+.nl-login-card .nl-page-title {
+  overflow-wrap: anywhere;
 }
 
 .nl-calendar {
@@ -390,8 +623,9 @@ a:hover {
 }
 
 .nl-calendar-event-pending {
-  background: #875A00;
-  border-color: #6E4800;
+  background: var(--nl-color-blue-100);
+  border-color: var(--nl-color-blue-600);
+  color: var(--nl-color-navy-900);
 }
 
 .nl-calendar-event-own {
@@ -405,17 +639,94 @@ a:hover {
 }
 
 .nl-calendar-event-resolved {
-  background: #35546B;
-  border-color: #243D50;
+  background: #526B7A;
+  border-color: #405866;
 }
 
 .nl-calendar-list {
   display: none;
 }
 
+@media (max-width: 991.98px) {
+  .nl-topbar .navbar-collapse {
+    margin-top: 12px;
+    padding: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  .nl-topbar .nav-link {
+    width: 100%;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .nl-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nl-responsive-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .nl-responsive-table,
+  .nl-responsive-table tbody,
+  .nl-responsive-table tr,
+  .nl-responsive-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .nl-responsive-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .nl-responsive-table tr {
+    overflow: hidden;
+    border: 1px solid var(--nl-color-border);
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .nl-responsive-table td {
+    display: grid;
+    grid-template-columns: minmax(118px, 0.7fr) 1fr;
+    gap: 12px;
+    border: 0;
+    border-bottom: 1px solid var(--nl-color-border-subtle);
+    text-align: left;
+  }
+
+  .nl-responsive-table td::before {
+    content: attr(data-label);
+    color: var(--nl-color-text-secondary);
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  .nl-responsive-table td:last-child {
+    border-bottom: 0;
+  }
+}
+
 @media (max-width: 575.98px) {
   .nl-main {
     padding-block: 16px 28px;
+  }
+
+  .nl-login-page {
+    display: block;
+    min-height: 0;
+    padding: 64px 0 24px;
+  }
+
+  .nl-login-card {
+    width: calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
   }
 
   .nl-page-header {
@@ -427,8 +738,31 @@ a:hover {
     width: 100%;
   }
 
-  .nl-table-card {
-    min-width: 680px;
+  .nl-context-chip {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nl-segmented {
+    grid-template-columns: 1fr;
+  }
+
+  .nl-calendar-header,
+  .nl-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .nl-calendar-header .btn-group,
+  .nl-pagination > div {
+    width: 100%;
+  }
+
+  .nl-calendar-header .btn,
+  .nl-pagination .btn {
+    flex: 1;
   }
 
   .nl-calendar-list {

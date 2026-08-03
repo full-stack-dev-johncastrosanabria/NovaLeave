@@ -15,7 +15,7 @@
         : activeContext == "Approver" && hasApproverContext
             ? "/aprobaciones"
             : "/mis-solicitudes";
-    var activeContextLabel = activeContext == "HR" ? "RRHH" : activeContext == "Approver" ? "Aprobaciones" : "Mi espacio";
+    var activeContextLabel = activeContext == "HR" ? "RRHH" : activeContext == "Approver" ? "Aprobador · Aprobaciones" : "Usuario · Mi espacio";
 }
 <!doctype html>
 <html lang="es">
@@ -30,15 +30,17 @@
   <div class="nl-shell">
   <header class="nl-topbar">
     <nav class="navbar navbar-expand-lg" aria-label="Navegacion principal">
-      <div class="container">
+      <div class="container-fluid nl-shell-container">
         <a class="navbar-brand d-inline-flex align-items-center gap-2 fw-bold" href="@activeRoot">
           <span class="nl-brand-mark" aria-hidden="true">N</span>
           <span>NovaLeave</span>
         </a>
         @if (User.Identity?.IsAuthenticated == true)
         {
-          <span class="nl-context-chip d-none d-md-inline-flex" aria-label="Contexto activo">@activeContextLabel</span>
+          <span class="nl-context-chip" aria-label="Contexto activo">@activeContextLabel</span>
         }
+        @if (User.Identity?.IsAuthenticated == true)
+        {
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Abrir navegacion">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -46,8 +48,8 @@
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             @if (hasUserContext && activeContext == "User")
             {
-              <li class="nav-item"><a class="nav-link @(path.Equals("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes">Mi historial</a></li>
-              <li class="nav-item"><a class="nav-link" href="/mis-solicitudes/crear">Nueva solicitud</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes">Mi espacio</a></li>
+              <li class="nav-item"><a class="nav-link @(path.StartsWith("/mis-solicitudes/crear", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes/crear">Nueva solicitud</a></li>
               <li class="nav-item"><a class="nav-link @(path.Equals("/saldo", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/saldo">Mi saldo</a></li>
               <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "User" ? "active" : string.Empty)" href="/calendario">Calendario</a></li>
             }
@@ -91,11 +93,13 @@
                 </div>
               }
               <div class="dropdown">
-                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu de usuario">
-                  @(User.Identity.Name ?? "Usuario")
+                <button class="btn nl-user-menu dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menú de usuario">
+                  <span class="nl-user-avatar" aria-hidden="true">@((User.Identity.Name ?? "U")[0].ToString().ToUpperInvariant())</span>
+                  <span class="nl-user-email">@(User.Identity.Name ?? "Usuario")</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li><span class="dropdown-item-text text-body-secondary">@(User.Identity.Name ?? "Usuario autenticado")</span></li>
+                  <li><span class="dropdown-item-text fw-semibold">@(User.Identity.Name ?? "Usuario autenticado")</span></li>
+                  <li><span class="dropdown-item-text small text-body-secondary">@activeContextLabel</span></li>
                   <li><hr class="dropdown-divider" /></li>
                   <li>
                     <form method="post" asp-area="Identity" asp-page="/Account/Logout">
@@ -107,18 +111,16 @@
             </div>
           }
         </div>
+        }
       </div>
     </nav>
   </header>
   <main class="nl-main" role="main">
-    <div class="container">
+    <div class="container-fluid nl-content-container">
     @RenderBody()
     @await Html.PartialAsync("_Toast", TempData["Toast"]?.ToString() ?? string.Empty)
     </div>
   </main>
-  <footer class="border-top py-3 bg-white">
-    <div class="container small text-secondary">NovaLeave</div>
-  </footer>
   <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
   <script src="~/js/site.js" asp-append-version="true"></script>
   @await RenderSectionAsync("Scripts", required: false)

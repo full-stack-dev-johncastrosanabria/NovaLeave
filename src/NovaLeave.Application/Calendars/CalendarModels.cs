@@ -42,7 +42,7 @@ public sealed record CalendarEvent(
         get
         {
             var requester = string.IsNullOrWhiteSpace(RequesterName) ? Label : $"{Label} de {RequesterName}";
-            return $"{requester}, del {StartDate:yyyy-MM-dd} al {EndDate:yyyy-MM-dd}, {WorkingDays} dias habiles, {StatusLabel}";
+            return $"{requester}, del {StartDate:dd/MM/yyyy} al {EndDate:dd/MM/yyyy}, {WorkingDays} días hábiles, {StatusLabel}";
         }
     }
 
@@ -51,7 +51,7 @@ public sealed record CalendarEvent(
         RequestStatus.Pending => "Pendiente",
         RequestStatus.Approved => "Aprobada",
         RequestStatus.Rejected => "Rechazada",
-        RequestStatus.CancelledByTimeout => "Cancelada automaticamente",
+        RequestStatus.CancelledByTimeout => "Cancelada automáticamente",
         RequestStatus.CancelledByApprover => "Cancelada por aprobador",
         _ => Status.ToString()
     };
@@ -67,9 +67,9 @@ public sealed record CalendarEvent(
     public string CategoryLabel => Category switch
     {
         CalendarEventCategory.OwnRequest => "Mis solicitudes",
-        CalendarEventCategory.PendingApproval => "Pendientes de aprobacion",
+        CalendarEventCategory.PendingApproval => "Pendientes de aprobación",
         CalendarEventCategory.ApprovedOrganization => "Aprobadas",
-        CalendarEventCategory.ResolvedByMe => "Resueltas por mi",
+        CalendarEventCategory.ResolvedByMe => "Resueltas por mí",
         _ => Category.ToString()
     };
 

@@ -7,14 +7,26 @@
   <div>
     <p class="nl-page-kicker">Mi espacio</p>
     <h1 class="nl-page-title">Mis solicitudes</h1>
-    <p class="nl-page-description">Solicitudes propias de vacaciones.</p>
+    <p class="nl-page-description">Consulte el estado, las fechas y el detalle de sus vacaciones.</p>
   </div>
   <a class="btn btn-primary" href="/mis-solicitudes/crear">Nueva solicitud</a>
 </div>
 
+@if (Model.Balance is not null)
+{
+<div class="nl-summary-grid mb-4" aria-label="Resumen de saldo">
+  <section class="nl-card nl-summary-card"><div class="nl-summary-label">Acumulado total</div><div class="nl-summary-value">@Model.Balance.AccruedDays</div></section>
+  <section class="nl-card nl-summary-card"><div class="nl-summary-label">Pendientes</div><div class="nl-summary-value">@Model.Balance.ReservedDays</div></section>
+  <section class="nl-card nl-summary-card"><div class="nl-summary-label">Días gozados</div><div class="nl-summary-value">@Model.Balance.DeductedDays</div></section>
+  <section class="nl-card nl-summary-card"><div class="nl-summary-label">Disponible</div><div class="nl-summary-value">@Model.Balance.AvailableDays</div></section>
+</div>
+}
+
 <section class="nl-card" aria-labelledby="requests-title">
   <div class="nl-card-body">
-    <h2 id="requests-title" class="h5 mb-3">Mi historial</h2>
+    <div class="nl-section-heading">
+      <div><h2 id="requests-title" class="h5 mb-1">Mi historial</h2><p class="text-body-secondary mb-0">@Model.Requests.Count solicitudes registradas</p></div>
+    </div>
     @if (!Model.Requests.Any())
     {
       <div class="nl-empty" role="status">No tienes solicitudes registradas.</div>
@@ -22,7 +34,7 @@
     else
     {
   <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Listado de solicitudes propias</caption>
     <thead>
       <tr>
@@ -37,12 +49,12 @@
       @foreach (var request in Model.Requests)
       {
         <tr>
-          <td>@request.StartDate.ToString("yyyy-MM-dd")</td>
-          <td>@request.EndDate.ToString("yyyy-MM-dd")</td>
-          <td>@request.WorkingDays</td>
-          <td><partial name="_StatusBadge" model="request.Status.ToString()" /></td>
-          <td>
-            <a class="btn btn-sm btn-outline-primary" href="/mis-solicitudes/@request.Id">Ver</a>
+          <td data-label="Inicio">@request.StartDate.ToString("dd/MM/yyyy")</td>
+          <td data-label="Fin">@request.EndDate.ToString("dd/MM/yyyy")</td>
+          <td data-label="Días hábiles"><strong>@request.WorkingDays</strong></td>
+          <td data-label="Estado"><partial name="_StatusBadge" model="request.Status.ToString()" /></td>
+          <td data-label="Acciones">
+            <a class="btn btn-sm btn-outline-primary" href="/mis-solicitudes/@request.Id">Ver detalle</a>
           </td>
         </tr>
       }

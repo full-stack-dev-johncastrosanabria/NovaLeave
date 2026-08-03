@@ -8,29 +8,32 @@
   <div>
     <p class="nl-page-kicker">Mi espacio</p>
     <h1 class="nl-page-title">Detalle de solicitud</h1>
-    <p class="nl-page-description">Informacion de la solicitud seleccionada.</p>
+    <p class="nl-page-description">Información completa de su solicitud de vacaciones.</p>
   </div>
   <a class="btn btn-outline-secondary" href="/mis-solicitudes">Volver</a>
 </div>
 
-<section class="nl-card mb-4">
+<div class="nl-detail-grid mb-4">
+<section class="nl-card">
   <div class="nl-card-body">
-<dl class="row mb-0">
-  <dt class="col-sm-3">Inicio</dt>
-  <dd class="col-sm-9">@Model.Request.StartDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Fin</dt>
-  <dd class="col-sm-9">@Model.Request.EndDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Dias habiles</dt>
-  <dd class="col-sm-9">@Model.Request.WorkingDays</dd>
-  <dt class="col-sm-3">Estado</dt>
-  <dd class="col-sm-9"><partial name="_StatusBadge" model="Model.Request.Status.ToString()" /></dd>
-  <dt class="col-sm-3">Motivo</dt>
-  <dd class="col-sm-9">@Model.Request.Reason</dd>
-</dl>
+    <h2 class="h5 mb-3">Estado y fechas</h2>
+    <dl class="nl-detail-list mb-0">
+      <div><dt>Estado</dt><dd><partial name="_StatusBadge" model="Model.Request.Status.ToString()" /></dd></div>
+      <div><dt>Fecha de inicio</dt><dd>@Model.Request.StartDate.ToString("dd/MM/yyyy")</dd></div>
+      <div><dt>Fecha de fin</dt><dd>@Model.Request.EndDate.ToString("dd/MM/yyyy")</dd></div>
+      <div><dt>Días hábiles</dt><dd><strong>@Model.Request.WorkingDays</strong></dd></div>
+    </dl>
   </div>
 </section>
+<section class="nl-card">
+  <div class="nl-card-body">
+    <h2 class="h5 mb-3">Motivo</h2>
+    <p class="nl-reason mb-0">@Model.Request.Reason</p>
+  </div>
+</section>
+</div>
 
 @if (Model.Request.Status == RequestStatus.Pending)
 {
-  <a class="btn btn-primary" href="/mis-solicitudes/@Model.Request.Id/editar">Editar pendiente</a>
+  <div class="nl-form-actions"><a class="btn btn-primary" href="/mis-solicitudes/@Model.Request.Id/editar">Editar solicitud</a><a class="btn btn-outline-secondary" href="/mis-solicitudes">Volver al historial</a></div>
 }

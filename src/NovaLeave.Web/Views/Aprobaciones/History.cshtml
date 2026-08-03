@@ -2,6 +2,15 @@
 @{
     ViewData["Title"] = "Historial de resoluciones";
 }
+@functions {
+    private static string ActionLabel(string action) => action switch
+    {
+        "Approve" => "Aprobada",
+        "Reject" => "Rechazada",
+        "Deactivate" => "Desactivada",
+        _ => action
+    };
+}
 
 <div class="nl-page-header">
   <div>
@@ -13,31 +22,42 @@
 
 <section class="nl-card">
   <div class="nl-card-body">
+@if (!Model.Items.Any())
+{
+  <div class="nl-empty" role="status"><strong>Aún no hay resoluciones.</strong><span>Las solicitudes resueltas aparecerán aquí.</span></div>
+}
+else
+{
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Historial de acciones del aprobador</caption>
     <thead>
       <tr>
         <th scope="col">Fecha</th>
         <th scope="col">Accion</th>
-        <th scope="col">Solicitud</th>
         <th scope="col">Solicitante</th>
+        <th scope="col">Periodo</th>
+        <th scope="col">Días</th>
         <th scope="col">Estado</th>
+        <th scope="col">Detalle</th>
       </tr>
     </thead>
     <tbody>
       @foreach (var item in Model.Items)
       {
         <tr>
-          <td>@item.TimestampUtc</td>
-          <td>@item.Action</td>
-          <td><a href="/aprobaciones/@item.RequestId">@item.RequestId</a></td>
-          <td>@item.RequesterId</td>
-          <td><partial name="_StatusBadge" model="item.Status.ToString()" /></td>
+          <td data-label="Fecha">@item.TimestampUtc.ToString("dd/MM/yyyy HH:mm")</td>
+          <td data-label="Resolución">@ActionLabel(item.Action)</td>
+          <td data-label="Solicitante"><strong>@item.RequesterName</strong></td>
+          <td data-label="Periodo">@item.StartDate.ToString("dd/MM/yyyy") – @item.EndDate.ToString("dd/MM/yyyy")</td>
+          <td data-label="Días">@item.WorkingDays</td>
+          <td data-label="Estado"><partial name="_StatusBadge" model="item.Status.ToString()" /></td>
+          <td data-label="Detalle"><a class="btn btn-sm btn-outline-primary" href="/aprobaciones/@item.RequestId">Ver detalle</a></td>
         </tr>
       }
     </tbody>
   </table>
 </div>
+}
   </div>
 </section>

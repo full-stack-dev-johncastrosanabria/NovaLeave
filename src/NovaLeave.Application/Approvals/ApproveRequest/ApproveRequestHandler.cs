@@ -59,7 +59,9 @@ public sealed class ApproveRequestHandler
         }
 
         var balance = _dbContext.VacationBalances.Single(candidate => candidate.UserId == request.OwnerId);
-        var projectedBalance = balance.AccruedDays - balance.DeductedDays - (balance.ReservedDays - request.WorkingDays);
+        // Approval converts this request's reservation into a deduction, so authoritative
+        // availability after approval equals current availability including all reservations.
+        var projectedBalance = balance.AvailableDays;
         if (projectedBalance < 0)
         {
             return Result.Failure(Error.Conflict("El saldo proyectado no puede ser negativo."));

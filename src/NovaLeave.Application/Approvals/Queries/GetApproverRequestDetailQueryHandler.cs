@@ -14,13 +14,15 @@ public sealed class GetApproverRequestDetailQueryHandler
     private readonly IApproverIdentityService _identityService;
     private readonly OverlapPolicy _overlapPolicy;
     private readonly TimeProvider _timeProvider;
+    private readonly IUserDirectory _userDirectory;
 
-    public GetApproverRequestDetailQueryHandler(IApplicationDbContext dbContext, IApproverIdentityService identityService, OverlapPolicy overlapPolicy, TimeProvider timeProvider)
+    public GetApproverRequestDetailQueryHandler(IApplicationDbContext dbContext, IApproverIdentityService identityService, OverlapPolicy overlapPolicy, TimeProvider timeProvider, IUserDirectory userDirectory)
     {
         _dbContext = dbContext;
         _identityService = identityService;
         _overlapPolicy = overlapPolicy;
         _timeProvider = timeProvider;
+        _userDirectory = userDirectory;
     }
 
     public async Task<Result<ApproverRequestDetail>> HandleAsync(string approverId, Guid requestId, CancellationToken cancellationToken)
@@ -60,19 +62,22 @@ public sealed class GetApproverRequestDetailQueryHandler
 
         var businessDate = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime);
         var canDeactivate = request.Status == RequestStatus.Approved && request.StartDate > businessDate;
+        var users = await _userDirectory.GetUsersByIdsAsync([request.OwnerId], cancellationToken);
 
         return Result<ApproverRequestDetail>.Success(new ApproverRequestDetail(
             request.Id,
             request.OwnerId,
+            users.TryGetValue(request.OwnerId, out var user) ? user.DisplayName : "Usuario",
             request.StartDate,
             request.EndDate,
             request.WorkingDays,
             request.Status,
             balance.AvailableDays,
-            balance.AccruedDays - balance.DeductedDays - (balance.ReservedDays - request.WorkingDays),
+            balance.AvailableDays,
             request.Status == RequestStatus.Pending,
             canDeactivate,
             hasOverlapWarning,
-            request.RowVersion));
+            request.RowVersion,
+            request.Reason));
     }
 }

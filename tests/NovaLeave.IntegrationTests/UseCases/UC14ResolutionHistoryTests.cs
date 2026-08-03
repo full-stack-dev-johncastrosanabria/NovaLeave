@@ -20,7 +20,8 @@ public sealed class UC14ResolutionHistoryTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Historial de resoluciones", html);
-        Assert.Contains("Approve", html);
-        Assert.Contains(requestId.ToString(), html);
+        Assert.Contains("Aprobada", html);
+        Assert.Contains("user1@example.test", html);
+        Assert.DoesNotContain($">{requestId}<", html);
     }
 }

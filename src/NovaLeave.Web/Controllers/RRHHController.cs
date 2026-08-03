@@ -28,6 +28,7 @@ public sealed class RRHHController : Controller
     private readonly ListApproverCapabilitiesQueryHandler _listCapabilities;
     private readonly GetApproverCapabilityQueryHandler _getCapability;
     private readonly ToggleApproverCapabilityCommandHandler _toggleCapability;
+    private readonly TimeProvider _timeProvider;
 
     public RRHHController(
         ICurrentUser currentUser,
@@ -39,7 +40,8 @@ public sealed class RRHHController : Controller
         GetHRAuditLogQueryHandler getAudit,
         ListApproverCapabilitiesQueryHandler listCapabilities,
         GetApproverCapabilityQueryHandler getCapability,
-        ToggleApproverCapabilityCommandHandler toggleCapability)
+        ToggleApproverCapabilityCommandHandler toggleCapability,
+        TimeProvider timeProvider)
     {
         _currentUser = currentUser;
         _getRequests = getRequests;
@@ -51,12 +53,23 @@ public sealed class RRHHController : Controller
         _listCapabilities = listCapabilities;
         _getCapability = getCapability;
         _toggleCapability = toggleCapability;
+        _timeProvider = timeProvider;
     }
 
     [HttpGet("/rrhh")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        return View(new RRHHDashboardViewModel());
+        var pending = await _getRequests.HandleAsync(new GetHRRequestListQuery(1, 1, RequestStatus.Pending), cancellationToken);
+        var approved = await _getCalendar.HandleAsync(new GetHRCalendarQuery(), cancellationToken);
+        var balances = await _getBalances.HandleAsync(new GetHRBalancesQuery(1, 1), cancellationToken);
+        var approvers = await _listCapabilities.HandleAsync(cancellationToken);
+        var today = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime);
+        return View(new RRHHDashboardViewModel(
+            pending.TotalCount,
+            approved.Count(item => item.Status == RequestStatus.Approved && item.EndDate >= today),
+            balances.TotalCount,
+            approvers.Count(item => item.IsActive && item.CanResolveRequests),
+            approvers.Count(item => !item.CanResolveRequests)));
     }
 
     [HttpGet("/rrhh/solicitudes")]
