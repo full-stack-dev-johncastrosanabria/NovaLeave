@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NovaLeave.Application.Calendars;
 using NovaLeave.Application.Common.Errors;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.HR.Audit;
@@ -64,7 +65,24 @@ public sealed class RRHHController : Controller
     public async Task<IActionResult> Calendar(int? year = null, int? month = null, CancellationToken cancellationToken = default)
     {
         var events = await _getCalendar.HandleAsync(new GetHRCalendarQuery(year, month), cancellationToken);
-        return View("Calendario", new RRHHCalendarioViewModel(events));
+        var calendarEvents = events
+            .Select(item => new CalendarEvent(
+                item.RequestId,
+                "Solicitud",
+                item.RequesterName,
+                item.StartDate,
+                item.EndDate,
+                item.WorkingDays,
+                item.Status,
+                true))
+            .ToList();
+
+        return View("Calendario", new RRHHCalendarioViewModel(CalendarViewModel.Create(
+            ResolveMonth(year, month, calendarEvents),
+            RoleContext.HR,
+            "Calendario RRHH",
+            "/rrhh/solicitudes/{id}",
+            calendarEvents)));
     }
 
     [HttpGet("/rrhh/saldos")]
@@ -110,5 +128,17 @@ public sealed class RRHHController : Controller
             ErrorCodes.Conflict => Conflict(error.Message),
             _ => BadRequest(error?.Message ?? "Solicitud invalida.")
         };
+    }
+
+    private static YearMonth ResolveMonth(int? year, int? month, IReadOnlyList<CalendarEvent> events)
+    {
+        if (year is null && month is null && events.Count > 0)
+        {
+            var firstEvent = events.OrderBy(item => item.StartDate).First();
+            return new YearMonth(firstEvent.StartDate.Year, firstEvent.StartDate.Month);
+        }
+
+        var now = DateTime.UtcNow;
+        return new YearMonth(year ?? now.Year, month ?? now.Month);
     }
 }
