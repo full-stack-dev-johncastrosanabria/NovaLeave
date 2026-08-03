@@ -1,0 +1,46 @@
+# NovaLeave — local development database
+#
+# Cross-platform by design: the team runs a mix of macOS (Apple Silicon) and
+# Windows hosts.
+#
+#   Apple Silicon (arm64) : mcr.microsoft.com/azure-sql-edge:latest  (arm64-native)
+#   Intel / AMD (amd64)   : mcr.microsoft.com/mssql/server:2022-latest
+#   Windows               : this compose file works, but LocalDB is also fine —
+#                           the integration-test fixture defaults to LocalDB, so
+#                           Windows developers need no environment variable.
+#
+# Select the image per host in .env (NOVALEAVE_SQL_IMAGE). See .env.example.
+#
+# Usage:
+#   cp .env.example .env      # then set MSSQL_SA_PASSWORD
+#   docker compose up -d
+#   docker compose down       # stop (keeps data)
+#   docker compose down -v    # stop and delete the database volume
+
+services:
+  sqlserver:
+    image: ${NOVALEAVE_SQL_IMAGE:-mcr.microsoft.com/azure-sql-edge:latest}
+    container_name: novaleave-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?set MSSQL_SA_PASSWORD in .env}
+      MSSQL_PID: Developer
+    ports:
+      # Host port is configurable so this never collides with another local
+      # SQL instance already bound to 1433.
+      - "${NOVALEAVE_SQL_PORT:-14333}:1433"
+    volumes:
+      - novaleave-sqldata:/var/opt/mssql
+    healthcheck:
+      # sqlcmd lives in different paths across the mssql/edge images, so probe
+      # the listener instead of depending on a specific tool location.
+      test: ["CMD-SHELL", "(</dev/tcp/localhost/1433) >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  novaleave-sqldata:
+    name: novaleave-sqldata

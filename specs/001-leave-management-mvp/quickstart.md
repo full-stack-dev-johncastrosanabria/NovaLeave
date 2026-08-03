@@ -57,6 +57,36 @@ Configuration validated at startup. Application will not start with missing or i
 
 ---
 
+## Local database with Docker (macOS / Linux)
+
+The team runs a mix of macOS (Apple Silicon) and Windows hosts. Windows developers can
+use SQL Server LocalDB and skip this section entirely — the integration-test fixture
+defaults to LocalDB. On macOS and Linux, LocalDB does not exist, so use the committed
+`docker-compose.yml`:
+
+```bash
+cp .env.example .env          # then set MSSQL_SA_PASSWORD to a value of your own
+docker compose up -d          # starts SQL on ${NOVALEAVE_SQL_PORT}, default 14333
+```
+
+| Setting | Notes |
+|---|---|
+| `MSSQL_SA_PASSWORD` | Local development only. `.env` is gitignored — never commit it. |
+| `NOVALEAVE_SQL_PORT` | Defaults to **14333**, not 1433, so it cannot collide with another local SQL instance. |
+| `NOVALEAVE_SQL_IMAGE` | `azure-sql-edge` on Apple Silicon (arm64-native); `mssql/server:2022-latest` on amd64. |
+
+Stop with `docker compose down` (keeps data) or `docker compose down -v` (deletes the volume).
+
+**Applying migrations:** `Microsoft.EntityFrameworkCore.Design` is referenced by
+`NovaLeave.Infrastructure`, not by `NovaLeave.Web`, so `dotnet ef` must be pointed at
+Infrastructure as the startup project. The integration tests do not need this — they
+migrate the database themselves.
+
+**Verified on 2026-08-03** (Apple M3, Azure SQL Edge): full suite green —
+37 unit + 92 integration + 5 E2E = **134 passed, 0 failed**.
+
+---
+
 ## Planned Setup Commands
 
 All commands below are **planned** — they will work once implementation begins.
@@ -85,11 +115,30 @@ Then browse to `https://localhost:5001` and log in at `/Identity/Account/Login`.
 dotnet test tests/NovaLeave.UnitTests
 ```
 
-### 5. Run integration tests (planned — requires SQL Server)
+### 5. Run integration tests (requires SQL Server)
 ```
 dotnet test tests/NovaLeave.IntegrationTests
 ```
-Integration tests use a real SQL Server database (connection string required). Testcontainers MAY be used when the test objective requires it; it is not mandatory.
+Integration tests use a real SQL Server database and apply the EF Core migrations
+themselves (`Database.MigrateAsync()` in `Support/IntegrationTestDatabase.cs`), so no
+manual `dotnet ef database update` is needed before running them. Testcontainers MAY be
+used when the test objective requires it; it is not mandatory.
+
+**Where the connection string comes from** — `Support/SqlServerFixture.cs` reads the
+`NOVALEAVE_TEST_SQLSERVER` environment variable and falls back to
+`(localdb)\MSSQLLocalDB` when it is unset:
+
+| Platform | What to do |
+|---|---|
+| **Windows** | Nothing. The LocalDB fallback works out of the box. |
+| **macOS / Linux** | LocalDB does not exist on these platforms. Start the container (see [Local database with Docker](#local-database-with-docker-macos--linux)) and export `NOVALEAVE_TEST_SQLSERVER` before running the tests, otherwise every database-backed test fails with a connection error. |
+
+```bash
+# macOS / Linux
+set -a; . ./.env; set +a
+export NOVALEAVE_TEST_SQLSERVER="Server=localhost,${NOVALEAVE_SQL_PORT};Database=NovaLeave_Test;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true;Pooling=false;Connect Timeout=60"
+dotnet test tests/NovaLeave.IntegrationTests
+```
 
 ### 6. Run E2E tests (planned — requires running application and demo seed data)
 ```
