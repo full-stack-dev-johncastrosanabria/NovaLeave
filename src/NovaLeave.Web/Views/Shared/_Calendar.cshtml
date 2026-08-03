@@ -11,13 +11,17 @@
     }
 }
 
-<section class="table-responsive" aria-label="@Model.Title">
+<section aria-label="@Model.Title">
   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <h2 class="h5 mb-0">@Model.CurrentMonth.DisplayName</h2>
+    <h2 class="h5 mb-0">
+      <i class="bi bi-calendar3 text-body-secondary me-1" aria-hidden="true"></i>
+      @Model.CurrentMonth.DisplayName
+    </h2>
     <span class="badge text-bg-light border">@(Model.CurrentRole == NovaLeave.Application.Calendars.RoleContext.HR ? "RRHH" : Model.CurrentRole.ToString())</span>
   </div>
 
-  <table class="table table-bordered align-middle calendar-grid" role="grid" aria-label="@Model.Title" data-calendar-keyboard="true">
+  <div class="nl-card p-2 mb-3 table-responsive">
+  <table class="table table-bordered align-middle calendar-grid nl-calendar mb-0" role="grid" aria-label="@Model.Title" data-calendar-keyboard="true">
     <caption>@Model.Title</caption>
     <thead>
       <tr>
@@ -36,41 +40,39 @@
         <tr role="row">
           @foreach (var day in week)
           {
-            var dayClass = day.IsWeekend ? "bg-body-tertiary text-body-secondary" : day.IsCurrentMonth ? string.Empty : "text-body-secondary";
-            <td class="@dayClass" role="gridcell" aria-label="@day.Date.ToString("yyyy-MM-dd")" tabindex="@(day.IsWeekend ? "-1" : "0")" style="min-width: 96px; height: 96px;">
+            var dayClass = day.IsWeekend ? "nl-weekend text-body-secondary" : day.IsCurrentMonth ? string.Empty : "nl-outside text-body-secondary";
+            <td class="@dayClass @(day.IsToday ? "nl-today" : null)" role="gridcell" aria-label="@day.Date.ToString("yyyy-MM-dd")" tabindex="@(day.IsWeekend ? "-1" : "0")">
               <div class="d-flex justify-content-between align-items-start gap-2">
-                <span class="fw-semibold @(day.IsToday ? "border border-primary rounded px-1" : string.Empty)">@day.Date.Day</span>
+                <span class="nl-day-number">@day.Date.Day</span>
                 @if (day.IsWeekend)
                 {
                   <span class="visually-hidden">Fin de semana</span>
                 }
               </div>
-              <div class="d-grid gap-1 mt-2">
-                @foreach (var item in day.Events.Take(3))
+              <div class="mt-1">
+                @foreach (var item in day.Events.Take(2))
                 {
                   var detailUrl = item.DetailUrl(Model.DetailRouteTemplate);
+                  @* The label and day count stay in the accessible name so the compact chip
+                     remains fully described to assistive technology. *@
                   if (detailUrl is not null)
                   {
-                    <a class="btn btn-sm btn-primary text-start text-wrap" href="@detailUrl" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status">
+                    <a class="nl-event text-bg-primary" href="@detailUrl" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" title="@item.Label - @item.StatusLabel - @item.WorkingDays dias">
                       <span>Solicitud</span>
-                      <span>@item.Label</span>
-                      <span class="badge border @item.StatusCssClass">@item.StatusLabel</span>
-                      <span class="small">@item.WorkingDays dias</span>
+                      <span class="visually-hidden">@item.Label @item.StatusLabel @item.WorkingDays dias</span>
                     </a>
                   }
                   else
                   {
-                    <span class="border rounded p-1 small bg-primary text-white" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status">
+                    <span class="nl-event text-bg-primary" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" title="@item.Label - @item.StatusLabel - @item.WorkingDays dias">
                       <span>Solicitud</span>
-                      <span>@item.Label</span>
-                      <span class="badge text-bg-light">@item.StatusLabel</span>
-                      <span>@item.WorkingDays dias</span>
+                      <span class="visually-hidden">@item.Label @item.StatusLabel @item.WorkingDays dias</span>
                     </span>
                   }
                 }
-                @if (day.Events.Count > 3)
+                @if (day.Events.Count > 2)
                 {
-                  <span class="small text-body-secondary">+@(day.Events.Count - 3) mas</span>
+                  <span class="small text-body-secondary">+@(day.Events.Count - 2) mas</span>
                 }
               </div>
             </td>
@@ -79,16 +81,20 @@
       }
     </tbody>
   </table>
+  </div>
 
   @if (Model.Events.Count == 0)
   {
-    <div class="alert alert-info" role="status">No hay periodos aprobados en este mes.</div>
+    <div class="alert alert-info d-flex align-items-center gap-2" role="status">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      <span>No hay periodos aprobados en este mes.</span>
+    </div>
   }
   else
   {
-    <div class="mt-4">
+    <div class="nl-card p-3">
       <h3 class="h6">Eventos autorizados</h3>
-      <ul class="list-group">
+      <ul class="list-group list-group-flush">
         @foreach (var item in Model.Events)
         {
           var detailUrl = item.DetailUrl(Model.DetailRouteTemplate);

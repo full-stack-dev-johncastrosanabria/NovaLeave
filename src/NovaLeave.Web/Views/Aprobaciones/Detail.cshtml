@@ -1,68 +1,110 @@
 @model NovaLeave.Web.ViewModels.Aprobaciones.AprobacionDetalleViewModel
 @{
     ViewData["Title"] = "Detalle para resolucion";
+    var overdrawn = Model.Request.ProjectedBalanceAfterApproval < 0;
 }
 
-<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-  <h1 class="h3 mb-0">Detalle para resolucion</h1>
-  <a class="btn btn-outline-secondary" href="/aprobaciones">Volver</a>
+<div class="d-flex justify-content-end align-items-center gap-3 mb-3">
+  <a class="btn btn-outline-secondary" href="/aprobaciones">
+    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+    <span class="ms-1">Volver</span>
+  </a>
 </div>
 
-<dl class="row">
-  <dt class="col-sm-3">Solicitante</dt>
-  <dd class="col-sm-9">@Model.Request.RequesterId</dd>
-  <dt class="col-sm-3">Inicio</dt>
-  <dd class="col-sm-9">@Model.Request.StartDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Fin</dt>
-  <dd class="col-sm-9">@Model.Request.EndDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Dias habiles</dt>
-  <dd class="col-sm-9">@Model.Request.WorkingDays</dd>
-  <dt class="col-sm-3">Saldo proyectado</dt>
-  <dd class="col-sm-9">@Model.Request.ProjectedBalanceAfterApproval</dd>
-</dl>
-
-@* RowVersion is a concurrency token, not business data: it travels as a hidden
-   field in each form below and is never displayed. *@
-
-@if (Model.Request.HasOverlapWarning)
-{
-  <div class="alert alert-warning" role="alert">Existe una advertencia de traslape.</div>
-}
-
 <div class="row g-3">
-  @if (Model.Request.CanApproveOrReject)
-  {
-  <div class="col-md-4">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar">
-      @Html.AntiForgeryToken()
-      <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <button type="submit" class="btn btn-success w-100" aria-label="Aprobar solicitud">Aprobar</button>
-    </form>
+  <div class="col-lg-7">
+    <div class="nl-card p-3 p-md-4 h-100">
+      <h2 class="h6 text-body-secondary mb-3">Solicitud</h2>
+      <dl class="row mb-0">
+        <dt class="col-sm-4">Solicitante</dt>
+        <dd class="col-sm-8">@Model.Request.RequesterId</dd>
+
+        <dt class="col-sm-4">Inicio</dt>
+        <dd class="col-sm-8">@Model.Request.StartDate.ToString("yyyy-MM-dd")</dd>
+
+        <dt class="col-sm-4">Fin</dt>
+        <dd class="col-sm-8">@Model.Request.EndDate.ToString("yyyy-MM-dd")</dd>
+
+        <dt class="col-sm-4">Dias habiles</dt>
+        <dd class="col-sm-8">@Model.Request.WorkingDays</dd>
+
+        <dt class="col-sm-4">Saldo proyectado</dt>
+        <dd class="col-sm-8 @(overdrawn ? "text-danger fw-semibold" : null)">
+          @if (overdrawn)
+          {
+            <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+            <span class="visually-hidden">Saldo insuficiente:</span>
+          }
+          @Model.Request.ProjectedBalanceAfterApproval
+        </dd>
+      </dl>
+
+      @* RowVersion is a concurrency token, not business data: it travels as a hidden field in
+         each form below and is never displayed. *@
+
+      @if (Model.Request.HasOverlapWarning)
+      {
+        <div class="alert alert-warning d-flex align-items-start gap-2 mt-3 mb-0" role="alert">
+          <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+          <span>Existe una advertencia de traslape con otra solicitud.</span>
+        </div>
+      }
+    </div>
   </div>
-  <div class="col-md-8">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar">
-      @Html.AntiForgeryToken()
-      <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <label class="form-label" for="RejectionReason">Razon de rechazo</label>
-      <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-2" rows="3" maxlength="500"></textarea>
-      <button type="submit" class="btn btn-danger" aria-label="Rechazar solicitud">Rechazar</button>
-    </form>
+
+  <div class="col-lg-5">
+    <div class="nl-card p-3 p-md-4 h-100">
+      <h2 class="h6 text-body-secondary mb-3">Resolucion</h2>
+
+      @if (Model.Request.CanApproveOrReject)
+      {
+        <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar" class="mb-4">
+          @Html.AntiForgeryToken()
+          <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
+          <button type="submit" class="btn btn-success w-100" aria-label="Aprobar solicitud">
+            <i class="bi bi-check-lg" aria-hidden="true"></i>
+            <span class="ms-1">Aprobar</span>
+          </button>
+        </form>
+
+        <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar">
+          @Html.AntiForgeryToken()
+          <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
+          <label class="form-label" for="RejectionReason">Razon de rechazo</label>
+          <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-1"
+                    rows="3" minlength="10" maxlength="500" required
+                    aria-describedby="rejectionHelp"></textarea>
+          <div id="rejectionHelp" class="form-text mb-2">
+            Obligatoria, entre 10 y 500 caracteres. Se comparte con la persona solicitante.
+          </div>
+          <button type="submit" class="btn btn-danger w-100" aria-label="Rechazar solicitud">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+            <span class="ms-1">Rechazar</span>
+          </button>
+        </form>
+      }
+
+      @if (Model.Request.CanDeactivate)
+      {
+        <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar"
+              onsubmit="return confirm('Se desactivara la solicitud aprobada y se restauraran los dias. Continuar?');">
+          @Html.AntiForgeryToken()
+          <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
+          <button type="submit" class="btn btn-warning w-100" aria-label="Desactivar solicitud aprobada">
+            <i class="bi bi-slash-circle" aria-hidden="true"></i>
+            <span class="ms-1">Desactivar solicitud</span>
+          </button>
+          <p class="form-text mb-0">Solo antes de que inicie el periodo. Restaura los dias descontados.</p>
+        </form>
+      }
+
+      @if (!Model.Request.CanApproveOrReject && !Model.Request.CanDeactivate)
+      {
+        <div class="alert alert-secondary d-flex align-items-start gap-2 mb-0" role="alert">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          <span>La solicitud no tiene acciones disponibles.</span>
+        </div>
+      }
+    </div>
   </div>
-  }
-  @if (Model.Request.CanDeactivate)
-  {
-  <div class="col-md-4">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar">
-      @Html.AntiForgeryToken()
-      <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <button type="submit" class="btn btn-warning w-100" aria-label="Desactivar solicitud aprobada">Desactivar solicitud</button>
-    </form>
-  </div>
-  }
-  @if (!Model.Request.CanApproveOrReject && !Model.Request.CanDeactivate)
-  {
-  <div class="col-12">
-    <div class="alert alert-secondary" role="alert">La solicitud no tiene acciones disponibles.</div>
-  </div>
-  }
 </div>

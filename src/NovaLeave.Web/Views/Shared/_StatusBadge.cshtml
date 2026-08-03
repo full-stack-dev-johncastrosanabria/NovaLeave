@@ -1,3 +1,20 @@
 @model string
-
-<span class="badge text-bg-secondary">@Model</span>
+@{
+    // Status is conveyed by icon + word, with colour as reinforcement only: colour must never
+    // be the sole carrier of meaning (constitution §11.2).
+    var (css, icon, label) = (Model ?? string.Empty) switch
+    {
+        "Pending" => ("text-bg-warning", "bi-hourglass-split", "Pendiente"),
+        "Approved" => ("text-bg-success", "bi-check-circle-fill", "Aprobada"),
+        "Rejected" => ("text-bg-danger", "bi-x-circle-fill", "Rechazada"),
+        "CancelledByTimeout" => ("text-bg-secondary", "bi-clock-history", "Caducada"),
+        "CancelledByApprover" => ("text-bg-dark", "bi-slash-circle", "Desactivada"),
+        _ => ("text-bg-secondary", "bi-dash-circle", Model ?? "-")
+    };
+}
+@* The canonical status travels in data-status for styling and tests; the visible cue is always
+   icon + word, so meaning never depends on colour alone. *@
+<span class="badge @css nl-status" data-status="@Model">
+  <i class="bi @icon" aria-hidden="true"></i>
+  <span>@label</span>
+</span>

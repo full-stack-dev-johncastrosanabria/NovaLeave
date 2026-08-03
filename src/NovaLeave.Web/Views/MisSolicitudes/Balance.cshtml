@@ -1,6 +1,6 @@
 @model NovaLeave.Web.ViewModels.MisSolicitudes.SaldoViewModel
 @{
-    ViewData["Title"] = "Mi saldo";
+    ViewData["Title"] = "Mi historial";
 }
 
 @functions {
@@ -16,37 +16,85 @@
             _ => type.ToString()
         };
     }
+
+    private static (string Icon, string Css) MovementCue(NovaLeave.Domain.Enums.MovementType type)
+    {
+        return type switch
+        {
+            NovaLeave.Domain.Enums.MovementType.Accrual => ("bi-plus-circle", "text-success"),
+            NovaLeave.Domain.Enums.MovementType.Reservation => ("bi-lock", "text-warning"),
+            NovaLeave.Domain.Enums.MovementType.Release => ("bi-unlock", "text-secondary"),
+            NovaLeave.Domain.Enums.MovementType.Deduction => ("bi-dash-circle", "text-danger"),
+            NovaLeave.Domain.Enums.MovementType.Restoration => ("bi-arrow-counterclockwise", "text-info"),
+            _ => ("bi-dot", "text-secondary")
+        };
+    }
 }
 
-<h1 class="h3 mb-4">Mi saldo</h1>
+@{
+    var stats = new (string Label, int Value, string Icon, string Hint)[]
+    {
+        ("Acumulado", Model.Balance.AccruedDays, "bi-plus-circle", "Dias ganados por meses completos"),
+        ("Reservado", Model.Balance.ReservedDays, "bi-lock", "Retenido por solicitudes pendientes"),
+        ("Deducido", Model.Balance.DeductedDays, "bi-dash-circle", "Descontado por solicitudes aprobadas"),
+        ("Disponible", Model.Balance.AvailableDays, "bi-wallet2", "Acumulado menos deducido y reservado")
+    };
+}
 
 <div class="row g-3 mb-4">
-  <div class="col-md-3"><div class="border rounded p-3"><strong>Acumulado</strong><div>@Model.Balance.AccruedDays</div></div></div>
-  <div class="col-md-3"><div class="border rounded p-3"><strong>Reservado</strong><div>@Model.Balance.ReservedDays</div></div></div>
-  <div class="col-md-3"><div class="border rounded p-3"><strong>Deducido</strong><div>@Model.Balance.DeductedDays</div></div></div>
-  <div class="col-md-3"><div class="border rounded p-3"><strong>Disponible</strong><div>@Model.Balance.AvailableDays</div></div></div>
+  @foreach (var stat in stats)
+  {
+    <div class="col-6 col-lg-3">
+      <div class="nl-card h-100 p-3 nl-stat">
+        <div class="d-flex align-items-center gap-2 nl-stat-label">
+          <i class="bi @stat.Icon" aria-hidden="true"></i>
+          <span>@stat.Label</span>
+        </div>
+        <div class="nl-stat-value">@stat.Value</div>
+        <div class="small text-body-secondary">@stat.Hint</div>
+      </div>
+    </div>
+  }
 </div>
 
-<h2 class="h5">Historial de movimientos</h2>
-<div class="table-responsive">
-  <table class="table table-striped align-middle">
-    <caption>Movimientos de saldo propios</caption>
-    <thead>
-      <tr>
-        <th scope="col">Fecha</th>
-        <th scope="col">Tipo</th>
-        <th scope="col">Dias</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach (var movement in Model.Balance.Movements)
-      {
-        <tr data-movement-type="@movement.Type">
-          <td>@movement.EffectiveAt</td>
-          <td>@MovementLabel(movement.Type)</td>
-          <td>@movement.Amount</td>
-        </tr>
-      }
-    </tbody>
-  </table>
+<div class="nl-card">
+  <div class="p-3 border-bottom">
+    <h2 class="h6 mb-0">Historial de movimientos</h2>
+  </div>
+
+  @if (!Model.Balance.Movements.Any())
+  {
+    <p class="text-body-secondary text-center py-4 mb-0">Todavia no hay movimientos de saldo.</p>
+  }
+  else
+  {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <caption class="px-3">Movimientos de saldo propios</caption>
+        <thead>
+          <tr>
+            <th scope="col">Fecha</th>
+            <th scope="col">Tipo</th>
+            <th scope="col" class="text-end">Dias</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var movement in Model.Balance.Movements)
+          {
+            var cue = MovementCue(movement.Type);
+            <tr data-movement-type="@movement.Type">
+              <td>@movement.EffectiveAt</td>
+              <td>
+                <span class="nl-status">
+                  <i class="bi @cue.Icon @cue.Css" aria-hidden="true"></i>
+                  <span>@MovementLabel(movement.Type)</span>
+                </span>
+              </td>
+              <td class="text-end">@movement.Amount</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 </div>

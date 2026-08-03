@@ -31,29 +31,42 @@
         : contexts.Count > 0 ? contexts[0].Key
         : string.Empty;
 
-    var navItems = new List<(string Label, string Href)>();
+    var navItems = new List<(string Label, string Href, string Icon)>();
     switch (activeContext)
     {
         case "hr":
-            navItems.Add(("Solicitudes", "/rrhh/solicitudes"));
-            navItems.Add(("Calendario", "/rrhh/calendario"));
-            navItems.Add(("Saldos", "/rrhh/saldos"));
-            navItems.Add(("Auditoria", "/rrhh/auditoria"));
-            navItems.Add(("Aprobadores", "/rrhh/aprobadores"));
+            navItems.Add(("Solicitudes", "/rrhh/solicitudes", "bi-inbox"));
+            navItems.Add(("Calendario", "/rrhh/calendario", "bi-calendar3"));
+            navItems.Add(("Saldos", "/rrhh/saldos", "bi-wallet2"));
+            navItems.Add(("Auditoria", "/rrhh/auditoria", "bi-shield-check"));
+            navItems.Add(("Aprobadores", "/rrhh/aprobadores", "bi-person-badge"));
             break;
         case "approver":
-            navItems.Add(("Pendientes", "/aprobaciones"));
-            navItems.Add(("Historial", "/aprobaciones/historial"));
-            if (canResolve) { navItems.Add(("Calendario", "/calendario")); }
+            navItems.Add(("Pendientes", "/aprobaciones", "bi-inbox"));
+            navItems.Add(("Historial", "/aprobaciones/historial", "bi-clock-history"));
+            // The scope is selected explicitly: without it an identity holding both User and
+            // Approver falls back to its personal scope and the approver calendar looks empty.
+            if (canResolve) { navItems.Add(("Calendario", "/calendario?context=Approver", "bi-calendar3")); }
             break;
         case "user":
-            navItems.Add(("Mis solicitudes", "/mis-solicitudes"));
-            navItems.Add(("Mi historial", "/saldo"));
-            navItems.Add(("Calendario", "/calendario"));
+            navItems.Add(("Mis solicitudes", "/mis-solicitudes", "bi-journal-text"));
+            navItems.Add(("Mi historial", "/saldo", "bi-wallet2"));
+            navItems.Add(("Calendario", "/calendario?context=User", "bi-calendar3"));
             break;
     }
 
+    var contextLabel = contexts.FirstOrDefault(c => c.Key == activeContext).Label ?? "NovaLeave";
     var brandHref = contexts.FirstOrDefault(c => c.Key == activeContext).Href ?? "/";
+
+    // Mark the current item so the active page is obvious without relying on colour alone.
+    bool IsActive(string href)
+    {
+        var target = href.Split('?')[0];
+        return target == "/"
+            ? path == "/"
+            : path.Equals(target, StringComparison.OrdinalIgnoreCase)
+              || path.StartsWith(target + "/", StringComparison.OrdinalIgnoreCase);
+    }
 }
 <!doctype html>
 <html lang="es">
@@ -61,53 +74,118 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>@ViewData["Title"] - NovaLeave</title>
-  <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+  @* CoreUI 5.9 is built on Bootstrap 5.3 and supersedes the base stylesheet: loading both
+     would duplicate and conflict. Every Bootstrap utility and component class still applies.
+     All assets are self-hosted and version-pinned in libman.json (constitution §7.2, §11.2). *@
+  <link rel="stylesheet" href="~/lib/coreui/css/coreui.min.css" />
+  <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="~/css/novaleave.css" />
 </head>
 <body>
-  <header class="border-bottom">
-    <nav class="navbar navbar-expand-lg bg-body">
-      <div class="container">
-        <a class="navbar-brand" href="@brandHref">NovaLeave</a>
-        @if (isAuthenticated)
-        {
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Abrir navegacion">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="mainNavigation">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              @foreach (var item in navItems)
-              {
-                <li class="nav-item"><a class="nav-link" href="@item.Href">@item.Label</a></li>
-              }
-            </ul>
-
-            <div class="d-flex align-items-center gap-2">
-              @if (showContextSwitcher)
-              {
-                <div class="dropdown">
-                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="misRoles" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mis roles</button>
-                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="misRoles">
-                    @foreach (var context in contexts)
-                    {
-                      <li><a class="dropdown-item" href="@context.Href">@context.Label</a></li>
-                    }
-                  </ul>
-                </div>
-              }
-              <form method="post" action="/Identity/Account/Logout" class="m-0">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-outline-secondary">Cerrar sesion</button>
-              </form>
-            </div>
-          </div>
-        }
-      </div>
-    </nav>
-  </header>
-  <main class="container py-4" role="main">
+@if (!isAuthenticated)
+{
+  <main class="container py-5" role="main">
     @RenderBody()
   </main>
-  <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+}
+else
+{
+  <div class="nl-shell">
+    <aside class="nl-sidebar" id="nlSidebar">
+      <a class="nl-brand" href="@brandHref">
+        <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+        <span>NovaLeave</span>
+      </a>
+
+      <nav class="nav flex-column mt-2" aria-label="Navegacion principal">
+        @foreach (var item in navItems)
+        {
+          var active = IsActive(item.Href);
+          <a class="nav-link @(active ? "active" : null)" href="@item.Href" @(active ? "aria-current=page" : null)>
+            <i class="bi @item.Icon" aria-hidden="true"></i>
+            <span>@item.Label</span>
+          </a>
+        }
+      </nav>
+
+      <div class="nl-sidebar-footer">
+        <div class="text-truncate">@currentUser!.Identity!.Name</div>
+        <div>@contextLabel</div>
+      </div>
+    </aside>
+
+    <div class="nl-main">
+      <header class="nl-header">
+        <button class="btn btn-sm btn-outline-secondary d-lg-none" type="button" id="nlSidebarToggle" aria-controls="nlSidebar" aria-expanded="false" aria-label="Abrir navegacion">
+          <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+
+        <h1 class="nl-page-title text-truncate mb-0">@ViewData["Title"]</h1>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+          @if (showContextSwitcher)
+          {
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="misRoles" data-coreui-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="bi bi-people" aria-hidden="true"></i>
+                <span class="d-none d-sm-inline ms-1">Mis roles</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="misRoles">
+                @foreach (var context in contexts)
+                {
+                  <li>
+                    <a class="dropdown-item @(context.Key == activeContext ? "active" : null)" href="@context.Href" @(context.Key == activeContext ? "aria-current=true" : null)>
+                      @context.Label
+                    </a>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+          <form method="post" action="/Identity/Account/Logout" class="m-0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+              <span class="d-none d-sm-inline ms-1">Cerrar sesion</span>
+            </button>
+          </form>
+        </div>
+      </header>
+
+      <main class="nl-content" role="main">
+        @RenderBody()
+      </main>
+    </div>
+  </div>
+}
+
+  <script src="~/lib/coreui/js/coreui.bundle.min.js"></script>
+  <script src="~/lib/htmx/htmx.min.js"></script>
+  <script>
+    // Offcanvas sidebar for narrow viewports.
+    (function () {
+      var toggle = document.getElementById('nlSidebarToggle');
+      var sidebar = document.getElementById('nlSidebar');
+      if (!toggle || !sidebar) { return; }
+      var backdrop;
+      function close() {
+        sidebar.classList.remove('show');
+        toggle.setAttribute('aria-expanded', 'false');
+        if (backdrop) { backdrop.remove(); backdrop = null; }
+      }
+      toggle.addEventListener('click', function () {
+        var open = sidebar.classList.toggle('show');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+          backdrop = document.createElement('div');
+          backdrop.className = 'nl-backdrop';
+          backdrop.addEventListener('click', close);
+          document.body.appendChild(backdrop);
+        } else { close(); }
+      });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); } });
+    })();
+  </script>
   @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

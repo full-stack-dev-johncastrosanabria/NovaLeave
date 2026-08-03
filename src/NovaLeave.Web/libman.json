@@ -5,6 +5,30 @@
     {
       "library": "bootstrap@5.3.3",
       "destination": "wwwroot/lib/bootstrap/"
+    },
+    {
+      "library": "@coreui/coreui@5.9.0",
+      "destination": "wwwroot/lib/coreui/",
+      "files": [
+        "dist/css/coreui.min.css",
+        "dist/js/coreui.bundle.min.js"
+      ]
+    },
+    {
+      "library": "bootstrap-icons@1.13.1",
+      "destination": "wwwroot/lib/bootstrap-icons/",
+      "files": [
+        "font/bootstrap-icons.min.css",
+        "font/fonts/bootstrap-icons.woff",
+        "font/fonts/bootstrap-icons.woff2"
+      ]
+    },
+    {
+      "library": "htmx.org@2.0.10",
+      "destination": "wwwroot/lib/htmx/",
+      "files": [
+        "dist/htmx.min.js"
+      ]
     }
   ]
 }

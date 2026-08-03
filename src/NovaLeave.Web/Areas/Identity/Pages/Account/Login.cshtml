@@ -4,18 +4,72 @@
     ViewData["Title"] = "Iniciar sesion";
 }
 
-<h1>Iniciar sesion</h1>
-<form method="post" class="needs-validation" novalidate>
-  <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-  <div class="mb-3">
-    <label asp-for="Input.Email" class="form-label">Correo</label>
-    <input asp-for="Input.Email" class="form-control" autocomplete="username" />
-    <span asp-validation-for="Input.Email" class="text-danger"></span>
+<div class="row justify-content-center">
+  <div class="col-12 col-sm-10 col-md-7 col-lg-5">
+
+    <div class="text-center mb-4">
+      <i class="bi bi-calendar2-check text-primary" style="font-size:2.25rem" aria-hidden="true"></i>
+      <h1 class="h4 mt-2 mb-1">NovaLeave</h1>
+      <p class="text-body-secondary mb-0">Gestion de solicitudes de vacaciones</p>
+    </div>
+
+    <div class="nl-card p-4">
+      <h2 class="h6 mb-3">Iniciar sesion</h2>
+
+      <form method="post" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert"></div>
+
+        <div class="mb-3">
+          <label asp-for="Input.Email" class="form-label">Correo</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-envelope" aria-hidden="true"></i></span>
+            <input asp-for="Input.Email" class="form-control" autocomplete="username" autofocus />
+          </div>
+          <span asp-validation-for="Input.Email" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+          <label asp-for="Input.Password" class="form-label">Contrasena</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock" aria-hidden="true"></i></span>
+            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+          </div>
+          <span asp-validation-for="Input.Password" class="text-danger small"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+          <span class="ms-1">Iniciar sesion</span>
+        </button>
+      </form>
+    </div>
+
+    @if (Model.ShowDemoIdentities)
+    {
+      @* Development and Staging only: never rendered when demo seeding is disabled. *@
+      <div class="nl-card p-3 mt-3">
+        <p class="small text-body-secondary mb-2">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          Identidades de demostracion &mdash; contrasena <code>Demo123!</code>
+        </p>
+        <ul class="list-unstyled small mb-0">
+          <li><code>user@@demo</code> &mdash; Usuario</li>
+          <li><code>approver@@demo</code> &mdash; Usuario y Aprobador</li>
+          <li><code>hr@@demo</code> &mdash; Usuario y RRHH</li>
+          <li><code>multi@@demo</code> &mdash; Todos los contextos</li>
+        </ul>
+      </div>
+    }
   </div>
-  <div class="mb-3">
-    <label asp-for="Input.Password" class="form-label">Contrasena</label>
-    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
-    <span asp-validation-for="Input.Password" class="text-danger"></span>
-  </div>
-  <button type="submit" class="btn btn-primary">Iniciar sesion</button>
-</form>
+</div>
+
+@section Scripts {
+  <script>
+    // Reveal the model-level validation block only when it actually has content, so an empty
+    // alert box is never announced to assistive technology.
+    (function () {
+      var summary = document.querySelector('[role="alert"].alert');
+      if (summary && summary.textContent.trim().length > 0) { summary.classList.remove('d-none'); }
+    })();
+  </script>
+}
