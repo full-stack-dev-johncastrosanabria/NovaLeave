@@ -3,12 +3,19 @@
     ViewData["Title"] = "Detalle para resolucion";
 }
 
-<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-  <h1 class="h3 mb-0">Detalle para resolucion</h1>
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">Aprobaciones</p>
+    <h1 class="nl-page-title">Detalle para resolucion</h1>
+    <p class="nl-page-description">Revisa la solicitud y el saldo proyectado antes de resolver.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/aprobaciones">Volver</a>
 </div>
 
-<dl class="row">
+<section class="nl-card mb-4">
+  <div class="nl-card-body">
+<div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" aria-live="polite"></div>
+<dl class="row mb-0">
   <dt class="col-sm-3">Solicitante</dt>
   <dd class="col-sm-9">@Model.Request.RequesterId</dd>
   <dt class="col-sm-3">Inicio</dt>
@@ -20,6 +27,8 @@
   <dt class="col-sm-3">Saldo proyectado</dt>
   <dd class="col-sm-9">@Model.Request.ProjectedBalanceAfterApproval</dd>
 </dl>
+  </div>
+</section>
 
 @* RowVersion is a concurrency token, not business data: it travels as a hidden
    field in each form below and is never displayed. *@
@@ -29,6 +38,8 @@
   <div class="alert alert-warning" role="alert">Existe una advertencia de traslape.</div>
 }
 
+<section class="nl-card">
+  <div class="nl-card-body">
 <div class="row g-3">
   @if (Model.Request.CanApproveOrReject)
   {
@@ -44,7 +55,7 @@
       @Html.AntiForgeryToken()
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
       <label class="form-label" for="RejectionReason">Razon de rechazo</label>
-      <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-2" rows="3" maxlength="500"></textarea>
+      <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-2" rows="3" maxlength="500">@Model.RejectionReason</textarea>
       <button type="submit" class="btn btn-danger" aria-label="Rechazar solicitud">Rechazar</button>
     </form>
   </div>
@@ -66,3 +77,5 @@
   </div>
   }
 </div>
+  </div>
+</section>

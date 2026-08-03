@@ -3,7 +3,7 @@ using NovaLeave.Domain.Enums;
 
 namespace NovaLeave.Application.Calendars.GetPersonalCalendar;
 
-public sealed record PersonalCalendarEvent(Guid RequestId, DateOnly StartDate, DateOnly EndDate, int WorkingDays);
+public sealed record PersonalCalendarEvent(Guid RequestId, DateOnly StartDate, DateOnly EndDate, int WorkingDays, RequestStatus Status);
 
 public sealed class GetPersonalCalendarQueryHandler
 {
@@ -17,9 +17,9 @@ public sealed class GetPersonalCalendarQueryHandler
     public async Task<IReadOnlyList<PersonalCalendarEvent>> HandleAsync(string userId, CancellationToken cancellationToken)
     {
         var events = _dbContext.VacationRequests
-            .Where(request => request.OwnerId == userId && request.Status == RequestStatus.Approved)
+            .Where(request => request.OwnerId == userId && (request.Status == RequestStatus.Pending || request.Status == RequestStatus.Approved))
             .OrderBy(request => request.StartDate)
-            .Select(request => new PersonalCalendarEvent(request.Id, request.StartDate, request.EndDate, request.WorkingDays))
+            .Select(request => new PersonalCalendarEvent(request.Id, request.StartDate, request.EndDate, request.WorkingDays, request.Status))
             .ToList();
 
         return await Task.FromResult(events);

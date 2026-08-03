@@ -4,16 +4,24 @@
     ViewData["Title"] = "Editar solicitud";
 }
 
-<h1 class="h3 mb-4">Editar solicitud pendiente</h1>
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">Mi espacio</p>
+    <h1 class="nl-page-title">Editar solicitud pendiente</h1>
+    <p class="nl-page-description">Solo las solicitudes pendientes pueden editarse.</p>
+  </div>
+</div>
 
+<section class="nl-card">
+  <div class="nl-card-body">
 <form method="post" class="row g-3">
   <input asp-for="RowVersion" type="hidden" />
-  <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+  <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
   <div class="col-md-4">
     <label asp-for="InputMode" class="form-label">Modo de ingreso</label>
     <select asp-for="InputMode" class="form-select">
-      <option value="@RequestInputMode.DateRange">Rango de fechas</option>
-      <option value="@RequestInputMode.StartPlusDays">Inicio y dias habiles</option>
+      <option value="@RequestInputMode.DateRange">Fecha inicio + Fecha fin</option>
+      <option value="@RequestInputMode.StartPlusDays">Fecha inicio + Cantidad de dias</option>
     </select>
   </div>
   <div class="col-md-4">
@@ -37,3 +45,5 @@
     <a class="btn btn-outline-secondary" href="/mis-solicitudes/@Model.Id">Volver</a>
   </div>
 </form>
+  </div>
+</section>

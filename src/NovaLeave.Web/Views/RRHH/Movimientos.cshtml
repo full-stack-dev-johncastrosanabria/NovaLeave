@@ -3,26 +3,34 @@
     ViewData["Title"] = "Movimientos RRHH";
 }
 
-<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-  <h1 class="h3 mb-0">Movimientos RRHH</h1>
-  <a class="btn btn-outline-secondary" href="/rrhh/saldos">Volver</a>
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">RRHH</p>
+    <h1 class="nl-page-title">Movimientos</h1>
+    <p class="nl-page-description">Historial de movimientos para el usuario seleccionado.</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <span class="nl-badge nl-readonly">Solo lectura</span>
+    <a class="btn btn-outline-secondary" href="/rrhh/saldos">Volver</a>
+  </div>
 </div>
 
-<dl class="row">
-  <dt class="col-sm-3">Usuario</dt>
-  <dd class="col-sm-9">@Model.Balance.UserName</dd>
-  <dt class="col-sm-3">Acumulado</dt>
-  <dd class="col-sm-9">@Model.Balance.AccruedDays</dd>
-  <dt class="col-sm-3">Reservado</dt>
-  <dd class="col-sm-9">@Model.Balance.ReservedDays</dd>
-  <dt class="col-sm-3">Deducido</dt>
-  <dd class="col-sm-9">@Model.Balance.DeductedDays</dd>
-  <dt class="col-sm-3">Disponible</dt>
-  <dd class="col-sm-9">@Model.Balance.AvailableDays</dd>
-</dl>
+<section class="nl-card mb-4">
+  <div class="nl-card-body">
+    <h2 class="h5 mb-3">@Model.Balance.UserName</h2>
+    <div class="nl-summary-grid">
+      <div><div class="nl-summary-label">Acumulado total</div><div class="nl-summary-value">@Model.Balance.AccruedDays</div></div>
+      <div><div class="nl-summary-label">Pendientes</div><div class="nl-summary-value">@Model.Balance.ReservedDays</div></div>
+      <div><div class="nl-summary-label">Días gozados</div><div class="nl-summary-value">@Model.Balance.DeductedDays</div></div>
+      <div><div class="nl-summary-label">Disponible</div><div class="nl-summary-value">@Model.Balance.AvailableDays</div></div>
+    </div>
+  </div>
+</section>
 
+<section class="nl-card">
+  <div class="nl-card-body">
 <div class="table-responsive">
-  <table class="table table-striped align-middle">
+  <table class="table nl-table nl-table-card align-middle">
     <caption>Movimientos de saldo</caption>
     <thead>
       <tr>
@@ -47,3 +55,5 @@
     </tbody>
   </table>
 </div>
+  </div>
+</section>

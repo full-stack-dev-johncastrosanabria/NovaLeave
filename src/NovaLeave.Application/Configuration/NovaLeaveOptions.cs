@@ -20,6 +20,8 @@ public sealed class NovaLeaveOptions
 
     public bool SeedDemoUsers { get; init; }
 
+    public string DemoUserPassword { get; init; } = string.Empty;
+
     public static bool TryGetDailyUtcTime(string cadence, out TimeOnly time)
     {
         time = default;

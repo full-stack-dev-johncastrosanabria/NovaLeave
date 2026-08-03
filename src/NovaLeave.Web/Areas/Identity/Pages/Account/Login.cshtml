@@ -4,18 +4,43 @@
     ViewData["Title"] = "Iniciar sesion";
 }
 
-<h1>Iniciar sesion</h1>
-<form method="post" class="needs-validation" novalidate>
-  <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-  <div class="mb-3">
-    <label asp-for="Input.Email" class="form-label">Correo</label>
-    <input asp-for="Input.Email" class="form-control" autocomplete="username" />
-    <span asp-validation-for="Input.Email" class="text-danger"></span>
-  </div>
-  <div class="mb-3">
-    <label asp-for="Input.Password" class="form-label">Contrasena</label>
-    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
-    <span asp-validation-for="Input.Password" class="text-danger"></span>
-  </div>
-  <button type="submit" class="btn btn-primary">Iniciar sesion</button>
-</form>
+<div class="nl-login-page">
+  <section class="nl-card nl-login-card" aria-labelledby="login-title">
+    <div class="nl-card-body">
+      <div class="text-center mb-4">
+        <span class="nl-brand-mark mx-auto mb-3" aria-hidden="true">N</span>
+        <p class="nl-page-kicker mb-1">NovaLeave</p>
+        <h1 id="login-title" class="nl-page-title">Iniciar sesion</h1>
+      </div>
+
+      <form method="post" class="needs-validation" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="mb-3">
+          <label asp-for="Input.Email" class="form-label">Correo</label>
+          <input asp-for="Input.Email" class="form-control" autocomplete="username" data-login-email />
+          <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        @if (Model.DemoAccounts.Count > 0)
+        {
+          <div class="mb-3">
+            <label class="form-label" for="DemoAccount">Cuenta</label>
+            <select class="form-select" id="DemoAccount" aria-label="Seleccionar cuenta de demostración" aria-describedby="DemoAccountHelp" data-demo-account-select>
+              <option value="">Seleccionar cuenta</option>
+              @foreach (var account in Model.DemoAccounts)
+              {
+                <option value="@account.Email">@account.Label - @account.Email</option>
+              }
+            </select>
+            <div id="DemoAccountHelp" class="form-text">Seleccione una cuenta preconfigurada para acceso rápido.</div>
+          </div>
+        }
+        <div class="mb-4">
+          <label asp-for="Input.Password" class="form-label">Contrasena</label>
+          <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+          <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Iniciar sesion</button>
+      </form>
+    </div>
+  </section>
+</div>

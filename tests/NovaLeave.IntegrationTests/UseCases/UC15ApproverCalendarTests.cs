@@ -24,4 +24,24 @@ public sealed class UC15ApproverCalendarTests
         Assert.DoesNotContain("user1@example.test", html);
         Assert.DoesNotContain("Vacaciones familiares", html);
     }
+
+    [Fact]
+    public async Task Approver_Calendar_Shows_Eligible_Pending_And_Own_User_Context_When_Authorized()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await ApproverTestData.SeedUserAndApproverAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "multi-1", "multi@example.test", 10, roles: "User,Approver", canResolveRequests: true);
+        var client = factory.CreateClient();
+        var pendingApprovalId = await ApproverTestData.CreatePendingRequestAsync(factory, client, "user-1");
+        var ownPendingId = await ApproverTestData.CreatePendingRequestAsync(factory, client, "multi-1");
+
+        var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedGet("/calendario?context=Approver", "multi-1", "User,Approver", canResolveRequests: true));
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Pendientes de aprobacion", html);
+        Assert.Contains("Mis solicitudes", html);
+        Assert.Contains($"/aprobaciones/{pendingApprovalId}", html);
+        Assert.Contains($"/mis-solicitudes/{ownPendingId}", html);
+    }
 }

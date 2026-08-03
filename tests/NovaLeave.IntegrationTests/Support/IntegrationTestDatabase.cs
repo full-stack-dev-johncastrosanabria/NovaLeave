@@ -10,12 +10,43 @@ namespace NovaLeave.IntegrationTests.Support;
 
 public static class IntegrationTestDatabase
 {
+    private static readonly SemaphoreSlim ResetGate = new(1, 1);
+    private static bool _databaseInitialized;
+
     public static async Task ResetAsync(WebApplicationFactory<Program> factory)
     {
-        using var scope = factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<NovaLeaveDbContext>();
-        await db.Database.EnsureDeletedAsync();
-        await db.Database.MigrateAsync();
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        await ResetGate.WaitAsync(timeout.Token);
+        try
+        {
+            using var scope = factory.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<NovaLeaveDbContext>();
+            if (!_databaseInitialized)
+            {
+                await db.Database.EnsureDeletedAsync(timeout.Token);
+                await db.Database.MigrateAsync(cancellationToken: timeout.Token);
+                _databaseInitialized = true;
+                return;
+            }
+
+            await using var transaction = await db.Database.BeginTransactionAsync(timeout.Token);
+            await db.BalanceMovements.ExecuteDeleteAsync(timeout.Token);
+            await db.VacationRequests.ExecuteDeleteAsync(timeout.Token);
+            await db.VacationBalances.ExecuteDeleteAsync(timeout.Token);
+            await db.AuditRecords.ExecuteDeleteAsync(timeout.Token);
+            await db.UserTokens.ExecuteDeleteAsync(timeout.Token);
+            await db.UserLogins.ExecuteDeleteAsync(timeout.Token);
+            await db.UserClaims.ExecuteDeleteAsync(timeout.Token);
+            await db.UserRoles.ExecuteDeleteAsync(timeout.Token);
+            await db.RoleClaims.ExecuteDeleteAsync(timeout.Token);
+            await db.Users.ExecuteDeleteAsync(timeout.Token);
+            await db.Roles.ExecuteDeleteAsync(timeout.Token);
+            await transaction.CommitAsync(timeout.Token);
+        }
+        finally
+        {
+            ResetGate.Release();
+        }
     }
 
     public static async Task SeedUserAsync(

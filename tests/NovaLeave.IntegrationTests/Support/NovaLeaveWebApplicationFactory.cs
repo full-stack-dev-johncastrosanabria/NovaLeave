@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -42,8 +41,7 @@ public sealed class NovaLeaveWebApplicationFactory : WebApplicationFactory<Progr
         {
             services.RemoveAll<DbContextOptions<NovaLeaveDbContext>>();
             services.AddDbContext<NovaLeaveDbContext>(options =>
-                options.UseSqlServer(SqlServerFixture.DefaultConnectionString)
-                    .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning)));
+                options.UseSqlServer(SqlServerFixture.DefaultConnectionString));
             services.Configure<MvcOptions>(options =>
             {
                 var antiforgeryFilter = options.Filters.FirstOrDefault(filter =>

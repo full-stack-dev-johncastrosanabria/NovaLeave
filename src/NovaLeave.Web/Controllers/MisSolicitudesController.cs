@@ -7,7 +7,6 @@ using NovaLeave.Application.Requests.CreateVacationRequest;
 using NovaLeave.Application.Requests.EditPendingRequest;
 using NovaLeave.Application.Requests.Models;
 using NovaLeave.Application.Requests.Queries;
-using NovaLeave.Web.Filters;
 using NovaLeave.Web.ViewModels.MisSolicitudes;
 
 namespace NovaLeave.Web.Controllers;
@@ -64,7 +63,6 @@ public sealed class MisSolicitudesController : Controller
     }
 
     [HttpPost("/mis-solicitudes/crear")]
-    [RedisplayFormOnInvalidModel]
     public async Task<IActionResult> Create(CreateVacationRequestViewModel viewModel, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
@@ -83,15 +81,12 @@ public sealed class MisSolicitudesController : Controller
         var result = await _createVacationRequest.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
         {
-            // A business-rule failure (overlap, balance, date policy) belongs on the form the
-            // person is looking at, with their input preserved.
-            if (result.Error is null || result.Error.Code == ErrorCodes.Validation)
+            if (result.Error?.Code is ErrorCodes.NotFound or ErrorCodes.Forbidden)
             {
-                ModelState.AddModelError(string.Empty, result.Error?.Message ?? "Solicitud invalida.");
-                return InvalidForm(viewModel);
+                return ToActionResult(result.Error);
             }
 
-            return ToActionResult(result.Error);
+            return WorkflowError(viewModel, result.Error);
         }
 
         return RedirectToAction(nameof(Detail), new { id = result.Value });
@@ -132,6 +127,13 @@ public sealed class MisSolicitudesController : Controller
     [HttpPost("/mis-solicitudes/{id:guid}/editar")]
     public async Task<IActionResult> Edit(Guid id, EditVacationRequestViewModel viewModel, CancellationToken cancellationToken)
     {
+        viewModel.Id = id;
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+            return View(viewModel);
+        }
+
         byte[] rowVersion;
         try
         {
@@ -139,7 +141,9 @@ public sealed class MisSolicitudesController : Controller
         }
         catch (FormatException)
         {
-            return BadRequest("RowVersion no valida.");
+            ModelState.AddModelError(string.Empty, ConflictMessage);
+            Response.StatusCode = StatusCodes.Status409Conflict;
+            return View(viewModel);
         }
 
         var command = new EditPendingRequestCommand(
@@ -155,7 +159,12 @@ public sealed class MisSolicitudesController : Controller
         var result = await _editPendingRequest.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
         {
-            return ToActionResult(result.Error);
+            if (result.Error?.Code is ErrorCodes.NotFound or ErrorCodes.Forbidden)
+            {
+                return ToActionResult(result.Error);
+            }
+
+            return WorkflowError(viewModel, result.Error);
         }
 
         return RedirectToAction(nameof(Detail), new { id });
@@ -199,4 +208,14 @@ public sealed class MisSolicitudesController : Controller
             _ => BadRequest(error?.Message ?? "Solicitud invalida.")
         };
     }
+
+    private IActionResult WorkflowError(object viewModel, Error? error)
+    {
+        var isConflict = error?.Code == ErrorCodes.Conflict;
+        ModelState.AddModelError(string.Empty, isConflict ? ConflictMessage : error?.Message ?? "No fue posible completar la solicitud.");
+        Response.StatusCode = isConflict ? StatusCodes.Status409Conflict : StatusCodes.Status400BadRequest;
+        return View(viewModel);
+    }
+
+    private const string ConflictMessage = "La informacion cambio mientras realizaba la operacion. Actualice la pagina e intentelo nuevamente.";
 }

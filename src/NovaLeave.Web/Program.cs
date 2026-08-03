@@ -4,7 +4,6 @@ using NovaLeave.Application;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Configuration;
 using NovaLeave.Infrastructure;
-using NovaLeave.Infrastructure.Seeding;
 using NovaLeave.Web.Filters;
 using NovaLeave.Web.Services;
 using Serilog;
@@ -29,8 +28,15 @@ builder.Services
     .AddOptions<NovaLeaveOptions>()
     .Bind(builder.Configuration.GetSection(NovaLeaveOptions.SectionName))
     .ValidateDataAnnotations()
-    .Validate(options => !string.IsNullOrWhiteSpace(options.AccrualSchedulerCadence), "Accrual scheduler cadence is required.")
+    .Validate(options => NovaLeaveOptions.TryGetDailyUtcTime(options.AccrualSchedulerCadence, out _), "Accrual scheduler cadence must use format 'Daily HH:mm UTC'.")
     .Validate(options => NovaLeaveOptions.TryGetDailyUtcTime(options.TimeoutSchedulerCadence, out _), "Timeout scheduler cadence must use format 'Daily HH:mm UTC'.")
+    .Validate(options => !options.SeedDemoUsers || !string.IsNullOrWhiteSpace(options.DemoUserPassword), "Demo user password is required when demo seeding is enabled.")
+    .ValidateOnStart();
+
+builder.Services
+    .AddOptions<DatabaseConfigurationOptions>()
+    .Configure(options => options.DefaultConnection = builder.Configuration.GetConnectionString("DefaultConnection") ?? string.Empty)
+    .Validate(options => !string.IsNullOrWhiteSpace(options.DefaultConnection), "Required configuration 'ConnectionStrings:DefaultConnection' is missing or empty.")
     .ValidateOnStart();
 
 builder.Services.AddSingleton(TimeProvider.System);
@@ -45,7 +51,6 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
     options.Filters.Add<DenyByDefaultAuthorizationFilter>();
     options.Filters.Add<OverpostingPreventionFilter>();
-    options.Filters.Add<ModelStateValidationFilter>();
     options.Filters.Add<SafeExceptionFilter>();
 });
 builder.Services.AddRazorPages();
@@ -68,11 +73,6 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
-
-// Composition root only: seeds the documented demo identities when
-// NovaLeave:SeedDemoUsers is enabled. No-ops in Production and when the flag is
-// off, and is idempotent across restarts.
-await DemoDataSeeder.SeedAsync(app.Services, app.Environment.IsProduction());
 
 if (!app.Environment.IsDevelopment())
 {
@@ -125,3 +125,8 @@ app.MapDefaultControllerRoute();
 app.Run();
 
 public partial class Program;
+
+internal sealed class DatabaseConfigurationOptions
+{
+    public string DefaultConnection { get; set; } = string.Empty;
+}

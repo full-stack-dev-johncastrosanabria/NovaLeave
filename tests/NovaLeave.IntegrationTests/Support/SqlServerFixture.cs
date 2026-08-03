@@ -7,7 +7,7 @@ public sealed class SqlServerFixture
 
     public static string DefaultConnectionString =>
         Environment.GetEnvironmentVariable(ConnectionStringEnvironmentVariable) ??
-        $"Server=(localdb)\\MSSQLLocalDB;Database={DatabaseName};Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true;Pooling=false";
+        $"Server=(localdb)\\MSSQLLocalDB;Database={DatabaseName};Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true";
 
     public string ConnectionString { get; } = DefaultConnectionString;
 }

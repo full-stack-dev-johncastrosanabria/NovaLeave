@@ -19,6 +19,10 @@ public sealed class UC12RejectRequestTests
 
         var invalid = await client.SendAsync(ApproverTestData.ApproverPost($"/aprobaciones/{requestId}/rechazar", ApproverTestData.Form(("RowVersion", rowVersion), ("RejectionReason", " corto "))));
         Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
+        var invalidHtml = await invalid.Content.ReadAsStringAsync();
+        Assert.Equal("text/html", invalid.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("corto", invalidHtml);
+        Assert.DoesNotContain(">RowVersion<", invalidHtml);
 
         var valid = await client.SendAsync(ApproverTestData.ApproverPost($"/aprobaciones/{requestId}/rechazar", ApproverTestData.Form(("RowVersion", rowVersion), ("RejectionReason", "  No cumple con la politica interna.  "))));
         Assert.Equal(HttpStatusCode.Redirect, valid.StatusCode);
