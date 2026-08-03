@@ -20,6 +20,21 @@ This runbook governs manual validation of EF Core SQL Server migrations. It does
 5. Run invariant checks for balances, lifecycle state, idempotency, and duplicate movements.
 6. Record commands, results, failures, reviewer, and exceptions.
 
+## Minimum Schema Checks
+
+- `VacationRequests` rowversion concurrency column exists.
+- `VacationBalances` rowversion concurrency column exists.
+- `BalanceMovements` remains append-only and supports accrual idempotency.
+- Unique accrual idempotency constraint for `(UserId, AccrualPeriod)` behavior is present.
+- `AuditRecords` stores required audit metadata without sensitive reason payloads.
+- Identity user extension columns for active state, capability, and employment start date exist.
+
+## Evidence Requirements
+
+Record migration name, source SHA, target database, command, result, reviewer,
+backup reference, rollback plan, and whether rollback was exercised or accepted
+as an environment-specific risk.
+
 ## Rollback Planning
 
 Rollback steps are environment-specific and must be documented before production use. If rollback is not validated, record it as an accepted operational risk before acceptance.

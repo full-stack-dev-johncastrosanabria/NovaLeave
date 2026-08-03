@@ -2,6 +2,7 @@ using NovaLeave.Application.Authorization;
 using NovaLeave.Application.Common.Errors;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Common.Results;
+using NovaLeave.Application.Observability;
 using NovaLeave.Domain.Entities;
 
 namespace NovaLeave.Application.Approvals.RejectRequest;
@@ -11,12 +12,18 @@ public sealed class RejectRequestHandler
     private readonly IApplicationDbContext _dbContext;
     private readonly IApproverIdentityService _identityService;
     private readonly TimeProvider _timeProvider;
+    private readonly IOperationalTelemetry _telemetry;
 
-    public RejectRequestHandler(IApplicationDbContext dbContext, IApproverIdentityService identityService, TimeProvider timeProvider)
+    public RejectRequestHandler(
+        IApplicationDbContext dbContext,
+        IApproverIdentityService identityService,
+        TimeProvider timeProvider,
+        IOperationalTelemetry telemetry)
     {
         _dbContext = dbContext;
         _identityService = identityService;
         _timeProvider = timeProvider;
+        _telemetry = telemetry;
     }
 
     public async Task<Result> HandleAsync(RejectRequestCommand command, CancellationToken cancellationToken)
@@ -41,6 +48,7 @@ public sealed class RejectRequestHandler
 
         if (!request.RowVersion.SequenceEqual(command.RowVersion))
         {
+            _telemetry.RecordConcurrencyConflict("rejection.rowversion");
             return Result.Failure(Error.Conflict("La solicitud fue modificada por otro proceso."));
         }
 
@@ -64,14 +72,18 @@ public sealed class RejectRequestHandler
                 timestamp));
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+            _telemetry.RecordRejection(true);
             return Result.Success();
         }
         catch (InvalidOperationException exception)
         {
+            _telemetry.RecordRejection(false);
             return Result.Failure(Error.Conflict(exception.Message));
         }
         catch (Exception exception) when (exception.GetType().Name == "DbUpdateConcurrencyException")
         {
+            _telemetry.RecordRejection(false);
+            _telemetry.RecordConcurrencyConflict("rejection.dbupdate");
             return Result.Failure(Error.Conflict("La solicitud fue modificada por otro proceso."));
         }
     }

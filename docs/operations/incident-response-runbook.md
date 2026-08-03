@@ -9,6 +9,8 @@ This runbook covers manual incident response for the NovaLeave MVP. It does not 
 - Implementer or operator detects and records the incident.
 - Reviewer or product owner approves any exception that affects acceptance.
 - Database owner performs or validates restore actions when needed.
+- Security reviewer handles suspected sensitive-data exposure.
+- Product owner or delegate confirms business-impact classification.
 
 ## Response Sequence
 
@@ -21,6 +23,22 @@ This runbook covers manual incident response for the NovaLeave MVP. It does not 
 7. Use the database migration runbook when schema state is involved.
 8. Validate recovery with health checks, targeted tests, and invariant checks.
 9. Record final status, root cause notes, remediation tasks, and approvals.
+
+## Incident Classes
+
+| Class | Examples | Immediate Evidence |
+| --- | --- | --- |
+| Authentication or authorization | Abnormal denial spike, suspected IDOR, forged mutation route | Correlated logs, request path, actor role, status code |
+| Balance or lifecycle | Negative balance, duplicate movement, invalid state transition | Invariant result, affected IDs, audit records |
+| Scheduled jobs | Accrual failure, timeout failure, duplicate-run anomaly | Job logs, metrics, audit, idempotency evidence |
+| Database | Readiness failure, migration mismatch, restore needed | Health result, migration version, backup reference |
+| Sensitive-data exposure | Reason, rejection reason, token, secret, or connection string in output | Preserved redacted sample and affected signal |
+
+## Communications
+
+Share only redacted evidence. Do not paste passwords, tokens, connection
+strings, full reasons, stack traces, or unapproved personal data into issue
+comments, PRs, chat, or handoff notes.
 
 ## Disaster Recovery
 
