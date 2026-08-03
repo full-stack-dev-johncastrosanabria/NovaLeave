@@ -18,6 +18,7 @@
 </dl>
 
 <form method="post" action="/rrhh/aprobadores/@Model.Approver.UserId/capacidad" class="vstack gap-3">
+  @Html.AntiForgeryToken()
   <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
 
   <div>

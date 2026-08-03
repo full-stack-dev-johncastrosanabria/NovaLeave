@@ -19,9 +19,10 @@
   <dd class="col-sm-9">@Model.Request.WorkingDays</dd>
   <dt class="col-sm-3">Saldo proyectado</dt>
   <dd class="col-sm-9">@Model.Request.ProjectedBalanceAfterApproval</dd>
-  <dt class="col-sm-3">RowVersion</dt>
-  <dd class="col-sm-9"><code>@Model.RowVersion</code></dd>
 </dl>
+
+@* RowVersion is a concurrency token, not business data: it travels as a hidden
+   field in each form below and is never displayed. *@
 
 @if (Model.Request.HasOverlapWarning)
 {
@@ -33,12 +34,14 @@
   {
   <div class="col-md-4">
     <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar">
+      @Html.AntiForgeryToken()
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
       <button type="submit" class="btn btn-success w-100" aria-label="Aprobar solicitud">Aprobar</button>
     </form>
   </div>
   <div class="col-md-8">
     <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar">
+      @Html.AntiForgeryToken()
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
       <label class="form-label" for="RejectionReason">Razon de rechazo</label>
       <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-2" rows="3" maxlength="500"></textarea>
@@ -50,6 +53,7 @@
   {
   <div class="col-md-4">
     <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar">
+      @Html.AntiForgeryToken()
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
       <button type="submit" class="btn btn-warning w-100" aria-label="Desactivar solicitud aprobada">Desactivar solicitud</button>
     </form>

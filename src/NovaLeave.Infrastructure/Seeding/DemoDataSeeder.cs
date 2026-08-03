@@ -29,11 +29,18 @@ public static class DemoDataSeeder
     /// <summary>Months of service granted to each demo identity, so balances start non-empty.</summary>
     private const int DemoMonthsOfService = 12;
 
+    /// <remarks>
+    /// Approvers and HR staff are employees as well, so they also hold <c>User</c> and can file
+    /// their own requests and see their own balance. Constitution §4.6 keeps this safe: requesting
+    /// and approving are mutually exclusive <em>per resource</em>, so they still cannot resolve
+    /// their own request. Only <c>user@demo</c> is deliberately single-role, to exercise the
+    /// navigation and context-switcher rules for an identity with one context (RBFV 4.2).
+    /// </remarks>
     private static readonly DemoIdentity[] DemoIdentities =
     [
         new("demo-user", "user@demo", ["User"], CanResolveRequests: false),
-        new("demo-approver", "approver@demo", ["Approver"], CanResolveRequests: true),
-        new("demo-hr", "hr@demo", ["HR"], CanResolveRequests: false),
+        new("demo-approver", "approver@demo", ["User", "Approver"], CanResolveRequests: true),
+        new("demo-hr", "hr@demo", ["User", "HR"], CanResolveRequests: false),
         new("demo-multi", "multi@demo", ["User", "Approver", "HR"], CanResolveRequests: true)
     ];
 
@@ -91,8 +98,24 @@ public static class DemoDataSeeder
         var seeded = 0;
         foreach (var identity in DemoIdentities)
         {
-            if (await userManager.FindByNameAsync(identity.Email) is not null)
+            var existing = await userManager.FindByNameAsync(identity.Email);
+            if (existing is not null)
             {
+                // Reconcile roles so an existing demo database picks up catalogue changes
+                // without being recreated. Still idempotent: unchanged identities are untouched.
+                var currentRoles = await userManager.GetRolesAsync(existing);
+                var missingRoles = identity.Roles.Except(currentRoles, StringComparer.Ordinal).ToArray();
+                if (missingRoles.Length > 0)
+                {
+                    await ThrowIfFailedAsync(
+                        userManager.AddToRolesAsync(existing, missingRoles),
+                        $"add roles '{string.Join(", ", missingRoles)}' to '{identity.Email}'");
+                    logger.LogInformation(
+                        "Added roles {Roles} to existing demo identity {Email}.",
+                        string.Join(", ", missingRoles),
+                        identity.Email);
+                }
+
                 continue;
             }
 
