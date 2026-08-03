@@ -81,6 +81,15 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// The MVP defines no landing page, so "/" had no route and returned 404 after
+// sign-in (the login ReturnUrl is "/"). Send each identity to the first entry
+// point its roles allow. Presentation-level routing only: no business rules.
+app.MapGet("/", (HttpContext http) =>
+    http.User.IsInRole("User") ? Results.Redirect("/mis-solicitudes")
+    : http.User.IsInRole("Approver") ? Results.Redirect("/aprobaciones")
+    : http.User.IsInRole("HR") ? Results.Redirect("/rrhh")
+    : Results.Redirect("/Identity/Account/AccessDenied"));
+
 app.MapRazorPages();
 app.MapDefaultControllerRoute();
 
