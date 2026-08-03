@@ -5,17 +5,29 @@
     var hasHrContext = User.IsInRole("HR");
     var contextCount = (hasUserContext ? 1 : 0) + (hasApproverContext ? 1 : 0) + (hasHrContext ? 1 : 0);
     var requestedContext = Context.Request.Query["context"].ToString();
+    var parsedCalendarContext = NovaLeave.Application.Calendars.RoleContext.User;
+    var hasExplicitCalendarContext = path.Equals("/calendario", StringComparison.OrdinalIgnoreCase)
+        && Enum.TryParse<NovaLeave.Application.Calendars.RoleContext>(requestedContext, true, out parsedCalendarContext)
+        && parsedCalendarContext is NovaLeave.Application.Calendars.RoleContext.User or NovaLeave.Application.Calendars.RoleContext.Approver;
     var activeContext = path.StartsWith("/rrhh", StringComparison.OrdinalIgnoreCase)
-        ? "HR"
-        : path.StartsWith("/aprobaciones", StringComparison.OrdinalIgnoreCase) || string.Equals(requestedContext, "Approver", StringComparison.OrdinalIgnoreCase)
-            ? "Approver"
-            : "User";
-    var activeRoot = activeContext == "HR" && hasHrContext
+        ? NovaLeave.Application.Calendars.RoleContext.HR
+        : path.StartsWith("/aprobaciones", StringComparison.OrdinalIgnoreCase)
+            ? NovaLeave.Application.Calendars.RoleContext.Approver
+            : hasExplicitCalendarContext
+                ? parsedCalendarContext
+                : path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && !hasUserContext && hasApproverContext
+                    ? NovaLeave.Application.Calendars.RoleContext.Approver
+                    : NovaLeave.Application.Calendars.RoleContext.User;
+    var activeRoot = activeContext == NovaLeave.Application.Calendars.RoleContext.HR && hasHrContext
         ? "/rrhh"
-        : activeContext == "Approver" && hasApproverContext
+        : activeContext == NovaLeave.Application.Calendars.RoleContext.Approver && hasApproverContext
             ? "/aprobaciones"
             : "/mis-solicitudes";
-    var activeContextLabel = activeContext == "HR" ? "RRHH" : activeContext == "Approver" ? "Aprobaciones" : "Mi espacio";
+    var activeContextLabel = activeContext == NovaLeave.Application.Calendars.RoleContext.HR
+        ? "RRHH"
+        : activeContext == NovaLeave.Application.Calendars.RoleContext.Approver
+            ? "Aprobaciones"
+            : "Mi espacio";
 }
 <!doctype html>
 <html lang="es">
@@ -44,20 +56,20 @@
         </button>
         <div class="collapse navbar-collapse" id="mainNavigation">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            @if (hasUserContext && activeContext == "User")
+            @if (hasUserContext && activeContext == NovaLeave.Application.Calendars.RoleContext.User)
             {
               <li class="nav-item"><a class="nav-link @(path.Equals("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes">Mi historial</a></li>
               <li class="nav-item"><a class="nav-link" href="/mis-solicitudes/crear">Nueva solicitud</a></li>
               <li class="nav-item"><a class="nav-link @(path.Equals("/saldo", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/saldo">Mi saldo</a></li>
-              <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "User" ? "active" : string.Empty)" href="/calendario">Calendario</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/calendario?context=User">Calendario</a></li>
             }
-            @if (hasApproverContext && activeContext == "Approver")
+            @if (hasApproverContext && activeContext == NovaLeave.Application.Calendars.RoleContext.Approver)
             {
               <li class="nav-item"><a class="nav-link @(path.Equals("/aprobaciones", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/aprobaciones">Aprobaciones</a></li>
               <li class="nav-item"><a class="nav-link @(path.Equals("/aprobaciones/historial", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/aprobaciones/historial">Historial</a></li>
-              <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "Approver" ? "active" : string.Empty)" href="/calendario?context=Approver">Calendario</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/calendario?context=Approver">Calendario</a></li>
             }
-            @if (hasHrContext && activeContext == "HR")
+            @if (hasHrContext && activeContext == NovaLeave.Application.Calendars.RoleContext.HR)
             {
               <li class="nav-item"><a class="nav-link @(path.Equals("/rrhh", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh">Inicio</a></li>
               <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/solicitudes">Solicitudes</a></li>

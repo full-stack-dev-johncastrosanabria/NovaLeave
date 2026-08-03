@@ -10,6 +10,21 @@
             .ToList();
     }
 }
+@{
+    var previousMonth = Model.CurrentMonth.FirstDay.AddMonths(-1);
+    var nextMonth = Model.CurrentMonth.FirstDay.AddMonths(1);
+    var today = DateTime.UtcNow;
+    var calendarRoute = Model.CurrentRole == NovaLeave.Application.Calendars.RoleContext.HR ? "/rrhh/calendario" : "/calendario";
+    var contextQuery = Model.CurrentRole switch
+    {
+        NovaLeave.Application.Calendars.RoleContext.User => "&context=User",
+        NovaLeave.Application.Calendars.RoleContext.Approver => "&context=Approver",
+        _ => string.Empty
+    };
+    var previousUrl = $"{calendarRoute}?year={previousMonth.Year}&month={previousMonth.Month}{contextQuery}";
+    var todayUrl = $"{calendarRoute}?year={today.Year}&month={today.Month}{contextQuery}";
+    var nextUrl = $"{calendarRoute}?year={nextMonth.Year}&month={nextMonth.Month}{contextQuery}";
+}
 
 <section class="nl-card" aria-label="@Model.Title">
   <div class="nl-card-body">
@@ -18,7 +33,14 @@
       <h2 class="h5 mb-1">@Model.CurrentMonth.DisplayName</h2>
       <p class="text-body-secondary mb-0">@Model.Title</p>
     </div>
-    <span class="nl-badge nl-readonly">@(Model.CurrentRole == NovaLeave.Application.Calendars.RoleContext.HR ? "RRHH" : Model.CurrentRole.ToString())</span>
+    <div class="d-flex flex-wrap gap-2">
+      <div class="btn-group" role="group" aria-label="Navegación del calendario">
+        <a class="btn btn-outline-primary" aria-label="Mes anterior" href="@previousUrl">Anterior</a>
+        <a class="btn btn-outline-primary" href="@todayUrl">Hoy</a>
+        <a class="btn btn-outline-primary" aria-label="Mes siguiente" href="@nextUrl">Siguiente</a>
+      </div>
+      <span class="nl-badge nl-readonly">@(Model.CurrentRole == NovaLeave.Application.Calendars.RoleContext.HR ? "RRHH" : Model.CurrentRole.ToString())</span>
+    </div>
   </div>
 
   <div class="d-flex flex-wrap gap-2 mb-3" aria-label="Leyenda de calendario">
