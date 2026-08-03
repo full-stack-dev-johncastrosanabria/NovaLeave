@@ -52,6 +52,52 @@ public sealed class UC02SwitchRoleContextTests
     }
 
     [Fact]
+    public async Task MultiRole_Calendar_Navigation_Uses_The_Active_Role_Context()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await IntegrationTestDatabase.ResetAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "multi-1", "multi@example.test", 5, roles: "User,Approver", canResolveRequests: true);
+        var client = factory.CreateClient();
+
+        var userResponse = await client.SendAsync(
+            IntegrationTestDatabase.AuthenticatedGet("/mis-solicitudes", "multi-1", "User,Approver", canResolveRequests: true));
+        var approverResponse = await client.SendAsync(
+            IntegrationTestDatabase.AuthenticatedGet("/aprobaciones", "multi-1", "User,Approver", canResolveRequests: true));
+        var userHtml = await userResponse.Content.ReadAsStringAsync();
+        var approverHtml = await approverResponse.Content.ReadAsStringAsync();
+
+        Assert.Contains("href=\"/calendario?context=User\"", userHtml);
+        Assert.Contains("href=\"/calendario?context=Approver\"", approverHtml);
+        Assert.Contains("Mi espacio", userHtml);
+        Assert.Contains("Aprobaciones", approverHtml);
+    }
+
+    [Fact]
+    public async Task MultiRole_Triple_Role_Identity_Sees_Each_Authorized_Context_Without_Mutating_Claims()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await IntegrationTestDatabase.ResetAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "multi-1", "multi@example.test", 5, roles: "User,Approver,HR", canResolveRequests: true);
+        var client = factory.CreateClient();
+
+        var response = await client.SendAsync(
+            IntegrationTestDatabase.AuthenticatedGet("/mis-solicitudes", "multi-1", "User,Approver,HR", canResolveRequests: true));
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("href=\"/mis-solicitudes\"", html);
+        Assert.Contains("href=\"/aprobaciones\"", html);
+        Assert.Contains("href=\"/rrhh\"", html);
+        var approverResponse = await client.SendAsync(
+            IntegrationTestDatabase.AuthenticatedGet("/aprobaciones", "multi-1", "User,Approver,HR", canResolveRequests: true));
+        var hrResponse = await client.SendAsync(
+            IntegrationTestDatabase.AuthenticatedGet("/rrhh", "multi-1", "User,Approver,HR", canResolveRequests: true));
+
+        Assert.Equal(HttpStatusCode.OK, approverResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, hrResponse.StatusCode);
+    }
+
+    [Fact]
     public async Task Every_Authenticated_Identity_Can_Sign_Out()
     {
         await using var factory = new NovaLeaveWebApplicationFactory();

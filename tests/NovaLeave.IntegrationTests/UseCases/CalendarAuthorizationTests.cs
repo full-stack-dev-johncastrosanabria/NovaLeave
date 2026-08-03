@@ -104,6 +104,85 @@ public sealed class CalendarAuthorizationTests
         Assert.Contains("Evento aprobado", approverHtml);
     }
 
+    [Fact]
+    public async Task User_And_HR_Identity_Can_Use_Explicit_User_Calendar_Without_HR_Scope()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await IntegrationTestDatabase.ResetAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "multi-1", "multi@example.test", 10, roles: "User,HR");
+        var client = factory.CreateClient();
+
+        var response = await client.SendAsync(
+            IntegrationTestDatabase.AuthenticatedGet("/calendario?context=User", "multi-1", "User,HR"));
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Mi calendario", html);
+        Assert.DoesNotContain("Calendario RRHH", html);
+    }
+
+    [Fact]
+    public async Task Triple_Role_Identity_Uses_Explicit_Approver_Context_And_Preserves_It_In_Month_Navigation()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await ApproverTestData.SeedUserAndApproverAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "multi-1", "multi@example.test", 10, roles: "User,Approver,HR", canResolveRequests: true);
+        var client = factory.CreateClient();
+
+        var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedGet(
+            "/calendario?context=Approver&year=2027&month=1",
+            "multi-1",
+            "User,Approver,HR",
+            canResolveRequests: true));
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Calendario de aprobaciones", html);
+        Assert.Contains("context=Approver", html);
+        Assert.Contains("year=2026&amp;month=12", html);
+        Assert.Contains("year=2027&amp;month=2", html);
+        var userContext = await client.SendAsync(IntegrationTestDatabase.AuthenticatedGet(
+            "/calendario?context=User",
+            "multi-1",
+            "User,Approver,HR",
+            canResolveRequests: true));
+        Assert.Equal(HttpStatusCode.OK, userContext.StatusCode);
+    }
+
+    [Fact]
+    public async Task Approver_Only_Default_Calendar_Renders_Approver_Context_In_Page_And_Navigation()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await ApproverTestData.SeedUserAndApproverAsync(factory);
+        var client = factory.CreateClient();
+
+        var response = await client.SendAsync(ApproverTestData.ApproverGet("/calendario"));
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Calendario de aprobaciones", html);
+        Assert.Contains("aria-label=\"Contexto activo\">Aprobaciones", html);
+        Assert.Contains("href=\"/calendario?context=Approver\"", html);
+    }
+
+    [Fact]
+    public async Task Inactive_Approver_Is_Denied_Approver_Calendar()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await IntegrationTestDatabase.ResetAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "approver-inactive", "inactive@example.test", 0, isActive: false, roles: "Approver", canResolveRequests: true);
+        var client = factory.CreateClient();
+
+        var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedGet(
+            "/calendario?context=Approver",
+            "approver-inactive",
+            "Approver",
+            isActive: false,
+            canResolveRequests: true));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
     private static async Task ApproveAsync(NovaLeaveWebApplicationFactory factory, HttpClient client, Guid requestId)
     {
         var rowVersion = ApproverTestData.RowVersionFor(factory, requestId);

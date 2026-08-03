@@ -27,12 +27,12 @@ public sealed class CalendarioController : Controller
     public async Task<IActionResult> Index(string? context = null, int? year = null, int? month = null, CancellationToken cancellationToken = default)
     {
         var userId = _currentUser.UserId ?? throw new InvalidOperationException("Usuario autenticado requerido.");
-        if (User.IsInRole("HR"))
+        var selectedContext = ResolveContext(context);
+        if (selectedContext == RoleContext.HR)
         {
             return Forbid();
         }
 
-        var selectedContext = ResolveContext(context);
         if (selectedContext == RoleContext.Approver)
         {
             if (!User.IsInRole("Approver") || !User.HasClaim("CanResolveRequests", "true"))
@@ -103,14 +103,9 @@ public sealed class CalendarioController : Controller
 
     private RoleContext ResolveContext(string? context)
     {
-        if (string.Equals(context, "Approver", StringComparison.OrdinalIgnoreCase))
+        if (Enum.TryParse<RoleContext>(context, true, out var requestedContext))
         {
-            return RoleContext.Approver;
-        }
-
-        if (string.Equals(context, "User", StringComparison.OrdinalIgnoreCase))
-        {
-            return RoleContext.User;
+            return requestedContext;
         }
 
         return User.IsInRole("Approver") && !User.IsInRole("User")
