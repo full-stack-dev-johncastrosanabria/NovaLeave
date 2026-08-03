@@ -6,7 +6,10 @@ using NovaLeave.Application.Authorization;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Configuration;
 using NovaLeave.Application.HR.ApproverCapabilities;
+using NovaLeave.Application.Observability;
 using NovaLeave.Infrastructure.Identity;
+using NovaLeave.Infrastructure.HealthChecks;
+using NovaLeave.Infrastructure.Observability;
 using NovaLeave.Infrastructure.Persistence;
 using NovaLeave.Infrastructure.Scheduling;
 
@@ -35,6 +38,9 @@ public static class DependencyInjection
         services.AddScoped<IAccrualUserSource, AccrualUserSource>();
         services.AddScoped<IUserDirectory, UserDirectory>();
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<NovaLeaveDbContext>());
+        services.AddSingleton<IOperationalTelemetry, OperationalTelemetry>();
+        services.AddHealthChecks()
+            .AddCheck<DatabaseConnectivityHealthCheck>("database", tags: ["ready"]);
 
         var timeoutCadence = configuration.GetSection(NovaLeaveOptions.SectionName)[nameof(NovaLeaveOptions.TimeoutSchedulerCadence)];
         var timeoutDays = configuration.GetSection(NovaLeaveOptions.SectionName)[nameof(NovaLeaveOptions.PendingRequestTimeoutDays)];

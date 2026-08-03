@@ -1,9 +1,11 @@
 # Quickstart — NovaLeave MVP (Developer Guide)
 
-**Date**: 2026-07-28 (revised 2026-07-28)
+**Date**: 2026-07-28 (revised 2026-08-03)
 **Feature**: 001-leave-management-mvp
 
-> **Status**: No production code has been written yet. This guide distinguishes **existing** items from **planned** items. Do not treat planned commands as if they already work.
+> **Status**: Implementation for UC-01 through UC-22 exists in `src/` and
+> `tests/`. Phase 11 validation evidence is recorded in
+> `phase-11-validation-evidence.md`.
 
 ---
 
@@ -12,15 +14,15 @@
 | Prerequisite | Status | Notes |
 |---|---|---|
 | .NET 10 SDK | **Required** | Install before any development begins |
-| SQL Server (local or container) | **Required** (planned) | Needed for integration tests and local development |
-| Node.js / npm or LibMan | **Planned** | Bootstrap 5.3.x asset management |
-| Docker | **Planned** | Containerized development; E2E Playwright tests |
+| SQL Server (local or container) | **Required** | Needed for integration tests and local development |
+| Bootstrap assets | **Present** | Managed under `src/NovaLeave.Web/wwwroot/lib/bootstrap/` |
+| Docker | **Required on macOS / Linux** | Hosts the local SQL Server; Windows hosts may use LocalDB instead (see below) |
 
 ---
 
-## Repository Structure (Planned — Not Yet Created)
+## Repository Structure
 
-No `src/` or `tests/` directories exist in the repository today. When implementation begins, the planned structure is:
+The implemented repository structure is:
 
 ```text
 src/
@@ -36,7 +38,6 @@ docs/
   adr/
   diagrams/
   operations/
-docker/
 ```
 
 ---
@@ -59,10 +60,9 @@ Configuration validated at startup. Application will not start with missing or i
 
 ## Local database with Docker (macOS / Linux)
 
-The team runs a mix of macOS (Apple Silicon) and Windows hosts. Windows developers can
-use SQL Server LocalDB and skip this section entirely — the integration-test fixture
-defaults to LocalDB. On macOS and Linux, LocalDB does not exist, so use the committed
-`docker-compose.yml`:
+The team runs a mix of macOS (Apple Silicon) and Windows hosts. Windows developers may use
+SQL Server LocalDB and skip this section — the integration-test fixture falls back to LocalDB.
+LocalDB does not exist on macOS or Linux, so use the committed `docker-compose.yml`:
 
 ```bash
 cp .env.example .env          # then set MSSQL_SA_PASSWORD to a value of your own
@@ -77,19 +77,9 @@ docker compose up -d          # starts SQL on ${NOVALEAVE_SQL_PORT}, default 143
 
 Stop with `docker compose down` (keeps data) or `docker compose down -v` (deletes the volume).
 
-**Applying migrations:** `Microsoft.EntityFrameworkCore.Design` is referenced by
-`NovaLeave.Infrastructure`, not by `NovaLeave.Web`, so `dotnet ef` must be pointed at
-Infrastructure as the startup project. The integration tests do not need this — they
-migrate the database themselves.
-
-**Verified on 2026-08-03** (Apple M3, Azure SQL Edge): full suite green —
-37 unit + 92 integration + 5 E2E = **134 passed, 0 failed**.
-
 ---
 
-## Planned Setup Commands
-
-All commands below are **planned** — they will work once implementation begins.
+## Setup Commands
 
 ### 1. Restore and build
 ```
@@ -97,56 +87,45 @@ dotnet restore
 dotnet build
 ```
 
-### 2. Apply EF Core migrations (planned)
+### 2. Apply EF Core migrations
 ```
 dotnet ef database update \
   --project src/NovaLeave.Infrastructure \
   --startup-project src/NovaLeave.Web
 ```
 
-### 3. Run the web application (planned)
+### 3. Run the web application
 ```
 dotnet run --project src/NovaLeave.Web
 ```
 Then browse to `https://localhost:5001` and log in at `/Identity/Account/Login`.
 
-### 4. Run unit tests (planned)
+### 4. Run unit tests
 ```
 dotnet test tests/NovaLeave.UnitTests
 ```
 
-### 5. Run integration tests (requires SQL Server)
+### 5. Run integration tests
 ```
 dotnet test tests/NovaLeave.IntegrationTests
 ```
-Integration tests use a real SQL Server database and apply the EF Core migrations
-themselves (`Database.MigrateAsync()` in `Support/IntegrationTestDatabase.cs`), so no
-manual `dotnet ef database update` is needed before running them. Testcontainers MAY be
-used when the test objective requires it; it is not mandatory.
+Integration tests use a real SQL Server database (connection string required). Testcontainers MAY be used when the test objective requires it; it is not mandatory.
 
-**Where the connection string comes from** — `Support/SqlServerFixture.cs` reads the
-`NOVALEAVE_TEST_SQLSERVER` environment variable and falls back to
-`(localdb)\MSSQLLocalDB` when it is unset:
-
-| Platform | What to do |
-|---|---|
-| **Windows** | Nothing. The LocalDB fallback works out of the box. |
-| **macOS / Linux** | LocalDB does not exist on these platforms. Start the container (see [Local database with Docker](#local-database-with-docker-macos--linux)) and export `NOVALEAVE_TEST_SQLSERVER` before running the tests, otherwise every database-backed test fails with a connection error. |
+On macOS and Linux the fixture's LocalDB fallback is unavailable, so point it at the Docker
+container by exporting the connection string first:
 
 ```bash
-# macOS / Linux
-set -a; . ./.env; set +a
-export NOVALEAVE_TEST_SQLSERVER="Server=localhost,${NOVALEAVE_SQL_PORT};Database=NovaLeave_Test;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true;Pooling=false;Connect Timeout=60"
-dotnet test tests/NovaLeave.IntegrationTests
+export NOVALEAVE_TEST_SQLSERVER="Server=localhost,14333;Database=NovaLeave_Test;User Id=sa;Password=<your MSSQL_SA_PASSWORD>;TrustServerCertificate=True;MultipleActiveResultSets=true;Pooling=false"
 ```
 
-### 6. Run E2E tests (planned — requires running application and demo seed data)
+### 6. Run E2E tests
 ```
 dotnet test tests/NovaLeave.EndToEndTests
 ```
-Requires `NovaLeave:SeedDemoUsers=true` in the test environment and a running application instance.
+Current E2E checks are smoke/static accessibility checks in the test project and
+do not require a separately running browser session.
 
-### 7. Manual Quality and Security Gate (planned — blocking)
+### 7. Manual Quality and Security Gate
 
 NovaLeave MVP does not use CI/CD or automated deployment pipelines. Before merge, handoff, release, or acceptance, execute and document the Manual Quality and Security Gate in `docs/operations/manual-quality-gate.md`.
 
@@ -154,7 +133,7 @@ If Bash, Python, Mermaid validation, static security analysis, dependency scanni
 
 ---
 
-## Demo Identities (Planned — CFG-003)
+## Demo Identities (CFG-003)
 
 When `NovaLeave:SeedDemoUsers=true`, the application seeds these identities at startup:
 
@@ -214,7 +193,7 @@ Full UC-to-route mapping: `specs/001-leave-management-mvp/contracts/uc-contracts
 
 ---
 
-## Create a Migration (Planned)
+## Create a Migration
 
 ```
 dotnet ef migrations add <MigrationName> \
@@ -242,12 +221,10 @@ dotnet ef migrations add <MigrationName> \
 
 ---
 
-## Useful Commands (Planned)
+## Useful Commands
 
 - Create migration:
   - `dotnet ef migrations add <Name> --project src/NovaLeave.Infrastructure --startup-project src/NovaLeave.Web`
-- Build container image:
-  - `docker build -t novelave:web -f docker/Dockerfile .`
 
 ---
 

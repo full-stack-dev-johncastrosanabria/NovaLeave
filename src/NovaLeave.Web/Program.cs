@@ -9,6 +9,10 @@ using NovaLeave.Web.Services;
 using Serilog;
 using Microsoft.Extensions.Options;
 using NovaLeave.Application.Authorization;
+using NovaLeave.Web.Middleware;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using System.Text.Json;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +53,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Identity/Account/Login";
     options.LogoutPath = "/Identity/Account/Logout";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(builder.Configuration.GetValue<int>("NovaLeave:SessionTimeoutMinutes"));
+    options.SlidingExpiration = true;
 });
 builder.Services.AddAuthorization(options =>
 {
@@ -69,6 +75,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseMiddleware<CorrelationMiddleware>();
 app.UseSerilogRequestLogging();
 app.UseRouting();
 
@@ -76,6 +83,28 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapGet("/health/live", () => Results.Json(new
+{
+    status = HealthStatus.Healthy.ToString()
+})).AllowAnonymous();
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var payload = new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(entry => new
+            {
+                name = entry.Key,
+                status = entry.Value.Status.ToString()
+            })
+        };
+        await context.Response.WriteAsync(JsonSerializer.Serialize(payload));
+    }
+}).AllowAnonymous();
 app.MapDefaultControllerRoute();
 
 app.Run();
