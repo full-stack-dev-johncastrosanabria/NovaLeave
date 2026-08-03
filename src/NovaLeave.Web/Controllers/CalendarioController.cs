@@ -40,7 +40,7 @@ public sealed class CalendarioController : Controller
                 return Forbid();
             }
 
-            var approverResult = await _getApproverCalendar.HandleAsync(userId, cancellationToken);
+            var approverResult = await _getApproverCalendar.HandleAsync(userId, User.IsInRole("User"), cancellationToken);
             if (approverResult.IsFailure)
             {
                 return Forbid();
@@ -49,13 +49,21 @@ public sealed class CalendarioController : Controller
             var approverEvents = approverResult.Value!
                 .Select(item => new CalendarEvent(
                     item.RequestId,
-                    "Evento aprobado",
+                    item.Category switch
+                    {
+                        CalendarEventCategory.OwnRequest => "Mi solicitud",
+                        CalendarEventCategory.PendingApproval => "Pendiente de aprobacion",
+                        CalendarEventCategory.ResolvedByMe => "Resuelta por mi",
+                        _ => "Evento aprobado"
+                    },
                     null,
                     item.StartDate,
                     item.EndDate,
                     item.WorkingDays,
-                    RequestStatus.Approved,
-                    false))
+                    item.Status,
+                    item.CanNavigateToDetail,
+                    item.Category,
+                    item.Category == CalendarEventCategory.OwnRequest ? "/mis-solicitudes/{id}" : "/aprobaciones/{id}"))
                 .ToList();
 
             return View("Approver", new CalendarioAprobadorViewModel(CalendarViewModel.Create(
@@ -80,8 +88,9 @@ public sealed class CalendarioController : Controller
                 item.StartDate,
                 item.EndDate,
                 item.WorkingDays,
-                RequestStatus.Approved,
-                true))
+                item.Status,
+                true,
+                CalendarEventCategory.OwnRequest))
             .ToList();
 
         return View(new CalendarioViewModel(CalendarViewModel.Create(

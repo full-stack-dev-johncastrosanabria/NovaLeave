@@ -22,9 +22,12 @@
   </div>
 
   <div class="d-flex flex-wrap gap-2 mb-3" aria-label="Leyenda de calendario">
+    @foreach (var category in Model.Events.Select(item => item.CategoryLabel).Distinct())
+    {
+      <span class="nl-badge nl-badge-neutral">@category</span>
+    }
     <span class="nl-badge nl-badge-approved">Aprobada</span>
     <span class="nl-badge nl-badge-pending">Pendiente</span>
-    <span class="nl-badge nl-badge-neutral">Otra</span>
   </div>
 
   <div class="table-responsive">
@@ -62,8 +65,9 @@
                   var detailUrl = item.DetailUrl(Model.DetailRouteTemplate);
                   if (detailUrl is not null)
                   {
-                    <a class="nl-calendar-event" href="@detailUrl" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status">
+                    <a class="nl-calendar-event @item.CategoryCssClass" href="@detailUrl" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" data-category="@item.Category">
                       <span>Solicitud</span>
+                      <span>@item.CategoryLabel</span>
                       <span>@item.Label</span>
                       <partial name="_StatusBadge" model="item.StatusLabel" />
                       <span class="small">@item.WorkingDays dias</span>
@@ -71,8 +75,9 @@
                   }
                   else
                   {
-                    <span class="nl-calendar-event" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status">
+                    <span class="nl-calendar-event @item.CategoryCssClass" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" data-category="@item.Category">
                       <span>Solicitud</span>
+                      <span>@item.CategoryLabel</span>
                       <span>@item.Label</span>
                       <partial name="_StatusBadge" model="item.StatusLabel" />
                       <span>@item.WorkingDays dias</span>
@@ -104,8 +109,9 @@
         @foreach (var item in Model.Events)
         {
           var detailUrl = item.DetailUrl(Model.DetailRouteTemplate);
-          <li class="list-group-item d-flex flex-column flex-md-row justify-content-between gap-2" data-status="@item.Status">
+          <li class="list-group-item d-flex flex-column flex-md-row justify-content-between gap-2" data-status="@item.Status" data-category="@item.Category">
             <span>
+              <span class="fw-semibold">@item.CategoryLabel</span>
               <span>@item.Label</span>
               @if (!string.IsNullOrWhiteSpace(item.RequesterName))
               {
