@@ -235,15 +235,15 @@
 
 ### Tests for User Story 6
 
-- [ ] T117 [P] [US6] Add shared calendar ViewModel unit tests in `tests/NovaLeave.UnitTests/Presentation/CalendarViewModelTests.cs`
-- [ ] T118 [P] [US6] Add calendar authorization integration tests for User personal `/calendario`, eligible Approver anonymized `/calendario`, HR-only `/rrhh/calendario`, HR denial on `/calendario`, and disabled Approver denial in `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`
-- [ ] T119 [P] [US6] Add calendar accessibility E2E smoke tests in `tests/NovaLeave.EndToEndTests/Calendar/CalendarAccessibilityTests.cs`
+- [X] T117 [P] [US6] Add shared calendar ViewModel unit tests in `tests/NovaLeave.UnitTests/Presentation/CalendarViewModelTests.cs`
+- [X] T118 [P] [US6] Add calendar authorization integration tests for User personal `/calendario`, eligible Approver anonymized `/calendario`, HR-only `/rrhh/calendario`, HR denial on `/calendario`, and disabled Approver denial in `tests/NovaLeave.IntegrationTests/UseCases/CalendarAuthorizationTests.cs`
+- [X] T119 [P] [US6] Add calendar accessibility E2E smoke tests in `tests/NovaLeave.EndToEndTests/Calendar/CalendarAccessibilityTests.cs`
 
 ### Implementation for User Story 6
 
-- [ ] T120 [P] [US6] Implement shared calendar query models in `src/NovaLeave.Application/Calendars/CalendarModels.cs`
-- [ ] T121 [US6] Implement shared `_Calendar.cshtml` partial with Bootstrap 5.3, status colors, keyboard support, and authorized links in `src/NovaLeave.Web/Views/Shared/_Calendar.cshtml`
-- [ ] T122 [US6] Integrate shared calendar partial into User and Approver `/calendario` views and the dedicated read-only HR `/rrhh/calendario` view without sharing route data scope under `src/NovaLeave.Web/Views/`
+- [X] T120 [P] [US6] Implement shared calendar query models in `src/NovaLeave.Application/Calendars/CalendarModels.cs`
+- [X] T121 [US6] Implement shared `_Calendar.cshtml` partial with Bootstrap 5.3, status colors, keyboard support, and authorized links in `src/NovaLeave.Web/Views/Shared/_Calendar.cshtml`
+- [X] T122 [US6] Integrate shared calendar partial into User and Approver `/calendario` views and the dedicated read-only HR `/rrhh/calendario` view without sharing route data scope under `src/NovaLeave.Web/Views/`
 
 **Checkpoint**: Calendar behavior for UC-08, UC-15, and UC-19 independently passes.
 

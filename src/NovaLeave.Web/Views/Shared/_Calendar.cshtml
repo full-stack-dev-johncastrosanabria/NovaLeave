@@ -1,20 +1,114 @@
-<section class="table-responsive" aria-label="Calendario de vacaciones">
-  <table class="table table-bordered align-middle">
+@model NovaLeave.Application.Calendars.CalendarViewModel
+
+@functions {
+    private static IReadOnlyList<IReadOnlyList<NovaLeave.Application.Calendars.CalendarDay>> Weeks(IReadOnlyList<NovaLeave.Application.Calendars.CalendarDay> days)
+    {
+        return days
+            .Select((day, index) => new { day, index })
+            .GroupBy(item => item.index / 7)
+            .Select(group => group.Select(item => item.day).ToList())
+            .ToList();
+    }
+}
+
+<section class="table-responsive" aria-label="@Model.Title">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 class="h5 mb-0">@Model.CurrentMonth.DisplayName</h2>
+    <span class="badge text-bg-light border">@(Model.CurrentRole == NovaLeave.Application.Calendars.RoleContext.HR ? "RRHH" : Model.CurrentRole.ToString())</span>
+  </div>
+
+  <table class="table table-bordered align-middle calendar-grid" role="grid" aria-label="@Model.Title" data-calendar-keyboard="true">
+    <caption>@Model.Title</caption>
     <thead>
       <tr>
-        <th scope="col">Lunes</th>
-        <th scope="col">Martes</th>
-        <th scope="col">Miércoles</th>
-        <th scope="col">Jueves</th>
-        <th scope="col">Viernes</th>
-        <th scope="col">Sábado</th>
-        <th scope="col">Domingo</th>
+        <th scope="col"><abbr title="Lunes">Lun</abbr></th>
+        <th scope="col"><abbr title="Martes">Mar</abbr></th>
+        <th scope="col"><abbr title="Miercoles">Mie</abbr></th>
+        <th scope="col"><abbr title="Jueves">Jue</abbr></th>
+        <th scope="col"><abbr title="Viernes">Vie</abbr></th>
+        <th scope="col"><abbr title="Sabado">Sab</abbr></th>
+        <th scope="col"><abbr title="Domingo">Dom</abbr></th>
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td colspan="7">Calendario pendiente de datos de aplicación.</td>
-      </tr>
+      @foreach (var week in Weeks(Model.Days))
+      {
+        <tr role="row">
+          @foreach (var day in week)
+          {
+            var dayClass = day.IsWeekend ? "bg-body-tertiary text-body-secondary" : day.IsCurrentMonth ? string.Empty : "text-body-secondary";
+            <td class="@dayClass" role="gridcell" aria-label="@day.Date.ToString("yyyy-MM-dd")" tabindex="@(day.IsWeekend ? "-1" : "0")" style="min-width: 96px; height: 96px;">
+              <div class="d-flex justify-content-between align-items-start gap-2">
+                <span class="fw-semibold @(day.IsToday ? "border border-primary rounded px-1" : string.Empty)">@day.Date.Day</span>
+                @if (day.IsWeekend)
+                {
+                  <span class="visually-hidden">Fin de semana</span>
+                }
+              </div>
+              <div class="d-grid gap-1 mt-2">
+                @foreach (var item in day.Events.Take(3))
+                {
+                  var detailUrl = item.DetailUrl(Model.DetailRouteTemplate);
+                  if (detailUrl is not null)
+                  {
+                    <a class="btn btn-sm btn-primary text-start text-wrap" href="@detailUrl" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status">
+                      <span>Solicitud</span>
+                      <span>@item.Label</span>
+                      <span class="badge border @item.StatusCssClass">@item.StatusLabel</span>
+                      <span class="small">@item.WorkingDays dias</span>
+                    </a>
+                  }
+                  else
+                  {
+                    <span class="border rounded p-1 small bg-primary text-white" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status">
+                      <span>Solicitud</span>
+                      <span>@item.Label</span>
+                      <span class="badge text-bg-light">@item.StatusLabel</span>
+                      <span>@item.WorkingDays dias</span>
+                    </span>
+                  }
+                }
+                @if (day.Events.Count > 3)
+                {
+                  <span class="small text-body-secondary">+@(day.Events.Count - 3) mas</span>
+                }
+              </div>
+            </td>
+          }
+        </tr>
+      }
     </tbody>
   </table>
+
+  @if (Model.Events.Count == 0)
+  {
+    <div class="alert alert-info" role="status">No hay periodos aprobados en este mes.</div>
+  }
+  else
+  {
+    <div class="mt-4">
+      <h3 class="h6">Eventos autorizados</h3>
+      <ul class="list-group">
+        @foreach (var item in Model.Events)
+        {
+          var detailUrl = item.DetailUrl(Model.DetailRouteTemplate);
+          <li class="list-group-item d-flex flex-column flex-md-row justify-content-between gap-2" data-status="@item.Status">
+            <span>
+              <span>@item.Label</span>
+              @if (!string.IsNullOrWhiteSpace(item.RequesterName))
+              {
+                <span> - @item.RequesterName</span>
+              }
+              <span> - @item.StartDate.ToString("yyyy-MM-dd") a @item.EndDate.ToString("yyyy-MM-dd")</span>
+              <span class="badge border @item.StatusCssClass">@item.StatusLabel</span>
+            </span>
+            @if (detailUrl is not null)
+            {
+              <a class="btn btn-sm btn-outline-primary align-self-start" href="@detailUrl" aria-label="@item.AccessibleName" data-calendar-event="true">Ver detalle</a>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  }
 </section>
