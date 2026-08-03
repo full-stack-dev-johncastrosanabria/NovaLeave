@@ -4,6 +4,7 @@ using NovaLeave.Application;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Configuration;
 using NovaLeave.Infrastructure;
+using NovaLeave.Infrastructure.Seeding;
 using NovaLeave.Web.Filters;
 using NovaLeave.Web.Services;
 using Serilog;
@@ -61,6 +62,11 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+
+// Composition root only: seeds the documented demo identities when
+// NovaLeave:SeedDemoUsers is enabled. No-ops in Production and when the flag is
+// off, and is idempotent across restarts.
+await DemoDataSeeder.SeedAsync(app.Services, app.Environment.IsProduction());
 
 if (!app.Environment.IsDevelopment())
 {
