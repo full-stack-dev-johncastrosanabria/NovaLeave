@@ -7,15 +7,21 @@
     var requestedContext = Context.Request.Query["context"].ToString();
     var activeContext = path.StartsWith("/rrhh", StringComparison.OrdinalIgnoreCase)
         ? "HR"
-        : path.StartsWith("/aprobaciones", StringComparison.OrdinalIgnoreCase) || string.Equals(requestedContext, "Approver", StringComparison.OrdinalIgnoreCase)
+        : string.Equals(requestedContext, "User", StringComparison.OrdinalIgnoreCase)
+            ? "User"
+            : path.StartsWith("/aprobaciones", StringComparison.OrdinalIgnoreCase) || string.Equals(requestedContext, "Approver", StringComparison.OrdinalIgnoreCase)
             ? "Approver"
+            : path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && hasApproverContext && !hasUserContext
+                ? "Approver"
             : "User";
     var activeRoot = activeContext == "HR" && hasHrContext
         ? "/rrhh"
         : activeContext == "Approver" && hasApproverContext
             ? "/aprobaciones"
             : "/mis-solicitudes";
-    var activeContextLabel = activeContext == "HR" ? "RRHH" : activeContext == "Approver" ? "Aprobador · Aprobaciones" : "Usuario · Mi espacio";
+    var activeRoleLabel = activeContext == "HR" ? "RRHH" : activeContext == "Approver" ? "Aprobador" : "Usuario";
+    var activeSpaceLabel = activeContext == "HR" ? "Solo lectura" : activeContext == "Approver" ? "Aprobaciones" : "Mi espacio";
+    var activeContextLabel = $"{activeRoleLabel} · {activeSpaceLabel}";
 }
 <!doctype html>
 <html lang="es">
@@ -37,7 +43,10 @@
         </a>
         @if (User.Identity?.IsAuthenticated == true)
         {
-          <span class="nl-context-chip" aria-label="Contexto activo">@activeContextLabel</span>
+          <span class="nl-context-chip" aria-label="Contexto activo: @activeContextLabel">
+            <span class="nl-context-role">@activeRoleLabel</span>
+            <span class="nl-context-space">@activeSpaceLabel</span>
+          </span>
         }
         @if (User.Identity?.IsAuthenticated == true)
         {
@@ -51,7 +60,7 @@
               <li class="nav-item"><a class="nav-link @(path.Equals("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes">Mi espacio</a></li>
               <li class="nav-item"><a class="nav-link @(path.StartsWith("/mis-solicitudes/crear", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes/crear">Nueva solicitud</a></li>
               <li class="nav-item"><a class="nav-link @(path.Equals("/saldo", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/saldo">Mi saldo</a></li>
-              <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "User" ? "active" : string.Empty)" href="/calendario">Calendario</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "User" ? "active" : string.Empty)" href="/calendario?context=User">Calendario</a></li>
             }
             @if (hasApproverContext && activeContext == "Approver")
             {

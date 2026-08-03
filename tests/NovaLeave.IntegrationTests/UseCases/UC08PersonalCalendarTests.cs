@@ -18,7 +18,7 @@ public sealed class UC08PersonalCalendarTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Mi calendario", html);
-        Assert.Contains("Calendario de vacaciones", html);
+        Assert.Contains("context=User", html);
     }
 
     [Fact]

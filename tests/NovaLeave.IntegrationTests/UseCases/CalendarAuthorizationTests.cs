@@ -104,6 +104,23 @@ public sealed class CalendarAuthorizationTests
         Assert.Contains("Evento aprobado", approverHtml);
     }
 
+    [Fact]
+    public async Task User_Approver_HR_Identity_Can_Use_Explicit_User_And_Approver_Calendar_Contexts()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await IntegrationTestDatabase.ResetAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "multi-1", "multi@example.test", 10, roles: "User,Approver,HR", canResolveRequests: true);
+        var client = factory.CreateClient();
+
+        var userContext = await client.SendAsync(IntegrationTestDatabase.AuthenticatedGet("/calendario?context=User", "multi-1", "User,Approver,HR", canResolveRequests: true));
+        var approverContext = await client.SendAsync(IntegrationTestDatabase.AuthenticatedGet("/calendario?context=Approver", "multi-1", "User,Approver,HR", canResolveRequests: true));
+
+        Assert.Equal(HttpStatusCode.OK, userContext.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, approverContext.StatusCode);
+        Assert.Contains("Mi calendario", await userContext.Content.ReadAsStringAsync());
+        Assert.Contains("Calendario de aprobaciones", await approverContext.Content.ReadAsStringAsync());
+    }
+
     private static async Task ApproveAsync(NovaLeaveWebApplicationFactory factory, HttpClient client, Guid requestId)
     {
         var rowVersion = ApproverTestData.RowVersionFor(factory, requestId);

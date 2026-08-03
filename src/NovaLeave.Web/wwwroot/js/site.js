@@ -102,3 +102,8 @@ document.querySelectorAll("[data-submit-once]").forEach((form) => {
     button.textContent = "Procesando…";
   });
 });
+
+const validationPopover = document.querySelector("[data-validation-popover]");
+if (validationPopover) {
+  requestAnimationFrame(() => validationPopover.focus({ preventScroll: true }));
+}
