@@ -287,18 +287,18 @@
 
 ### Tests for User Story 8
 
-- [ ] T137 [P] [US8] Add UC-22 Approver capability list tests in `tests/NovaLeave.IntegrationTests/UseCases/UC22ApproverCapabilityListTests.cs`
-- [ ] T138 [P] [US8] Add UC-22 capability toggle validation, rowversion, and audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC22ApproverCapabilityToggleTests.cs`
-- [ ] T139 [P] [US8] Add inactive HR and non-Approver target denial tests in `tests/NovaLeave.IntegrationTests/Security/HRCapabilityAuthorizationTests.cs`
-- [ ] T140 [P] [US8] Add HR capability E2E smoke tests in `tests/NovaLeave.EndToEndTests/HR/HRCapabilitySmokeTests.cs`
+- [X] T137 [P] [US8] Add UC-22 Approver capability list tests in `tests/NovaLeave.IntegrationTests/UseCases/UC22ApproverCapabilityListTests.cs`
+- [X] T138 [P] [US8] Add UC-22 capability toggle validation, rowversion, and audit tests in `tests/NovaLeave.IntegrationTests/UseCases/UC22ApproverCapabilityToggleTests.cs`
+- [X] T139 [P] [US8] Add inactive HR and non-Approver target denial tests in `tests/NovaLeave.IntegrationTests/Security/HRCapabilityAuthorizationTests.cs`
+- [X] T140 [P] [US8] Add HR capability E2E smoke tests in `tests/NovaLeave.EndToEndTests/HR/HRCapabilitySmokeTests.cs`
 
 ### Implementation for User Story 8
 
-- [ ] T141 [P] [US8] Implement Approver capability list query in `src/NovaLeave.Application/HR/ApproverCapabilities/ListApproverCapabilities/`
-- [ ] T142 [US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`
-- [ ] T143 [US8] Implement HR Approver capability MVC controller routes `/rrhh/aprobadores` and `/rrhh/aprobadores/{id}/capacidad` in `src/NovaLeave.Web/Controllers/RRHHController.cs`
-- [ ] T144 [US8] Implement capability management ViewModels in `src/NovaLeave.Web/ViewModels/RRHH/ApproverCapabilities/`
-- [ ] T145 [US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Web/Views/RRHH/ApproverCapabilities/`
+- [X] T141 [P] [US8] Implement Approver capability list query in `src/NovaLeave.Application/HR/ApproverCapabilities/ListApproverCapabilities/`
+- [X] T142 [US8] Implement `canResolveRequests` toggle command with reason, confirmation, rowversion, role revalidation, and audit in `src/NovaLeave.Application/HR/ApproverCapabilities/ToggleApproverCapability/`
+- [X] T143 [US8] Implement HR Approver capability MVC controller routes `/rrhh/aprobadores` and `/rrhh/aprobadores/{id}/capacidad` in `src/NovaLeave.Web/Controllers/RRHHController.cs`
+- [X] T144 [US8] Implement capability management ViewModels in `src/NovaLeave.Web/ViewModels/RRHH/ApproverCapabilities/`
+- [X] T145 [US8] Implement capability list, modal confirmation, validation, concurrency, and toast UI in `src/NovaLeave.Web/Views/RRHH/ApproverCapabilities/`
 
 **Checkpoint**: UC-22 independently passes.
 

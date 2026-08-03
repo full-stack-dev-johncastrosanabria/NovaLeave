@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NovaLeave.Application.Authorization;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Configuration;
+using NovaLeave.Application.HR.ApproverCapabilities;
 using NovaLeave.Infrastructure.Identity;
 using NovaLeave.Infrastructure.Persistence;
 using NovaLeave.Infrastructure.Scheduling;
@@ -30,6 +31,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
         services.AddScoped<IApproverIdentityService, ApproverIdentityService>();
+        services.AddScoped<IApproverCapabilityStore, ApproverCapabilityStore>();
         services.AddScoped<IAccrualUserSource, AccrualUserSource>();
         services.AddScoped<IUserDirectory, UserDirectory>();
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<NovaLeaveDbContext>());

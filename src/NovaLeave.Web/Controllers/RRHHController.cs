@@ -4,11 +4,14 @@ using NovaLeave.Application.Calendars;
 using NovaLeave.Application.Common.Errors;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.HR.Audit;
+using NovaLeave.Application.HR.ApproverCapabilities.ListApproverCapabilities;
+using NovaLeave.Application.HR.ApproverCapabilities.ToggleApproverCapability;
 using NovaLeave.Application.HR.Balances;
 using NovaLeave.Application.HR.Calendar;
 using NovaLeave.Application.HR.Requests;
 using NovaLeave.Domain.Enums;
 using NovaLeave.Web.ViewModels.RRHH;
+using NovaLeave.Web.ViewModels.RRHH.ApproverCapabilities;
 
 namespace NovaLeave.Web.Controllers;
 
@@ -22,6 +25,9 @@ public sealed class RRHHController : Controller
     private readonly GetHRBalancesQueryHandler _getBalances;
     private readonly GetHRBalanceMovementsQueryHandler _getMovements;
     private readonly GetHRAuditLogQueryHandler _getAudit;
+    private readonly ListApproverCapabilitiesQueryHandler _listCapabilities;
+    private readonly GetApproverCapabilityQueryHandler _getCapability;
+    private readonly ToggleApproverCapabilityCommandHandler _toggleCapability;
 
     public RRHHController(
         ICurrentUser currentUser,
@@ -30,7 +36,10 @@ public sealed class RRHHController : Controller
         GetHRCalendarQueryHandler getCalendar,
         GetHRBalancesQueryHandler getBalances,
         GetHRBalanceMovementsQueryHandler getMovements,
-        GetHRAuditLogQueryHandler getAudit)
+        GetHRAuditLogQueryHandler getAudit,
+        ListApproverCapabilitiesQueryHandler listCapabilities,
+        GetApproverCapabilityQueryHandler getCapability,
+        ToggleApproverCapabilityCommandHandler toggleCapability)
     {
         _currentUser = currentUser;
         _getRequests = getRequests;
@@ -39,6 +48,9 @@ public sealed class RRHHController : Controller
         _getBalances = getBalances;
         _getMovements = getMovements;
         _getAudit = getAudit;
+        _listCapabilities = listCapabilities;
+        _getCapability = getCapability;
+        _toggleCapability = toggleCapability;
     }
 
     [HttpGet("/rrhh")]
@@ -106,9 +118,56 @@ public sealed class RRHHController : Controller
         return View("Auditoria", new RRHHAuditoriaViewModel(result));
     }
 
+    [HttpGet("/rrhh/aprobadores")]
+    public async Task<IActionResult> ApproverCapabilities(CancellationToken cancellationToken)
+    {
+        var approvers = await _listCapabilities.HandleAsync(cancellationToken);
+        return View("ApproverCapabilities/Index", new ApproverCapabilitiesIndexViewModel(approvers));
+    }
+
+    [HttpGet("/rrhh/aprobadores/{id}/capacidad")]
+    public async Task<IActionResult> ApproverCapability(string id, CancellationToken cancellationToken)
+    {
+        var result = await _getCapability.HandleAsync(id, cancellationToken);
+        if (result.IsFailure)
+        {
+            return ToActionResult(result.Error);
+        }
+
+        return View("ApproverCapabilities/Capability", BuildCapabilityForm(result.Value!));
+    }
+
+    [HttpPost("/rrhh/aprobadores/{id}/capacidad")]
+    public async Task<IActionResult> ToggleApproverCapability(string id, ToggleApproverCapabilityInput input, CancellationToken cancellationToken)
+    {
+        if (!TryDecode(input.RowVersion, out var rowVersion))
+        {
+            return BadRequest("RowVersion no valida.");
+        }
+
+        var result = await _toggleCapability.HandleAsync(new ToggleApproverCapabilityCommand(
+            RequireUserId(),
+            id,
+            input.Enable,
+            input.Reason ?? string.Empty,
+            input.Confirmed,
+            rowVersion), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return ToActionResult(result.Error);
+        }
+
+        TempData["Toast"] = "Capacidad de aprobador actualizada.";
+        return RedirectToAction(nameof(ApproverCapabilities));
+    }
+
     [HttpPost("/rrhh/saldos/{userId}")]
     [HttpPost("/rrhh/roles/{userId}")]
     [HttpPost("/rrhh/usuarios/{userId}/roles")]
+    [HttpPost("/rrhh/aprobadores/{userId}/roles")]
+    [HttpPost("/rrhh/aprobadores/{userId}/asignar")]
+    [HttpPost("/rrhh/aprobadores/{userId}/remover")]
     public IActionResult DenyForgedMutations(string userId)
     {
         return Forbid();
@@ -128,6 +187,28 @@ public sealed class RRHHController : Controller
             ErrorCodes.Conflict => Conflict(error.Message),
             _ => BadRequest(error?.Message ?? "Solicitud invalida.")
         };
+    }
+
+    private static ApproverCapabilityFormViewModel BuildCapabilityForm(NovaLeave.Application.HR.ApproverCapabilities.ApproverCapabilityItem item)
+    {
+        return new ApproverCapabilityFormViewModel(
+            item,
+            new ToggleApproverCapabilityInput { Enable = item.CanResolveRequests, RowVersion = Convert.ToBase64String(item.RowVersion) },
+            Convert.ToBase64String(item.RowVersion));
+    }
+
+    private static bool TryDecode(string rowVersion, out byte[] decoded)
+    {
+        try
+        {
+            decoded = Convert.FromBase64String(rowVersion);
+            return true;
+        }
+        catch (FormatException)
+        {
+            decoded = [];
+            return false;
+        }
     }
 
     private static YearMonth ResolveMonth(int? year, int? month, IReadOnlyList<CalendarEvent> events)
