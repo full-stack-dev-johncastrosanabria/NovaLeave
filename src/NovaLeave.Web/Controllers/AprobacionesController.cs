@@ -66,11 +66,13 @@ public sealed class AprobacionesController : Controller
     {
         if (!TryDecode(rowVersion, out var decoded))
         {
-            return BadRequest("RowVersion no valida.");
+            return await RenderDetailErrorAsync(id, null, StatusCodes.Status409Conflict, null, cancellationToken);
         }
 
         var result = await _approve.HandleAsync(new ApproveRequestCommand(RequireUserId(), id, decoded), cancellationToken);
-        return result.IsFailure ? ToActionResult(result.Error) : RedirectToAction(nameof(History));
+        return result.IsFailure
+            ? await HandleWorkflowErrorAsync(id, result.Error, null, cancellationToken)
+            : RedirectToAction(nameof(History));
     }
 
     [HttpPost("/aprobaciones/{id:guid}/rechazar")]
@@ -78,11 +80,13 @@ public sealed class AprobacionesController : Controller
     {
         if (!TryDecode(viewModel.RowVersion, out var decoded))
         {
-            return BadRequest("RowVersion no valida.");
+            return await RenderDetailErrorAsync(id, null, StatusCodes.Status409Conflict, viewModel.RejectionReason, cancellationToken);
         }
 
         var result = await _reject.HandleAsync(new RejectRequestCommand(RequireUserId(), id, viewModel.RejectionReason, decoded), cancellationToken);
-        return result.IsFailure ? ToActionResult(result.Error) : RedirectToAction(nameof(History));
+        return result.IsFailure
+            ? await HandleWorkflowErrorAsync(id, result.Error, viewModel.RejectionReason, cancellationToken)
+            : RedirectToAction(nameof(History));
     }
 
     [HttpPost("/aprobaciones/{id:guid}/desactivar")]
@@ -90,16 +94,18 @@ public sealed class AprobacionesController : Controller
     {
         if (Request.Form.Keys.Any(key => key is not ("__RequestVerificationToken" or "RowVersion")))
         {
-            return BadRequest("La desactivacion aplica a la solicitud completa.");
+            return await RenderDetailErrorAsync(id, Error.Validation("La desactivacion aplica a la solicitud completa."), StatusCodes.Status400BadRequest, null, cancellationToken);
         }
 
         if (!TryDecode(viewModel.RowVersion, out var decoded))
         {
-            return BadRequest("RowVersion no valida.");
+            return await RenderDetailErrorAsync(id, null, StatusCodes.Status409Conflict, null, cancellationToken);
         }
 
         var result = await _deactivate.HandleAsync(new DeactivateApprovedRequestCommand(RequireUserId(), id, decoded), cancellationToken);
-        return result.IsFailure ? ToActionResult(result.Error) : RedirectToAction(nameof(History));
+        return result.IsFailure
+            ? await HandleWorkflowErrorAsync(id, result.Error, null, cancellationToken)
+            : RedirectToAction(nameof(History));
     }
 
     [HttpGet("/aprobaciones/historial")]
@@ -141,4 +147,43 @@ public sealed class AprobacionesController : Controller
             _ => BadRequest(error?.Message ?? "Solicitud invalida.")
         };
     }
+
+    private Task<IActionResult> HandleWorkflowErrorAsync(Guid id, Error? error, string? rejectionReason, CancellationToken cancellationToken)
+    {
+        if (error?.Code is ErrorCodes.NotFound or ErrorCodes.Forbidden)
+        {
+            return Task.FromResult(ToActionResult(error));
+        }
+
+        var statusCode = error?.Code == ErrorCodes.Conflict
+            ? StatusCodes.Status409Conflict
+            : StatusCodes.Status400BadRequest;
+        return RenderDetailErrorAsync(id, error, statusCode, rejectionReason, cancellationToken);
+    }
+
+    private async Task<IActionResult> RenderDetailErrorAsync(
+        Guid id,
+        Error? error,
+        int statusCode,
+        string? rejectionReason,
+        CancellationToken cancellationToken)
+    {
+        var detail = await _getDetail.HandleAsync(RequireUserId(), id, cancellationToken);
+        if (detail.IsFailure)
+        {
+            return ToActionResult(detail.Error);
+        }
+
+        var message = statusCode == StatusCodes.Status409Conflict
+            ? ConflictMessage
+            : error?.Message ?? "No fue posible completar la operacion.";
+        ModelState.AddModelError(string.Empty, message);
+        Response.StatusCode = statusCode;
+        return View("Detail", new AprobacionDetalleViewModel(
+            detail.Value!,
+            Convert.ToBase64String(detail.Value!.RowVersion),
+            rejectionReason ?? string.Empty));
+    }
+
+    private const string ConflictMessage = "La informacion cambio mientras realizaba la operacion. Actualice la pagina e intentelo nuevamente.";
 }

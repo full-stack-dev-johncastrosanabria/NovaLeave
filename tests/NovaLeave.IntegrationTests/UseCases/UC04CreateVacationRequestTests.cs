@@ -65,6 +65,10 @@ public sealed class UC04CreateVacationRequestTests
             ("Reason", "Solo fin de semana no valido."))));
 
         Assert.Equal(HttpStatusCode.BadRequest, rejected.StatusCode);
+        var html = await rejected.Content.ReadAsStringAsync();
+        Assert.Equal("text/html", rejected.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("Solo fin de semana no valido.", html);
+        Assert.Contains("alert-danger", html);
     }
 
     [Theory]
@@ -84,6 +88,8 @@ public sealed class UC04CreateVacationRequestTests
             ("Reason", "Vacaciones familiares invalidas."))));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("text/html", response.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("alert-danger", await response.Content.ReadAsStringAsync());
     }
 
     private static FormUrlEncodedContent Form(params (string Key, string Value)[] values)

@@ -53,6 +53,10 @@ public sealed class UC22ApproverCapabilityToggleTests
             ("RowVersion", rowVersion)));
 
         Assert.Equal(expected, response.StatusCode);
+        var html = await response.Content.ReadAsStringAsync();
+        Assert.Equal("text/html", response.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("alert-danger", html);
+        Assert.DoesNotContain(">RowVersion<", html);
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<NovaLeaveDbContext>();
         Assert.True(db.Users.Single(user => user.Id == "approver-1").CanResolveRequests);

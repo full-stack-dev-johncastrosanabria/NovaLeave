@@ -19,8 +19,6 @@
   <dd class="col-sm-9">@Model.Approver.DisplayName</dd>
   <dt class="col-sm-3">Estado actual</dt>
   <dd class="col-sm-9"><span class="nl-badge @(Model.Approver.CanResolveRequests ? "nl-badge-approved" : "nl-badge-neutral")">@(Model.Approver.CanResolveRequests ? "Habilitado" : "Deshabilitado")</span></dd>
-  <dt class="col-sm-3">RowVersion</dt>
-  <dd class="col-sm-9"><code>@Model.RowVersion</code></dd>
 </dl>
   </div>
 </section>
@@ -29,22 +27,23 @@
   <div class="nl-card-body">
 <form method="post" action="/rrhh/aprobadores/@Model.Approver.UserId/capacidad" class="vstack gap-3">
   <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
+  <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" aria-live="polite"></div>
 
   <div>
     <label class="form-label" for="Enable">Nueva capacidad</label>
     <select class="form-select" id="Enable" name="Enable">
-      <option value="true" selected="@Model.Approver.CanResolveRequests">Habilitado</option>
-      <option value="false" selected="@(!Model.Approver.CanResolveRequests)">Deshabilitado</option>
+      <option value="true" selected="@(Model.Input.Enable ? "selected" : null)">Habilitado</option>
+      <option value="false" selected="@(!Model.Input.Enable ? "selected" : null)">Deshabilitado</option>
     </select>
   </div>
 
   <div>
     <label class="form-label" for="Reason">Justificacion</label>
-    <textarea class="form-control" id="Reason" name="Reason" rows="4" minlength="10" maxlength="500"></textarea>
+    <textarea class="form-control" id="Reason" name="Reason" rows="4" minlength="10" maxlength="500">@Model.Input.Reason</textarea>
   </div>
 
   <div class="form-check">
-    <input class="form-check-input" type="checkbox" id="Confirmed" name="Confirmed" value="true" />
+    <input class="form-check-input" type="checkbox" id="Confirmed" name="Confirmed" value="true" checked="@(Model.Input.Confirmed ? "checked" : null)" />
     <label class="form-check-label" for="Confirmed">Confirmo que solo se cambiara canResolveRequests.</label>
   </div>
 

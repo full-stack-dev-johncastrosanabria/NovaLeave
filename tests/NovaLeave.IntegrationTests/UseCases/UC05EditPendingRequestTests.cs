@@ -56,6 +56,10 @@ public sealed class UC05EditPendingRequestTests
             ("RowVersion", Convert.ToBase64String([1, 2, 3])))));
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var html = await response.Content.ReadAsStringAsync();
+        Assert.Equal("text/html", response.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("La informacion cambio", html, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Vacaciones familiares extendidas.", html);
     }
 
     private static FormUrlEncodedContent Form(params (string Key, string Value)[] values)

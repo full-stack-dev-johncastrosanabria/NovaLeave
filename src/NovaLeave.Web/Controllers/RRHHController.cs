@@ -142,7 +142,7 @@ public sealed class RRHHController : Controller
     {
         if (!TryDecode(input.RowVersion, out var rowVersion))
         {
-            return BadRequest("RowVersion no valida.");
+            return await RenderCapabilityErrorAsync(id, input, null, StatusCodes.Status409Conflict, cancellationToken);
         }
 
         var result = await _toggleCapability.HandleAsync(new ToggleApproverCapabilityCommand(
@@ -155,7 +155,15 @@ public sealed class RRHHController : Controller
 
         if (result.IsFailure)
         {
-            return ToActionResult(result.Error);
+            if (result.Error?.Code is ErrorCodes.NotFound or ErrorCodes.Forbidden)
+            {
+                return ToActionResult(result.Error);
+            }
+
+            var statusCode = result.Error?.Code == ErrorCodes.Conflict
+                ? StatusCodes.Status409Conflict
+                : StatusCodes.Status400BadRequest;
+            return await RenderCapabilityErrorAsync(id, input, result.Error, statusCode, cancellationToken);
         }
 
         TempData["Toast"] = "Capacidad de aprobador actualizada.";
@@ -195,6 +203,30 @@ public sealed class RRHHController : Controller
             item,
             new ToggleApproverCapabilityInput { Enable = item.CanResolveRequests, RowVersion = Convert.ToBase64String(item.RowVersion) },
             Convert.ToBase64String(item.RowVersion));
+    }
+
+    private async Task<IActionResult> RenderCapabilityErrorAsync(
+        string id,
+        ToggleApproverCapabilityInput input,
+        Error? error,
+        int statusCode,
+        CancellationToken cancellationToken)
+    {
+        var capability = await _getCapability.HandleAsync(id, cancellationToken);
+        if (capability.IsFailure)
+        {
+            return ToActionResult(capability.Error);
+        }
+
+        var message = statusCode == StatusCodes.Status409Conflict
+            ? "La informacion cambio mientras realizaba la operacion. Actualice la pagina e intentelo nuevamente."
+            : error?.Message ?? "Revise los datos e intentelo nuevamente.";
+        ModelState.AddModelError(string.Empty, message);
+        Response.StatusCode = statusCode;
+        return View("ApproverCapabilities/Capability", new ApproverCapabilityFormViewModel(
+            capability.Value!,
+            input,
+            Convert.ToBase64String(capability.Value!.RowVersion)));
     }
 
     private static bool TryDecode(string rowVersion, out byte[] decoded)

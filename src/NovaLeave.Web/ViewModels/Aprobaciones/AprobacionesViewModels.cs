@@ -4,7 +4,7 @@ namespace NovaLeave.Web.ViewModels.Aprobaciones;
 
 public sealed record AprobacionesIndexViewModel(IReadOnlyList<ApproverRequestSummary> Requests);
 
-public sealed record AprobacionDetalleViewModel(ApproverRequestDetail Request, string RowVersion);
+public sealed record AprobacionDetalleViewModel(ApproverRequestDetail Request, string RowVersion, string RejectionReason = "");
 
 public sealed record AprobacionesHistorialViewModel(IReadOnlyList<ResolutionHistoryItem> Items);
 

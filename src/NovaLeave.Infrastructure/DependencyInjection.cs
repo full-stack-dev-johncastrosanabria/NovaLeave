@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IApproverCapabilityStore, ApproverCapabilityStore>();
         services.AddScoped<IAccrualUserSource, AccrualUserSource>();
         services.AddScoped<IUserDirectory, UserDirectory>();
+        services.AddHostedService<DemoUserSeeder>();
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<NovaLeaveDbContext>());
         services.AddSingleton<IOperationalTelemetry, OperationalTelemetry>();
         services.AddHealthChecks()

@@ -1,0 +1,19 @@
+@model NovaLeave.Web.ViewModels.UnexpectedErrorViewModel
+@{
+    ViewData["Title"] = "No fue posible completar la operacion";
+}
+
+<div class="nl-page-header">
+  <div>
+    <p class="nl-page-kicker">NovaLeave</p>
+    <h1 class="nl-page-title">No fue posible completar la operacion</h1>
+    <p class="nl-page-description">Intentelo nuevamente. Si el problema continua, indique el codigo de referencia.</p>
+  </div>
+</div>
+
+<section class="nl-card">
+  <div class="nl-card-body">
+    <div class="alert alert-danger mb-3" role="alert">Ocurrio un error inesperado y la operacion no se completo.</div>
+    <p class="mb-0"><strong>Codigo de referencia:</strong> <code>@Model.CorrelationId</code></p>
+  </div>
+</section>

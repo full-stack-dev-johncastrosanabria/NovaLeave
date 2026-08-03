@@ -78,10 +78,10 @@ public sealed class LoginModel : PageModel
 
         var candidates = new[]
         {
-            new DemoAccountOption("Usuario Demo", "user@demo"),
-            new DemoAccountOption("Aprobador Demo", "approver@demo"),
-            new DemoAccountOption("RRHH Demo", "hr@demo"),
-            new DemoAccountOption("Multirrol Demo", "multi@demo")
+            new DemoAccountOption("Usuario Demo", "demo.user@novaleave.test"),
+            new DemoAccountOption("Aprobador Demo", "demo.approver@novaleave.test"),
+            new DemoAccountOption("RRHH Demo", "demo.rrhh@novaleave.test"),
+            new DemoAccountOption("Multirrol Demo", "demo.combo@novaleave.test")
         };
 
         var configured = new List<DemoAccountOption>();

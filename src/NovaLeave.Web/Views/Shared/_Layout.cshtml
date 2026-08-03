@@ -14,7 +14,7 @@
         ? "/rrhh"
         : activeContext == "Approver" && hasApproverContext
             ? "/aprobaciones"
-            : "/";
+            : "/mis-solicitudes";
     var activeContextLabel = activeContext == "HR" ? "RRHH" : activeContext == "Approver" ? "Aprobaciones" : "Mi espacio";
 }
 <!doctype html>
@@ -46,9 +46,9 @@
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             @if (hasUserContext && activeContext == "User")
             {
-              <li class="nav-item"><a class="nav-link @(path.StartsWith("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes">Mi espacio</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes">Mi historial</a></li>
               <li class="nav-item"><a class="nav-link" href="/mis-solicitudes/crear">Nueva solicitud</a></li>
-              <li class="nav-item"><a class="nav-link @(path.Equals("/saldo", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/saldo">Mi historial</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/saldo", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/saldo">Mi saldo</a></li>
               <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "User" ? "active" : string.Empty)" href="/calendario">Calendario</a></li>
             }
             @if (hasApproverContext && activeContext == "Approver")
@@ -113,6 +113,7 @@
   <main class="nl-main" role="main">
     <div class="container">
     @RenderBody()
+    @await Html.PartialAsync("_Toast", TempData["Toast"]?.ToString() ?? string.Empty)
     </div>
   </main>
   <footer class="border-top py-3 bg-white">
