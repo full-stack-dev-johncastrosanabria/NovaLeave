@@ -212,9 +212,23 @@ public sealed class MisSolicitudesController : Controller
     private IActionResult WorkflowError(object viewModel, Error? error)
     {
         var isConflict = error?.Code == ErrorCodes.Conflict;
-        ModelState.AddModelError(string.Empty, isConflict ? ConflictMessage : error?.Message ?? "No fue posible completar la solicitud.");
+        ModelState.AddModelError(string.Empty, isConflict ? ConflictMessage : ToWorkflowMessage(error));
         Response.StatusCode = isConflict ? StatusCodes.Status409Conflict : StatusCodes.Status400BadRequest;
         return View(viewModel);
+    }
+
+    private static string ToWorkflowMessage(Error? error)
+    {
+        if (error?.Code != ErrorCodes.Validation)
+        {
+            return "No fue posible completar la solicitud. Revisa los datos e intentelo nuevamente.";
+        }
+
+        return error.Message switch
+        {
+            "Vacation balance totals cannot be negative." => "No tienes saldo disponible suficiente para reservar los dias solicitados.",
+            _ => error.Message
+        };
     }
 
     private const string ConflictMessage = "La informacion cambio mientras realizaba la operacion. Actualice la pagina e intentelo nuevamente.";
