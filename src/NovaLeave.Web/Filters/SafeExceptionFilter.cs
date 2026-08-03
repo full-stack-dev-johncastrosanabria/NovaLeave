@@ -15,12 +15,17 @@ public sealed class SafeExceptionFilter : IExceptionFilter
             return;
         }
 
+        var correlationId = context.HttpContext.Items.TryGetValue("correlation_id", out var value)
+            ? value?.ToString()
+            : context.HttpContext.TraceIdentifier;
+        var safePayload = new { message = "La operación no pudo completarse.", correlation_id = correlationId };
+
         context.Result = context.Exception switch
         {
             UnauthorizedAccessException => new ForbidResult(),
             KeyNotFoundException => new NotFoundResult(),
-            InvalidOperationException => new ConflictObjectResult("La operación no pudo completarse."),
-            _ => new ObjectResult("Ocurrió un error inesperado.") { StatusCode = StatusCodes.Status500InternalServerError }
+            InvalidOperationException => new ConflictObjectResult(safePayload),
+            _ => new ObjectResult(new { message = "Ocurrió un error inesperado.", correlation_id = correlationId }) { StatusCode = StatusCodes.Status500InternalServerError }
         };
 
         context.ExceptionHandled = true;

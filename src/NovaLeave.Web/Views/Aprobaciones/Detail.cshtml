@@ -34,7 +34,7 @@
   <div class="col-md-4">
     <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar">
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <button type="submit" class="btn btn-success w-100">Aprobar</button>
+      <button type="submit" class="btn btn-success w-100" aria-label="Aprobar solicitud">Aprobar</button>
     </form>
   </div>
   <div class="col-md-8">
@@ -42,7 +42,7 @@
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
       <label class="form-label" for="RejectionReason">Razon de rechazo</label>
       <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-2" rows="3" maxlength="500"></textarea>
-      <button type="submit" class="btn btn-danger">Rechazar</button>
+      <button type="submit" class="btn btn-danger" aria-label="Rechazar solicitud">Rechazar</button>
     </form>
   </div>
   }
@@ -51,7 +51,7 @@
   <div class="col-md-4">
     <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar">
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <button type="submit" class="btn btn-warning w-100">Desactivar solicitud</button>
+      <button type="submit" class="btn btn-warning w-100" aria-label="Desactivar solicitud aprobada">Desactivar solicitud</button>
     </form>
   </div>
   }

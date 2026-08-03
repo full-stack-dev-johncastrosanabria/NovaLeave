@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NovaLeave.Domain.Entities;
@@ -9,7 +10,7 @@ namespace NovaLeave.IntegrationTests.Support;
 
 public static class IntegrationTestDatabase
 {
-    public static async Task ResetAsync(NovaLeaveWebApplicationFactory factory)
+    public static async Task ResetAsync(WebApplicationFactory<Program> factory)
     {
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<NovaLeaveDbContext>();
@@ -18,7 +19,7 @@ public static class IntegrationTestDatabase
     }
 
     public static async Task SeedUserAsync(
-        NovaLeaveWebApplicationFactory factory,
+        WebApplicationFactory<Program> factory,
         string userId,
         string email,
         int accruedDays,
