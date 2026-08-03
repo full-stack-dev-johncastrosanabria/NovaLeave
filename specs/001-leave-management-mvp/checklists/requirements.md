@@ -34,4 +34,5 @@
 - All items pass against the restored approved MVP baseline and Constitution v7.0.0.
 - OQ-001 is resolved out of MVP scope; no User Pending cancellation requirement, route, action, transition, contract, or task is introduced.
 - OQ-002 is resolved with completed-calendar-month accrual from `EmploymentStartDate`, including the approved 2026-03-15 and 2026-03-01 examples in `spec.md` and `docs/use-cases.md`.
-- Remaining undecided values are deployment configuration only: `NovaLeave:PendingRequestTimeoutDays`, `NovaLeave:SessionTimeoutMinutes`, and accrual scheduler cadence.
+- Runtime configuration values are resolved by DR-001: `NovaLeave:PendingRequestTimeoutDays=14`, `NovaLeave:SessionTimeoutMinutes=30`, and the accrual and timeout job cadence is daily at `00:05 UTC`.
+- Environment-specific values, including connection strings and secret-store configuration, remain deployment configuration.

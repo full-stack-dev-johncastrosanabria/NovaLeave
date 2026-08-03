@@ -35,7 +35,7 @@ tests/
 docs/
   adr/
   diagrams/
-  runbooks/
+  operations/
 docker/
 ```
 
