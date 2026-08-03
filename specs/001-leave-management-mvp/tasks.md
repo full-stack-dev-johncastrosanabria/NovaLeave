@@ -210,18 +210,18 @@
 
 ### Tests for User Story 5
 
-- [ ] T108 [P] [US5] Add OQ-002 accrual examples A and B tests in `tests/NovaLeave.UnitTests/Domain/MonthlyAccrualPolicyTests.cs`
-- [ ] T109 [P] [US5] Add UC-17 accrual integration tests in `tests/NovaLeave.IntegrationTests/UseCases/UC17MonthlyAccrualTests.cs`
-- [ ] T110 [P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`
-- [ ] T111 [P] [US5] Add catch-up accrual tests in `tests/NovaLeave.IntegrationTests/UseCases/UC17AccrualCatchUpTests.cs`
+- [X] T108 [P] [US5] Add OQ-002 accrual examples A and B tests in `tests/NovaLeave.UnitTests/Domain/MonthlyAccrualPolicyTests.cs`
+- [X] T109 [P] [US5] Add UC-17 accrual integration tests in `tests/NovaLeave.IntegrationTests/UseCases/UC17MonthlyAccrualTests.cs`
+- [X] T110 [P] [US5] Add duplicate accrual idempotency tests in `tests/NovaLeave.IntegrationTests/Idempotency/AccrualIdempotencyTests.cs`
+- [X] T111 [P] [US5] Add catch-up accrual tests in `tests/NovaLeave.IntegrationTests/UseCases/UC17AccrualCatchUpTests.cs`
 
 ### Implementation for User Story 5
 
-- [ ] T112 [US5] Implement monthly accrual policy in `src/NovaLeave.Domain/Services/MonthlyAccrualPolicy.cs`
-- [ ] T113 [US5] Implement accrual command with unique `(UserId, AccrualPeriod)` idempotency in `src/NovaLeave.Application/System/ExecuteMonthlyAccrual/`
-- [ ] T114 [US5] Implement accrual scheduler adapter with DR-001-configured cadence in `src/NovaLeave.Infrastructure/Scheduling/MonthlyAccrualJob.cs`
-- [ ] T115 [US5] Add EF Core unique index for accrual idempotency in `src/NovaLeave.Infrastructure/Persistence/Configurations/BalanceMovementConfiguration.cs`
-- [ ] T116 [US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Web/Views/MisSolicitudes/Balance.cshtml`
+- [X] T112 [US5] Implement monthly accrual policy in `src/NovaLeave.Domain/Services/MonthlyAccrualPolicy.cs`
+- [X] T113 [US5] Implement accrual command with unique `(UserId, AccrualPeriod)` idempotency in `src/NovaLeave.Application/System/ExecuteMonthlyAccrual/`
+- [X] T114 [US5] Implement accrual scheduler adapter with DR-001-configured cadence in `src/NovaLeave.Infrastructure/Scheduling/MonthlyAccrualJob.cs`
+- [X] T115 [US5] Add EF Core unique index for accrual idempotency in `src/NovaLeave.Infrastructure/Persistence/Configurations/BalanceMovementConfiguration.cs`
+- [X] T116 [US5] Ensure balance history displays accrual, reservation, release, deduction, and restoration movements in `src/NovaLeave.Web/Views/MisSolicitudes/Balance.cshtml`
 
 **Checkpoint**: UC-07 and UC-17 balance/accrual behavior independently pass.
 

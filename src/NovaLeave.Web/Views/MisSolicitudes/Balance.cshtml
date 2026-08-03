@@ -3,6 +3,21 @@
     ViewData["Title"] = "Mi saldo";
 }
 
+@functions {
+    private static string MovementLabel(NovaLeave.Domain.Enums.MovementType type)
+    {
+        return type switch
+        {
+            NovaLeave.Domain.Enums.MovementType.Accrual => "Acumulacion mensual",
+            NovaLeave.Domain.Enums.MovementType.Reservation => "Reserva",
+            NovaLeave.Domain.Enums.MovementType.Release => "Liberacion",
+            NovaLeave.Domain.Enums.MovementType.Deduction => "Deduccion",
+            NovaLeave.Domain.Enums.MovementType.Restoration => "Restauracion",
+            _ => type.ToString()
+        };
+    }
+}
+
 <h1 class="h3 mb-4">Mi saldo</h1>
 
 <div class="row g-3 mb-4">
@@ -26,9 +41,9 @@
     <tbody>
       @foreach (var movement in Model.Balance.Movements)
       {
-        <tr>
+        <tr data-movement-type="@movement.Type">
           <td>@movement.EffectiveAt</td>
-          <td>@movement.Type</td>
+          <td>@MovementLabel(movement.Type)</td>
           <td>@movement.Amount</td>
         </tr>
       }

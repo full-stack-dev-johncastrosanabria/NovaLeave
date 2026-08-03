@@ -24,7 +24,8 @@ public static class IntegrationTestDatabase
         int accruedDays,
         bool isActive = true,
         bool canResolveRequests = false,
-        string roles = "User")
+        string roles = "User",
+        DateOnly? employmentStartDate = null)
     {
         using var scope = factory.Services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -53,7 +54,7 @@ public static class IntegrationTestDatabase
             EmailConfirmed = true,
             IsActive = isActive,
             CanResolveRequests = canResolveRequests,
-            EmploymentStartDate = new DateOnly(2026, 1, 1)
+            EmploymentStartDate = employmentStartDate ?? new DateOnly(2026, 1, 1)
         };
 
         var result = await userManager.CreateAsync(user, "Demo123!");
