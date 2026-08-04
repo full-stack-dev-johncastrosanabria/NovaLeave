@@ -66,7 +66,7 @@ public sealed class AprobacionesController : Controller
     {
         if (!TryDecode(rowVersion, out var decoded))
         {
-            return BadRequest("RowVersion no valida.");
+            return BadRequest("RowVersion no válida.");
         }
 
         var result = await _approve.HandleAsync(new ApproveRequestCommand(RequireUserId(), id, decoded), cancellationToken);
@@ -78,7 +78,7 @@ public sealed class AprobacionesController : Controller
     {
         if (!TryDecode(viewModel.RowVersion, out var decoded))
         {
-            return BadRequest("RowVersion no valida.");
+            return BadRequest("RowVersion no válida.");
         }
 
         var result = await _reject.HandleAsync(new RejectRequestCommand(RequireUserId(), id, viewModel.RejectionReason, decoded), cancellationToken);
@@ -90,12 +90,12 @@ public sealed class AprobacionesController : Controller
     {
         if (Request.Form.Keys.Any(key => key is not ("__RequestVerificationToken" or "RowVersion")))
         {
-            return BadRequest("La desactivacion aplica a la solicitud completa.");
+            return BadRequest("La desactivación aplica a la solicitud completa.");
         }
 
         if (!TryDecode(viewModel.RowVersion, out var decoded))
         {
-            return BadRequest("RowVersion no valida.");
+            return BadRequest("RowVersion no válida.");
         }
 
         var result = await _deactivate.HandleAsync(new DeactivateApprovedRequestCommand(RequireUserId(), id, decoded), cancellationToken);
@@ -138,7 +138,7 @@ public sealed class AprobacionesController : Controller
             ErrorCodes.NotFound => NotFound(),
             ErrorCodes.Forbidden => Forbid(),
             ErrorCodes.Validation => BadRequest(error.Message),
-            _ => BadRequest(error?.Message ?? "Solicitud invalida.")
+            _ => BadRequest(error?.Message ?? "Solicitud inválida.")
         };
     }
 }

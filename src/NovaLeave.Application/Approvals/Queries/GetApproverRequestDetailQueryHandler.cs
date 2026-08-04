@@ -49,7 +49,7 @@ public sealed class GetApproverRequestDetailQueryHandler
 
         if (request.Status is not (RequestStatus.Pending or RequestStatus.Approved))
         {
-            return Result<ApproverRequestDetail>.Failure(Error.Conflict("La solicitud ya no es elegible para resolucion."));
+            return Result<ApproverRequestDetail>.Failure(Error.Conflict("La solicitud ya no es elegible para resolución."));
         }
 
         var balance = _dbContext.VacationBalances.Single(candidate => candidate.UserId == request.OwnerId);

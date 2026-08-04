@@ -12,7 +12,7 @@
     <label asp-for="InputMode" class="form-label">Modo de ingreso</label>
     <select asp-for="InputMode" class="form-select">
       <option value="@RequestInputMode.DateRange">Rango de fechas</option>
-      <option value="@RequestInputMode.StartPlusDays">Inicio y dias habiles</option>
+      <option value="@RequestInputMode.StartPlusDays">Inicio y días hábiles</option>
     </select>
   </div>
   <div class="col-md-4">
@@ -24,7 +24,7 @@
     <input asp-for="EndDate" type="date" class="form-control" />
   </div>
   <div class="col-md-4">
-    <label asp-for="WorkingDays" class="form-label">Dias habiles</label>
+    <label asp-for="WorkingDays" class="form-label">Días hábiles</label>
     <input asp-for="WorkingDays" type="number" min="1" class="form-control" />
   </div>
   <div class="col-12">

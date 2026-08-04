@@ -1,6 +1,6 @@
 @model NovaLeave.Web.ViewModels.Aprobaciones.AprobacionDetalleViewModel
 @{
-    ViewData["Title"] = "Detalle para resolucion";
+    ViewData["Title"] = "Detalle para resolución";
     var overdrawn = Model.Request.ProjectedBalanceAfterApproval < 0;
 }
 
@@ -25,7 +25,7 @@
         <dt class="col-sm-4">Fin</dt>
         <dd class="col-sm-8">@Model.Request.EndDate.ToString("yyyy-MM-dd")</dd>
 
-        <dt class="col-sm-4">Dias habiles</dt>
+        <dt class="col-sm-4">Días hábiles</dt>
         <dd class="col-sm-8">@Model.Request.WorkingDays</dd>
 
         <dt class="col-sm-4">Saldo proyectado</dt>
@@ -54,7 +54,7 @@
 
   <div class="col-lg-5">
     <div class="nl-card p-3 p-md-4 h-100">
-      <h2 class="h6 text-body-secondary mb-3">Resolucion</h2>
+      <h2 class="h6 text-body-secondary mb-3">Resolución</h2>
 
       @if (Model.Request.CanApproveOrReject)
       {
@@ -70,7 +70,7 @@
         <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar">
           @Html.AntiForgeryToken()
           <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-          <label class="form-label" for="RejectionReason">Razon de rechazo</label>
+          <label class="form-label" for="RejectionReason">Razón de rechazo</label>
           <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-1"
                     rows="3" minlength="10" maxlength="500" required
                     aria-describedby="rejectionHelp"></textarea>
@@ -87,14 +87,14 @@
       @if (Model.Request.CanDeactivate)
       {
         <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar"
-              onsubmit="return confirm('Se desactivara la solicitud aprobada y se restauraran los dias. Continuar?');">
+              onsubmit="return confirm('Se desactivará la solicitud aprobada y se restaurarán los días. ¿Continuar?');">
           @Html.AntiForgeryToken()
           <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
           <button type="submit" class="btn btn-warning w-100" aria-label="Desactivar solicitud aprobada">
             <i class="bi bi-slash-circle" aria-hidden="true"></i>
             <span class="ms-1">Desactivar solicitud</span>
           </button>
-          <p class="form-text mb-0">Solo antes de que inicie el periodo. Restaura los dias descontados.</p>
+          <p class="form-text mb-0">Solo antes de que inicie el período. Restaura los días descontados.</p>
         </form>
       }
 

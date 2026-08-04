@@ -51,7 +51,7 @@ public sealed class CalendarViewModelTests
 
         Assert.Equal($"/mis-solicitudes/{eventId}", item.DetailUrl("/mis-solicitudes/{id}"));
         Assert.Contains("Solicitud aprobada", item.AccessibleName);
-        Assert.Contains("2 dias habiles", item.AccessibleName);
+        Assert.Contains("2 días hábiles", item.AccessibleName);
     }
 
     [Fact]

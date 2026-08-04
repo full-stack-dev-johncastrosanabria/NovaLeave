@@ -1,5 +1,8 @@
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.WebEncoders;
 using NovaLeave.Application;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Configuration;
@@ -39,6 +42,15 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Spanish accents (á é í ó ú ñ ¿ ¡) are emitted as literal UTF-8 rather than numeric entities.
+// The default encoder escapes everything outside Basic Latin, which made the markup unreadable
+// and larger. Only the Latin-1 supplement is added; HTML-significant characters are still
+// escaped, so Razor's XSS protection is unchanged (constitution §7.2).
+builder.Services.Configure<WebEncoderOptions>(options =>
+{
+    options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement);
+});
 
 builder.Services.AddControllersWithViews(options =>
 {

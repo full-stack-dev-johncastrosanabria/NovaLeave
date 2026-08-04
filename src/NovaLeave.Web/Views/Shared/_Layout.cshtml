@@ -20,14 +20,25 @@
     if (isHR) { contexts.Add(("hr", "RRHH", "/rrhh")); }
     var showContextSwitcher = contexts.Count >= 2;
 
-    // Each context owns its navigation bar (RBFV 7.1, 7.2, 7.3); the active one is derived from
-    // the current route prefix, so switching context changes only the prefix and the visible
-    // navigation. Notably the RRHH context links the calendar to /rrhh/calendario and never to
-    // the shared /calendario, which carries no HR behaviour (RBFV 7.3).
+    // Each context owns its navigation bar (RBFV 7.1, 7.2, 7.3). The active one comes from the
+    // route prefix where that is unambiguous, and from the explicit ?context= value on shared
+    // routes such as /calendario. Deriving from the prefix alone dropped a multi-role identity
+    // back to its first context on every shared route, which made the navigation appear to
+    // switch by itself. Context selection stays presentational: it changes the visible
+    // navigation only, never identity, roles, claims, or authorization (RBFV 4.1).
     var path = Context.Request.Path.Value ?? string.Empty;
+    var requestedContext = Context.Request.Query["context"].ToString();
+
     var activeContext =
+        // Unambiguous route prefixes win.
         isHR && path.StartsWith("/rrhh", StringComparison.OrdinalIgnoreCase) ? "hr"
         : isApprover && path.StartsWith("/aprobaciones", StringComparison.OrdinalIgnoreCase) ? "approver"
+        : isUser && (path.StartsWith("/mis-solicitudes", StringComparison.OrdinalIgnoreCase)
+                     || path.StartsWith("/saldo", StringComparison.OrdinalIgnoreCase)) ? "user"
+        // Shared routes carry the context explicitly.
+        : isApprover && string.Equals(requestedContext, "Approver", StringComparison.OrdinalIgnoreCase) ? "approver"
+        : isHR && string.Equals(requestedContext, "HR", StringComparison.OrdinalIgnoreCase) ? "hr"
+        : isUser && string.Equals(requestedContext, "User", StringComparison.OrdinalIgnoreCase) ? "user"
         : contexts.Count > 0 ? contexts[0].Key
         : string.Empty;
 
@@ -38,7 +49,7 @@
             navItems.Add(("Solicitudes", "/rrhh/solicitudes", "bi-inbox"));
             navItems.Add(("Calendario", "/rrhh/calendario", "bi-calendar3"));
             navItems.Add(("Saldos", "/rrhh/saldos", "bi-wallet2"));
-            navItems.Add(("Auditoria", "/rrhh/auditoria", "bi-shield-check"));
+            navItems.Add(("Auditoría", "/rrhh/auditoria", "bi-shield-check"));
             navItems.Add(("Aprobadores", "/rrhh/aprobadores", "bi-person-badge"));
             break;
         case "approver":
@@ -100,7 +111,7 @@ else
         <span>NovaLeave</span>
       </a>
 
-      <nav class="nav flex-column" aria-label="Navegacion principal">
+      <nav class="nav flex-column" aria-label="Navegación principal">
         <div class="nl-nav-section">@contextLabel</div>
         @foreach (var item in navItems)
         {
@@ -114,13 +125,13 @@ else
 
       <div class="nl-sidebar-footer">
         <div class="nl-user text-truncate">@currentUser!.Identity!.Name</div>
-        <div>Sesion activa</div>
+        <div>Sesión activa</div>
       </div>
     </aside>
 
     <div class="nl-main">
       <header class="nl-header">
-        <button class="btn btn-sm btn-outline-secondary d-lg-none" type="button" id="nlSidebarToggle" aria-controls="nlSidebar" aria-expanded="false" aria-label="Abrir navegacion">
+        <button class="btn btn-sm btn-outline-secondary d-lg-none" type="button" id="nlSidebarToggle" aria-controls="nlSidebar" aria-expanded="false" aria-label="Abrir navegación">
           <i class="bi bi-list" aria-hidden="true"></i>
         </button>
 
@@ -129,17 +140,26 @@ else
         <div class="ms-auto d-flex align-items-center gap-2">
           @if (showContextSwitcher)
           {
+            @* The control names the active context so the current mode is never ambiguous, and
+               the matching option is marked selected (RBFV 4.2 active-context indication). *@
             <div class="dropdown">
-              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="misRoles" data-coreui-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="misRoles" data-coreui-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Mis roles. Contexto actual: @contextLabel">
                 <i class="bi bi-people" aria-hidden="true"></i>
-                <span class="d-none d-sm-inline ms-1">Mis roles</span>
+                <span class="ms-1">@contextLabel</span>
               </button>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="misRoles">
+                <li><h2 class="dropdown-header">Mis roles</h2></li>
                 @foreach (var context in contexts)
                 {
+                  var isCurrent = context.Key == activeContext;
                   <li>
-                    <a class="dropdown-item @(context.Key == activeContext ? "active" : null)" href="@context.Href" @(context.Key == activeContext ? "aria-current=true" : null)>
-                      @context.Label
+                    <a class="dropdown-item d-flex align-items-center gap-2 @(isCurrent ? "active" : null)" href="@context.Href" @(isCurrent ? "aria-current=true" : null)>
+                      <i class="bi bi-check2 @(isCurrent ? null : "invisible")" aria-hidden="true"></i>
+                      <span>@context.Label</span>
+                      @if (isCurrent)
+                      {
+                        <span class="visually-hidden">(contexto actual)</span>
+                      }
                     </a>
                   </li>
                 }
@@ -150,7 +170,7 @@ else
             @Html.AntiForgeryToken()
             <button type="submit" class="btn btn-sm btn-outline-secondary">
               <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-              <span class="d-none d-sm-inline ms-1">Cerrar sesion</span>
+              <span class="d-none d-sm-inline ms-1">Cerrar sesión</span>
             </button>
           </form>
         </div>

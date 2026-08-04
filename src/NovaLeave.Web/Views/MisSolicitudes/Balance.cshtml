@@ -8,11 +8,11 @@
     {
         return type switch
         {
-            NovaLeave.Domain.Enums.MovementType.Accrual => "Acumulacion mensual",
+            NovaLeave.Domain.Enums.MovementType.Accrual => "Acumulación mensual",
             NovaLeave.Domain.Enums.MovementType.Reservation => "Reserva",
-            NovaLeave.Domain.Enums.MovementType.Release => "Liberacion",
-            NovaLeave.Domain.Enums.MovementType.Deduction => "Deduccion",
-            NovaLeave.Domain.Enums.MovementType.Restoration => "Restauracion",
+            NovaLeave.Domain.Enums.MovementType.Release => "Liberación",
+            NovaLeave.Domain.Enums.MovementType.Deduction => "Deducción",
+            NovaLeave.Domain.Enums.MovementType.Restoration => "Restauración",
             _ => type.ToString()
         };
     }
@@ -34,7 +34,7 @@
 @{
     var stats = new (string Label, int Value, string Icon, string Hint)[]
     {
-        ("Acumulado", Model.Balance.AccruedDays, "bi-plus-circle", "Dias ganados por meses completos"),
+        ("Acumulado", Model.Balance.AccruedDays, "bi-plus-circle", "Días ganados por meses completos"),
         ("Reservado", Model.Balance.ReservedDays, "bi-lock", "Retenido por solicitudes pendientes"),
         ("Deducido", Model.Balance.DeductedDays, "bi-dash-circle", "Descontado por solicitudes aprobadas"),
         ("Disponible", Model.Balance.AvailableDays, "bi-wallet2", "Acumulado menos deducido y reservado")
@@ -79,7 +79,7 @@
           <tr>
             <th scope="col">Fecha</th>
             <th scope="col">Tipo</th>
-            <th scope="col" class="text-end">Dias</th>
+            <th scope="col" class="text-end">Días</th>
           </tr>
         </thead>
         <tbody>

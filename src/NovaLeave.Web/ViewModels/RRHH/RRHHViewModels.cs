@@ -6,7 +6,34 @@ using NovaLeave.Application.HR.Requests;
 
 namespace NovaLeave.Web.ViewModels.RRHH;
 
-public sealed record RRHHDashboardViewModel;
+/// <summary>
+/// Read-only overview of the organization for the HR context. Every figure is derived from the
+/// same authorized read queries the detail pages use; HR gains no write capability here
+/// (constitution §4.3).
+/// </summary>
+public sealed record RRHHDashboardViewModel(
+    int TotalRequests,
+    int PendingRequests,
+    int ApprovedRequests,
+    int RejectedRequests,
+    int CancelledRequests,
+    int TotalEmployees,
+    int TotalAvailableDays,
+    int TotalReservedDays,
+    int TotalDeductedDays,
+    int ApproverCount,
+    int ApproversAbleToResolve,
+    IReadOnlyList<HRRequestSummary> RecentRequests,
+    IReadOnlyList<HRAuditLogItem> RecentAudit)
+{
+    /// <summary>Share of resolved requests that were approved, for the approval-rate tile.</summary>
+    public int ApprovalRatePercent =>
+        ApprovedRequests + RejectedRequests == 0
+            ? 0
+            : (int)Math.Round(ApprovedRequests * 100.0 / (ApprovedRequests + RejectedRequests));
+
+    public bool HasRequests => TotalRequests > 0;
+}
 
 public sealed record RRHHSolicitudesIndexViewModel(PagedResult<HRRequestSummary> Requests);
 

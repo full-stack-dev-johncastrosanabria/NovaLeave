@@ -24,7 +24,7 @@ public sealed class UC21HRAuditTests
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Auditoria RRHH", html);
+        Assert.Contains("Auditoría RRHH", html);
         Assert.Contains("HRSensitiveAccess", html);
         Assert.Contains(requestId.ToString(), html);
         Assert.DoesNotContain("Vacaciones familiares de inicio de ano.", html);

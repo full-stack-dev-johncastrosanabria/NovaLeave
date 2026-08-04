@@ -22,9 +22,9 @@
               <label asp-for="InputMode" class="form-label">Modo de ingreso</label>
               <select asp-for="InputMode" class="form-select" id="inputMode" aria-describedby="modeHelp">
                 <option value="@RequestInputMode.DateRange">Rango de fechas</option>
-                <option value="@RequestInputMode.StartPlusDays">Inicio y dias habiles</option>
+                <option value="@RequestInputMode.StartPlusDays">Inicio y días hábiles</option>
               </select>
-              <div id="modeHelp" class="form-text">Elige como quieres indicar el periodo.</div>
+              <div id="modeHelp" class="form-text">Elige como quieres indicar el período.</div>
               <span asp-validation-for="InputMode" class="text-danger d-block" style="font-size:12px"></span>
             </div>
 
@@ -40,12 +40,12 @@
             <div class="col-md-6">
               <label asp-for="EndDate" class="form-label">Fecha de fin</label>
               <input asp-for="EndDate" type="date" class="form-control" id="endDate" aria-describedby="endHelp" />
-              <div id="endHelp" class="form-text" data-mode-hint="startPlusDays" hidden>Se calcula a partir del inicio y los dias habiles.</div>
+              <div id="endHelp" class="form-text" data-mode-hint="startPlusDays" hidden>Se calcula a partir del inicio y los días hábiles.</div>
               <span asp-validation-for="EndDate" class="text-danger d-block" style="font-size:12px"></span>
             </div>
 
             <div class="col-md-6">
-              <label asp-for="WorkingDays" class="form-label">Dias habiles</label>
+              <label asp-for="WorkingDays" class="form-label">Días hábiles</label>
               <input asp-for="WorkingDays" type="number" min="1" class="form-control nl-num" id="workingDays" aria-describedby="daysHelp" />
               <div id="daysHelp" class="form-text" data-mode-hint="dateRange">Calculado entre inicio y fin, sin sabados ni domingos.</div>
               <span asp-validation-for="WorkingDays" class="text-danger d-block" style="font-size:12px"></span>
@@ -79,10 +79,10 @@
     <div class="nl-card p-3">
       <h2 class="h6 mb-2">Como se calcula</h2>
       <ul class="mb-0 ps-3" style="font-size:13px; color:var(--nl-muted-fg)">
-        <li class="mb-1">Solo cuentan dias habiles: de lunes a viernes.</li>
-        <li class="mb-1">Los feriados cuentan como dias habiles.</li>
+        <li class="mb-1">Solo cuentan días hábiles: de lunes a viernes.</li>
+        <li class="mb-1">Los feriados cuentan como días hábiles.</li>
         <li class="mb-1">El inicio mas temprano es el dia siguiente a hoy.</li>
-        <li class="mb-1">Los dias se reservan al crear y se descuentan al aprobar.</li>
+        <li class="mb-1">Los días se reservan al crear y se descuentan al aprobar.</li>
         <li>El servidor recalcula y valida todo antes de guardar.</li>
       </ul>
     </div>

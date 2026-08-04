@@ -14,29 +14,29 @@
   <dd class="col-sm-9">@Model.Request.StartDate.ToString("yyyy-MM-dd")</dd>
   <dt class="col-sm-3">Fin</dt>
   <dd class="col-sm-9">@Model.Request.EndDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Dias habiles</dt>
+  <dt class="col-sm-3">Días hábiles</dt>
   <dd class="col-sm-9">@Model.Request.WorkingDays</dd>
   <dt class="col-sm-3">Estado</dt>
   <dd class="col-sm-9">@Model.Request.Status</dd>
-  <dt class="col-sm-3">Razon</dt>
+  <dt class="col-sm-3">Razón</dt>
   <dd class="col-sm-9">@Model.Request.Reason</dd>
   @if (!string.IsNullOrWhiteSpace(Model.Request.RejectionReason))
   {
-    <dt class="col-sm-3">Razon de rechazo</dt>
+    <dt class="col-sm-3">Razón de rechazo</dt>
     <dd class="col-sm-9">@Model.Request.RejectionReason</dd>
   }
 </dl>
 
-<h2 class="h5">Auditoria</h2>
+<h2 class="h5">Auditoría</h2>
 <div class="table-responsive">
   <table class="table nl-table align-middle">
-    <caption class="visually-hidden">Auditoria de la solicitud</caption>
+    <caption class="visually-hidden">Auditoría de la solicitud</caption>
     <thead>
       <tr>
         <th scope="col">Fecha</th>
         <th scope="col">Actor</th>
         <th scope="col">Rol</th>
-        <th scope="col">Accion</th>
+        <th scope="col">Acción</th>
         <th scope="col">Resultado</th>
       </tr>
     </thead>

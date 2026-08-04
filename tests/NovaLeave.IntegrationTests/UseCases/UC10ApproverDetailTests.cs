@@ -17,7 +17,7 @@ public sealed class UC10ApproverDetailTests
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Detalle para resolucion", html);
+        Assert.Contains("Detalle para resolución", html);
         Assert.Contains("Saldo proyectado", html);
         Assert.Contains("RowVersion", html);
         Assert.DoesNotContain("Vacaciones familiares", html);

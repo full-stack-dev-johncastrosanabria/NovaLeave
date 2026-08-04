@@ -27,10 +27,10 @@
       <tr>
         <th scope="col"><abbr title="Lunes">Lun</abbr></th>
         <th scope="col"><abbr title="Martes">Mar</abbr></th>
-        <th scope="col"><abbr title="Miercoles">Mie</abbr></th>
+        <th scope="col"><abbr title="Miércoles">Mié</abbr></th>
         <th scope="col"><abbr title="Jueves">Jue</abbr></th>
         <th scope="col"><abbr title="Viernes">Vie</abbr></th>
-        <th scope="col"><abbr title="Sabado">Sab</abbr></th>
+        <th scope="col"><abbr title="Sábado">Sáb</abbr></th>
         <th scope="col"><abbr title="Domingo">Dom</abbr></th>
       </tr>
     </thead>
@@ -57,16 +57,16 @@
                      remains fully described to assistive technology. *@
                   if (detailUrl is not null)
                   {
-                    <a class="nl-event text-bg-primary" href="@detailUrl" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" title="@item.Label - @item.StatusLabel - @item.WorkingDays dias">
+                    <a class="nl-event text-bg-primary" href="@detailUrl" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" title="@item.Label - @item.StatusLabel - @item.WorkingDays días">
                       <span>Solicitud</span>
-                      <span class="visually-hidden">@item.Label @item.StatusLabel @item.WorkingDays dias</span>
+                      <span class="visually-hidden">@item.Label @item.StatusLabel @item.WorkingDays días</span>
                     </a>
                   }
                   else
                   {
-                    <span class="nl-event text-bg-primary" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" title="@item.Label - @item.StatusLabel - @item.WorkingDays dias">
+                    <span class="nl-event text-bg-primary" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" title="@item.Label - @item.StatusLabel - @item.WorkingDays días">
                       <span>Solicitud</span>
-                      <span class="visually-hidden">@item.Label @item.StatusLabel @item.WorkingDays dias</span>
+                      <span class="visually-hidden">@item.Label @item.StatusLabel @item.WorkingDays días</span>
                     </span>
                   }
                 }

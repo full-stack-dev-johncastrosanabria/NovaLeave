@@ -53,10 +53,40 @@ public sealed class RRHHController : Controller
         _toggleCapability = toggleCapability;
     }
 
+    /// <summary>Rows sampled for the overview tiles; the detail pages remain the paged source.</summary>
+    private const int DashboardSampleSize = 200;
+    private const int RecentRequestSize = 5;
+    private const int RecentAuditSize = 6;
+
     [HttpGet("/rrhh")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        return View(new RRHHDashboardViewModel());
+        // Composed from the same authorized read queries the detail pages use, so the overview
+        // can never show more than HR is allowed to see (constitution §4.3).
+        var requests = await _getRequests.HandleAsync(new GetHRRequestListQuery(1, DashboardSampleSize), cancellationToken);
+        var balances = await _getBalances.HandleAsync(new GetHRBalancesQuery(1, DashboardSampleSize), cancellationToken);
+        var audit = await _getAudit.HandleAsync(new GetHRAuditLogQuery(1, RecentAuditSize), cancellationToken);
+        var approvers = await _listCapabilities.HandleAsync(cancellationToken);
+
+        var items = requests.Items;
+        var model = new RRHHDashboardViewModel(
+            TotalRequests: requests.TotalCount,
+            PendingRequests: items.Count(request => request.Status == RequestStatus.Pending),
+            ApprovedRequests: items.Count(request => request.Status == RequestStatus.Approved),
+            RejectedRequests: items.Count(request => request.Status == RequestStatus.Rejected),
+            CancelledRequests: items.Count(request =>
+                request.Status == RequestStatus.CancelledByTimeout ||
+                request.Status == RequestStatus.CancelledByApprover),
+            TotalEmployees: balances.TotalCount,
+            TotalAvailableDays: balances.Items.Sum(balance => balance.AvailableDays),
+            TotalReservedDays: balances.Items.Sum(balance => balance.ReservedDays),
+            TotalDeductedDays: balances.Items.Sum(balance => balance.DeductedDays),
+            ApproverCount: approvers.Count,
+            ApproversAbleToResolve: approvers.Count(approver => approver.IsActive && approver.CanResolveRequests),
+            RecentRequests: items.OrderByDescending(request => request.CreatedAtUtc).Take(RecentRequestSize).ToList(),
+            RecentAudit: audit.Items.Take(RecentAuditSize).ToList());
+
+        return View(model);
     }
 
     [HttpGet("/rrhh/solicitudes")]
@@ -142,7 +172,7 @@ public sealed class RRHHController : Controller
     {
         if (!TryDecode(input.RowVersion, out var rowVersion))
         {
-            return BadRequest("RowVersion no valida.");
+            return BadRequest("RowVersion no válida.");
         }
 
         var result = await _toggleCapability.HandleAsync(new ToggleApproverCapabilityCommand(

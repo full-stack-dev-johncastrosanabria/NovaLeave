@@ -87,7 +87,7 @@ public sealed class MisSolicitudesController : Controller
             // person is looking at, with their input preserved.
             if (result.Error is null || result.Error.Code == ErrorCodes.Validation)
             {
-                ModelState.AddModelError(string.Empty, result.Error?.Message ?? "Solicitud invalida.");
+                ModelState.AddModelError(string.Empty, result.Error?.Message ?? "Solicitud inválida.");
                 return InvalidForm(viewModel);
             }
 
@@ -139,7 +139,7 @@ public sealed class MisSolicitudesController : Controller
         }
         catch (FormatException)
         {
-            return BadRequest("RowVersion no valida.");
+            return BadRequest("RowVersion no válida.");
         }
 
         var command = new EditPendingRequestCommand(
@@ -196,7 +196,7 @@ public sealed class MisSolicitudesController : Controller
             ErrorCodes.Conflict => Conflict(error.Message),
             ErrorCodes.NotFound => NotFound(),
             ErrorCodes.Forbidden => Forbid(),
-            _ => BadRequest(error?.Message ?? "Solicitud invalida.")
+            _ => BadRequest(error?.Message ?? "Solicitud inválida.")
         };
     }
 }

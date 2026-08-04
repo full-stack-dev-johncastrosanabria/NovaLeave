@@ -32,7 +32,7 @@ public sealed record CalendarEvent(
         get
         {
             var requester = string.IsNullOrWhiteSpace(RequesterName) ? Label : $"{Label} de {RequesterName}";
-            return $"{requester}, del {StartDate:yyyy-MM-dd} al {EndDate:yyyy-MM-dd}, {WorkingDays} dias habiles, {StatusLabel}";
+            return $"{requester}, del {StartDate:yyyy-MM-dd} al {EndDate:yyyy-MM-dd}, {WorkingDays} días hábiles, {StatusLabel}";
         }
     }
 
