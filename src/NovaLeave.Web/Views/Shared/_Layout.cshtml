@@ -54,7 +54,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNavigation">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <ul class="navbar-nav nl-primary-nav me-auto mb-2 mb-lg-0">
             @if (hasUserContext && activeContext == "User")
             {
               <li class="nav-item"><a class="nav-link @(path.Equals("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes">Mi espacio</a></li>
@@ -80,23 +80,23 @@
           </ul>
           @if (User.Identity?.IsAuthenticated == true)
           {
-            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+            <div class="nl-header-actions d-flex flex-column flex-lg-row align-items-lg-center gap-2">
               @if (contextCount > 1)
               {
-                <div class="dropdown">
-                  <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Mis roles</button>
+                <div class="dropdown nl-role-switcher">
+                  <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"><span class="nl-role-switcher-label">Mis roles</span><span class="nl-role-switcher-current">@activeSpaceLabel</span></button>
                   <ul class="dropdown-menu dropdown-menu-end">
                   @if (hasUserContext)
                   {
-                    <li><a class="dropdown-item" href="/mis-solicitudes">Mi espacio</a></li>
+                    <li><a class="dropdown-item @(activeContext == "User" ? "active" : string.Empty)" href="/mis-solicitudes">Mi espacio</a></li>
                   }
                   @if (hasApproverContext)
                   {
-                    <li><a class="dropdown-item" href="/aprobaciones">Aprobaciones</a></li>
+                    <li><a class="dropdown-item @(activeContext == "Approver" ? "active" : string.Empty)" href="/aprobaciones">Aprobaciones</a></li>
                   }
                   @if (hasHrContext)
                   {
-                    <li><a class="dropdown-item" href="/rrhh">RRHH</a></li>
+                    <li><a class="dropdown-item @(activeContext == "HR" ? "active" : string.Empty)" href="/rrhh">RRHH</a></li>
                   }
                   </ul>
                 </div>
