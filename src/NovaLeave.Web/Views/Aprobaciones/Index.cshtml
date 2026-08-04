@@ -17,7 +17,7 @@
     <h2 id="approvals-title" class="h5 mb-3">Pendientes</h2>
     @if (!Model.Requests.Any())
     {
-      <div class="nl-empty" role="status"><strong>No hay solicitudes pendientes.</strong><span>Las nuevas solicitudes elegibles aparecerán aquí.</span></div>
+      <div class="nl-empty" role="status"><partial name="_EmptyStateIcon" /><strong>No hay solicitudes pendientes.</strong><span>Las nuevas solicitudes elegibles aparecerán aquí.</span></div>
     }
     else
     {

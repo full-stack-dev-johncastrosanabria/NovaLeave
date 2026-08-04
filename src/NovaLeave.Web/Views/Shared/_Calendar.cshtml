@@ -104,7 +104,7 @@
 
   @if (Model.Events.Count == 0)
   {
-    <div class="nl-empty" role="status"><strong>No hay eventos en este mes.</strong><span>Cambie de mes para consultar otros periodos.</span></div>
+    <div class="nl-empty" role="status"><partial name="_EmptyStateIcon" /><strong>No hay eventos en este mes.</strong><span>Cambie de mes para consultar otros periodos.</span></div>
   }
   else
   {

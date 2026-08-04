@@ -27,7 +27,7 @@
 
 <section class="nl-card">
   <div class="nl-card-body">
-<form method="post" action="/rrhh/aprobadores/@Model.Approver.UserId/capacidad" class="vstack gap-3">
+<form method="post" action="/rrhh/aprobadores/@Model.Approver.UserId/capacidad" class="vstack gap-3" data-submit-once>
   @Html.AntiForgeryToken()
   <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
   <partial name="_ValidationSummary" />
@@ -67,7 +67,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Confirmar y guardar</button>
+          <button type="submit" class="btn btn-primary" data-submit-button>Confirmar y guardar</button>
         </div>
       </div>
     </div>

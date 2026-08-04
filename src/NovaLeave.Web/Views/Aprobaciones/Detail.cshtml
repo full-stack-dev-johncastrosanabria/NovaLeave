@@ -46,14 +46,14 @@
   @if (Model.Request.CanApproveOrReject)
   {
   <div class="col-md-4">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar" data-submit-once>
+    <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar" data-submit-once data-confirm data-confirm-title="Aprobar solicitud" data-confirm-message="La solicitud se aprobará y el saldo será actualizado de forma inmediata." data-confirm-label="Aprobar solicitud" data-confirm-variant="success">
       @Html.AntiForgeryToken()
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
       <button type="submit" class="btn btn-success w-100" aria-label="Aprobar solicitud" data-submit-button>Aprobar solicitud</button>
     </form>
   </div>
   <div class="col-md-8">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar" data-submit-once>
+    <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar" data-submit-once data-confirm data-confirm-title="Rechazar solicitud" data-confirm-message="La solicitud será rechazada y la reserva de saldo se liberará." data-confirm-label="Rechazar solicitud" data-confirm-variant="danger">
       @Html.AntiForgeryToken()
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
       <label class="form-label" for="RejectionReason">Razón de rechazo</label>
@@ -66,10 +66,10 @@
   @if (Model.Request.CanDeactivate)
   {
   <div class="col-md-4">
-    <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar" data-submit-once>
+    <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar" data-submit-once data-confirm data-confirm-title="Desactivar solicitud" data-confirm-message="La solicitud aprobada será desactivada y el saldo correspondiente será restaurado." data-confirm-label="Desactivar solicitud" data-confirm-variant="danger">
       @Html.AntiForgeryToken()
       <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-      <button type="submit" class="btn btn-warning w-100" aria-label="Desactivar solicitud aprobada">Desactivar solicitud</button>
+      <button type="submit" class="btn btn-warning w-100" aria-label="Desactivar solicitud aprobada" data-submit-button>Desactivar solicitud</button>
     </form>
   </div>
   }

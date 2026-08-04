@@ -17,7 +17,7 @@
     <h2 id="requests-title" class="h5 mb-3">Mi historial</h2>
     @if (!Model.Requests.Any())
     {
-      <div class="nl-empty" role="status"><strong>Aún no tienes solicitudes.</strong><span>Cuando registres vacaciones, podrás consultar aquí su estado y detalle.</span><a class="btn btn-primary" href="/mis-solicitudes/crear">Crear primera solicitud</a></div>
+      <div class="nl-empty" role="status"><partial name="_EmptyStateIcon" /><strong>Aún no tienes solicitudes.</strong><span>Cuando registres vacaciones, podrás consultar aquí su estado y detalle.</span><a class="btn btn-primary" href="/mis-solicitudes/crear">Crear primera solicitud</a></div>
     }
     else
     {

@@ -15,7 +15,7 @@
   <div class="nl-card-body">
 @if (!Model.Items.Any())
 {
-  <div class="nl-empty" role="status"><strong>No hay resoluciones realizadas.</strong><span>El historial se actualizará después de resolver solicitudes.</span><a class="btn btn-outline-primary" href="/aprobaciones">Ver solicitudes pendientes</a></div>
+  <div class="nl-empty" role="status"><partial name="_EmptyStateIcon" /><strong>No hay resoluciones realizadas.</strong><span>El historial se actualizará después de resolver solicitudes.</span><a class="btn btn-outline-primary" href="/aprobaciones">Ver solicitudes pendientes</a></div>
 }
 else
 {

@@ -30,6 +30,32 @@ public sealed class AccessibilityRegressionTests
             "Status indicators must render a visible text value, not only a CSS color.");
     }
 
+    [Fact]
+    public void Shared_Confirmation_Modal_Has_Accessible_Title_Description_And_Controls()
+    {
+        var content = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "src/NovaLeave.Web/Views/Shared/_ConfirmationModal.cshtml"));
+
+        Assert.Contains("aria-labelledby=\"nlConfirmationTitle\"", content);
+        Assert.Contains("aria-describedby=\"nlConfirmationMessage\"", content);
+        Assert.Contains("data-confirm-submit", content);
+        Assert.Contains("data-bs-dismiss=\"modal\"", content);
+    }
+
+    [Fact]
+    public void Motion_System_Provides_Page_Entry_And_Reduced_Motion_Override()
+    {
+        var content = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "src/NovaLeave.Web/wwwroot/css/site.css"));
+
+        Assert.Contains(".nl-page-enter", content);
+        Assert.Contains("translateY(4px)", content);
+        Assert.Contains("@media (prefers-reduced-motion: reduce)", content);
+        Assert.Contains("animation-duration: 1ms !important", content);
+    }
+
     private static string FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

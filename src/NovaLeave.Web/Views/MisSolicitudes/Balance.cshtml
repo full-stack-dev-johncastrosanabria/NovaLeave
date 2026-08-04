@@ -38,7 +38,7 @@
 <h2 id="movements-title" class="h5 mb-3">Historial de movimientos</h2>
 @if (!Model.Balance.Movements.Any())
 {
-  <div class="nl-empty" role="status"><strong>Aún no hay movimientos.</strong><span>Los movimientos de acumulación y solicitudes aparecerán aquí.</span></div>
+  <div class="nl-empty" role="status"><partial name="_EmptyStateIcon" /><strong>Aún no hay movimientos.</strong><span>Los movimientos de acumulación y solicitudes aparecerán aquí.</span></div>
 }
 else
 {

@@ -125,11 +125,12 @@
     </nav>
   </header>
   <main class="nl-main" role="main">
-    <div class="container-fluid nl-content-container">
+    <div class="container-fluid nl-content-container nl-page-enter">
     @RenderBody()
     @await Html.PartialAsync("_Toast", TempData["Toast"]?.ToString() ?? string.Empty)
     </div>
   </main>
+  <partial name="_ConfirmationModal" />
   <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
   <script src="~/js/site.js" asp-append-version="true"></script>
   @await RenderSectionAsync("Scripts", required: false)

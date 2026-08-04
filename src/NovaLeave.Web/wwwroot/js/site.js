@@ -93,13 +93,71 @@ document.querySelectorAll("[data-character-source]").forEach((source) => {
   update();
 });
 
+(() => {
+  const modalElement = document.getElementById("nlConfirmationModal");
+  const confirmButton = modalElement?.querySelector("[data-confirm-submit]");
+  if (!modalElement || !confirmButton || typeof bootstrap === "undefined") return;
+
+  const title = modalElement.querySelector("#nlConfirmationTitle");
+  const message = modalElement.querySelector("#nlConfirmationMessage");
+  const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+  let pendingForm = null;
+
+  document.querySelectorAll("form[data-confirm]").forEach((form) => {
+    form.addEventListener("submit", (event) => {
+      if (form.dataset.confirmed === "true") return;
+      event.preventDefault();
+      pendingForm = form;
+      title.textContent = form.dataset.confirmTitle ?? "Confirmar operación";
+      message.textContent = form.dataset.confirmMessage ?? "Revise la operación antes de continuar.";
+      confirmButton.textContent = form.dataset.confirmLabel ?? "Confirmar";
+      confirmButton.className = form.dataset.confirmVariant === "success"
+        ? "btn btn-success"
+        : form.dataset.confirmVariant === "danger"
+          ? "btn nl-button-danger-confirm"
+          : "btn btn-primary";
+      modal.show();
+    });
+  });
+
+  confirmButton.addEventListener("click", () => {
+    if (!pendingForm) return;
+    const form = pendingForm;
+    pendingForm = null;
+    form.dataset.confirmed = "true";
+    modal.hide();
+    form.requestSubmit();
+  });
+
+  modalElement.addEventListener("hidden.bs.modal", () => {
+    pendingForm = null;
+  });
+})();
+
 document.querySelectorAll("[data-submit-once]").forEach((form) => {
   form.addEventListener("submit", () => {
+    if (form.hasAttribute("data-confirm") && form.dataset.confirmed !== "true") return;
     const button = form.querySelector("[data-submit-button]");
     if (!button) return;
+    const originalLabel = button.textContent.trim();
+    const loadingLabel = originalLabel.startsWith("Aprobar")
+      ? "Aprobando…"
+      : originalLabel.startsWith("Rechazar")
+        ? "Rechazando…"
+        : originalLabel.startsWith("Guardar")
+          ? "Guardando…"
+          : originalLabel.startsWith("Crear")
+            ? "Creando…"
+            : "Procesando…";
+
+    button.style.minWidth = `${Math.ceil(button.getBoundingClientRect().width)}px`;
     button.disabled = true;
     button.setAttribute("aria-busy", "true");
-    button.textContent = "Procesando…";
+    button.replaceChildren();
+    const spinner = document.createElement("span");
+    spinner.className = "nl-button-spinner";
+    spinner.setAttribute("aria-hidden", "true");
+    button.append(spinner, document.createTextNode(loadingLabel));
   });
 });
 
