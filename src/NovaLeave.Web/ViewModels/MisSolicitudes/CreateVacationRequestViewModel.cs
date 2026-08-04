@@ -13,4 +13,10 @@ public sealed class CreateVacationRequestViewModel
     public int? WorkingDays { get; set; }
 
     public string Reason { get; set; } = string.Empty;
+
+    public int AccruedDays { get; set; }
+
+    public int ReservedDays { get; set; }
+
+    public int AvailableDays { get; set; }
 }

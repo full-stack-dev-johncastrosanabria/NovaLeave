@@ -12,13 +12,15 @@ public sealed class GetApproverRequestDetailQueryHandler
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly IApproverIdentityService _identityService;
+    private readonly IUserDirectory _userDirectory;
     private readonly OverlapPolicy _overlapPolicy;
     private readonly TimeProvider _timeProvider;
 
-    public GetApproverRequestDetailQueryHandler(IApplicationDbContext dbContext, IApproverIdentityService identityService, OverlapPolicy overlapPolicy, TimeProvider timeProvider)
+    public GetApproverRequestDetailQueryHandler(IApplicationDbContext dbContext, IApproverIdentityService identityService, IUserDirectory userDirectory, OverlapPolicy overlapPolicy, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
         _identityService = identityService;
+        _userDirectory = userDirectory;
         _overlapPolicy = overlapPolicy;
         _timeProvider = timeProvider;
     }
@@ -60,10 +62,15 @@ public sealed class GetApproverRequestDetailQueryHandler
 
         var businessDate = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime);
         var canDeactivate = request.Status == RequestStatus.Approved && request.StartDate > businessDate;
+        var users = await _userDirectory.GetUsersByIdsAsync([request.OwnerId], cancellationToken);
+        var requesterName = users.TryGetValue(request.OwnerId, out var requester)
+            ? requester.DisplayName
+            : request.OwnerId;
 
         return Result<ApproverRequestDetail>.Success(new ApproverRequestDetail(
             request.Id,
             request.OwnerId,
+            requesterName,
             request.StartDate,
             request.EndDate,
             request.WorkingDays,

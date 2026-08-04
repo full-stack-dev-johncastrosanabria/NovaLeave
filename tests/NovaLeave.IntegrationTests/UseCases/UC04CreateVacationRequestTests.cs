@@ -9,6 +9,27 @@ namespace NovaLeave.IntegrationTests.UseCases;
 public sealed class UC04CreateVacationRequestTests
 {
     [Fact]
+    public async Task Create_Form_Shows_Balance_Summary_And_Derived_Field_Hooks()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await IntegrationTestDatabase.ResetAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "user-1", "user1@example.test", 10);
+        var client = factory.CreateClient();
+
+        var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedGet("/mis-solicitudes/crear"));
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Acumulado total", html);
+        Assert.Contains("Pendientes", html);
+        Assert.Contains("Disponible actual", html);
+        Assert.Contains("Saldo posterior estimado", html);
+        Assert.Contains("data-available-days=\"10\"", html);
+        Assert.Contains("data-derived-end-date", html);
+        Assert.DoesNotContain("Cómo se calcula", html);
+    }
+
+    [Fact]
     public async Task DateRange_Create_Reserves_Balance_And_Audits_Atomically()
     {
         await using var factory = new NovaLeaveWebApplicationFactory();

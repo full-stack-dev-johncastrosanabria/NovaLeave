@@ -95,7 +95,7 @@
 <body>
 @if (!isAuthenticated)
 {
-  <main class="container py-5" role="main">
+  <main class="container py-5 nl-page-enter" role="main">
     @RenderBody()
   </main>
 }
@@ -176,7 +176,7 @@ else
         </div>
       </header>
 
-      <main class="nl-content" role="main" id="contenido" tabindex="-1">
+      <main class="nl-content nl-page-enter" role="main" id="contenido" tabindex="-1">
         @RenderBody()
       </main>
     </div>
@@ -185,31 +185,7 @@ else
 
   <script src="~/lib/coreui/js/coreui.bundle.min.js"></script>
   <script src="~/lib/htmx/htmx.min.js"></script>
-  <script>
-    // Offcanvas sidebar for narrow viewports.
-    (function () {
-      var toggle = document.getElementById('nlSidebarToggle');
-      var sidebar = document.getElementById('nlSidebar');
-      if (!toggle || !sidebar) { return; }
-      var backdrop;
-      function close() {
-        sidebar.classList.remove('show');
-        toggle.setAttribute('aria-expanded', 'false');
-        if (backdrop) { backdrop.remove(); backdrop = null; }
-      }
-      toggle.addEventListener('click', function () {
-        var open = sidebar.classList.toggle('show');
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        if (open) {
-          backdrop = document.createElement('div');
-          backdrop.className = 'nl-backdrop';
-          backdrop.addEventListener('click', close);
-          document.body.appendChild(backdrop);
-        } else { close(); }
-      });
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); } });
-    })();
-  </script>
+  <script src="~/js/novaleave.js"></script>
   @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

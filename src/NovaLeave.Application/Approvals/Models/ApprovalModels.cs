@@ -14,6 +14,7 @@ public sealed record ApproverRequestSummary(
 public sealed record ApproverRequestDetail(
     Guid Id,
     string RequesterId,
+    string RequesterName,
     DateOnly StartDate,
     DateOnly EndDate,
     int WorkingDays,

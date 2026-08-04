@@ -58,14 +58,14 @@
                   if (detailUrl is not null)
                   {
                     <a class="nl-event text-bg-primary" href="@detailUrl" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" title="@item.Label - @item.StatusLabel - @item.WorkingDays días">
-                      <span>Solicitud</span>
+                      <span>@(string.IsNullOrWhiteSpace(item.RequesterName) ? item.Label : item.RequesterName)</span>
                       <span class="visually-hidden">@item.Label @item.StatusLabel @item.WorkingDays días</span>
                     </a>
                   }
                   else
                   {
                     <span class="nl-event text-bg-primary" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" title="@item.Label - @item.StatusLabel - @item.WorkingDays días">
-                      <span>Solicitud</span>
+                      <span>@(string.IsNullOrWhiteSpace(item.RequesterName) ? item.Label : item.RequesterName)</span>
                       <span class="visually-hidden">@item.Label @item.StatusLabel @item.WorkingDays días</span>
                     </span>
                   }

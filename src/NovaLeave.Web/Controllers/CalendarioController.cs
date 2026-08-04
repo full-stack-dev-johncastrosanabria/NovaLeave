@@ -81,7 +81,7 @@ public sealed class CalendarioController : Controller
             .Select(item => new CalendarEvent(
                 item.RequestId,
                 "Solicitud propia",
-                null,
+                item.RequesterName,
                 item.StartDate,
                 item.EndDate,
                 item.WorkingDays,

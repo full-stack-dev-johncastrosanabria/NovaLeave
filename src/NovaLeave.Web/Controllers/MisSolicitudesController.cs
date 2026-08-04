@@ -50,17 +50,20 @@ public sealed class MisSolicitudesController : Controller
     }
 
     [HttpGet("/mis-solicitudes/crear")]
-    public IActionResult Create()
+    public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
         // The earliest valid start is the day after the current business date (BR-002), so the
         // form opens on that date instead of DateOnly.MinValue, which rendered as 01/01/0001.
         var earliestStart = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime).AddDays(1);
 
-        return View(new CreateVacationRequestViewModel
+        var viewModel = new CreateVacationRequestViewModel
         {
             StartDate = earliestStart,
             EndDate = earliestStart
-        });
+        };
+
+        await PopulateCreateBalanceAsync(viewModel, cancellationToken);
+        return View(viewModel);
     }
 
     [HttpPost("/mis-solicitudes/crear")]
@@ -69,6 +72,7 @@ public sealed class MisSolicitudesController : Controller
     {
         if (!ModelState.IsValid)
         {
+            await PopulateCreateBalanceAsync(viewModel, cancellationToken);
             return InvalidForm(viewModel);
         }
 
@@ -88,6 +92,7 @@ public sealed class MisSolicitudesController : Controller
             if (result.Error is null || result.Error.Code == ErrorCodes.Validation)
             {
                 ModelState.AddModelError(string.Empty, result.Error?.Message ?? "Solicitud inválida.");
+                await PopulateCreateBalanceAsync(viewModel, cancellationToken);
                 return InvalidForm(viewModel);
             }
 
@@ -176,6 +181,19 @@ public sealed class MisSolicitudesController : Controller
     private string RequireUserId()
     {
         return _currentUser.UserId ?? throw new InvalidOperationException("Usuario autenticado requerido.");
+    }
+
+    private async Task PopulateCreateBalanceAsync(CreateVacationRequestViewModel viewModel, CancellationToken cancellationToken)
+    {
+        var result = await _getMyBalance.HandleAsync(RequireUserId(), cancellationToken);
+        if (result.IsFailure || result.Value is null)
+        {
+            return;
+        }
+
+        viewModel.AccruedDays = result.Value.AccruedDays;
+        viewModel.ReservedDays = result.Value.ReservedDays;
+        viewModel.AvailableDays = result.Value.AvailableDays;
     }
 
     /// <summary>
