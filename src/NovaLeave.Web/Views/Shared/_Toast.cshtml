@@ -3,7 +3,12 @@
 @if (!string.IsNullOrWhiteSpace(Model))
 {
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div class="toast show nl-card" role="status" aria-live="polite" aria-atomic="true">
+    <div class="toast show nl-toast" role="status" aria-live="polite" aria-atomic="true">
+      <div class="toast-header">
+        <span class="nl-toast-indicator" aria-hidden="true"></span>
+        <strong class="me-auto">NovaLeave</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar notificación"></button>
+      </div>
       <div class="toast-body">@Model</div>
     </div>
   </div>

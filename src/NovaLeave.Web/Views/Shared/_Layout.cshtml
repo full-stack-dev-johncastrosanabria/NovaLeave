@@ -7,15 +7,21 @@
     var requestedContext = Context.Request.Query["context"].ToString();
     var activeContext = path.StartsWith("/rrhh", StringComparison.OrdinalIgnoreCase)
         ? "HR"
-        : path.StartsWith("/aprobaciones", StringComparison.OrdinalIgnoreCase) || string.Equals(requestedContext, "Approver", StringComparison.OrdinalIgnoreCase)
+        : string.Equals(requestedContext, "User", StringComparison.OrdinalIgnoreCase)
+            ? "User"
+            : path.StartsWith("/aprobaciones", StringComparison.OrdinalIgnoreCase) || string.Equals(requestedContext, "Approver", StringComparison.OrdinalIgnoreCase)
             ? "Approver"
+            : path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && hasApproverContext && !hasUserContext
+                ? "Approver"
             : "User";
     var activeRoot = activeContext == "HR" && hasHrContext
         ? "/rrhh"
         : activeContext == "Approver" && hasApproverContext
             ? "/aprobaciones"
             : "/mis-solicitudes";
-    var activeContextLabel = activeContext == "HR" ? "RRHH" : activeContext == "Approver" ? "Aprobaciones" : "Mi espacio";
+    var activeRoleLabel = activeContext == "HR" ? "RRHH" : activeContext == "Approver" ? "Aprobador" : "Usuario";
+    var activeSpaceLabel = activeContext == "HR" ? "Solo lectura" : activeContext == "Approver" ? "Aprobaciones" : "Mi espacio";
+    var activeContextLabel = $"{activeRoleLabel} · {activeSpaceLabel}";
 }
 <!doctype html>
 <html lang="es">
@@ -30,26 +36,31 @@
   <div class="nl-shell">
   <header class="nl-topbar">
     <nav class="navbar navbar-expand-lg" aria-label="Navegacion principal">
-      <div class="container">
+      <div class="container-fluid nl-shell-container">
         <a class="navbar-brand d-inline-flex align-items-center gap-2 fw-bold" href="@activeRoot">
           <span class="nl-brand-mark" aria-hidden="true">N</span>
           <span>NovaLeave</span>
         </a>
         @if (User.Identity?.IsAuthenticated == true)
         {
-          <span class="nl-context-chip d-none d-md-inline-flex" aria-label="Contexto activo">@activeContextLabel</span>
+          <span class="nl-context-chip" aria-label="Contexto activo: @activeContextLabel">
+            <span class="nl-context-role">@activeRoleLabel</span>
+            <span class="nl-context-space">@activeSpaceLabel</span>
+          </span>
         }
+        @if (User.Identity?.IsAuthenticated == true)
+        {
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Abrir navegacion">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNavigation">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <ul class="navbar-nav nl-primary-nav me-auto mb-2 mb-lg-0">
             @if (hasUserContext && activeContext == "User")
             {
-              <li class="nav-item"><a class="nav-link @(path.Equals("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes">Mi historial</a></li>
-              <li class="nav-item"><a class="nav-link" href="/mis-solicitudes/crear">Nueva solicitud</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes">Mi espacio</a></li>
+              <li class="nav-item"><a class="nav-link @(path.StartsWith("/mis-solicitudes/crear", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes/crear">Nueva solicitud</a></li>
               <li class="nav-item"><a class="nav-link @(path.Equals("/saldo", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/saldo">Mi saldo</a></li>
-              <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "User" ? "active" : string.Empty)" href="/calendario">Calendario</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "User" ? "active" : string.Empty)" href="/calendario?context=User">Calendario</a></li>
             }
             @if (hasApproverContext && activeContext == "Approver")
             {
@@ -69,33 +80,35 @@
           </ul>
           @if (User.Identity?.IsAuthenticated == true)
           {
-            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2">
+            <div class="nl-header-actions d-flex flex-column flex-lg-row align-items-lg-center gap-2">
               @if (contextCount > 1)
               {
-                <div class="dropdown">
-                  <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Mis roles</button>
+                <div class="dropdown nl-role-switcher">
+                  <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"><span class="nl-role-switcher-label">Mis roles</span><span class="nl-role-switcher-current">@activeSpaceLabel</span></button>
                   <ul class="dropdown-menu dropdown-menu-end">
                   @if (hasUserContext)
                   {
-                    <li><a class="dropdown-item" href="/mis-solicitudes">Mi espacio</a></li>
+                    <li><a class="dropdown-item @(activeContext == "User" ? "active" : string.Empty)" href="/mis-solicitudes">Mi espacio</a></li>
                   }
                   @if (hasApproverContext)
                   {
-                    <li><a class="dropdown-item" href="/aprobaciones">Aprobaciones</a></li>
+                    <li><a class="dropdown-item @(activeContext == "Approver" ? "active" : string.Empty)" href="/aprobaciones">Aprobaciones</a></li>
                   }
                   @if (hasHrContext)
                   {
-                    <li><a class="dropdown-item" href="/rrhh">RRHH</a></li>
+                    <li><a class="dropdown-item @(activeContext == "HR" ? "active" : string.Empty)" href="/rrhh">RRHH</a></li>
                   }
                   </ul>
                 </div>
               }
               <div class="dropdown">
-                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu de usuario">
-                  @(User.Identity.Name ?? "Usuario")
+                <button class="btn nl-user-menu dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menú de usuario">
+                  <span class="nl-user-avatar" aria-hidden="true">@((User.Identity.Name ?? "U")[0].ToString().ToUpperInvariant())</span>
+                  <span class="nl-user-email">@(User.Identity.Name ?? "Usuario")</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li><span class="dropdown-item-text text-body-secondary">@(User.Identity.Name ?? "Usuario autenticado")</span></li>
+                  <li><span class="dropdown-item-text fw-semibold">@(User.Identity.Name ?? "Usuario autenticado")</span></li>
+                  <li><span class="dropdown-item-text small text-body-secondary">@activeContextLabel</span></li>
                   <li><hr class="dropdown-divider" /></li>
                   <li>
                     <form method="post" asp-area="Identity" asp-page="/Account/Logout">
@@ -107,18 +120,16 @@
             </div>
           }
         </div>
+        }
       </div>
     </nav>
   </header>
   <main class="nl-main" role="main">
-    <div class="container">
+    <div class="container-fluid nl-content-container">
     @RenderBody()
     @await Html.PartialAsync("_Toast", TempData["Toast"]?.ToString() ?? string.Empty)
     </div>
   </main>
-  <footer class="border-top py-3 bg-white">
-    <div class="container small text-secondary">NovaLeave</div>
-  </footer>
   <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
   <script src="~/js/site.js" asp-append-version="true"></script>
   @await RenderSectionAsync("Scripts", required: false)

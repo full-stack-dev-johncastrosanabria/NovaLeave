@@ -36,27 +36,45 @@
 <section class="nl-card" aria-labelledby="movements-title">
   <div class="nl-card-body">
 <h2 id="movements-title" class="h5 mb-3">Historial de movimientos</h2>
+@if (!Model.Balance.Movements.Any())
+{
+  <div class="nl-empty" role="status"><strong>Aún no hay movimientos.</strong><span>Los movimientos de acumulación y solicitudes aparecerán aquí.</span></div>
+}
+else
+{
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Movimientos de saldo propios</caption>
     <thead>
       <tr>
         <th scope="col">Fecha</th>
         <th scope="col">Tipo</th>
         <th scope="col">Dias</th>
+        <th scope="col">Solicitud</th>
       </tr>
     </thead>
     <tbody>
       @foreach (var movement in Model.Balance.Movements)
       {
         <tr data-movement-type="@movement.Type">
-          <td>@movement.EffectiveAt</td>
-          <td>@MovementLabel(movement.Type)</td>
-          <td>@movement.Amount</td>
+          <td data-label="Fecha">@movement.EffectiveAt.ToString("dd/MM/yyyy HH:mm")</td>
+          <td data-label="Movimiento">@MovementLabel(movement.Type)</td>
+          <td data-label="Días"><strong class="@(movement.Amount >= 0 ? "text-success" : "text-danger")">@(movement.Amount > 0 ? "+" : string.Empty)@movement.Amount</strong></td>
+          <td data-label="Solicitud">
+            @if (movement.RequestId is not null)
+            {
+              <a href="/mis-solicitudes/@movement.RequestId">Ver solicitud</a>
+            }
+            else
+            {
+              <span class="text-body-secondary">No aplica</span>
+            }
+          </td>
         </tr>
       }
     </tbody>
   </table>
 </div>
+}
   </div>
 </section>

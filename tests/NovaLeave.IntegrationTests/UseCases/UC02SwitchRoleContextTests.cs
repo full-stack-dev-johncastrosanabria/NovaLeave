@@ -46,9 +46,28 @@ public sealed class UC02SwitchRoleContextTests
         Assert.Contains("Mis roles", html);
         Assert.Contains("Mi espacio", html);
         Assert.Contains("Aprobaciones", html);
+        Assert.Contains("href=\"/calendario?context=User\"", html);
 
         // RRHH is not held, so it is never offered as a context.
         Assert.DoesNotContain("RRHH", html);
+    }
+
+    [Fact]
+    public async Task Explicit_Approver_Calendar_Context_Keeps_Approver_Navigation_For_Multi_Role_Identity()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await IntegrationTestDatabase.ResetAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "multi-1", "multi@example.test", 5, roles: "User,Approver,HR", canResolveRequests: true);
+        var client = factory.CreateClient();
+
+        var response = await client.SendAsync(
+            IntegrationTestDatabase.AuthenticatedGet("/calendario?context=Approver", "multi-1", "User,Approver,HR", canResolveRequests: true));
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Aprobador", html);
+        Assert.Contains("href=\"/calendario?context=Approver\"", html);
+        Assert.DoesNotContain("href=\"/calendario?context=User\"", html);
     }
 
     [Fact]

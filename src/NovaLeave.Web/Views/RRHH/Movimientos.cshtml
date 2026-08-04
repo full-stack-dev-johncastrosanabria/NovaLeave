@@ -2,6 +2,17 @@
 @{
     ViewData["Title"] = "Movimientos RRHH";
 }
+@functions {
+    private static string MovementLabel(NovaLeave.Domain.Enums.MovementType type) => type switch
+    {
+        NovaLeave.Domain.Enums.MovementType.Accrual => "Acumulación mensual",
+        NovaLeave.Domain.Enums.MovementType.Reservation => "Reserva",
+        NovaLeave.Domain.Enums.MovementType.Release => "Liberación",
+        NovaLeave.Domain.Enums.MovementType.Deduction => "Deducción",
+        NovaLeave.Domain.Enums.MovementType.Restoration => "Restauración",
+        _ => type.ToString()
+    };
+}
 
 <div class="nl-page-header">
   <div>
@@ -30,7 +41,7 @@
 <section class="nl-card">
   <div class="nl-card-body">
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Movimientos de saldo</caption>
     <thead>
       <tr>
@@ -45,11 +56,11 @@
       @foreach (var movement in Model.Balance.Movements)
       {
         <tr>
-          <td>@movement.EffectiveAtUtc</td>
-          <td>@movement.Type</td>
-          <td>@movement.Amount</td>
-          <td>@movement.RequestId</td>
-          <td>@movement.AccrualPeriod</td>
+          <td data-label="Fecha">@movement.EffectiveAtUtc.ToString("dd/MM/yyyy HH:mm")</td>
+          <td data-label="Movimiento">@MovementLabel(movement.Type)</td>
+          <td data-label="Días"><strong>@(movement.Amount > 0 ? "+" : string.Empty)@movement.Amount</strong></td>
+          <td data-label="Solicitud">@if(movement.RequestId is not null){<a href="/rrhh/solicitudes/@movement.RequestId">Ver solicitud</a>}else{<span class="text-body-secondary">No aplica</span>}</td>
+          <td data-label="Periodo">@(movement.AccrualPeriod?.ToString("MM/yyyy") ?? "No aplica")</td>
         </tr>
       }
     </tbody>

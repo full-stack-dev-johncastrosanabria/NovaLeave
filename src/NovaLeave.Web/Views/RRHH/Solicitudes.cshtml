@@ -17,8 +17,18 @@
 
 <section class="nl-card">
   <div class="nl-card-body">
+<form method="get" class="nl-filter-bar mb-3">
+  <div><label class="form-label" for="status">Estado</label><select class="form-select" id="status" name="status"><option value="">Todos</option>@foreach (var status in Enum.GetValues<NovaLeave.Domain.Enums.RequestStatus>()){<option value="@status" selected="@(Context.Request.Query["status"] == status.ToString() ? "selected" : null)">@status</option>}</select></div>
+  <button class="btn btn-outline-primary" type="submit">Aplicar filtro</button>
+</form>
+@if (!Model.Requests.Items.Any())
+{
+  <div class="nl-empty" role="status"><strong>No se encontraron solicitudes.</strong><span>Ajuste el filtro o consulte otra página.</span></div>
+}
+else
+{
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Solicitudes de vacaciones de la organizacion</caption>
     <thead>
       <tr>
@@ -34,18 +44,20 @@
       @foreach (var request in Model.Requests.Items)
       {
         <tr>
-          <td>@request.RequesterName</td>
-          <td>@request.StartDate.ToString("yyyy-MM-dd")</td>
-          <td>@request.EndDate.ToString("yyyy-MM-dd")</td>
-          <td>@request.WorkingDays</td>
-          <td><partial name="_StatusBadge" model="request.Status.ToString()" /></td>
-          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/solicitudes/@request.Id">Ver</a></td>
+          <td data-label="Persona"><strong>@request.RequesterName</strong></td>
+          <td data-label="Inicio">@request.StartDate.ToString("dd/MM/yyyy")</td>
+          <td data-label="Fin">@request.EndDate.ToString("dd/MM/yyyy")</td>
+          <td data-label="Días">@request.WorkingDays</td>
+          <td data-label="Estado"><partial name="_StatusBadge" model="request.Status.ToString()" /></td>
+          <td data-label="Detalle"><a class="btn btn-sm btn-outline-primary" href="/rrhh/solicitudes/@request.Id">Ver detalle</a></td>
         </tr>
       }
     </tbody>
   </table>
 </div>
+}
   </div>
 </section>
 
-<p class="text-body-secondary">Pagina @Model.Requests.Page de @Math.Max(1, (int)Math.Ceiling(Model.Requests.TotalCount / (double)Model.Requests.PageSize))</p>
+@{ var totalPages = Math.Max(1, (int)Math.Ceiling(Model.Requests.TotalCount / (double)Model.Requests.PageSize)); }
+<nav class="nl-pagination" aria-label="Paginación de solicitudes"><span>Página @Model.Requests.Page de @totalPages</span><div>@if(Model.Requests.Page > 1){<a class="btn btn-outline-primary" href="?page=@(Model.Requests.Page-1)&status=@Context.Request.Query["status"]">Anterior</a>}@if(Model.Requests.Page < totalPages){<a class="btn btn-outline-primary" href="?page=@(Model.Requests.Page+1)&status=@Context.Request.Query["status"]">Siguiente</a>}</div></nav>

@@ -1,6 +1,11 @@
 @if (!ViewData.ModelState.IsValid)
 {
-  <div class="alert alert-danger nl-card" role="alert" aria-live="polite">
-    <div asp-validation-summary="All"></div>
+  <div class="alert alert-danger alert-dismissible fade show nl-validation-popover" role="alert" aria-live="assertive" aria-atomic="true" tabindex="-1" data-validation-popover>
+    <div class="nl-validation-popover-icon" aria-hidden="true">!</div>
+    <div class="nl-validation-popover-content">
+      <strong>No fue posible completar la solicitud</strong>
+      <div asp-validation-summary="All"></div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar mensaje"></button>
   </div>
 }

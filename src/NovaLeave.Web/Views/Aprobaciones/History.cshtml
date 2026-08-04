@@ -13,8 +13,14 @@
 
 <section class="nl-card">
   <div class="nl-card-body">
+@if (!Model.Items.Any())
+{
+  <div class="nl-empty" role="status"><strong>No hay resoluciones realizadas.</strong><span>El historial se actualizará después de resolver solicitudes.</span><a class="btn btn-outline-primary" href="/aprobaciones">Ver solicitudes pendientes</a></div>
+}
+else
+{
 <div class="table-responsive">
-  <table class="table nl-table nl-table-card align-middle">
+  <table class="table nl-table nl-responsive-table align-middle">
     <caption>Historial de acciones del aprobador</caption>
     <thead>
       <tr>
@@ -29,15 +35,16 @@
       @foreach (var item in Model.Items)
       {
         <tr>
-          <td>@item.TimestampUtc</td>
-          <td>@item.Action</td>
-          <td><a href="/aprobaciones/@item.RequestId">@item.RequestId</a></td>
-          <td>@item.RequesterId</td>
-          <td><partial name="_StatusBadge" model="item.Status.ToString()" /></td>
+          <td data-label="Fecha">@item.TimestampUtc.ToString("dd/MM/yyyy HH:mm")</td>
+          <td data-label="Acción">@(item.Action == "Approve" ? "Aprobación" : item.Action == "Reject" ? "Rechazo" : item.Action == "Deactivate" ? "Desactivación" : item.Action)</td>
+          <td data-label="Detalle"><a class="btn btn-sm btn-outline-primary" href="/aprobaciones/@item.RequestId">Ver detalle</a></td>
+          <td data-label="Solicitante">Usuario solicitante</td>
+          <td data-label="Estado"><partial name="_StatusBadge" model="item.Status.ToString()" /></td>
         </tr>
       }
     </tbody>
   </table>
 </div>
+}
   </div>
 </section>

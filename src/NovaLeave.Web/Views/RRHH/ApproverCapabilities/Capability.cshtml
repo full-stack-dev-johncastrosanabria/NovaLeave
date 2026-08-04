@@ -18,7 +18,9 @@
   <dt class="col-sm-3">Aprobador</dt>
   <dd class="col-sm-9">@Model.Approver.DisplayName</dd>
   <dt class="col-sm-3">Estado actual</dt>
-  <dd class="col-sm-9"><span class="nl-badge @(Model.Approver.CanResolveRequests ? "nl-badge-approved" : "nl-badge-neutral")">@(Model.Approver.CanResolveRequests ? "Habilitado" : "Deshabilitado")</span></dd>
+  <dd class="col-sm-9"><span class="nl-badge @(Model.Approver.CanResolveRequests ? "nl-badge-approved" : "nl-badge-neutral")">@(Model.Approver.CanResolveRequests ? "Habilitado para resolver" : "Deshabilitado para resolver")</span></dd>
+  <dt class="col-sm-3">Cuenta</dt>
+  <dd class="col-sm-9">@(Model.Approver.IsActive ? "Cuenta activa" : "Cuenta inactiva")</dd>
 </dl>
   </div>
 </section>
@@ -28,19 +30,20 @@
 <form method="post" action="/rrhh/aprobadores/@Model.Approver.UserId/capacidad" class="vstack gap-3">
   @Html.AntiForgeryToken()
   <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-  <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" aria-live="polite"></div>
+  <partial name="_ValidationSummary" />
 
   <div>
     <label class="form-label" for="Enable">Nueva capacidad</label>
     <select class="form-select" id="Enable" name="Enable">
-      <option value="true" selected="@(Model.Input.Enable ? "selected" : null)">Habilitado</option>
-      <option value="false" selected="@(!Model.Input.Enable ? "selected" : null)">Deshabilitado</option>
+      <option value="true" selected="@(Model.Input.Enable ? "selected" : null)">Habilitado para resolver</option>
+      <option value="false" selected="@(!Model.Input.Enable ? "selected" : null)">Deshabilitado para resolver</option>
     </select>
   </div>
 
   <div>
     <label class="form-label" for="Reason">Justificacion</label>
-    <textarea class="form-control" id="Reason" name="Reason" rows="4" minlength="10" maxlength="500">@Model.Input.Reason</textarea>
+    <textarea class="form-control" id="Reason" name="Reason" rows="4" minlength="10" maxlength="500" required data-character-source>@Model.Input.Reason</textarea>
+    <div class="d-flex justify-content-between"><span class="form-text">Entre 10 y 500 caracteres.</span><span class="form-text" data-character-count>0 / 500</span></div>
   </div>
 
   <div class="form-check">

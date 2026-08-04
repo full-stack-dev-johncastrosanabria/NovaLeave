@@ -6,7 +6,7 @@
         "Pending" or "Pendiente" => "nl-badge-pending",
         "Approved" or "Aprobada" => "nl-badge-approved",
         "Rejected" or "Rechazada" => "nl-badge-rejected",
-        "CancelledByTimeout" or "Cancelada automaticamente" => "nl-badge-neutral",
+        "CancelledByTimeout" or "Cancelada automaticamente" or "Cancelada automáticamente" => "nl-badge-neutral",
         "CancelledByApprover" or "Cancelada por aprobador" => "nl-badge-neutral",
         _ => "nl-badge-neutral"
     };
@@ -15,10 +15,10 @@
         "Pending" => "Pendiente",
         "Approved" => "Aprobada",
         "Rejected" => "Rechazada",
-        "CancelledByTimeout" => "Cancelada automaticamente",
+        "CancelledByTimeout" => "Cancelada automáticamente",
         "CancelledByApprover" => "Cancelada por aprobador",
         _ => normalized
     };
 }
 
-<span class="nl-badge @cssClass" aria-label="@Model">@label</span>
+<span class="nl-badge @cssClass" aria-label="Estado: @label">@label</span>
