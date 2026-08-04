@@ -41,36 +41,40 @@
     };
 }
 
-<div class="row g-3 mb-4">
+<div class="row g-3">
   @foreach (var stat in stats)
   {
     <div class="col-6 col-lg-3">
-      <div class="nl-card h-100 p-3 nl-stat">
-        <div class="d-flex align-items-center gap-2 nl-stat-label">
+      <div class="nl-card h-100 nl-stat @(stat.Label == "Disponible" ? "nl-stat-accent" : null)">
+        <div class="nl-stat-label">
           <i class="bi @stat.Icon" aria-hidden="true"></i>
           <span>@stat.Label</span>
         </div>
         <div class="nl-stat-value">@stat.Value</div>
-        <div class="small text-body-secondary">@stat.Hint</div>
+        <div class="nl-stat-hint">@stat.Hint</div>
       </div>
     </div>
   }
 </div>
 
 <div class="nl-card">
-  <div class="p-3 border-bottom">
-    <h2 class="h6 mb-0">Historial de movimientos</h2>
+  <div class="nl-card-header">
+    <h2>Historial de movimientos</h2>
+    <span class="text-body-secondary" style="font-size:12px">@Model.Balance.Movements.Count() movimiento@(Model.Balance.Movements.Count() == 1 ? "" : "s")</span>
   </div>
 
   @if (!Model.Balance.Movements.Any())
   {
-    <p class="text-body-secondary text-center py-4 mb-0">Todavia no hay movimientos de saldo.</p>
+    <div class="nl-empty">
+      <i class="bi bi-clock-history" aria-hidden="true"></i>
+      <p class="mb-0">Todavia no hay movimientos de saldo.</p>
+    </div>
   }
   else
   {
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <caption class="px-3">Movimientos de saldo propios</caption>
+      <table class="table nl-table align-middle">
+        <caption class="visually-hidden">Movimientos de saldo propios</caption>
         <thead>
           <tr>
             <th scope="col">Fecha</th>

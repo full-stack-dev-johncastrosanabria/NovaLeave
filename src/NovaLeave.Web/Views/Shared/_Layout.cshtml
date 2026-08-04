@@ -90,6 +90,9 @@
 }
 else
 {
+  @* Keyboard users reach content without traversing the whole navigation rail. *@
+  <a class="nl-skip" href="#contenido">Saltar al contenido</a>
+
   <div class="nl-shell">
     <aside class="nl-sidebar" id="nlSidebar">
       <a class="nl-brand" href="@brandHref">
@@ -97,7 +100,8 @@ else
         <span>NovaLeave</span>
       </a>
 
-      <nav class="nav flex-column mt-2" aria-label="Navegacion principal">
+      <nav class="nav flex-column" aria-label="Navegacion principal">
+        <div class="nl-nav-section">@contextLabel</div>
         @foreach (var item in navItems)
         {
           var active = IsActive(item.Href);
@@ -109,8 +113,8 @@ else
       </nav>
 
       <div class="nl-sidebar-footer">
-        <div class="text-truncate">@currentUser!.Identity!.Name</div>
-        <div>@contextLabel</div>
+        <div class="nl-user text-truncate">@currentUser!.Identity!.Name</div>
+        <div>Sesion activa</div>
       </div>
     </aside>
 
@@ -152,7 +156,7 @@ else
         </div>
       </header>
 
-      <main class="nl-content" role="main">
+      <main class="nl-content" role="main" id="contenido" tabindex="-1">
         @RenderBody()
       </main>
     </div>

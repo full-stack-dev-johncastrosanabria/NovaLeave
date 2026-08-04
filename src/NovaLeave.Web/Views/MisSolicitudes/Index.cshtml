@@ -1,10 +1,17 @@
 @model NovaLeave.Web.ViewModels.MisSolicitudes.MisSolicitudesIndexViewModel
 @{
     ViewData["Title"] = "Mis solicitudes";
+    var requests = Model.Requests.ToList();
+    var pending = requests.Count(r => r.Status == NovaLeave.Domain.Enums.RequestStatus.Pending);
+    var approved = requests.Count(r => r.Status == NovaLeave.Domain.Enums.RequestStatus.Approved);
 }
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-  <p class="text-body-secondary mb-0">Solicitudes propias de vacaciones.</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+  <p class="text-body-secondary mb-0">
+    @requests.Count solicitud@(requests.Count == 1 ? "" : "es") &middot;
+    @pending pendiente@(pending == 1 ? "" : "s") &middot;
+    @approved aprobada@(approved == 1 ? "" : "s")
+  </p>
   <a class="btn btn-primary" href="/mis-solicitudes/crear">
     <i class="bi bi-plus-lg" aria-hidden="true"></i>
     <span class="ms-1">Nueva solicitud</span>
@@ -12,30 +19,31 @@
 </div>
 
 <div class="nl-card">
-  @if (!Model.Requests.Any())
+  @if (requests.Count == 0)
   {
-    <div class="text-center text-body-secondary py-5 px-3">
-      <i class="bi bi-journal-text d-block mb-2" style="font-size:2rem" aria-hidden="true"></i>
-      <p class="mb-3">Todavia no tienes solicitudes de vacaciones.</p>
-      <a class="btn btn-primary" href="/mis-solicitudes/crear">Crear la primera</a>
+    <div class="nl-empty">
+      <i class="bi bi-journal-text" aria-hidden="true"></i>
+      <p class="mb-1 fw-medium text-body">Todavia no tienes solicitudes</p>
+      <p class="mb-3">Crea tu primera solicitud de vacaciones para verla aqui.</p>
+      <a class="btn btn-primary btn-sm" href="/mis-solicitudes/crear">Crear solicitud</a>
     </div>
   }
   else
   {
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <caption class="px-3">Listado de solicitudes propias</caption>
+      <table class="table nl-table align-middle">
+        <caption class="visually-hidden">Listado de solicitudes propias</caption>
         <thead>
           <tr>
             <th scope="col">Inicio</th>
             <th scope="col">Fin</th>
             <th scope="col" class="text-end">Dias habiles</th>
             <th scope="col">Estado</th>
-            <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            <th scope="col" class="text-end"><span class="visually-hidden">Acciones</span></th>
           </tr>
         </thead>
         <tbody>
-          @foreach (var request in Model.Requests)
+          @foreach (var request in requests)
           {
             <tr>
               <td>@request.StartDate.ToString("yyyy-MM-dd")</td>

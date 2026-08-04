@@ -4,57 +4,95 @@
     ViewData["Title"] = "Crear solicitud";
 }
 
+<div class="row g-3">
+  <div class="col-lg-8">
+    <form method="post" id="createRequestForm" novalidate>
+      <div class="nl-card">
+        <div class="nl-card-header">
+          <h2>Nueva solicitud de vacaciones</h2>
+        </div>
 
-<form method="post" class="row g-3" id="createRequestForm">
-  @* "All" so business-rule failures added to ModelState (overlap, balance, date policy) are
-     visible too, not only field-level ones. *@
-  <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <div class="p-3 p-md-4">
+          @* "All" so business-rule failures added to ModelState (overlap, balance, date policy)
+             are surfaced too, not only field-level ones. role="alert" announces them. *@
+          <div asp-validation-summary="All" class="alert alert-danger d-none" role="alert" id="createErrors"></div>
 
-  <div class="col-md-4">
-    <label asp-for="InputMode" class="form-label">Modo de ingreso</label>
-    <select asp-for="InputMode" class="form-select" id="inputMode">
-      <option value="@RequestInputMode.DateRange">Rango de fechas</option>
-      <option value="@RequestInputMode.StartPlusDays">Inicio y dias habiles</option>
-    </select>
-    <span asp-validation-for="InputMode" class="text-danger"></span>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label asp-for="InputMode" class="form-label">Modo de ingreso</label>
+              <select asp-for="InputMode" class="form-select" id="inputMode" aria-describedby="modeHelp">
+                <option value="@RequestInputMode.DateRange">Rango de fechas</option>
+                <option value="@RequestInputMode.StartPlusDays">Inicio y dias habiles</option>
+              </select>
+              <div id="modeHelp" class="form-text">Elige como quieres indicar el periodo.</div>
+              <span asp-validation-for="InputMode" class="text-danger d-block" style="font-size:12px"></span>
+            </div>
+
+            <div class="col-md-6">
+              <label asp-for="StartDate" class="form-label">
+                Fecha de inicio <span class="nl-required" aria-hidden="true">*</span>
+              </label>
+              <input asp-for="StartDate" type="date" class="form-control" id="startDate" required aria-describedby="startHelp" />
+              <div id="startHelp" class="form-text">Debe ser a partir del dia siguiente.</div>
+              <span asp-validation-for="StartDate" class="text-danger d-block" style="font-size:12px"></span>
+            </div>
+
+            <div class="col-md-6">
+              <label asp-for="EndDate" class="form-label">Fecha de fin</label>
+              <input asp-for="EndDate" type="date" class="form-control" id="endDate" aria-describedby="endHelp" />
+              <div id="endHelp" class="form-text" data-mode-hint="startPlusDays" hidden>Se calcula a partir del inicio y los dias habiles.</div>
+              <span asp-validation-for="EndDate" class="text-danger d-block" style="font-size:12px"></span>
+            </div>
+
+            <div class="col-md-6">
+              <label asp-for="WorkingDays" class="form-label">Dias habiles</label>
+              <input asp-for="WorkingDays" type="number" min="1" class="form-control nl-num" id="workingDays" aria-describedby="daysHelp" />
+              <div id="daysHelp" class="form-text" data-mode-hint="dateRange">Calculado entre inicio y fin, sin sabados ni domingos.</div>
+              <span asp-validation-for="WorkingDays" class="text-danger d-block" style="font-size:12px"></span>
+            </div>
+
+            <div class="col-12">
+              <label asp-for="Reason" class="form-label">
+                Motivo <span class="nl-required" aria-hidden="true">*</span>
+              </label>
+              <textarea asp-for="Reason" class="form-control" rows="4" minlength="10" maxlength="500" required aria-describedby="reasonHelp"></textarea>
+              <div id="reasonHelp" class="form-text">
+                Entre 10 y 500 caracteres. <span id="reasonCount" class="nl-num">0</span>/500
+              </div>
+              <span asp-validation-for="Reason" class="text-danger d-block" style="font-size:12px"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 p-3 border-top">
+          <button type="submit" class="btn btn-primary" id="submitButton">
+            <span class="spinner-border spinner-border-sm me-1 d-none" id="submitSpinner" aria-hidden="true"></span>
+            <span id="submitLabel">Crear solicitud</span>
+          </button>
+          <a class="btn btn-outline-secondary" href="/mis-solicitudes">Cancelar</a>
+        </div>
+      </div>
+    </form>
   </div>
 
-  <div class="col-md-4">
-    <label asp-for="StartDate" class="form-label">Fecha de inicio</label>
-    <input asp-for="StartDate" type="date" class="form-control" id="startDate" />
-    <span asp-validation-for="StartDate" class="text-danger"></span>
+  <div class="col-lg-4">
+    <div class="nl-card p-3">
+      <h2 class="h6 mb-2">Como se calcula</h2>
+      <ul class="mb-0 ps-3" style="font-size:13px; color:var(--nl-muted-fg)">
+        <li class="mb-1">Solo cuentan dias habiles: de lunes a viernes.</li>
+        <li class="mb-1">Los feriados cuentan como dias habiles.</li>
+        <li class="mb-1">El inicio mas temprano es el dia siguiente a hoy.</li>
+        <li class="mb-1">Los dias se reservan al crear y se descuentan al aprobar.</li>
+        <li>El servidor recalcula y valida todo antes de guardar.</li>
+      </ul>
+    </div>
   </div>
-
-  <div class="col-md-4">
-    <label asp-for="EndDate" class="form-label">Fecha de fin</label>
-    <input asp-for="EndDate" type="date" class="form-control" id="endDate" />
-    <span asp-validation-for="EndDate" class="text-danger"></span>
-    <div class="form-text" data-mode-hint="startPlusDays" hidden>Se calcula a partir del inicio y los dias habiles.</div>
-  </div>
-
-  <div class="col-md-4">
-    <label asp-for="WorkingDays" class="form-label">Dias habiles</label>
-    <input asp-for="WorkingDays" type="number" min="1" class="form-control" id="workingDays" />
-    <span asp-validation-for="WorkingDays" class="text-danger"></span>
-    <div class="form-text" data-mode-hint="dateRange">Se calcula entre las fechas de inicio y fin, excluyendo sabados y domingos.</div>
-  </div>
-
-  <div class="col-12">
-    <label asp-for="Reason" class="form-label">Motivo</label>
-    <textarea asp-for="Reason" class="form-control" rows="4" maxlength="500"></textarea>
-    <span asp-validation-for="Reason" class="text-danger"></span>
-  </div>
-
-  <div class="col-12 d-flex gap-2">
-    <button type="submit" class="btn btn-primary">Crear solicitud</button>
-    <a class="btn btn-outline-secondary" href="/mis-solicitudes">Volver</a>
-  </div>
-</form>
+</div>
 
 @section Scripts {
 <script>
   // Presentation aid only. The server recalculates and revalidates every value it stores
-  // (UC-04 step 3), so nothing here is trusted.
+  // (UC-04 step 3), so nothing computed here is trusted.
   (function () {
     var form = document.getElementById('createRequestForm');
     if (!form) { return; }
@@ -63,6 +101,13 @@
     var start = document.getElementById('startDate');
     var end = document.getElementById('endDate');
     var days = document.getElementById('workingDays');
+    var reason = document.getElementById('Reason');
+    var counter = document.getElementById('reasonCount');
+    var errors = document.getElementById('createErrors');
+
+    // Only reveal the summary when it actually carries a message, so an empty alert is
+    // never announced to assistive technology.
+    if (errors && errors.textContent.trim().length > 0) { errors.classList.remove('d-none'); }
 
     function countWorkingDays(from, to) {
       if (!from || !to || to < from) { return ''; }
@@ -76,13 +121,8 @@
       return total;
     }
 
-    function parse(input) {
-      return input.value ? new Date(input.value + 'T00:00:00Z') : null;
-    }
-
-    function isDateRange() {
-      return (mode.value || '').toLowerCase().indexOf('startplusdays') === -1;
-    }
+    var parse = function (input) { return input.value ? new Date(input.value + 'T00:00:00Z') : null; };
+    var isDateRange = function () { return (mode.value || '').toLowerCase().indexOf('startplusdays') === -1; };
 
     function apply() {
       var dateRange = isDateRange();
@@ -91,29 +131,39 @@
       // calculation, never by typing.
       days.readOnly = dateRange;
       end.readOnly = !dateRange;
-      days.classList.toggle('bg-body-secondary', dateRange);
-      end.classList.toggle('bg-body-secondary', !dateRange);
 
       form.querySelectorAll('[data-mode-hint]').forEach(function (hint) {
-        var forRange = hint.getAttribute('data-mode-hint') === 'dateRange';
-        hint.hidden = forRange !== dateRange;
+        hint.hidden = (hint.getAttribute('data-mode-hint') === 'dateRange') !== dateRange;
       });
 
-      if (dateRange) {
-        days.value = countWorkingDays(parse(start), parse(end));
-      }
+      if (dateRange) { days.value = countWorkingDays(parse(start), parse(end)); }
     }
 
-    mode.addEventListener('change', apply);
-    start.addEventListener('change', apply);
-    end.addEventListener('change', apply);
+    ['change', 'input'].forEach(function (evt) {
+      mode.addEventListener(evt, apply);
+      start.addEventListener(evt, apply);
+      end.addEventListener(evt, apply);
+    });
     apply();
 
-    // A read-only control is still submitted, but the server ignores the derived value for the
-    // active mode; this keeps the posted payload consistent with what is displayed.
+    if (reason && counter) {
+      var updateCount = function () { counter.textContent = reason.value.length; };
+      reason.addEventListener('input', updateCount);
+      updateCount();
+    }
+
+    // Submit feedback: disable and show progress so the action is never ambiguous.
     form.addEventListener('submit', function () {
       days.readOnly = false;
       end.readOnly = false;
+      var button = document.getElementById('submitButton');
+      var spinner = document.getElementById('submitSpinner');
+      if (button && !button.disabled) {
+        spinner.classList.remove('d-none');
+        document.getElementById('submitLabel').textContent = 'Creando...';
+        // Defer disabling so the button still submits its value with the form.
+        setTimeout(function () { button.disabled = true; }, 0);
+      }
     });
   })();
 </script>

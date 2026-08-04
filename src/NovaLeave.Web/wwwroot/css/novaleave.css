@@ -1,32 +1,186 @@
 /*
-  NovaLeave application styles.
-  Extends CoreUI/Bootstrap variables and utilities rather than restating the framework
-  (constitution §11.2). Every status cue pairs colour with text and an icon, because colour
-  alone must never carry meaning.
+  NovaLeave design system.
+
+  Style:      Data-Dense Dashboard (operational/enterprise reporting)
+  Palette:    Professional blue + neutral grey, semantic status colours
+  Type:       Fira Sans (body) / Fira Code (tabular figures), self-hosted
+  Density:    8/10 — compact rows, 12px card padding, 8px grid gap
+
+  Extends CoreUI/Bootstrap variables rather than restating the framework
+  (constitution §11.2). Colour never carries meaning alone: every status pairs a
+  hue with an icon and a word.
 */
 
-:root {
-  --nl-sidebar-width: 15rem;
-  --nl-header-height: 3.5rem;
+/* ---------- self-hosted fonts (no CDN: constitution §7.2) ---------------- */
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap; /* avoid invisible text while loading */
+  src: url('../lib/fonts/fira-sans-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../lib/fonts/fira-sans-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../lib/fonts/fira-sans-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../lib/fonts/fira-sans-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../lib/fonts/fira-code-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../lib/fonts/fira-code-latin-600-normal.woff2') format('woff2');
 }
 
-/* ---------- shell ------------------------------------------------------- */
+/* ---------- tokens ------------------------------------------------------- */
+
+:root {
+  /* Layout — Data-Dense Dashboard reference values */
+  --nl-sidebar-width: 240px;
+  --nl-header-height: 56px;
+  --nl-row-height: 36px;
+  --nl-card-padding: 12px;
+  --nl-grid-gap: 8px;
+  --nl-radius: 8px;
+
+  /* Spacing rhythm (4/8pt) */
+  --nl-space-1: 4px;
+  --nl-space-2: 8px;
+  --nl-space-3: 12px;
+  --nl-space-4: 16px;
+  --nl-space-5: 24px;
+  --nl-space-6: 32px;
+
+  /* Semantic colour — professional blue + neutral grey.
+     Every pair below meets WCAG AA against its intended background. */
+  --nl-primary: #2563EB;
+  --nl-primary-hover: #1D4ED8;
+  --nl-on-primary: #FFFFFF;
+  --nl-accent: #047857;
+  --nl-background: #F1F5F9;
+  --nl-surface: #FFFFFF;
+  --nl-foreground: #0F172A;
+  --nl-muted-fg: #475569;   /* 7.0:1 on white — safe for secondary text */
+  --nl-border: #E2E8F0;
+  --nl-danger: #B91C1C;
+  --nl-warning: #92400E;
+  --nl-success: #047857;
+
+  /* Sidebar (dark rail) */
+  --nl-rail: #0F172A;
+  --nl-rail-fg: #E2E8F0;
+  --nl-rail-muted: #94A3B8;  /* 5.9:1 on the rail */
+
+  --nl-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --nl-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+
+  /* Motion — 150-300ms micro-interactions */
+  --nl-transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* CoreUI/Bootstrap variable overrides so framework components inherit the palette. */
+:root,
+[data-coreui-theme='light'] {
+  --cui-primary: var(--nl-primary);
+  --cui-primary-rgb: 37, 99, 235;
+  --cui-body-bg: var(--nl-background);
+  --cui-body-color: var(--nl-foreground);
+  --cui-border-color: var(--nl-border);
+  --cui-secondary-color: var(--nl-muted-fg);
+  --cui-border-radius: var(--nl-radius);
+  --cui-link-color: var(--nl-primary);
+  --cui-link-hover-color: var(--nl-primary-hover);
+  --bs-primary: var(--nl-primary);
+  --bs-body-bg: var(--nl-background);
+  --bs-body-color: var(--nl-foreground);
+  --bs-border-color: var(--nl-border);
+}
+
+/* ---------- base --------------------------------------------------------- */
 
 body {
+  font-family: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--nl-foreground);
+  background-color: var(--nl-background);
   min-height: 100vh;
-  background-color: var(--cui-tertiary-bg, #f8f9fa);
+  -webkit-font-smoothing: antialiased;
 }
 
-.nl-shell {
-  display: flex;
-  min-height: 100vh;
+h1, h2, h3, h4, h5, h6 { font-weight: 600; letter-spacing: -0.01em; }
+
+/* Tabular figures keep numeric columns from shifting width as values change. */
+.nl-num,
+.nl-calendar .nl-day-number,
+td.text-end,
+th.text-end {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
 }
+
+code, kbd, samp, pre { font-family: 'Fira Code', ui-monospace, SFMono-Regular, monospace; }
+
+/* Focus is always visible; never removed without replacement. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--nl-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.nl-sidebar a:focus-visible { outline-color: #FFFFFF; }
+
+/* Skip link: keyboard users reach content without traversing the whole rail. */
+.nl-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2000;
+  padding: var(--nl-space-2) var(--nl-space-4);
+  background: var(--nl-primary);
+  color: var(--nl-on-primary);
+  border-radius: 0 0 var(--nl-radius) 0;
+}
+.nl-skip:focus { left: 0; }
+
+/* ---------- shell -------------------------------------------------------- */
+
+.nl-shell { display: flex; min-height: 100vh; }
 
 .nl-sidebar {
   width: var(--nl-sidebar-width);
   flex: 0 0 var(--nl-sidebar-width);
-  background: linear-gradient(180deg, #1b2a4a 0%, #16233d 100%);
-  color: rgba(255, 255, 255, 0.85);
+  background: var(--nl-rail);
+  color: var(--nl-rail-fg);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -34,185 +188,234 @@ body {
   height: 100vh;
 }
 
-.nl-sidebar .nl-brand {
+.nl-brand {
   height: var(--nl-header-height);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0 1rem;
+  gap: var(--nl-space-2);
+  padding: 0 var(--nl-space-4);
   font-weight: 600;
-  font-size: 1.05rem;
-  color: #fff;
+  font-size: 1rem;
+  color: #FFFFFF;
   text-decoration: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex: 0 0 auto;
+}
+.nl-brand:hover { color: #FFFFFF; }
+
+.nl-nav-section {
+  padding: var(--nl-space-4) var(--nl-space-4) var(--nl-space-1);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nl-rail-muted);
 }
 
 .nl-sidebar .nav-link {
-  color: rgba(255, 255, 255, 0.78);
-  padding: 0.6rem 1rem;
+  color: var(--nl-rail-fg);
+  padding: 9px var(--nl-space-4);
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 10px;
+  font-size: 14px;
   border-left: 3px solid transparent;
+  transition: background-color var(--nl-transition), color var(--nl-transition);
 }
-
-.nl-sidebar .nav-link:hover {
-  color: #fff;
-  background-color: rgba(255, 255, 255, 0.06);
-}
-
+.nl-sidebar .nav-link:hover { color: #FFFFFF; background-color: rgba(255, 255, 255, 0.07); }
 .nl-sidebar .nav-link.active {
-  color: #fff;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-left-color: var(--cui-primary, #5856d6);
+  color: #FFFFFF;
+  background-color: rgba(37, 99, 235, 0.22);
+  border-left-color: var(--nl-primary);
   font-weight: 600;
 }
-
-.nl-sidebar .nav-link .bi {
-  font-size: 1.05rem;
-  width: 1.25rem;
-  text-align: center;
-}
+.nl-sidebar .nav-link .bi { font-size: 1rem; width: 1.15rem; text-align: center; flex: 0 0 auto; }
 
 .nl-sidebar-footer {
   margin-top: auto;
-  padding: 0.75rem 1rem;
+  padding: var(--nl-space-3) var(--nl-space-4);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  color: var(--nl-rail-muted);
 }
+.nl-sidebar-footer .nl-user { color: var(--nl-rail-fg); font-weight: 500; }
 
-.nl-main {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
+.nl-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
 
 .nl-header {
   height: var(--nl-header-height);
-  background-color: var(--cui-body-bg, #fff);
-  border-bottom: 1px solid var(--cui-border-color, #dee2e6);
+  background-color: var(--nl-surface);
+  border-bottom: 1px solid var(--nl-border);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0 1.25rem;
+  gap: var(--nl-space-3);
+  padding: 0 var(--nl-space-5);
   position: sticky;
   top: 0;
   z-index: 1020;
 }
 
-.nl-content {
-  padding: 1.5rem 1.25rem 3rem;
-}
+.nl-page-title { font-size: 1.125rem; font-weight: 600; margin: 0; }
 
-/* Mobile: the sidebar collapses into an offcanvas panel. */
+.nl-content { padding: var(--nl-space-5); }
+.nl-content > * + * { margin-top: var(--nl-space-4); }
+
 @media (max-width: 991.98px) {
   .nl-sidebar {
     position: fixed;
     z-index: 1045;
     transform: translateX(-100%);
-    transition: transform 0.2s ease-in-out;
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
   .nl-sidebar.show { transform: translateX(0); }
-  .nl-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1040;
-  }
+  .nl-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); z-index: 1040; }
+  .nl-content { padding: var(--nl-space-4); }
+  .nl-header { padding: 0 var(--nl-space-4); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .nl-sidebar { transition: none; }
-}
-
-/* ---------- content ----------------------------------------------------- */
-
-.nl-page-title {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin: 0;
-}
+/* ---------- surfaces ----------------------------------------------------- */
 
 .nl-card {
-  background-color: var(--cui-body-bg, #fff);
-  border: 1px solid var(--cui-border-color, #dee2e6);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  background-color: var(--nl-surface);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--nl-radius);
+  box-shadow: var(--nl-shadow-sm);
 }
 
-.nl-stat {
+.nl-card-header {
+  padding: var(--nl-space-3) var(--nl-space-4);
+  border-bottom: 1px solid var(--nl-border);
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nl-space-3);
 }
+.nl-card-header h2, .nl-card-header h3 { font-size: 0.875rem; font-weight: 600; margin: 0; }
 
+.nl-stat { padding: var(--nl-space-4); display: flex; flex-direction: column; gap: 2px; }
+.nl-stat-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--nl-muted-fg);
+}
 .nl-stat-value {
   font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.nl-stat-hint { font-size: 12px; color: var(--nl-muted-fg); }
+.nl-stat-accent { border-left: 3px solid var(--nl-primary); }
+
+/* ---------- tables ------------------------------------------------------- */
+
+.nl-table { margin-bottom: 0; font-size: 14px; }
+.nl-table > thead > tr > th {
+  height: var(--nl-row-height);
+  padding: 0 var(--nl-space-3);
+  vertical-align: middle;
+  background-color: #F8FAFC;
+  border-bottom: 1px solid var(--nl-border);
+  font-size: 11px;
   font-weight: 600;
-  line-height: 1.1;
-}
-
-.nl-stat-label {
-  font-size: 0.8rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--cui-secondary-color, #6c757d);
+  color: var(--nl-muted-fg);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
+.nl-table > tbody > tr > td {
+  height: var(--nl-row-height);
+  padding: 6px var(--nl-space-3);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--nl-border);
+}
+.nl-table > tbody > tr:last-child > td { border-bottom: 0; }
+.nl-table > tbody > tr:hover { background-color: #F8FAFC; }
 
-/* Status badges always carry an icon and a word, never colour alone. */
-.nl-status { display: inline-flex; align-items: center; gap: 0.35rem; }
+.nl-empty { padding: var(--nl-space-6) var(--nl-space-4); text-align: center; color: var(--nl-muted-fg); }
+.nl-empty .bi { font-size: 2rem; display: block; margin-bottom: var(--nl-space-2); opacity: 0.6; }
 
-/* ---------- calendar ---------------------------------------------------- */
+/* ---------- status ------------------------------------------------------- */
 
-.nl-calendar { table-layout: fixed; }
+.nl-status { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.badge.nl-status { font-weight: 500; font-size: 12px; padding: 4px 8px; }
 
+/* ---------- calendar ----------------------------------------------------- */
+
+.nl-calendar { table-layout: fixed; margin-bottom: 0; }
 .nl-calendar th {
-  font-size: 0.75rem;
+  padding: var(--nl-space-2);
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--cui-secondary-color, #6c757d);
+  letter-spacing: 0.05em;
+  color: var(--nl-muted-fg);
   font-weight: 600;
+  text-align: center;
+  background-color: #F8FAFC;
 }
-
-.nl-calendar td {
-  height: 5.25rem;
-  vertical-align: top;
-  padding: 0.35rem;
-}
-
-.nl-calendar .nl-day-number { font-size: 0.8rem; color: var(--cui-secondary-color, #6c757d); }
-.nl-calendar .nl-outside { background-color: var(--cui-tertiary-bg, #f8f9fa); }
-.nl-calendar .nl-weekend { background-color: rgba(0, 0, 0, 0.02); }
+.nl-calendar td { height: 84px; vertical-align: top; padding: 5px; }
+.nl-calendar .nl-day-number { font-size: 12px; font-weight: 500; color: var(--nl-muted-fg); }
+.nl-calendar .nl-outside { background-color: #F8FAFC; }
+.nl-calendar .nl-weekend { background-color: #F8FAFC; }
 .nl-calendar .nl-today .nl-day-number {
-  background-color: var(--cui-primary, #5856d6);
-  color: #fff;
-  border-radius: 50%;
-  padding: 0.1rem 0.4rem;
+  background-color: var(--nl-primary);
+  color: #FFFFFF;
+  border-radius: 999px;
+  padding: 1px 7px;
   font-weight: 600;
 }
 
 .nl-event {
   display: block;
-  font-size: 0.72rem;
-  padding: 0.1rem 0.35rem;
-  border-radius: 0.25rem;
-  margin-top: 0.15rem;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 3px;
   text-decoration: none;
-  border-left: 3px solid currentColor;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: filter var(--nl-transition);
+}
+.nl-event:hover { filter: brightness(0.92); }
+
+/* ---------- forms -------------------------------------------------------- */
+
+.form-label { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.form-text { font-size: 12px; color: var(--nl-muted-fg); }
+.form-control, .form-select { font-size: 14px; }
+.form-control:focus, .form-select:focus {
+  border-color: var(--nl-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+/* A derived field is read-only: visibly inert, but still readable (not disabled). */
+.form-control[readonly] { background-color: #F1F5F9; color: var(--nl-muted-fg); cursor: not-allowed; }
+.nl-required { color: var(--nl-danger); font-weight: 600; }
+
+.btn { font-size: 14px; font-weight: 500; transition: background-color var(--nl-transition), border-color var(--nl-transition); }
+.btn-primary { --cui-btn-bg: var(--nl-primary); --cui-btn-border-color: var(--nl-primary); --cui-btn-hover-bg: var(--nl-primary-hover); --cui-btn-hover-border-color: var(--nl-primary-hover); }
+
+/* ---------- motion ------------------------------------------------------- */
+
+/* Motion must never be required to understand the interface. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .nl-sidebar { transition: none; }
 }
 
-/* Focus must stay visible for keyboard users. */
-a:focus-visible,
-button:focus-visible,
-.nav-link:focus-visible {
-  outline: 2px solid var(--cui-primary, #5856d6);
-  outline-offset: 2px;
-}
-
-/* htmx: show a subtle busy state on the element being swapped. */
+/* htmx busy state on the element being swapped. */
 .htmx-request.nl-busy { opacity: 0.6; pointer-events: none; }

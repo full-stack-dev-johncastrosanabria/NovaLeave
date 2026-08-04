@@ -27,7 +27,12 @@ public sealed class CalendarioController : Controller
     public async Task<IActionResult> Index(string? context = null, int? year = null, int? month = null, CancellationToken cancellationToken = default)
     {
         var userId = _currentUser.UserId ?? throw new InvalidOperationException("Usuario autenticado requerido.");
-        if (User.IsInRole("HR"))
+
+        // The shared calendar carries no HR behaviour and must never expose organization-wide
+        // data, so an HR-only identity is denied and directed to /rrhh/calendario (RBFV 7.3).
+        // An identity that *also* holds User or Approver still reaches its own personal or
+        // anonymized approver scope here, which RBFV 5.2 authorizes for those roles.
+        if (User.IsInRole("HR") && !User.IsInRole("User") && !User.IsInRole("Approver"))
         {
             return Forbid();
         }
