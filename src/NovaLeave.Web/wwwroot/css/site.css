@@ -222,15 +222,6 @@ a:hover {
   max-width: 1080px;
 }
 
-.nl-form-enter {
-  animation: nl-form-enter 220ms ease-out both;
-}
-
-@keyframes nl-form-enter {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .nl-form-section-heading {
   display: flex;
   align-items: flex-start;
@@ -851,18 +842,6 @@ a:hover {
 
 .nl-card-body {
   padding: clamp(18px, 2vw, 24px);
-}
-
-.nl-reveal {
-  opacity: 0;
-  transform: translateY(7px);
-  transition: opacity 240ms var(--nl-ease-standard) var(--nl-reveal-delay, 0ms),
-    transform 240ms var(--nl-ease-standard) var(--nl-reveal-delay, 0ms);
-}
-
-.nl-reveal.nl-reveal-visible {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 .nl-summary-card {

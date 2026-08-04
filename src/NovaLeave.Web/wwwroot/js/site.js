@@ -107,20 +107,3 @@ const validationPopover = document.querySelector("[data-validation-popover]");
 if (validationPopover) {
   requestAnimationFrame(() => validationPopover.focus({ preventScroll: true }));
 }
-
-(() => {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-  const targets = document.querySelectorAll(
-    ".nl-page-header, .nl-summary-card, .nl-module-card, main > .nl-content-container > .nl-card, main > .nl-content-container > section.nl-card"
-  );
-
-  targets.forEach((target, index) => {
-    target.classList.add("nl-reveal");
-    target.style.setProperty("--nl-reveal-delay", `${Math.min(index * 35, 175)}ms`);
-  });
-
-  requestAnimationFrame(() => {
-    targets.forEach((target) => target.classList.add("nl-reveal-visible"));
-  });
-})();
