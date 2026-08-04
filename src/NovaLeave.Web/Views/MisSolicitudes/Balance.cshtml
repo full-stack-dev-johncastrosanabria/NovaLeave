@@ -2,79 +2,42 @@
 @{
     ViewData["Title"] = "Mi saldo";
 }
-
 @functions {
-    private static string MovementLabel(NovaLeave.Domain.Enums.MovementType type)
+    private static string MovementLabel(NovaLeave.Domain.Enums.MovementType type) => type switch
     {
-        return type switch
-        {
-            NovaLeave.Domain.Enums.MovementType.Accrual => "Acumulacion mensual",
-            NovaLeave.Domain.Enums.MovementType.Reservation => "Reserva",
-            NovaLeave.Domain.Enums.MovementType.Release => "Liberacion",
-            NovaLeave.Domain.Enums.MovementType.Deduction => "Deduccion",
-            NovaLeave.Domain.Enums.MovementType.Restoration => "Restauracion",
-            _ => type.ToString()
-        };
-    }
+        NovaLeave.Domain.Enums.MovementType.Accrual => "Acumulación mensual",
+        NovaLeave.Domain.Enums.MovementType.Reservation => "Reserva",
+        NovaLeave.Domain.Enums.MovementType.Release => "Liberación",
+        NovaLeave.Domain.Enums.MovementType.Deduction => "Deducción",
+        NovaLeave.Domain.Enums.MovementType.Restoration => "Restauración",
+        _ => type.ToString()
+    };
 }
 
-<div class="nl-page-header">
-  <div>
-    <p class="nl-page-kicker">Mi espacio</p>
-    <h1 class="nl-page-title">Mi saldo</h1>
-    <p class="nl-page-description">Resumen e historial de movimientos de vacaciones.</p>
-  </div>
+<div class="nl-page-header nl-page-header-card">
+  <div class="nl-heading-group"><span class="nl-heading-icon"><partial name="_Icon" model="@("briefcase")" /></span><div><h1 class="nl-page-title">Mi Saldo Global de Vacaciones</h1><p class="nl-page-description">Resumen consolidado de días devengados, reservados y gozados para <strong>@Model.UserDisplayName</strong>.</p></div></div>
 </div>
 
 <div class="nl-summary-grid mb-4">
-  <section class="nl-card nl-summary-card" aria-label="Acumulado total"><div class="nl-summary-label">Acumulado total</div><div class="nl-summary-value">@Model.Balance.AccruedDays</div></section>
-  <section class="nl-card nl-summary-card" aria-label="Pendientes"><div class="nl-summary-label">Pendientes</div><div class="nl-summary-value">@Model.Balance.ReservedDays</div></section>
-  <section class="nl-card nl-summary-card" aria-label="Días gozados"><div class="nl-summary-label">Días gozados</div><div class="nl-summary-value">@Model.Balance.DeductedDays</div></section>
-  <section class="nl-card nl-summary-card" aria-label="Disponible"><div class="nl-summary-label">Disponible</div><div class="nl-summary-value">@Model.Balance.AvailableDays</div></section>
+  <section class="nl-card nl-summary-card nl-summary-primary"><div class="nl-summary-label">Acumulado total</div><div class="nl-summary-value">@Model.Balance.AccruedDays días</div><div class="nl-summary-help">Días acumulados desde fecha de ingreso</div></section>
+  <section class="nl-card nl-summary-card nl-summary-warning"><div class="nl-summary-label">Pendientes</div><div class="nl-summary-value">@Model.Balance.ReservedDays días</div><div class="nl-summary-help">Reservados por solicitudes en trámite</div></section>
+  <section class="nl-card nl-summary-card nl-summary-success"><div class="nl-summary-label">Días gozados</div><div class="nl-summary-value">@Model.Balance.DeductedDays días</div><div class="nl-summary-help">Deducidos por vacaciones aprobadas</div></section>
+  <section class="nl-card nl-summary-card nl-summary-available"><div class="nl-summary-label">Disponible</div><div class="nl-summary-value">@Model.Balance.AvailableDays días</div><div class="nl-summary-help">Saldo neto disponible para solicitar</div></section>
 </div>
 
-<section class="nl-card" aria-labelledby="movements-title">
-  <div class="nl-card-body">
-<h2 id="movements-title" class="h5 mb-3">Historial de movimientos</h2>
-@if (!Model.Balance.Movements.Any())
-{
-  <div class="nl-empty" role="status"><partial name="_EmptyStateIcon" /><strong>Aún no hay movimientos.</strong><span>Los movimientos de acumulación y solicitudes aparecerán aquí.</span></div>
-}
-else
-{
-<div class="table-responsive">
-  <table class="table nl-table nl-responsive-table align-middle">
-    <caption>Movimientos de saldo propios</caption>
-    <thead>
-      <tr>
-        <th scope="col">Fecha</th>
-        <th scope="col">Tipo</th>
-        <th scope="col">Dias</th>
-        <th scope="col">Solicitud</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach (var movement in Model.Balance.Movements)
-      {
-        <tr data-movement-type="@movement.Type">
-          <td data-label="Fecha">@movement.EffectiveAt.ToString("dd/MM/yyyy HH:mm")</td>
-          <td data-label="Movimiento">@MovementLabel(movement.Type)</td>
-          <td data-label="Días"><strong class="@(movement.Amount >= 0 ? "text-success" : "text-danger")">@(movement.Amount > 0 ? "+" : string.Empty)@movement.Amount</strong></td>
-          <td data-label="Solicitud">
-            @if (movement.RequestId is not null)
-            {
-              <a href="/mis-solicitudes/@movement.RequestId">Ver solicitud</a>
-            }
-            else
-            {
-              <span class="text-body-secondary">No aplica</span>
-            }
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
-</div>
-}
-  </div>
-</section>
+<section class="nl-card" aria-labelledby="movements-title"><div class="nl-card-body">
+  <h2 id="movements-title" class="h5 nl-section-title"><partial name="_Icon" model="@("clock")" />Cronología de Movimientos de Saldo</h2>
+  @if (!Model.Balance.Movements.Any())
+  {
+    <div class="nl-empty nl-empty-compact" role="status"><partial name="_EmptyStateIcon" /><strong>Aún no hay movimientos.</strong><span>Los movimientos de acumulación y solicitudes aparecerán aquí.</span></div>
+  }
+  else
+  {
+    <div class="table-responsive"><table class="table nl-table nl-responsive-table align-middle"><caption>Movimientos de saldo propios</caption><thead><tr><th scope="col">Fecha</th><th scope="col">Tipo movimiento</th><th scope="col">Días</th><th scope="col">Descripción</th><th scope="col">Solicitud</th></tr></thead><tbody>
+    @foreach (var movement in Model.Balance.Movements)
+    {
+      <tr><td data-label="Fecha">@movement.EffectiveAt.ToString("dd/MM/yyyy")</td><td data-label="Tipo movimiento">@MovementLabel(movement.Type)</td><td data-label="Días"><strong class="@(movement.Amount >= 0 ? "text-success" : "text-danger")">@(movement.Amount > 0 ? "+" : string.Empty)@movement.Amount</strong></td><td data-label="Descripción">Movimiento de @MovementLabel(movement.Type).ToLowerInvariant()</td><td data-label="Solicitud">@if (movement.RequestId is not null){<a href="/mis-solicitudes/@movement.RequestId">Ver solicitud</a>}else{<span class="text-body-secondary">No aplica</span>}</td></tr>
+    }
+    </tbody></table></div>
+  }
+</div></section>

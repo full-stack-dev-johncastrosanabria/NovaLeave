@@ -1,54 +1,58 @@
 @model NovaLeave.Web.ViewModels.MisSolicitudes.MisSolicitudesIndexViewModel
+@using NovaLeave.Domain.Enums
 @{
     ViewData["Title"] = "Mis solicitudes";
 }
 
-<div class="nl-page-header">
-  <div>
-    <p class="nl-page-kicker">Mi espacio</p>
-    <h1 class="nl-page-title">Mis solicitudes</h1>
-    <p class="nl-page-description">Solicitudes propias de vacaciones.</p>
+<div class="nl-page-header nl-page-header-card">
+  <div class="nl-heading-group">
+    <span class="nl-heading-icon"><partial name="_Icon" model="@("file")" /></span>
+    <div>
+      <h1 class="nl-page-title">Mis Solicitudes de Vacaciones</h1>
+      <p class="nl-page-description">Gestión de solicitudes personales para <strong>@Model.UserDisplayName</strong>.</p>
+    </div>
   </div>
-  <a class="btn btn-primary" href="/mis-solicitudes/crear">Nueva solicitud</a>
+  <a class="btn btn-primary" href="/mis-solicitudes/crear"><partial name="_Icon" model="@("plus")" />Nueva Solicitud de Vacaciones</a>
+</div>
+
+<div class="nl-summary-grid mb-4">
+  <section class="nl-card nl-summary-card nl-summary-primary" aria-label="Acumulado total"><div class="nl-summary-label">Acumulado total</div><div class="nl-summary-value">@Model.Balance.AccruedDays días</div><div class="nl-summary-help">Días devengados</div></section>
+  <section class="nl-card nl-summary-card nl-summary-warning" aria-label="Pendientes"><div class="nl-summary-label">Pendientes</div><div class="nl-summary-value">@Model.Balance.ReservedDays días</div><div class="nl-summary-help">Reserva activa</div></section>
+  <section class="nl-card nl-summary-card nl-summary-success" aria-label="Días gozados"><div class="nl-summary-label">Días gozados</div><div class="nl-summary-value">@Model.Balance.DeductedDays días</div><div class="nl-summary-help">Deducidos por aprobación</div></section>
+  <section class="nl-card nl-summary-card nl-summary-available" aria-label="Disponible"><div class="nl-summary-label">Disponible</div><div class="nl-summary-value">@Model.Balance.AvailableDays días</div><div class="nl-summary-help">Saldo neto disponible</div></section>
 </div>
 
 <section class="nl-card" aria-labelledby="requests-title">
   <div class="nl-card-body">
-    <h2 id="requests-title" class="h5 mb-3">Mi historial</h2>
+    <div class="nl-section-heading">
+      <h2 id="requests-title" class="h5 mb-0">Historial de Solicitudes <span class="nl-count-badge">@Model.Requests.Count</span></h2>
+      <label class="nl-filter-control"><span class="visually-hidden">Filtrar por estado</span><partial name="_Icon" model="@("filter")" /><select class="form-select" data-request-status-filter><option value="">Todos los Estados</option><option value="Pending">Pendiente</option><option value="Approved">Aprobada</option><option value="Rejected">Rechazada</option><option value="Cancelled">Cancelada</option></select></label>
+    </div>
     @if (!Model.Requests.Any())
     {
       <div class="nl-empty" role="status"><partial name="_EmptyStateIcon" /><strong>Aún no tienes solicitudes.</strong><span>Cuando registres vacaciones, podrás consultar aquí su estado y detalle.</span><a class="btn btn-primary" href="/mis-solicitudes/crear">Crear primera solicitud</a></div>
     }
     else
     {
-  <div class="table-responsive">
-  <table class="table nl-table nl-responsive-table align-middle">
-    <caption>Listado de solicitudes propias</caption>
-    <thead>
-      <tr>
-        <th scope="col">Inicio</th>
-        <th scope="col">Fin</th>
-        <th scope="col">Dias habiles</th>
-        <th scope="col">Estado</th>
-        <th scope="col">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach (var request in Model.Requests)
-      {
-        <tr>
-          <td data-label="Inicio">@request.StartDate.ToString("dd/MM/yyyy")</td>
-          <td data-label="Fin">@request.EndDate.ToString("dd/MM/yyyy")</td>
-          <td data-label="Días hábiles">@request.WorkingDays</td>
-          <td data-label="Estado"><partial name="_StatusBadge" model="request.Status.ToString()" /></td>
-          <td data-label="Acción">
-            <a class="btn btn-sm btn-outline-primary" href="/mis-solicitudes/@request.Id">Ver detalle</a>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
-</div>
+      <div class="table-responsive">
+        <table class="table nl-table nl-responsive-table align-middle">
+          <caption>Listado de solicitudes propias</caption>
+          <thead><tr><th scope="col">ID</th><th scope="col">Rango de fechas</th><th scope="col">Días hábiles</th><th scope="col">Estado</th><th scope="col">Fecha creación</th><th scope="col">Acciones</th></tr></thead>
+          <tbody>
+          @foreach (var request in Model.Requests)
+          {
+            <tr data-request-status="@request.Status">
+              <td data-label="ID"><a class="nl-request-id" href="/mis-solicitudes/@request.Id">#req-@request.Id.ToString("N")[..6]</a></td>
+              <td data-label="Rango de fechas"><strong>@request.StartDate.ToString("yyyy-MM-dd") al @request.EndDate.ToString("yyyy-MM-dd")</strong></td>
+              <td data-label="Días hábiles"><strong>@request.WorkingDays días</strong></td>
+              <td data-label="Estado"><partial name="_StatusBadge" model="request.Status.ToString()" /></td>
+              <td data-label="Fecha creación">@request.CreatedAtUtc.ToString("d/M/yyyy")</td>
+              <td data-label="Acciones"><div class="nl-row-actions"><a class="btn btn-sm btn-light" href="/mis-solicitudes/@request.Id"><partial name="_Icon" model="@("eye")" />Ver</a>@if (request.Status == RequestStatus.Pending){<a class="btn btn-sm btn-outline-warning" href="/mis-solicitudes/@request.Id/editar"><partial name="_Icon" model="@("edit")" />Editar</a>}</div></td>
+            </tr>
+          }
+          </tbody>
+        </table>
+      </div>
     }
   </div>
 </section>

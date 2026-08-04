@@ -33,21 +33,31 @@
   <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+  <svg class="visually-hidden" aria-hidden="true" focusable="false">
+    <symbol id="nl-icon-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 12h6M9 16h6" /></symbol>
+    <symbol id="nl-icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+    <symbol id="nl-icon-briefcase" viewBox="0 0 24 24"><path d="M4 8h16v12H4zM9 8V5h6v3M4 12h16M9 12v2M15 12v2" /></symbol>
+    <symbol id="nl-icon-calendar" viewBox="0 0 24 24"><path d="M4 6h16v14H4zM8 3v6M16 3v6M4 10h16" /></symbol>
+    <symbol id="nl-icon-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5zM3 12l9 5 9-5M3 16l9 5 9-5" /></symbol>
+    <symbol id="nl-icon-users" viewBox="0 0 24 24"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM2 21v-2a6 6 0 0 1 12 0v2M17 11a3 3 0 1 0 0-6M16 15a5 5 0 0 1 6 5v1" /></symbol>
+    <symbol id="nl-icon-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6zM12 8v5M12 17h.01" /></symbol>
+    <symbol id="nl-icon-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></symbol>
+    <symbol id="nl-icon-edit" viewBox="0 0 24 24"><path d="m4 16-1 5 5-1L19 9l-4-4zM13 7l4 4" /></symbol>
+    <symbol id="nl-icon-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z" /></symbol>
+    <symbol id="nl-icon-arrow" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
+    <symbol id="nl-icon-arrow-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6M9 12h10" /></symbol>
+    <symbol id="nl-icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
+    <symbol id="nl-icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="m8 12 3 3 5-6" /></symbol>
+    <symbol id="nl-icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></symbol>
+  </svg>
   <div class="nl-shell">
   <header class="nl-topbar">
     <nav class="navbar navbar-expand-lg" aria-label="Navegacion principal">
       <div class="container-fluid nl-shell-container">
-        <a class="navbar-brand d-inline-flex align-items-center gap-2 fw-bold" href="@activeRoot">
-          <span class="nl-brand-mark" aria-hidden="true">N</span>
-          <span>NovaLeave</span>
+        <a class="navbar-brand d-inline-flex align-items-center gap-2" href="@activeRoot" aria-label="NovaLeave">
+          <span class="nl-brand-mark" aria-hidden="true">NL</span>
+          <span class="nl-brand-copy"><strong>NovaLeave</strong><small>Gestión de vacaciones</small></span>
         </a>
-        @if (User.Identity?.IsAuthenticated == true)
-        {
-          <span class="nl-context-chip" aria-label="Contexto activo: @activeContextLabel">
-            <span class="nl-context-role">@activeRoleLabel</span>
-            <span class="nl-context-space">@activeSpaceLabel</span>
-          </span>
-        }
         @if (User.Identity?.IsAuthenticated == true)
         {
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Abrir navegacion">
@@ -57,25 +67,25 @@
           <ul class="navbar-nav nl-primary-nav me-auto mb-2 mb-lg-0">
             @if (hasUserContext && activeContext == "User")
             {
-              <li class="nav-item"><a class="nav-link @(path.Equals("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes">Mi espacio</a></li>
-              <li class="nav-item"><a class="nav-link @(path.StartsWith("/mis-solicitudes/crear", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes/crear">Nueva solicitud</a></li>
-              <li class="nav-item"><a class="nav-link @(path.Equals("/saldo", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/saldo">Mi saldo</a></li>
-              <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "User" ? "active" : string.Empty)" href="/calendario?context=User">Calendario</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/mis-solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes"><partial name="_Icon" model="@("file")" />Mis Solicitudes</a></li>
+              <li class="nav-item"><a class="nav-link @(path.StartsWith("/mis-solicitudes/crear", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/mis-solicitudes/crear"><partial name="_Icon" model="@("plus")" />Crear Solicitud</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/saldo", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/saldo"><partial name="_Icon" model="@("briefcase")" />Mi Saldo</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "User" ? "active" : string.Empty)" href="/calendario?context=User"><partial name="_Icon" model="@("calendar")" />Mi Calendario</a></li>
             }
             @if (hasApproverContext && activeContext == "Approver")
             {
-              <li class="nav-item"><a class="nav-link @(path.Equals("/aprobaciones", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/aprobaciones">Aprobaciones</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/aprobaciones", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/aprobaciones"><partial name="_Icon" model="@("check")" />Aprobaciones</a></li>
               <li class="nav-item"><a class="nav-link @(path.Equals("/aprobaciones/historial", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/aprobaciones/historial">Historial</a></li>
               <li class="nav-item"><a class="nav-link @(path.Equals("/calendario", StringComparison.OrdinalIgnoreCase) && activeContext == "Approver" ? "active" : string.Empty)" href="/calendario?context=Approver">Calendario</a></li>
             }
             @if (hasHrContext && activeContext == "HR")
             {
-              <li class="nav-item"><a class="nav-link @(path.Equals("/rrhh", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh">Inicio</a></li>
-              <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/solicitudes">Solicitudes</a></li>
-              <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/calendario", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/calendario">Calendario organizacional</a></li>
-              <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/saldos", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/saldos">Saldos</a></li>
-              <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/auditoria", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/auditoria">Auditoria</a></li>
-              <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/aprobadores", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/aprobadores">Aprobadores</a></li>
+              <li class="nav-item"><a class="nav-link @(path.Equals("/rrhh", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh"><partial name="_Icon" model="@("briefcase")" />Panel RRHH</a></li>
+              <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/solicitudes", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/solicitudes"><partial name="_Icon" model="@("file")" />Solicitudes</a></li>
+              <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/calendario", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/calendario"><partial name="_Icon" model="@("calendar")" />Calendario Global</a></li>
+              <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/saldos", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/saldos"><partial name="_Icon" model="@("briefcase")" />Saldos Org.</a></li>
+              <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/aprobadores", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/aprobadores"><partial name="_Icon" model="@("users")" />Aprobadores</a></li>
+              <li class="nav-item"><a class="nav-link @(path.StartsWith("/rrhh/auditoria", StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)" href="/rrhh/auditoria"><partial name="_Icon" model="@("shield")" />Auditoría</a></li>
             }
           </ul>
           @if (User.Identity?.IsAuthenticated == true)
@@ -104,7 +114,7 @@
               <div class="dropdown">
                 <button class="btn nl-user-menu dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menú de usuario">
                   <span class="nl-user-avatar" aria-hidden="true">@((User.Identity.Name ?? "U")[0].ToString().ToUpperInvariant())</span>
-                  <span class="nl-user-email">@(User.Identity.Name ?? "Usuario")</span>
+                  <span class="nl-user-copy"><strong>@(User.Identity.Name ?? "Usuario")</strong><small>@activeRoleLabel</small></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li><span class="dropdown-item-text fw-semibold">@(User.Identity.Name ?? "Usuario autenticado")</span></li>

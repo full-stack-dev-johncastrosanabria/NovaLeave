@@ -54,9 +54,20 @@ public sealed class RRHHController : Controller
     }
 
     [HttpGet("/rrhh")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        return View(new RRHHDashboardViewModel());
+        var requests = await _getRequests.HandleAsync(new GetHRRequestListQuery(1, 1), cancellationToken);
+        var pending = await _getRequests.HandleAsync(new GetHRRequestListQuery(1, 1, RequestStatus.Pending), cancellationToken);
+        var approved = await _getRequests.HandleAsync(new GetHRRequestListQuery(1, 1, RequestStatus.Approved), cancellationToken);
+        var balances = await _getBalances.HandleAsync(new GetHRBalancesQuery(1, 1), cancellationToken);
+        var approvers = await _listCapabilities.HandleAsync(cancellationToken);
+        return View(new RRHHDashboardViewModel(
+            requests.TotalCount,
+            pending.TotalCount,
+            approved.TotalCount,
+            balances.TotalCount,
+            approvers.Count,
+            approvers.Count(item => item.CanResolveRequests)));
     }
 
     [HttpGet("/rrhh/solicitudes")]

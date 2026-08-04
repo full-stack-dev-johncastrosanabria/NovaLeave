@@ -3,49 +3,22 @@
     ViewData["Title"] = "Saldos RRHH";
 }
 
-<div class="nl-page-header">
-  <div>
-    <p class="nl-page-kicker">RRHH</p>
-    <h1 class="nl-page-title">Saldos</h1>
-    <p class="nl-page-description">Consulta de saldos globales de vacaciones.</p>
-  </div>
-  <div class="d-flex flex-wrap gap-2">
-    <span class="nl-badge nl-readonly">Solo lectura</span>
-    <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
-  </div>
+<div class="nl-page-header nl-page-header-card">
+  <div class="nl-heading-group"><span class="nl-heading-icon"><partial name="_Icon" model="@("briefcase")" /></span><div><h1 class="nl-page-title">Saldos de Vacaciones Organizacionales (RRHH)</h1><p class="nl-page-description">Resumen consolidado de saldos devengados, reservados y disfrutados por colaborador.</p></div></div>
+  <span class="nl-badge nl-readonly">Solo Lectura (Modificación de saldos deshabilitada)</span>
 </div>
 
-<section class="nl-card">
-  <div class="nl-card-body">
-<div class="table-responsive">
-  <table class="table nl-table nl-responsive-table align-middle">
-    <caption>Saldos globales de vacaciones</caption>
-    <thead>
-      <tr>
-        <th scope="col">Usuario</th>
-        <th scope="col">Acumulado total</th>
-        <th scope="col">Pendientes</th>
-        <th scope="col">Días gozados</th>
-        <th scope="col">Disponible</th>
-        <th scope="col">Movimientos</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach (var balance in Model.Balances.Items)
-      {
-        <tr>
-          <td data-label="Persona"><strong>@balance.UserName</strong></td>
-          <td data-label="Acumulado total">@balance.AccruedDays</td>
-          <td data-label="Pendientes">@balance.ReservedDays</td>
-          <td data-label="Días gozados">@balance.DeductedDays</td>
-          <td data-label="Disponible"><strong>@balance.AvailableDays</strong></td>
-          <td data-label="Movimientos"><a class="btn btn-sm btn-outline-primary" href="/rrhh/saldos/@balance.UserId">Ver movimientos</a></td>
-        </tr>
-      }
-    </tbody>
-  </table>
-</div>
-  </div>
-</section>
+<section class="nl-card"><div class="nl-card-body">
+  <div class="nl-section-heading"><h2 class="h5 mb-0">Colaboradores Registrados: <strong class="text-primary">@Model.Balances.TotalCount</strong></h2></div>
+  <div class="table-responsive"><table class="table nl-table nl-responsive-table align-middle"><caption>Saldos globales de vacaciones</caption><thead><tr><th scope="col">Colaborador</th><th scope="col">Acumulado total</th><th scope="col">Pendientes</th><th scope="col">Días gozados</th><th scope="col">Disponible</th><th scope="col">Acciones</th></tr></thead><tbody>
+  @foreach (var balance in Model.Balances.Items)
+  {
+    <tr><td data-label="Colaborador"><strong>@balance.UserName</strong></td><td data-label="Acumulado total"><strong class="text-primary">@balance.AccruedDays días</strong></td><td data-label="Pendientes"><strong class="text-warning">@balance.ReservedDays días</strong></td><td data-label="Días gozados"><strong class="text-success">@balance.DeductedDays días</strong></td><td data-label="Disponible"><strong>@balance.AvailableDays días</strong></td><td data-label="Acciones"><a class="btn btn-sm btn-light" href="/rrhh/saldos/@balance.UserId"><partial name="_Icon" model="@("eye")" />Cronología</a></td></tr>
+  }
+  </tbody></table></div>
+</div></section>
 
-<p class="text-body-secondary">Pagina @Model.Balances.Page de @Math.Max(1, (int)Math.Ceiling(Model.Balances.TotalCount / (double)Model.Balances.PageSize))</p>
+@if (Model.Balances.TotalCount > Model.Balances.PageSize)
+{
+  <p class="text-body-secondary mt-3">Página @Model.Balances.Page de @Math.Max(1, (int)Math.Ceiling(Model.Balances.TotalCount / (double)Model.Balances.PageSize))</p>
+}

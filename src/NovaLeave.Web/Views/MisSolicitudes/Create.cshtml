@@ -4,135 +4,76 @@
     ViewData["Title"] = "Crear solicitud";
 }
 
-<div class="nl-page-header">
-  <div>
-    <p class="nl-page-kicker">Mi espacio</p>
-    <h1 class="nl-page-title">Crear solicitud de vacaciones</h1>
-    <p class="nl-page-description">Selecciona el modo de ingreso aprobado y completa los datos requeridos.</p>
+<div class="nl-narrow-page">
+  <div class="nl-page-header nl-page-header-card">
+    <div class="nl-heading-group">
+      <a class="btn btn-light nl-icon-button" href="/mis-solicitudes" aria-label="Volver a mis solicitudes"><partial name="_Icon" model="@("arrow-left")" /></a>
+      <div><h1 class="nl-page-title"><span class="nl-title-icon"><partial name="_Icon" model="@("plus")" /></span>Crear Solicitud de Vacaciones</h1><p class="nl-page-description">Completa los datos del periodo requerido. Saldo disponible actual: <strong class="text-primary">@Model.AvailableDays días hábiles</strong></p></div>
+    </div>
   </div>
+
+  <section class="nl-card nl-form-card"><div class="nl-card-body">
+    <form method="post" id="createRequestForm" data-submit-once data-available-days="@Model.AvailableDays">
+      <partial name="_ValidationSummary" />
+      <fieldset class="mb-4">
+        <legend class="form-label text-uppercase">Modo de ingreso de fechas:</legend>
+        <div class="nl-segmented nl-segmented-two" id="inputMode">
+          <label class="nl-segment-option"><input asp-for="InputMode" type="radio" value="@RequestInputMode.DateRange" /><span>Fecha inicio + Fecha fin</span><partial name="_Icon" model="@("check")" /></label>
+          <label class="nl-segment-option"><input asp-for="InputMode" type="radio" value="@RequestInputMode.StartPlusDays" /><span>Fecha inicio + Cantidad de días</span><partial name="_Icon" model="@("check")" /></label>
+        </div>
+        <span asp-validation-for="InputMode" class="text-danger"></span>
+      </fieldset>
+
+      <div class="row g-3">
+        <div class="col-md-6"><label asp-for="StartDate" class="form-label">Fecha de Inicio (Lunes a Viernes):</label><input asp-for="StartDate" type="date" class="form-control" id="startDate" /><span asp-validation-for="StartDate" class="text-danger"></span></div>
+        <div class="col-md-6" data-date-range-field><label asp-for="EndDate" class="form-label">Fecha de Fin:</label><input asp-for="EndDate" type="date" class="form-control" id="endDate" /><span asp-validation-for="EndDate" class="text-danger"></span></div>
+        <div class="col-md-6" data-days-field hidden><label asp-for="WorkingDays" class="form-label">Cantidad de días hábiles:</label><input asp-for="WorkingDays" type="number" min="1" class="form-control" id="workingDays" /><span asp-validation-for="WorkingDays" class="text-danger"></span></div>
+      </div>
+
+      <div class="nl-calculation-panel my-4" role="status" aria-live="polite">
+        <div class="nl-calculation-title"><span class="nl-info-icon"><partial name="_Icon" model="@("info")" /></span>Resumen de Días Calculados:</div>
+        <div class="nl-calculation-grid"><div><span>Días hábiles calculados:</span><strong id="calculatedDays">0 días</strong></div><div><span>Fecha fin calculada:</span><strong id="calculatedEnd">—</strong></div><div><span>Saldo posterior:</span><strong class="text-success" id="calculatedBalance">@Model.AvailableDays días</strong></div></div>
+      </div>
+
+      <div class="mb-4"><label asp-for="Reason" class="form-label">Motivo de la Solicitud (10 a 500 caracteres):</label><textarea asp-for="Reason" class="form-control" rows="5" maxlength="500" placeholder="Describe el motivo o justificativo de tu solicitud de vacaciones..." data-character-source></textarea><span asp-validation-for="Reason" class="text-danger"></span><div class="text-end form-text" data-character-count>0 / 500 caracteres</div></div>
+
+      <div class="nl-form-actions"><a class="btn btn-light" href="/mis-solicitudes">Cancelar</a><button type="submit" class="btn btn-primary" data-submit-button>Enviar Solicitud de Vacaciones</button></div>
+    </form>
+  </div></section>
 </div>
-
-<section class="nl-card nl-form-card">
-  <div class="nl-card-body">
-<form method="post" class="row g-3" id="createRequestForm" data-submit-once>
-  <partial name="_ValidationSummary" />
-  <div class="col-12 nl-form-section-heading">
-    <span class="nl-form-step" aria-hidden="true">1</span>
-    <div><h2 class="h5 mb-1">Periodo de vacaciones</h2><p class="mb-0 text-body-secondary">Elige cómo deseas indicar el periodo. Los cálculos mostrados son informativos.</p></div>
-  </div>
-  <div class="col-lg-4">
-    <label asp-for="InputMode" class="form-label">Modo de ingreso</label>
-    <select asp-for="InputMode" class="form-select" id="inputMode">
-      <option value="@RequestInputMode.DateRange">Fecha inicio + Fecha fin</option>
-      <option value="@RequestInputMode.StartPlusDays">Fecha inicio + Cantidad de dias</option>
-    </select>
-    <span asp-validation-for="InputMode" class="text-danger"></span>
-  </div>
-
-  <div class="col-lg-4">
-    <label asp-for="StartDate" class="form-label">Fecha de inicio</label>
-    <input asp-for="StartDate" type="date" class="form-control" id="startDate" />
-    <span asp-validation-for="StartDate" class="text-danger"></span>
-  </div>
-
-  <div class="col-lg-4">
-    <label asp-for="EndDate" class="form-label">Fecha de fin</label>
-    <input asp-for="EndDate" type="date" class="form-control" id="endDate" />
-    <span asp-validation-for="EndDate" class="text-danger"></span>
-    <div class="form-text" data-mode-hint="startPlusDays" hidden>Se calcula a partir del inicio y los dias habiles.</div>
-  </div>
-
-  <div class="col-lg-4">
-    <label asp-for="WorkingDays" class="form-label">Dias habiles</label>
-    <input asp-for="WorkingDays" type="number" min="1" class="form-control" id="workingDays" />
-    <span asp-validation-for="WorkingDays" class="text-danger"></span>
-    <div class="form-text" data-mode-hint="dateRange">Se calcula entre las fechas de inicio y fin, excluyendo sabados y domingos.</div>
-  </div>
-
-  <div class="col-12 nl-form-divider" aria-hidden="true"></div>
-  <div class="col-12 nl-form-section-heading">
-    <span class="nl-form-step" aria-hidden="true">2</span>
-    <div><h2 class="h5 mb-1">Detalle de la solicitud</h2><p class="mb-0 text-body-secondary">Incluye un motivo breve que ayude a revisar tu solicitud.</p></div>
-  </div>
-  <div class="col-12">
-    <label asp-for="Reason" class="form-label">Motivo</label>
-    <textarea asp-for="Reason" class="form-control" rows="4" maxlength="500" data-character-source></textarea>
-    <span asp-validation-for="Reason" class="text-danger"></span>
-    <div class="d-flex justify-content-between"><span class="form-text">Explique brevemente el motivo de la solicitud.</span><span class="form-text" data-character-count>0 / 500</span></div>
-  </div>
-
-  <div class="col-12 nl-form-actions pt-2">
-    <button type="submit" class="btn btn-primary" data-submit-button>Crear solicitud</button>
-    <a class="btn btn-outline-secondary" href="/mis-solicitudes">Volver</a>
-  </div>
-</form>
-  </div>
-</section>
 
 @section Scripts {
 <script>
-  // Presentation aid only. The server recalculates and revalidates every value it stores
-  // (UC-04 step 3), so nothing here is trusted.
   (function () {
     var form = document.getElementById('createRequestForm');
-    if (!form) { return; }
-
-    var mode = document.getElementById('inputMode');
+    if (!form) return;
+    var modes = Array.from(form.querySelectorAll('input[name="InputMode"]'));
     var start = document.getElementById('startDate');
     var end = document.getElementById('endDate');
     var days = document.getElementById('workingDays');
+    var rangeField = form.querySelector('[data-date-range-field]');
+    var daysField = form.querySelector('[data-days-field]');
+    var available = Number(form.dataset.availableDays || 0);
 
-    function countWorkingDays(from, to) {
-      if (!from || !to || to < from) { return ''; }
-      var total = 0;
-      var cursor = new Date(from.getTime());
-      while (cursor <= to) {
-        var weekday = cursor.getUTCDay();
-        if (weekday !== 0 && weekday !== 6) { total++; }
-        cursor.setUTCDate(cursor.getUTCDate() + 1);
-      }
-      return total;
+    function selectedMode() { return modes.find(function (item) { return item.checked; })?.value || 'DateRange'; }
+    function parse(value) { return value ? new Date(value + 'T00:00:00Z') : null; }
+    function format(date) { return date ? date.toISOString().slice(0, 10) : '—'; }
+    function countWorkingDays(from, to) { if (!from || !to || to < from) return 0; var total = 0; var cursor = new Date(from); while (cursor <= to) { var weekday = cursor.getUTCDay(); if (weekday !== 0 && weekday !== 6) total++; cursor.setUTCDate(cursor.getUTCDate() + 1); } return total; }
+    function endFromDays(from, requestedDays) { if (!from || requestedDays < 1) return null; var cursor = new Date(from); var counted = 0; while (counted < requestedDays) { var weekday = cursor.getUTCDay(); if (weekday !== 0 && weekday !== 6) counted++; if (counted < requestedDays) cursor.setUTCDate(cursor.getUTCDate() + 1); } return cursor; }
+    function update() {
+      var isRange = selectedMode().toLowerCase().indexOf('startplusdays') === -1;
+      rangeField.hidden = !isRange; daysField.hidden = isRange;
+      var requested = isRange ? countWorkingDays(parse(start.value), parse(end.value)) : Number(days.value || 0);
+      var calculatedEnd = isRange ? parse(end.value) : endFromDays(parse(start.value), requested);
+      document.getElementById('calculatedDays').textContent = requested + (requested === 1 ? ' día' : ' días');
+      document.getElementById('calculatedEnd').textContent = format(calculatedEnd);
+      document.getElementById('calculatedBalance').textContent = Math.max(0, available - requested) + ' días';
+      if (!isRange && calculatedEnd) end.value = format(calculatedEnd);
+      if (isRange) days.value = requested || '';
     }
-
-    function parse(input) {
-      return input.value ? new Date(input.value + 'T00:00:00Z') : null;
-    }
-
-    function isDateRange() {
-      return (mode.value || '').toLowerCase().indexOf('startplusdays') === -1;
-    }
-
-    function apply() {
-      var dateRange = isDateRange();
-
-      // The derived field is read-only in each mode: it only ever changes as a result of the
-      // calculation, never by typing.
-      days.readOnly = dateRange;
-      end.readOnly = !dateRange;
-      days.classList.toggle('bg-body-secondary', dateRange);
-      end.classList.toggle('bg-body-secondary', !dateRange);
-
-      form.querySelectorAll('[data-mode-hint]').forEach(function (hint) {
-        var forRange = hint.getAttribute('data-mode-hint') === 'dateRange';
-        hint.hidden = forRange !== dateRange;
-      });
-
-      if (dateRange) {
-        days.value = countWorkingDays(parse(start), parse(end));
-      }
-    }
-
-    mode.addEventListener('change', apply);
-    start.addEventListener('change', apply);
-    end.addEventListener('change', apply);
-    apply();
-
-    // A read-only control is still submitted, but the server ignores the derived value for the
-    // active mode; this keeps the posted payload consistent with what is displayed.
-    form.addEventListener('submit', function () {
-      days.readOnly = false;
-      end.readOnly = false;
-    });
+    modes.forEach(function (item) { item.addEventListener('change', update); });
+    [start, end, days].forEach(function (item) { item.addEventListener('change', update); item.addEventListener('input', update); });
+    update();
   })();
 </script>
 }

@@ -19,9 +19,9 @@ public sealed class UC07ViewOwnBalanceTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Acumulado", html);
-        Assert.Contains("Reservado", html);
+        Assert.Contains("Pendientes", html);
         Assert.Contains("Disponible", html);
-        Assert.Contains("Reservation", html);
+        Assert.Contains("Reserva", html);
     }
 
     private static FormUrlEncodedContent Form(params (string Key, string Value)[] values)

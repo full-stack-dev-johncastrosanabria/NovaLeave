@@ -86,7 +86,7 @@ public sealed class UC18HRRequestsTests
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Pagina 2 de 2", html);
+        Assert.Contains("Página 2 de 2", html);
         Assert.Contains("bulk-user-01", html);
     }
 

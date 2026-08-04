@@ -56,7 +56,7 @@ public sealed class CalendarioController : Controller
                         CalendarEventCategory.ResolvedByMe => "Resuelta por mi",
                         _ => "Evento aprobado"
                     },
-                    null,
+                    item.RequesterName,
                     item.StartDate,
                     item.EndDate,
                     item.WorkingDays,
@@ -84,7 +84,7 @@ public sealed class CalendarioController : Controller
             .Select(item => new CalendarEvent(
                 item.RequestId,
                 "Solicitud propia",
-                null,
+                item.RequesterName,
                 item.StartDate,
                 item.EndDate,
                 item.WorkingDays,

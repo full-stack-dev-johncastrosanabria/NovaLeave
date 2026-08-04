@@ -3,8 +3,11 @@ using NovaLeave.Application.Requests.Models;
 
 namespace NovaLeave.Web.ViewModels.MisSolicitudes;
 
-public sealed record MisSolicitudesIndexViewModel(IReadOnlyList<UserRequestSummary> Requests);
+public sealed record MisSolicitudesIndexViewModel(
+    string UserDisplayName,
+    IReadOnlyList<UserRequestSummary> Requests,
+    MyBalanceView Balance);
 
 public sealed record SolicitudDetalleViewModel(UserRequestDetail Request);
 
-public sealed record SaldoViewModel(MyBalanceView Balance);
+public sealed record SaldoViewModel(string UserDisplayName, MyBalanceView Balance);

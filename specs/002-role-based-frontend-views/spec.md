@@ -1,559 +1,673 @@
 # Role-Based Frontend Views Specification — NovaLeave MVP
 
 **Related Feature**: `001-leave-management-mvp` (complementary specification; not an independent feature and no separate implementation plan)
-**Version**: 2.0.1
-**Date**: 2026-07-23
-**Status**: Ready for Planning. All 34 RBFV criteria defined and traced to MVP requirements.
-**Constitution**: `.specify/memory/constitution.md` v6.0.1
+**Version**: 2.1.0
+**Date**: 2026-08-04
+**Status**: Audited. Normative for role-based presentation; implementation deviations are recorded in §21 and are not legitimized by this document.
+**Constitution**: `.specify/memory/constitution.md` v7.0.0
 
 ---
 
 ## 1. Purpose
 
-This specification defines the mandatory view and navigation structure for NovaLeave MVP based on the three application roles (`User`, `Approver`, `HR`) plus the automatic system actor. It complements `specs/001-leave-management-mvp/spec.md` (business behavior) and `specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0 (design tokens, components, accessibility baseline).
+This specification defines the role-based route, view, navigation, composition,
+and interaction contracts for the NovaLeave MVP. It documents the implemented
+Presentation surface for `User`, `Approver`, and `HR` while preserving the
+requirements of the Constitution, the functional MVP specification, and the
+approved frontend design specification.
 
-All routes, views, and navigation elements described here MUST conform to the Constitution v7.0.0, the approved frontend design specification v1.3.0, and the authority order in Constitution §15.1.
-
----
+This document MUST be used as the view-level guide for maintaining existing
+screens and extending the approved MVP. It MUST NOT be used to introduce or
+alter business rules, permissions, roles, routes, lifecycle states, or server
+calculations.
 
 ## 2. Scope
 
 This specification covers:
 
-- Route-to-role mapping and exclusive access rules
-- Required views per role
-- Shared views accessible by multiple roles
-- Navigation structure per role
-- View-level accessibility requirements
-- Security and authorization boundaries at the routing level
+- Route-to-role mapping and role-context navigation.
+- The shared application shell and authenticated header.
+- The implemented view inventory for `User`, `Approver`, and `HR`.
+- Login, access-denied, and branded unexpected-error presentation.
+- Tables, filters, pagination, forms, summary cards, badges, alerts, modals,
+  empty states, calendars, and feedback patterns.
+- Reusable Razor partials and shared CSS/JavaScript conventions.
+- Responsive and accessibility obligations at view level.
+- Presentation-to-business boundary rules for future views.
 
-This specification does NOT cover:
+This specification does not define:
 
-- Business rules (see `specs/001-leave-management-mvp/spec.md`)
-- Design tokens, colors, spacing, motion (see `frontend-design-spec.md`)
-- API contracts (no approved API exists for the MVP)
+- Domain rules, balance formulas, authorization invariants, lifecycle
+  transitions, or validation policy; those remain in
+  `specs/001-leave-management-mvp/spec.md` and the Constitution.
+- Design-token values, typography scales, breakpoints, spacing, radii, shadows,
+  or motion durations; implementations MUST reference
+  `specs/001-leave-management-mvp/frontend-design-spec.md` instead of duplicating
+  those values here.
+- Database, infrastructure, API, deployment, or background-job behavior.
+
+## 3. Authority and Evidence
+
+### 3.1 Authority Order
+
+Conflicts MUST be resolved in this order:
+
+1. `.specify/memory/constitution.md` v7.0.0.
+2. `specs/001-leave-management-mvp/spec.md`.
+3. `specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0.
+4. This specification.
+5. Approved ADRs.
+6. Code and tests as implementation evidence.
+
+Code and tests MUST NOT override a higher-authority requirement. A conflicting
+implementation is an `IMPLEMENTATION_DEVIATION`, not a new requirement.
+
+### 3.2 Audit Evidence
+
+This revision was derived from the current controllers, ViewModels, Razor
+Views, Identity Razor Pages, shared partials, `site.css`, `site.js`, Presentation
+unit tests, MVC integration tests, route/security tests, E2E smoke tests, recent
+frontend commits, and the current working-tree diff.
+
+No frontend-specific ADR changes the presentation contracts in this document.
+The existing ADRs address runtime configuration, generated-artifact review, and
+the manual quality gate.
+
+### 3.3 Finding Classification
+
+| Classification | Meaning in this audit |
+|---|---|
+| `ALREADY_DOCUMENTED` | The prior spec and implementation agree with higher-authority sources. |
+| `DOCUMENTATION_GAP` | Valid implemented composition or interaction existed but was not described precisely. |
+| `STALE_SPEC` | The prior spec described a different or unsupported presentation and has been corrected here. |
+| `IMPLEMENTATION_DEVIATION` | Current code or markup conflicts with a higher-authority rule and remains listed in §21. |
+| `OUT_OF_SCOPE` | The finding belongs to business, infrastructure, or future functionality and is not converted into a frontend requirement. |
+
+## 4. Roles and Contexts
+
+| Technical role | Spanish UI context | Context root | Presentation responsibility |
+|---|---|---|---|
+| `User` | `Mi espacio` | `/mis-solicitudes` | Personal requests, personal balance/history, and personal calendar. |
+| `Approver` | `Aprobaciones` | `/aprobaciones` | Eligible request resolution, resolution history, and authorized Approver calendar. |
+| `HR` | `RRHH` | `/rrhh` | Organization-wide read views and Approver capability management. |
+
+An identity MAY hold more than one role. The active UI context determines the
+visible navigation and target route only. It MUST NOT mutate identity, session,
+roles, claims, ownership, active status, `canResolveRequests`, or authorization.
+
+### 4.1 Context Switcher — `Mis roles`
+
+- The switcher MUST be visible only when at least two authorized contexts are
+  available to the identity.
+- It MUST list only contexts the identity may enter: `Mi espacio`,
+  `Aprobaciones`, and/or `RRHH`.
+- `Aprobaciones` MUST NOT be offered when the Approver context is not eligible,
+  including `canResolveRequests=false`.
+- Selecting an option MUST navigate to that context root.
+- The current context MUST be communicated with text; an icon or color MUST NOT
+  be its sole indicator.
+- The control MUST support keyboard use and focus management according to the
+  frontend design specification.
+- `/calendario?context=User` and `/calendario?context=Approver` MUST preserve the
+  selected shared-calendar context for multi-role identities.
+
+## 5. Route and View Map
+
+### 5.1 User Routes
+
+| Route | Method | View | Required actor |
+|---|---|---|---|
+| `/mis-solicitudes` | GET | `MisSolicitudes/Index` | Active `User`. |
+| `/mis-solicitudes/crear` | GET, POST | `MisSolicitudes/Create` | Active `User`. |
+| `/mis-solicitudes/{id}` | GET | `MisSolicitudes/Detail` | Active owning `User`. |
+| `/mis-solicitudes/{id}/editar` | GET, POST | `MisSolicitudes/Edit` | Active owning `User`; mutation remains subject to approved state rules. |
+| `/saldo` | GET | `MisSolicitudes/Balance` | Active `User`. |
+| `/calendario?context=User` | GET | `Calendario/Index` | Active `User`. |
+
+### 5.2 Approver Routes
+
+| Route | Method | View or outcome | Required actor |
+|---|---|---|---|
+| `/aprobaciones` | GET | `Aprobaciones/Index` | Active eligible `Approver` with `canResolveRequests=true`. |
+| `/aprobaciones/{id}` | GET | `Aprobaciones/Detail` | Active eligible `Approver`, not owner. |
+| `/aprobaciones/{id}/aprobar` | POST | Redirect or redisplayed detail | Active eligible `Approver`, not owner. |
+| `/aprobaciones/{id}/rechazar` | POST | Redirect or redisplayed detail | Active eligible `Approver`, not owner. |
+| `/aprobaciones/{id}/desactivar` | POST | Redirect or redisplayed detail | Active eligible `Approver`, not owner; approved pre-start request only. |
+| `/aprobaciones/historial` | GET | `Aprobaciones/History` | Active eligible `Approver`. |
+| `/calendario?context=Approver` | GET | `Calendario/Approver` | Active eligible `Approver`. |
+
+### 5.3 HR Routes
+
+| Route | Method | View | Required actor |
+|---|---|---|---|
+| `/rrhh` | GET | `RRHH/Index` | Active `HR`. |
+| `/rrhh/solicitudes` | GET | `RRHH/Solicitudes` | Active `HR`; read-only request data. |
+| `/rrhh/solicitudes/{id}` | GET | `RRHH/SolicitudDetalle` | Active `HR`; read-only request detail. |
+| `/rrhh/calendario` | GET | `RRHH/Calendario` | Active `HR`; organization calendar. |
+| `/rrhh/saldos` | GET | `RRHH/Saldos` | Active `HR`; read-only balances. |
+| `/rrhh/saldos/{userId}` | GET | `RRHH/Movimientos` | Active `HR`; read-only movements. |
+| `/rrhh/auditoria` | GET | `RRHH/Auditoria` | Active `HR`; relevant redacted audit data. |
+| `/rrhh/aprobadores` | GET | `RRHH/ApproverCapabilities/Index` | Active `HR`. |
+| `/rrhh/aprobadores/{id}/capacidad` | GET, POST | `RRHH/ApproverCapabilities/Capability` | Active `HR`; approved capability-management operation only. |
+
+HR MUST use `/rrhh/calendario`. `/calendario` MUST NOT provide or expose the HR
+organization-wide calendar.
+
+### 5.4 Shared and Identity Routes
+
+| Route | Method | Presentation behavior |
+|---|---|---|
+| `/` | GET | Redirects to `/mis-solicitudes`, `/aprobaciones`, or `/rrhh` according to the identity's authorized role order; otherwise redirects to access denied. |
+| `/Identity/Account/Login` | GET, POST | Identity login Razor Page. |
+| `/Identity/Account/Logout` | POST | Identity logout; MUST retain antiforgery protection. |
+| `/Identity/Account/AccessDenied` | GET | Branded access-denied Razor Page. |
+| Central exception view | internal error result | `Views/Shared/Error.cshtml` with a correlation/reference identifier and no implementation details. |
+
+The prior aliases `/acceso-denegado` and `/error` are not implemented public
+routes and are removed from the route contract.
+
+## 6. Shared Application Shell
+
+Authenticated MVC views MUST use `Views/Shared/_Layout.cshtml`. The shell
+contains:
+
+1. A semantic `<header>` with the NovaLeave brand linked to the active context
+   root.
+2. One role-specific primary navigation set at a time.
+3. The `Mis roles` context switcher when multiple eligible contexts exist.
+4. A user menu with identity/context text and a POST `Cerrar sesión` action.
+5. A semantic `<main>` containing the rendered view and shared toast region.
+6. The shared confirmation modal and pinned Bootstrap bundle.
+
+The brand, navigation, context switcher, user menu, focus treatment, mobile
+navigation, and visual tokens MUST follow `frontend-design-spec.md`; this
+document does not redefine their measurements or colors.
+
+### 6.1 Primary Navigation
+
+| Context | Required labels and destinations |
+|---|---|
+| `User` | `Mis solicitudes` → `/mis-solicitudes`; `Crear solicitud` → `/mis-solicitudes/crear`; `Mi historial` → `/saldo`; `Mi calendario` → `/calendario?context=User`. |
+| `Approver` | `Aprobaciones` → `/aprobaciones`; `Historial` → `/aprobaciones/historial`; `Calendario` → `/calendario?context=Approver`. |
+| `HR` | `Panel RRHH` → `/rrhh`; `Solicitudes` → `/rrhh/solicitudes`; `Calendario global` → `/rrhh/calendario`; `Saldos` → `/rrhh/saldos`; `Aprobadores` → `/rrhh/aprobadores`; `Auditoría` → `/rrhh/auditoria`. |
+
+Only navigation for the active context MUST be rendered. Hiding navigation is
+not authorization; direct requests MUST still be authorized server-side.
+
+### 6.2 Page Composition
+
+Views SHOULD compose the current shared visual hierarchy:
+
+- Page header with one `<h1>`, concise Spanish description, optional approved
+  SVG icon, and a context-appropriate action or read-only indicator.
+- Summary-card grid when authoritative totals are available.
+- One or more white `.nl-card` surfaces for the principal content.
+- Section headings, filters, tables/forms/calendars, and an explicit empty or
+  error state inside the content surface.
+
+Decorative icons MUST use the shared SVG icon partial or an approved equivalent,
+MUST be hidden from assistive technology when adjacent text supplies the name,
+and MUST NOT replace visible labels.
+
+## 7. View Inventory by Role
+
+### 7.1 User — `Mi espacio`
+
+| View | Current structure and normative presentation |
+|---|---|
+| `MisSolicitudes/Index` | Page header with create action; four balance cards; client-visible status filter; own-request table with status badge, date range, working days, creation date, detail action, and conditional edit action; explicit empty state. |
+| `MisSolicitudes/Create` | Constrained form card; two-mode segmented selector; start/end or start/days input; informational calculated-days/end/balance panel; reason counter; validation summary; cancel and submit actions. |
+| `MisSolicitudes/Edit` | Pre-populated dedicated ViewModel and row-version token; MUST present the same two mutually exclusive modes as Create and preserve input on validation/conflict. |
+| `MisSolicitudes/Detail` | Read-only status/date/reason composition; edit action only for an owned `Pending` request. |
+| `MisSolicitudes/Balance` | Four balance cards and a chronological movement table with request links where authorized; explicit empty state. |
+| `Calendario/Index` | Personal month view through the shared calendar partial and authorized owner-detail links. |
+
+### 7.2 Approver — `Aprobaciones`
+
+| View | Current structure and normative presentation |
+|---|---|
+| `Aprobaciones/Index` | Queue count; pending-request table with requester, dates, requested days, authoritative available value, projected post-approval value, and review link; explicit empty state. |
+| `Aprobaciones/Detail` | Request identity and date information; projected-balance summary; overlap warning when applicable; mutually exclusive approve/reject controls; conditional pre-start deactivation; validation/conflict feedback and confirmation. |
+| `Aprobaciones/History` | Resolution table with timestamp, action, request/detail link, requester, and status; explicit empty state. |
+| `Calendario/Approver` | Authorized Approver month view through the shared calendar partial, respecting anonymization and detail-link authorization. |
+
+The Approver UI MUST display requester identity where the approved view contract
+authorizes it. It MUST NOT display the actor as anonymous when the requester name
+is available and required by the approved queue/detail design.
+
+### 7.3 HR — `RRHH`
+
+| View | Current structure and normative presentation |
+|---|---|
+| `RRHH/Index` | Organization metric cards and quick-link module cards for calendar, Approver capability management, and audit. |
+| `RRHH/Solicitudes` | Read-only request table, status filter, server-side paging state, detail links, and empty state. |
+| `RRHH/SolicitudDetalle` | Read-only requester, dates, days, status, authorized reasons, and audit trail; no resolution actions. |
+| `RRHH/Calendario` | Dedicated organization calendar with requester identity and authorized detail links; visible read-only marker. |
+| `RRHH/Saldos` | Read-only organization balance table with the four approved balance concepts and movement links. |
+| `RRHH/Movimientos` | Selected-user balance summary and chronological movements with request links where available. |
+| `RRHH/Auditoria` | Relevant, redacted audit records with paging state. |
+| `ApproverCapabilities/Index` | Approver identity, active status, capability status, and link to the controlled capability form. |
+| `ApproverCapabilities/Capability` | Current capability summary; dedicated input ViewModel; reason, confirmation, row version, and explicit modal confirmation. |
+
+All HR request, calendar, balance, movement, and audit views MUST visibly state
+`Solo lectura` and MUST render no Approve, Reject, Deactivate, balance-edit, or
+role-assignment action. Capability management is the sole approved HR mutation
+and MUST be described as such rather than as general administration.
+
+## 8. Reusable Presentation Components
+
+The following shared artifacts are the canonical reuse points:
+
+| Artifact | Responsibility |
+|---|---|
+| `_Layout.cshtml` | Shell, role navigation, context switcher, user menu, logout, shared assets, toast host, and confirmation modal host. |
+| `_Icon.cshtml` plus the layout SVG sprite | Consistent decorative line icons without emoji text. |
+| `_StatusBadge.cshtml` | Spanish status label plus semantic class; color is never the only state signal. |
+| `_Calendar.cshtml` | Shared month grid, navigation, authorized event links, overflow indicator, event list, and calendar empty state. |
+| `_ValidationSummary.cshtml` | Focusable, assertive validation summary with explicit failure heading. |
+| `_ConfirmationModal.cshtml` | Reusable Bootstrap confirmation surface driven by form data attributes. |
+| `_Toast.cshtml` | Shared polite success feedback rendered from `TempData`. |
+| `_EmptyStateIcon.cshtml` | Decorative accessible-hidden SVG for empty states. |
+| `Error.cshtml` | Safe unexpected-error presentation with correlation reference. |
+
+New views MUST reuse these artifacts where their responsibility matches. A new
+partial, View Component, or Tag Helper MAY be added only when repeated markup or
+behavior has a cohesive responsibility not covered by an existing component.
+
+## 9. Tables, Filters, Pagination, and Search
+
+- Tables MUST use semantic captions and scoped column headers.
+- Desktop tabular views SHOULD use `.nl-table`; views that require a mobile card
+  fallback SHOULD also use the shared responsive-table convention and
+  `data-label` values.
+- A filter MUST have a visible or accessible label and MUST preserve its current
+  value after navigation or server response.
+- Client-side filtering MAY be used only for an already-bounded rendered result,
+  such as the current personal request status filter. It MUST NOT replace
+  server-side filtering or pagination for potentially large organization lists.
+- Organization lists that may exceed approved limits MUST use server-side
+  pagination. Paging links MUST preserve active filters and expose accessible
+  names and current-page information.
+- Sorting, searching, date-range filtering, page-size selection, and full
+  first/previous/next/last controls MUST be implemented only where supported by
+  the corresponding query contract. The spec MUST NOT claim they exist merely
+  because a table is present.
+- Empty results MUST render an explicit Spanish empty state rather than an empty
+  table body.
+
+## 10. Forms and Validation Presentation
+
+- Every mutation MUST bind a dedicated input ViewModel and use server-side
+  validation as authoritative.
+- Razor MUST NOT bind Domain or EF entities directly.
+- Every control MUST have an associated visible label or equivalent accessible
+  name, and field errors MUST be rendered adjacent to their controls when
+  available.
+- `_ValidationSummary` MUST present operation-level failures, including safe
+  validation and conflict messages. Focus SHOULD move to that summary or the
+  first invalid field.
+- User-entered non-sensitive values MUST be preserved when a form is redisplayed.
+- Create and Edit MUST expose exactly the two approved request input modes. Only
+  the active mode's fields MUST be enabled and submitted.
+- Working-day, end-date, character-count, and balance previews are informational.
+  They MUST be labelled for assistive technology and MUST NOT be accepted as
+  authoritative server values.
+- Row-version values MAY be carried in hidden inputs for optimistic concurrency;
+  they MUST NOT be presented as business data.
+- Forms MUST prevent duplicate submission, preserve button width while loading,
+  expose a processing state, and wait for server confirmation before permanent
+  UI updates.
+- Unsafe requests MUST retain antiforgery protection.
+
+## 11. Summary Cards and Status Representation
+
+Balance summaries MUST use these exact labels and authoritative mappings:
+
+| Label | Meaning |
+|---|---|
+| `Acumulado total` | Accrued days. |
+| `Pendientes` | Days reserved by active `Pending` requests. |
+| `Días gozados` | Permanently deducted days. |
+| `Disponible` | Authoritative available balance. |
+
+Summary cards MUST provide a text label, value, and concise helper text where
+useful. They MUST NOT introduce a new balance formula.
+
+Status presentation MUST use the Spanish labels approved in
+`frontend-design-spec.md`, the corresponding semantic tokens, and readable
+text. `Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, and
+`CancelledByApprover` MUST remain visually and textually distinguishable.
+
+## 12. Confirmations, Feedback, and View States
+
+- Approve, Reject, pre-start Deactivate, and capability changes MUST require an
+  explicit accessible confirmation before submission.
+- Reject MUST retain its required reason input. Capability changes MUST retain
+  reason, explicit confirmation, and row-version input. No new reason
+  requirement may be invented for request deactivation.
+- Shared confirmation behavior SHOULD use `_ConfirmationModal` and
+  `data-confirm-*` attributes. A specialized modal MAY be retained when the form
+  content itself is part of the confirmation, as in capability management.
+- Success MAY use the shared toast. Validation, authorization, conflict, and
+  critical failures MUST have persistent inline feedback and MUST NOT rely only
+  on a toast.
+- Conflict text MUST tell the actor to refresh current information and retry.
+- Loading states MUST include accessible text and prevent duplicate submission.
+- Every list or calendar MUST define an explicit empty state. Error and forbidden
+  states MUST use safe Spanish messaging without revealing protected resources
+  or implementation details.
+
+## 13. Calendar Contract
+
+All three role contexts MUST reuse `_Calendar.cshtml` and a dedicated wrapper
+ViewModel containing the shared `CalendarViewModel`.
+
+- The grid MUST be a traditional Monday-to-Sunday month view with semantic day
+  headers, weekday focus targets, muted weekends, and no weekend events.
+- Only authoritative approved periods MUST be rendered, as required by
+  `frontend-design-spec.md` §25.2.
+- User events MUST show the owner's approved periods and MAY link to
+  `/mis-solicitudes/{id}` when authorized.
+- Approver events MUST preserve the approved anonymized scope. They MUST NOT
+  expose requester identity or a detail link when the actor is not authorized
+  for that detail.
+- HR events MUST show the requester name and MAY link to
+  `/rrhh/solicitudes/{id}`.
+- Events MUST show readable text including working-day count; approved calendar
+  events use the approved calendar treatment from the design spec.
+- No essential event information may depend only on hover.
+- Month controls, day cells, events, overflow, current day, focus, keyboard
+  behavior, mobile rendering, and reduced motion MUST follow
+  `frontend-design-spec.md` §25 without redefining its values here.
+
+## 14. Responsive Behavior
+
+- The shell, page header, summary grids, module grids, tables, forms, dialogs,
+  and calendars MUST work across the breakpoints defined by the frontend design
+  specification.
+- The authenticated header MUST use the approved mobile navigation pattern.
+- Summary and module grids MUST collapse without hiding required data or actions.
+- Responsive tables MAY become labelled card rows on smaller screens; status,
+  dates, working days, balance impact, and authorized actions remain the content
+  priority.
+- Normal forms MUST become single-column where needed.
+- The calendar MUST retain the approved mobile month-view behavior; replacing
+  the month grid with a different presentation requires design review.
+- Required actions and focused controls MUST remain visible and reachable
+  without page-level horizontal overflow.
+
+## 15. Accessibility and Keyboard Interaction
+
+Every view MUST meet WCAG 2.1 AA and the frontend design specification:
+
+- Semantic landmarks and one purpose-matching `<h1>`.
+- Logical heading hierarchy.
+- Visible focus for every interactive element.
+- Accessible labels for forms, filters, menus, modal controls, and calendar
+  navigation.
+- Textual status and validation feedback; color and icons are never sole cues.
+- Semantic table captions and headers.
+- Accessible modal naming, focus containment, close behavior, and focus return.
+- `aria-live` treatment for meaningful validation, calculation, loading, month,
+  and result updates.
+- Keyboard operation for dropdowns, forms, confirmation dialogs, and calendar
+  events; calendar key behavior MUST follow the design spec.
+- Decorative SVGs MUST use `aria-hidden="true"`; meaningful standalone icons
+  require an accessible name.
+- Reduced-motion preferences MUST disable non-essential motion as defined in the
+  design spec.
+- Interactive target dimensions MUST use the approved minimum.
+
+## 16. Login, Access Denied, and Unexpected Errors
+
+### 16.1 Login
+
+The Identity login page MUST use the shared NovaLeave visual system, visible
+email/password labels, appropriate autocomplete attributes, preserved email,
+server and client validation, antiforgery, keyboard access, and responsive card
+layout. When demo seeding is enabled outside Production, the `Cuenta de
+demostración` selector MAY prefill the email but MUST NOT authenticate and MUST
+mask email display according to the design spec.
+
+### 16.2 Access Denied
+
+`/Identity/Account/AccessDenied` MUST provide a branded Spanish denial without
+confirming protected-resource existence. It SHOULD provide a safe path back to
+an authorized context.
+
+### 16.3 Unexpected Error
+
+The centralized error view MUST provide safe Spanish guidance and a correlation
+reference. It MUST NOT display stack traces, database detail, secrets, or
+sensitive request content.
+
+## 17. ViewModels and Presentation Boundaries
+
+- Every Razor View MUST receive a dedicated Presentation ViewModel or a shared
+  Presentation contract intentionally wrapped by one.
+- ViewModels MAY contain display-ready values, current filters, paging state,
+  safe URLs, and hidden concurrency tokens.
+- Controllers MAY select a view, map Application results, set safe status codes,
+  and preserve validation feedback. They MUST NOT calculate balances, working
+  days, overlap, permissions, or lifecycle transitions.
+- Razor MAY conditionally render an action only from an authoritative
+  server-provided capability or status. It MUST NOT independently decide that an
+  actor is authorized.
+- Client calculations are previews only. Hidden fields, query strings, CSS
+  state, disabled buttons, and context selection are untrusted.
+
+## 18. Frontend Extension Rules
+
+Future NovaLeave screens and changes:
+
+1. MUST reuse the shared layout, role navigation, context switcher, icon system,
+   feedback components, and established view patterns before creating a new
+   abstraction.
+2. MUST NOT use inline styles.
+3. MUST NOT add inline scripts or duplicate CSS/JavaScript per view; shared
+   behavior belongs under the controlled `wwwroot/css` and `wwwroot/js` assets.
+4. MUST use the pinned Bootstrap 5.3.x conventions and the shared NovaLeave
+   component classes.
+5. MUST keep user-facing navigation, labels, validation, and feedback in Spanish;
+   technical identifiers remain in English.
+6. MUST use dedicated ViewModels and MUST NOT expose Domain or EF entities
+   directly to Razor.
+7. MUST keep authorization, sensitive-data visibility, and business decisions
+   outside purely visual logic.
+8. MUST preserve established patterns for tables, filters, pagination, forms,
+   badges, alerts, confirmations, modals, loading, and empty states.
+9. MUST meet WCAG 2.1 AA, include responsive behavior, support keyboard use, and
+   retain visible focus.
+10. MUST NOT use color, motion, or an icon as the only indicator of status or
+    meaning.
+11. MUST NOT create roles, permissions, routes, lifecycle states, balance rules,
+    or other business behavior from the frontend.
+12. MUST NOT render an action the actor cannot execute; hiding it remains UX,
+    not authorization.
+13. MUST NOT trust client-calculated dates, working days, balances, projections,
+    ownership, status, role, or capability.
+14. MUST preserve the separation of `User`, `Approver`, and `HR` contexts,
+    including privacy and detail-link boundaries.
+15. MUST use `/rrhh/calendario` for HR and MUST NOT reuse `/calendario` as the
+    HR organization calendar.
+16. MUST reference the values in `frontend-design-spec.md` for palette,
+    typography, spacing, radius, shadow, motion, target size, and breakpoints;
+    it MUST NOT invent or duplicate those values here.
+17. MUST remain compatible with approved contracts, use cases, authorization
+    policies, and route traceability tests.
+18. SHOULD extend an existing partial or shared module when the responsibility
+    is already present; a new component MAY be introduced for a genuinely new,
+    repeated presentation concern.
+
+## 19. Security and Authorization Presentation Rules
+
+- Protected controllers MUST retain their approved active-role policies.
+- Approver queue, detail, history, resolution, and calendar context require an
+  eligible active Approver with `canResolveRequests=true`.
+- Owner and resource eligibility MUST be revalidated server-side.
+- HR MUST NOT receive request-resolution, balance-edit, or role-assignment UI.
+- The capability-management form MUST target only an existing Approver and MUST
+  preserve reason, confirmation, concurrency, and audit behavior from the
+  authoritative specifications.
+- Unauthorized detail links MUST not be rendered, and forced browsing MUST fail
+  closed.
+- Request reasons and rejection reasons are sensitive. Their rendering MUST be
+  limited to an authorized owner, eligible Approver use case, or authorized HR
+  read use case.
+
+## 20. Traceability Matrix
+
+| Context | Route/view | Primary use case evidence | Principal RBFV criteria |
+|---|---|---|---|
+| Shared | `/Identity/Account/Login` | UC01 | RBFV-027, RBFV-033 |
+| Shared | Context switcher in `_Layout` | UC02 | RBFV-009, RBFV-010, RBFV-020, RBFV-021 |
+| User | `/mis-solicitudes` | UC03 | RBFV-001, RBFV-024, RBFV-031 |
+| User | `/mis-solicitudes/crear` | UC04 | RBFV-028, RBFV-029, RBFV-034 |
+| User | `/mis-solicitudes/{id}/editar` | UC05 | RBFV-028, RBFV-029, RBFV-030 |
+| User | `/mis-solicitudes/{id}` | UC06 | RBFV-001, RBFV-026 |
+| User | `/saldo` | UC07 | RBFV-022, RBFV-024 |
+| User | `/calendario?context=User` | UC08 | RBFV-026, RBFV-029 |
+| Approver | `/aprobaciones` | UC09 | RBFV-003, RBFV-025, RBFV-031, RBFV-034 |
+| Approver | `/aprobaciones/{id}` | UC10 | RBFV-025, RBFV-030, RBFV-031 |
+| Approver | Approve/Reject POST | UC11, UC12 | RBFV-006, RBFV-014, RBFV-030 |
+| Approver | Deactivate POST | UC13 | RBFV-014, RBFV-030 |
+| Approver | `/aprobaciones/historial` | UC14 | RBFV-023 |
+| Approver | `/calendario?context=Approver` | UC15 | RBFV-012, RBFV-026 |
+| HR | `/rrhh/solicitudes[/{id}]` | UC18 | RBFV-005, RBFV-006, RBFV-032 |
+| HR | `/rrhh/calendario` | UC19 | RBFV-026, RBFV-032 |
+| HR | `/rrhh/saldos[/{userId}]` | UC20 | RBFV-007, RBFV-024, RBFV-032 |
+| HR | `/rrhh/auditoria` | UC21 | RBFV-032 |
+| HR | `/rrhh/aprobadores[/{id}/capacidad]` | UC22 | RBFV-008, RBFV-013, RBFV-015, RBFV-016, RBFV-017, RBFV-032 |
+| Cross-role | Route authorization | Route traceability and security tests | RBFV-002, RBFV-004, RBFV-006–RBFV-008, RBFV-011–RBFV-017 |
+| Cross-view | Shared accessibility/components | Presentation unit and E2E accessibility tests | RBFV-018, RBFV-019, RBFV-027 |
+
+### 20.1 RBFV Acceptance Criteria
+
+The identifiers consumed by the primary MVP traceability matrix remain stable:
+
+| ID | Normative outcome |
+|---|---|
+| RBFV-001 | Active User can render owned request list/detail; cross-user data is absent. |
+| RBFV-002 | User access to Approver routes is denied. |
+| RBFV-003 | Eligible active Approver can render the queue and authorized detail. |
+| RBFV-004 | An Approver without an active User context cannot create a User request. |
+| RBFV-005 | Active HR can render organization request list/detail as read-only. |
+| RBFV-006 | HR request-resolution attempts are denied and no resolution action is rendered. |
+| RBFV-007 | HR balance mutation is denied and no balance-edit action is rendered. |
+| RBFV-008 | HR role assignment/removal is denied and no such action is rendered. |
+| RBFV-009 | Multi-role context switching changes navigation/route only. |
+| RBFV-010 | Triple-role eligible identity sees all three context options. |
+| RBFV-011 | Inactive User protected access is denied. |
+| RBFV-012 | Inactive or capability-disabled Approver protected access is denied. |
+| RBFV-013 | Inactive HR capability mutation is denied. |
+| RBFV-014 | Approver self-resolution is denied and its action is absent. |
+| RBFV-015 | Capability toggle for a non-Approver is rejected. |
+| RBFV-016 | Capability toggle without valid reason/confirmation is rejected with feedback. |
+| RBFV-017 | Stale capability toggle returns a safe conflict outcome. |
+| RBFV-018 | Views satisfy the approved accessibility contract. |
+| RBFV-019 | Reduced-motion preference suppresses non-essential animation. |
+| RBFV-020 | `Mis roles` is shown only for two or more eligible contexts. |
+| RBFV-021 | Context switching does not change identity, claims, or authorization. |
+| RBFV-022 | `/saldo` is labelled `Mi historial` in navigation. |
+| RBFV-023 | Approver history navigation is labelled `Historial`. |
+| RBFV-024 | Balance cards use the four exact approved Spanish labels. |
+| RBFV-025 | Approver queue/detail present the three authoritative projected-balance values and warn/disable approval when invalid. |
+| RBFV-026 | Calendar activation reaches only the authorized role-specific detail route. |
+| RBFV-027 | User-facing text contains no emoji; icons remain accessible. |
+| RBFV-028 | Create/Edit expose only the two approved mutually exclusive input modes. |
+| RBFV-029 | Working-day previews match the approved weekend policy but remain informational. |
+| RBFV-030 | Conflicting resolution controls disable during submit; server confirmation remains authoritative. |
+| RBFV-031 | User/Approver views use the approved hierarchy, cards, statuses, feedback, and empty states. |
+| RBFV-032 | HR views preserve read-only boundaries, dedicated calendar route, pagination where required, and controlled capability management. |
+| RBFV-033 | Login follows Identity, branding, accessibility, responsive, masking, and no-gradient/no-emoji rules. |
+| RBFV-034 | Successful creation feedback is visible and the eligible Approver queue shows the committed request exactly once on normal refresh/navigation. |
+
+## 21. Audit Findings and Unresolved Implementation Deviations
+
+The following findings MUST NOT be treated as approved behavior. They remain
+implementation work outside this documentation-only change.
+
+### 21.1 `DOCUMENTATION_GAP` Resolved Here
+
+- The exact shared partial inventory and its responsibilities are now defined.
+- Page-header, metric-card, module-card, table-card, form-preview, empty-state,
+  toast, validation-popover, icon-sprite, and data-attribute interaction patterns
+  are documented.
+- The current distinction between bounded client-side filtering and server-side
+  organization pagination is documented.
+- The real Identity access-denied route and centralized internal error view
+  replace stale public-route aliases.
+- The current HR dashboard and dedicated capability form are included in the
+  view map.
+
+### 21.2 `STALE_SPEC` Corrected
+
+- The spec no longer claims that every table already has sorting, search,
+  date-range filtering, page-size selection, and complete pagination controls.
+- The spec no longer describes a generic rendered Dashboard view at `/`; the
+  implemented root behavior is a role-aware redirect.
+- The spec no longer treats `/acceso-denegado` or `/error` as implemented public
+  routes.
+- Reuse rules now reference the partials and client hooks that actually exist.
+
+### 21.3 `IMPLEMENTATION_DEVIATION`
+
+1. The User navigation currently renders `Mi Saldo`; the approved label is
+   `Mi historial` (RBFV-022 and frontend design spec §15).
+2. The responsive header currently uses a Bootstrap collapse rather than the
+   approved off-canvas mobile drawer, and the user menu omits the approved
+   disabled `Perfil` placeholder.
+3. `MisSolicitudes/Create.cshtml` contains duplicated inline request-preview
+   JavaScript while a shared implementation exists in `site.js`; future and
+   corrected views MUST use shared assets.
+4. The Edit view uses a select and simultaneously renders both mode-specific
+   inputs instead of the same mutually exclusive two-mode presentation required
+   for Create/Edit.
+5. Current uncommitted calendar query/view changes render non-approved statuses
+   and requester names in scopes where `frontend-design-spec.md` §25 requires
+   approved periods only and Approver anonymization.
+6. The shared calendar exposes keyboard data hooks but `site.js` does not
+   implement the specified arrow/Home/End/PageUp/PageDown interaction. On the
+   smallest breakpoint it hides the grid and shows a list instead of the
+   approved mobile month-grid behavior.
+7. The Approver detail and history currently render `Usuario solicitante`
+   instead of the authorized requester name required by the approved visual
+   hierarchy.
+8. The Approver detail does not visibly implement the required invalid projected
+   balance warning plus disabled Approve control.
+9. Several lists lack the complete server-side filters, sorting, accessible
+   pagination controls, or mobile fallback required by the frontend design spec,
+   especially Approver history/queue and HR balances/audit/capabilities.
+10. The shared status badge maps both cancellation states to one neutral class
+    instead of preserving their distinct approved semantic treatments.
+11. The login demo-account option currently displays the full email rather than
+    the masked presentation required by the frontend design spec.
+12. Some current CSS overrides use radius and interactive-height values outside
+    the approved design-token contracts. The design spec remains authoritative;
+    these values are not adopted here.
+
+### 21.4 `OUT_OF_SCOPE`
+
+- Changes to business calculations, authorization, state transitions, routes,
+  data contracts, controller behavior, CSS, JavaScript, Razor, tests, or demo
+  data are outside this documentation-only audit.
+- No deviation listed above was corrected or converted into a new business
+  requirement by this revision.
+
+## 22. Version History
+
+| Version | Date | Change |
+|---|---|---|
+| 1.0.0 | 2026-07-23 | Initial role-based view draft. |
+| 2.0.0 | 2026-07-23 | Added `HR`/`RRHH` context. |
+| 2.0.1 | 2026-07-30 | Clarified Approver capability eligibility and HR-only calendar route. |
+| 2.1.0 | 2026-08-04 | Audited current Presentation implementation; documented shared components and final view composition; corrected stale route/view claims; added `Frontend Extension Rules`; recorded unresolved deviations without legitimizing them. |
 
 ---
 
-## 3. Authority Order
-
-Per Constitution §15.1:
-
-1. **Constitution v7.0.0** — architecture, security, roles, cross-cutting invariants, engineering quality, governance
-2. **Approved feature specifications** — business behavior and acceptance criteria within constitutional boundaries
-3. **Approved frontend design specification v1.3.0** — design tokens, responsive behavior, accessibility, components, motion, interaction patterns
-4. **Approved ADRs** — authorized architectural exceptions
-5. **Code and tests** — implement approved requirements but do not override them
-6. **Prototypes, screen-construction guides, OKF, Mermaid, Graphify** — derived or reference artifacts; cannot introduce requirements, roles, or permissions
-
-### 3.1 Complementary Authority Boundary
-
-This specification complements `specs/001-leave-management-mvp/spec.md`. It is
-authoritative only for frontend routes, navigation, role-based view behavior,
-accessibility, and presentation.
-
-It must not redefine domain rules, lifecycle states, balance semantics, backend
-authorization invariants, or MVP scope. In any conflict, the Constitution and
-the primary MVP specification prevail.
-
----
-
-## 4. Role and Context Definitions
-
-| Technical Role | Spanish UI Context | Route Prefix | Description |
-|----------------|-------------------|--------------|-------------|
-| `User` | `Mi espacio` | `/mis-solicitudes` | Personal vacation workflows |
-| `Approver` | `Aprobaciones` | `/aprobaciones` | Request resolution workflows |
-| `HR` | `RRHH` | `/rrhh` | Organization-wide read access and approver-capability management |
-| System | — | — | Automatic timeout cancellation (`CancelledByTimeout`) |
-
-> **Note**: The technical identifier is always `User` / `Approver` / `HR` in code, policies, and documentation. The Spanish context label (`Mi espacio` / `Aprobaciones` / `RRHH`) appears only in user-facing navigation and breadcrumbs.
-
-### 4.1 Role Combinations
-
-A single identity MAY hold any valid combination of `User`, `Approver`, and `HR` roles. When multiple roles are present:
-
-- All authorized navigation contexts MUST be available via a context switcher in the header
-- Switching context MUST NOT modify identity, session, roles, claims, permissions, ownership, or resource authorization
-- The active context determines which navigation bar and route prefix are visible
-- Resource authorization is ALWAYS re-evaluated per request; context is a UI convenience only
-
-### 4.2 Context Selector — "Mis roles"
-
-When an identity has at least two authorized contexts:
-
-- **Visible label**: `Mis roles` (accessible name and visible concept)
-- **Control type**: Accessible dropdown/button group (`<select>` or `<button aria-haspopup="listbox">` + listbox)
-- **Options**: `Mi espacio`, `Aprobaciones`, `RRHH` (Spanish labels matching role contexts)
-- **Behavior**: Switching context updates the visible navigation and route prefix only; **must not** modify identity, session, roles, claims, permissions, ownership, or resource authorization
-- **Display condition**: Hidden when the identity has fewer than two authorized contexts
-- **Active context indication**: The selected context may be indicated inside the control (e.g., as the button label or selected option)
-- **Keyboard accessible**: Full arrow-key navigation, `Esc` to close, focus management on open/close
-- **No emojis** or icons as sole indicators
-
----
-
-## 5. Route-to-Role Mapping
-
-### 5.1 Exclusive Routes
-
-| Route Pattern | Methods | Authorized Role(s) | Description |
-|---------------|---------|-------------------|-------------|
-| `/mis-solicitudes` | GET | `User` (Active) | List own requests |
-| `/mis-solicitudes/crear` | GET, POST | `User` (Active) | Create new request |
-| `/mis-solicitudes/{id}/editar` | GET, POST | `User` (Active, Owner) | Edit own `Pending` request |
-| `/mis-solicitudes/{id}` | GET | `User` (Active, Owner) | View own request detail |
-| `/aprobaciones` | GET | `Approver` (Active, `canResolveRequests=true`) | List eligible pending requests |
-| `/aprobaciones/{id}` | GET | `Approver` (Active, `canResolveRequests=true`, Eligible) | View request detail for resolution |
-| `/aprobaciones/{id}/aprobar` | POST | `Approver` (Active, `canResolveRequests=true`, Eligible, Not Owner) | Approve request |
-| `/aprobaciones/{id}/rechazar` | POST | `Approver` (Active, `canResolveRequests=true`, Eligible, Not Owner) | Reject request |
-| `/aprobaciones/{id}/desactivar` | POST | `Approver` (Active, `canResolveRequests=true`, Eligible, Not Owner) | Deactivate approved request (pre-start) |
-| `/rrhh` | GET | `HR` (Active) | HR dashboard |
-| `/rrhh/solicitudes` | GET | `HR` (Active) | Read-only request list (org-wide) |
-| `/rrhh/solicitudes/{id}` | GET | `HR` (Active) | Read-only request detail |
-| `/rrhh/calendario` | GET | `HR` (Active) | Organizational calendar |
-| `/rrhh/saldos` | GET | `HR` (Active) | Read-only balances list |
-| `/rrhh/saldos/{userId}` | GET | `HR` (Active) | Read-only balance detail and movements |
-| `/rrhh/auditoria` | GET | `HR` (Active) | Relevant audit information |
-| `/rrhh/aprobadores` | GET | `HR` (Active) | Approver capability list |
-| `/rrhh/aprobadores/{id}/capacidad` | GET, POST | `HR` (Active) | Toggle `canResolveRequests` for Approver |
-
-### 5.2 Shared Routes
-
-| Route Pattern | Methods | Authorized Role(s) | Description |
-|---------------|---------|-------------------|-------------|
-| `/` | GET | `User` (Active) \| `Approver` (Active) \| `HR` (Active) | Dashboard redirect based on roles |
-| `/saldo` | GET | `User` (Active) | View own global balance (labeled **Mi historial** in navigation) |
-| `/calendario` | GET | `User` (Active) \| `Approver` (Active, `canResolveRequests=true`) | Basic vacation calendar for User personal scope and Approver anonymized scope only; HR MUST use `/rrhh/calendario` |
-| `/acceso-denegado` | GET | Any (including unauthenticated) | Branded 403 page |
-| `/error` | GET | Any | Branded error page |
-
-### 5.3 Authentication Routes (Shared)
-
-| Route Pattern | Methods | Description |
-|---------------|---------|-------------|
-| `/Identity/Account/Login` | GET, POST | ASP.NET Core Identity login |
-| `/Identity/Account/Logout` | POST | Secure logout |
-| `/Identity/Account/AccessDenied` | GET | Redirect target for failed authorization |
-
-> All authentication routes use the default Identity UI area. No custom routes are added.
-
----
-
-## 6. Required Views Per Role
-
-### 6.1 User Context (`Mi espacio`)
-
-| View | Route | Purpose | Key Components |
-|------|-------|---------|----------------|
-| **Mis Solicitudes** | `/mis-solicitudes` | List own requests with status badges, date ranges, working-day totals, balance impact | Table, status badges, empty state, create button |
-| **Crear Solicitud** | `/mis-solicitudes/crear` | Submit new vacation request using either input mode | Dual-mode form (date-range / start+days), validation summary, balance preview, submit |
-| **Editar Solicitud** | `/mis-solicitudes/{id}/editar` | Edit owned `Pending` request with full revalidation | Pre-filled dual-mode form, revalidation, version concurrency token |
-| **Detalle de Solicitud** | `/mis-solicitudes/{id}` | Read-only detail with full audit trail | Status badge, date range, working days, reason, balance impact, audit timeline |
-| **Mi historial** | `/saldo` | Display accrued, reserved, deducted, available days with history | Summary cards, balance movements, request-related movements, accrual note |
-| **Calendario Básico** | `/calendario` | Month-view calendar showing own approved periods | Month grid, event markers, legend |
-
-### 6.2 Approver Context (`Aprobaciones`)
-
-| View | Route | Purpose | Key Components |
-|------|-------|---------|----------------|
-| **Pendientes de Resolución** | `/aprobaciones` | List all eligible `Pending` requests across organization | Table with requester, dates, working days, **balance available, projected balance (Disponible actual, Días solicitados, Disponible después de aprobar)**, overlap warnings, action buttons |
-| **Detalle para Resolución** | `/aprobaciones/{id}` | Detail view with resolution actions | Full request info, **balance revalidation with projected balance**, overlap revalidation, approve/reject/deactivate buttons, rejection reason textarea |
-| **Historial de Resoluciones** | `/aprobaciones/historial` | List of requests resolved by this approver | Table with date, action, requester, status, audit link |
-| **Calendario Básico** | `/calendario` | Month-view calendar showing approved periods (org-wide, anonymized per policy) for Approvers with `canResolveRequests=true` | Month grid, event markers, legend |
-
-### 6.3 HR Context (`RRHH`)
-
-| View | Route | Purpose | Key Components |
-|------|-------|---------|----------------|
-| **Dashboard RRHH** | `/rrhh` | Organization-wide summary cards | Total pending, active approvers, balance summary, quick links |
-| **Solicitudes (Solo Lectura)** | `/rrhh/solicitudes` | Filterable, paginated list of all requests | Table with requester, dates, status, working days, reservation, deduction |
-| **Detalle de Solicitud (Solo Lectura)** | `/rrhh/solicitudes/{id}` | Full request detail including audit trail | Same as Approver detail but read-only; no resolution actions |
-| **Calendario Organizacional** | `/rrhh/calendario` | Dedicated read-only HR calendar route showing all vacation requests organization-wide; HR MUST NOT use `/calendario` | Month grid, event markers, legend, filter by requester name if applicable |
-| **Saldos (Solo Lectura)** | `/rrhh/saldos` | List all users with balance summary | Table with user, **Acumulado total, Pendientes, Días gozados, Disponible** |
-| **Movimientos de Saldo (Solo Lectura)** | `/rrhh/saldos/{userId}` | Balance history for user | Timeline of accruals, reservations, deductions, restorations |
-| **Auditoría Relevante** | `/rrhh/auditoria` | Filterable audit log | Table with timestamp, actor, role, action, entity, result |
-| **Gestión de Aprobadores** | `/rrhh/aprobadores` | List all identities with `Approver` role and `canResolveRequests` | Table with name, email, active status, canResolveRequests, toggle action |
-| **Activar/Desactivar Capacidad** | `/rrhh/aprobadores/{id}/capacidad` | Modal with reason, confirmation, row version | Confirmation modal, reason textarea (required), row version check, audit |
-
-### 6.4 Shared Views
-
-| View | Route | Purpose | Key Components |
-|------|-------|---------|----------------|
-| **Dashboard** | `/` | Role-aware landing page | Context switcher (if multi-role), quick actions, summary cards |
-| **Acceso Denegado** | `/acceso-denegado` | Branded 403 with context-aware message | Friendly message, return link, contact hint |
-| **Error** | `/error` | Branded error page | Correlation ID, support reference |
-
----
-
-## 7. Navigation Structure
-
-### 7.1 User Context Navigation (`Mi espacio`)
-
-```mermaid
-flowchart LR
-    A[Dashboard /] --> B[Mis Solicitudes /mis-solicitudes]
-    A --> C[Mi Historial /saldo]
-    A --> D[Calendario /calendario]
-    B --> E[Crear /mis-solicitudes/crear]
-    B --> F[Detalle /mis-solicitudes/{id}]
-    F --> G[Editar /mis-solicitudes/{id}/editar]
-```
-
-**Primary Nav Items (header/sidebar):**
-1. **Mis solicitudes** → `/mis-solicitudes`
-2. **Mi historial** → `/saldo`
-3. **Calendario** → `/calendario`
-
-**Context Switcher** (visible only when identity has 2+ roles): Labeled **"Mis roles"** — dropdown with available contexts (`Mi espacio`, `Aprobaciones`, `RRHH`); hidden when <2 roles; switching updates route prefix and navigation only; does not modify identity, session, roles, claims, or permissions.
-
-### 7.2 Approver Context Navigation (`Aprobaciones`)
-
-```mermaid
-flowchart LR
-    A[Dashboard /] --> B[Pendientes /aprobaciones]
-    A --> C[Historial /aprobaciones/historial]
-    A --> D[Calendario /calendario]
-    B --> E[Detalle /aprobaciones/{id}]
-    E --> F1[Aprobar POST]
-    E --> F2[Rechazar POST]
-    E --> F3[Desactivar POST]
-```
-
-**Primary Nav Items (header/sidebar):**
-1. **Pendientes** → `/aprobaciones`
-2. **Historial** → `/aprobaciones/historial`
-3. **Calendario** → `/calendario`
-
-**Context Switcher** (visible only when identity has 2+ roles): Labeled **"Mis roles"** — dropdown with available contexts (`Mi espacio`, `Aprobaciones`, `RRHH`); hidden when <2 roles; switching updates route prefix and navigation only; does not modify identity, session, roles, claims, or permissions.
-
-### 7.3 HR Context Navigation (`RRHH`)
-
-The `RRHH` context calendar navigation MUST point only to `/rrhh/calendario`. The shared `/calendario` route has no HR behavior and MUST NOT expose HR global-calendar data.
-
-```mermaid
-flowchart LR
-    A[Dashboard /rrhh] --> B[Solicitudes /rrhh/solicitudes]
-    A --> C[Calendario /rrhh/calendario]
-    A --> D[Saldos /rrhh/saldos]
-    A --> E[Auditoría /rrhh/auditoria]
-    A --> F[Aprobadores /rrhh/aprobadores]
-    B --> G[Detalle /rrhh/solicitudes/{id}]
-    D --> H[Movimientos /rrhh/saldos/{userId}]
-    F --> I[Capacidad /rrhh/aprobadores/{id}/capacidad]
-```
-
-**Primary Nav Items (header/sidebar):**
-1. **Solicitudes** → `/rrhh/solicitudes`
-2. **Calendario** → `/rrhh/calendario`
-3. **Saldos** → `/rrhh/saldos`
-4. **Auditoría** → `/rrhh/auditoria`
-5. **Aprobadores** → `/rrhh/aprobadores`
-
-**Context Switcher** (visible only when identity has 2+ roles): Labeled **"Mis roles"** — dropdown with available contexts (`Mi espacio`, `Aprobaciones`, `RRHH`); hidden when <2 roles; switching updates route prefix and navigation only; does not modify identity, session, roles, claims, or permissions.
-
----
-
-## 8. View-Level Accessibility Checklist
-
-Every view MUST satisfy the baseline from `frontend-design-spec.md` §8 plus the following per-view requirements.
-
-### 8.1 Common to All Views
-
-- [ ] Semantic HTML5 landmarks (`<header>`, `<main>`, `<nav>`, `<footer>`)
-- [ ] Single `<h1>` matching view purpose
-- [ ] Heading hierarchy (h1 → h2 → h3) without gaps
-- [ ] Visible focus outline on all interactive elements (per design token `--nl-color-blue-600`, 2px offset)
-- [ ] Minimum 44×44px touch targets on all buttons, links, form controls
-- [ ] `prefers-reduced-motion: reduce` respected (animations ≤ 1ms)
-- [ ] Color contrast ≥ 4.5:1 for text, ≥ 3:1 for UI components
-- [ ] Status badges include text label; color is not sole conveyor
-- [ ] Form inputs have associated `<label>` or `aria-label`
-- [ ] Validation errors announced via `aria-live="polite"` region
-- [ ] Tables have `<caption>`, `<th scope="col">`, and row `<th scope="row">` where applicable
-- [ ] No horizontal scrolling at 320px viewport width
-
-### 8.2 Mis Solicitudes (List)
-
-- [ ] Table rows keyboard-navigable; `Enter`/`Space` opens detail
-- [ ] Status column uses semantic badges with text
-- [ ] Empty state has descriptive text and create action link
-- [ ] Sortable columns announce sort direction via `aria-sort`
-- [ ] **Server-side pagination** with accessible controls: page size selector (10/25/50), first/prev/next/last with ellipsis, `aria-label` for each control, total count announced via `aria-live="polite"`
-
-### 8.3 Crear / Editar Solicitud
-
-- [ ] Dual-mode selector announced as radio group (`role="radiogroup"`)
-- [ ] Date inputs use `type="date"` with accessible label
-- [ ] Working-days preview updates via `aria-live="polite"`
-- [ ] Balance impact shown before submit with clear wording
-- [ ] Submit button disabled during submission; loading state announced
-- [ ] Revalidation errors focus first invalid field
-
-### 8.4 Detalle de Solicitud (User)
-
-- [ ] Audit timeline as `<ol>` with `datetime` attributes
-- [ ] Balance impact card uses semantic state colors with text
-- [ ] Edit link only visible when status=`Pending` and user=owner
-
-### 8.5 Mi Historial
-
-- [ ] Four summary cards: Acumulado total, Pendientes, Días gozados, Disponible
-- [ ] Available balance emphasized (larger type, primary color)
-- [ ] Balance movements timeline with date, concept, amount, resulting balance
-- [ ] Request-related movements/history already available
-- [ ] Reservation breakdown as definition list `<dl>`
-
-### 8.6 Calendario Básico (User)
-
-- [ ] Month grid as `<table>` with `scope="col"` day headers (Mon–Sun)
-- [ ] **Weekend columns (Sat/Sun) visually distinct**: muted background (`--nl-color-border-subtle`), no event rendering
-- [ ] Approved periods as `<span class="nl-calendar-event">` with `aria-label` (format: `Solicitud propia, del {start} al {end}, {días} días`)
-- [ ] Keyboard navigation between days (arrow keys: Left/Right/Up/Down move by day/week)
-- [ ] `Home`/`End` jump to first/last day of month; `PageUp`/`PageDown` navigate months
-- [ ] Current day highlighted with `2px solid --nl-color-blue-600` border, not color alone
-- [ ] Focus indicator on day cell: `--nl-overlay` shadow + outline
-- [ ] **Events keyboard-activatable**: `Enter`/`Space` on day with event → navigate to `/mis-solicitudes/{id}`
-- [ ] No events rendered on weekend cells; weekend days non-focusable for event navigation
-- [ ] Month navigation: accessible `<button>` prev/next with `aria-label` "Mes anterior"/"Mes siguiente"
-- [ ] `aria-live="polite"` region announces month change
-
-### 8.7 Pendientes de Resolución (Approver)
-
-- [ ] Table with requester name, dates, working days, balance available
-- [ ] **Projected balance columns: Disponible actual, Días solicitados, Disponible después de aprobar**
-- [ ] Overlap warning column with icon + text
-- [ ] Action buttons (Aprobar / Rechazar / Desactivar) in same row
-- [ ] Row `data-request-id` for traceability
-- [ ] **Server-side pagination** with accessible controls: page size selector (10/25/50), first/prev/next/last with ellipsis, `aria-label` for each control, total count announced via `aria-live="polite"`
-
-### 8.8 Detalle para Resolución (Approver)
-
-- [ ] Full request detail mirrored from User detail
-- [ ] **Projected balance card: Disponible actual, Días solicitados, Disponible después de aprobar (server-calculated)**
-- [ ] Revalidation banner if balance/overlap changed since list load
-- [ ] Rejection reason `textarea` with `aria-describedby` linking to char-count hint
-- [ ] Charounter live region (10–500 chars)
-- [ ] Approve/Reject/Deactivate buttons use `aria-pressed` during async call
-- [ ] Deactivate button only visible when status=`Approved` and start date > today
-- [ ] **Approve button disabled when projected balance is negative; warning displayed**
-
-### 8.9 Calendario Básico (Approver)
-
-- [ ] Same keyboard/structure requirements as User calendar (§8.6)
-- [ ] **Weekend columns (Sat/Sun) visually distinct**: muted background, no event rendering
-- [ ] Events anonymized per policy (show date ranges only, no requester names)
-- [ ] **Calendar events keyboard-activatable (Enter/Space) → navigate to `/aprobaciones/{id}`**
-- [ ] Month navigation buttons accessible with `aria-label`
-- [ ] `aria-live="polite"` region announces month change
-
-### 8.10 Historial de Resoluciones (Approver)
-
-- [ ] Table with columns: date, action (Aprobó/Rechazó/Desactivó), requester, status, audit link
-- [ ] **Server-side pagination** with accessible controls: page size selector (10/25/50), first/prev/next/last with ellipsis, `aria-label` for each control, total count announced via `aria-live="polite"`
-- [ ] Sortable columns (date, action, requester) with `aria-sort` announcement
-- [ ] Filterable by date range, action type, requester
-- [ ] Row click navigates to read-only detail (`/aprobaciones/{id}`)
-- [ ] Empty state: "No hay resoluciones realizadas" with link to pending queue
-
-### 8.11 Solicitudes RRHH (List)
-
-- [ ] Filterable by status, date range, requester
-- [ ] Server-side pagination with accessible controls
-- [ ] Status badges with text labels
-- [ ] Row click navigates to read-only detail
-
-### 8.12 Detalle de Solicitud RRHH
-
-- [ ] Same content as Approver detail, read-only
-- [ ] Audit trail fully visible
-- [ ] No resolution action buttons present
-- [ ] **Projected balance displayed read-only: Disponible actual, Días solicitados, Disponible después de aprobar**
-
-### 8.13 Calendario Organizacional RRHH
-
-- [ ] Same keyboard/structure requirements as User calendar (§8.6)
-- [ ] **Weekend columns (Sat/Sun) visually distinct**: muted background, no event rendering
-- [ ] Events show requester name (HR-authorized) + working-day count (e.g., `Juan Pérez — 5 días`)
-- [ ] Multiple events per day stack vertically with `+N más` overflow indicator
-- [ ] Filter toolbar: requester name `<input>` (accessible label), `Buscar` input (debounced 300ms)
-- [ ] **Calendar events keyboard-activatable (Enter/Space) → navigate to `/rrhh/solicitudes/{id}`**
-- [ ] Month navigation buttons accessible with `aria-label`
-- [ ] `aria-live="polite"` region announces month change and filter results count
-- [ ] Tooltip on hover/focus: requester, date range, working days, status `Aprobada`
-
-### 8.14 Saldos y Movimientos RRHH
-
-- [ ] Sortable, filterable table
-- [ ] Balance movements as timeline with semantic indicators
-- [ ] **Balance summary cards use labels: Acumulado total, Pendientes, Días gozados, Disponible**
-- [ ] **Server-side pagination** for balances table: page size selector, first/prev/next/last with ellipsis, `aria-label` controls, total count via `aria-live="polite"`
-
-### 8.15 Gestión de Aprobadores RRHH
-
-- [ ] Table with toggle buttons for `canResolveRequests`
-- [ ] Toggle opens modal with required reason, confirmation, row version
-- [ ] Inactive approvers clearly marked
-- [ ] Audit trail link for each capability change
-- [ ] **Server-side pagination** for approvers table: page size selector, first/prev/next/last with ellipsis, `aria-label` controls, total count via `aria-live="polite"`
-
-### 8.16 Auditoría Relevante RRHH
-
-- [ ] Filterable table: date range, actor, action, entity, result
-- [ ] Server-side pagination with accessible controls: page size selector, first/prev/next/last, `aria-label`, total via `aria-live="polite"`
-- [ ] Semantic column headers with `scope="col"`; row actions via keyboard
-- [ ] Redacted sensitive data in payload column (no reasons/tokens/secrets exposed)
-- [ ] Sortable columns with `aria-sort` announcement
-- [ ] Responsive: card fallback on mobile with timestamp + actor + action + result
-
-### 8.17 Login Screen (ASP.NET Core Identity)
-
-- [ ] NovaLeave branding with design tokens (navy-900, blue-600)
-- [ ] White surface card with subtle border and shadow
-- [ ] Email/username and password fields with visible `<label>` elements
-- [ ] Client-side and server-side validation with alert feedback
-- [ ] Preserved email on validation failure
-- [ ] Accessible: full keyboard nav, visible focus, autocomplete attrs, aria-describedby for errors
-- [ ] Responsive: centered card mobile, constrained desktop
-- [ ] No emojis, no gradients
-- [ ] Antiforgery, secure cookies, lockout, session behavior preserved
-
----
-
-## 9. Security and Authorization at the Routing Layer
-
-### 9.1 Policy Definitions
-
-| Policy | Requirement |
-|--------|-------------|
-| `RequireActiveUser` | Authenticated, `Active` status, `User` claim present |
-| `RequireActiveApprover` | Authenticated, `Active` status, `Approver` claim present, `canResolveRequests=true` |
-| `RequireActiveHR` | Authenticated, `Active` status, `HR` claim present |
-| `RequireRequestOwner` | Resource owner matches current identity |
-| `RequireApproverEligible` | Active Approver with `canResolveRequests=true`, not owner, request in eligible state |
-| `RequireApproverNotOwner` | Active Approver with `canResolveRequests=true`, not owner of target request |
-| `RequirePreStartDeactivation` | Request `Approved` + start date > system business date |
-| `RequireHRForApproverManagement` | Active HR, target has Approver role |
-
-### 9.2 Controller Authorization
-
-```csharp
-// User context controllers
-[Authorize(Policy = "RequireActiveUser")]
-public class MisSolicitudesController : Controller { }
-
-[Authorize(Policy = "RequireActiveUser")]
-public class SaldoController : Controller { }
-
-// Approver context controllers
-[Authorize(Policy = "RequireActiveApprover")]
-public class AprobacionesController : Controller { }
-
-// HR context controllers
-[Authorize(Policy = "RequireActiveHR")]
-public class RRHHController : Controller { }
-
-// Shared User/Approver calendar only; HR uses RRHHController at /rrhh/calendario.
-[Authorize(Policy = "RequireActiveUserOrEligibleApprover")]
-public class CalendarioController : Controller { }
-```
-
-### 9.3 Resource Authorization (Per-Action)
-
-All mutation endpoints MUST revalidate in the Application layer:
-
-- Identity is Active
-- Role matches required role for action
-- `canResolveRequests=true` for Approver queue, detail, and resolution actions
-- Ownership/eligibility for target resource
-- Request state allows the transition
-- Concurrency token matches (optimistic lock)
-
-**HR-specific prohibitions enforced in Application layer:**
-
-- HR MUST NOT approve, reject, or deactivate any request
-- HR MUST NOT modify vacation balances
-- HR MUST NOT assign or remove roles
-- HR may only toggle `canResolveRequests` for identities that already have `Approver` role
-
-Hidden nav, disabled buttons, or client-side checks are NOT authorization controls.
-
----
-
-## 10. Shared Components Referenced
-
-The following components are defined in `frontend-design-spec.md` and MUST be used consistently:
-
-- `.nl-button-primary`, `.nl-button-secondary`, `.nl-button-danger`
-- `.nl-card`, `.nl-overlay`
-- Status badges: `.nl-badge-pending`, `.nl-badge-approved`, `.nl-badge-rejected`, `.nl-badge-timeout`, `.nl-badge-cancelled-approver`
-- `.nl-skeleton` for loading
-- `.nl-table`, `.nl-form`, `.nl-input`, `.nl-select`, `.nl-textarea`
-- Toast/alert components with semantic colors
-- Modal confirmation for destructive actions
-
----
-
-## 11. Acceptance Criteria
-
-| ID | Scenario | Expected Result |
-|----|----------|-----------------|
-| RBFV-001 | Active User navigates to `/mis-solicitudes` | 200 OK, list view rendered |
-| RBFV-002 | Active User navigates to `/aprobaciones` | 403 Forbidden → `/acceso-denegado` |
-| RBFV-003 | Active Approver with `canResolveRequests=true` navigates to `/aprobaciones` | 200 OK, list view rendered |
-| RBFV-004 | Active Approver navigates to `/mis-solicitudes/crear` | 403 Forbidden |
-| RBFV-005 | Active HR navigates to `/rrhh/solicitudes` | 200 OK, read-only list rendered |
-| RBFV-006 | Active HR attempts `/aprobaciones/{id}/aprobar` | 403 Forbidden |
-| RBFV-007 | Active HR attempts balance edit endpoint | 403 Forbidden |
-| RBFV-008 | Active HR attempts role assignment/removal | 403 Forbidden |
-| RBFV-009 | Dual-role identity switches context | Header updates, route prefix changes, no session modification |
-| RBFV-010 | Triple-role identity sees all three contexts in switcher | Dropdown shows `Mi espacio`, `Aprobaciones`, `RRHH` |
-| RBFV-011 | Inactive User attempts `/mis-solicitudes` | 403 Forbidden (policy `RequireActiveUser` fails) |
-| RBFV-012 | Inactive Approver or Approver with `canResolveRequests=false` attempts `/aprobaciones`, `/aprobaciones/{id}`, or a resolution POST | 403 Forbidden (policy `RequireActiveApprover` or resource eligibility fails) |
-| RBFV-013 | Inactive HR attempts `/rrhh/aprobadores/{id}/capacidad` | 403 Forbidden (policy `RequireActiveHR` fails) |
-| RBFV-014 | Approver attempts to approve own request | 403 Forbidden (policy `RequireApproverNotOwner` fails) |
-| RBFV-015 | HR toggles `canResolveRequests` for non-Approver | 400 Bad Request (validation fails) |
-| RBFV-016 | HR toggles `canResolveRequests` without reason | 400 Bad Request (validation fails) |
-| RBFV-017 | HR toggles `canResolveRequests` with stale row version | 409 Conflict (optimistic concurrency) |
-| RBFV-018 | All views pass accessibility checklist (§8) | Axecore/PASS, manual keyboard audit PASS |
-| RBFV-019 | Reduced-motion preference disables all non-essential animation | Verified via DevTools emulation |
-| RBFV-020 | Multi-role identity sees context switcher labeled "Mis roles" | Dropdown/button shows "Mis roles" with options: Mi espacio, Aprobaciones, RRHH; hidden when <2 roles |
-| RBFV-021 | Context switcher labeled "Mis roles" — switching does not modify session/roles/claims | Route prefix changes, navigation updates, identity/claims unchanged |
-| RBFV-022 | User navigation shows "Mi historial" (not "Mi saldo") at `/saldo` | Label in nav/sidebar is "Mi historial"; route `/saldo` unchanged |
-| RBFV-023 | Approver navigation shows "Historial" (not "Historial y Desactivación") | Nav item reads "Historial" at `/aprobaciones/historial` |
-| RBFV-024 | Balance cards show "Acumulado total", "Pendientes", "Días gozados", "Disponible" | Four cards with exact labels; no "Devengado", "Reservado", "Deducido" as card titles |
-| RBFV-025 | Approver list/detail shows projected balance: Disponible actual, Días solicitados, Disponible después de aprobar | Three values displayed; server-calculated; warning + disable Approve when negative |
-| RBFV-026 | Calendar event keyboard activation opens authorized detail by role | User→/mis-solicitudes/{id}, Approver→/aprobaciones/{id}, HR→/rrhh/solicitudes/{id}; no link if unauthorized |
-| RBFV-027 | No emoji text in any view (navigation, buttons, cards, statuses, alerts, modals, login) | Visual grep for emoji ranges returns zero matches in rendered views |
-| RBFV-028 | Request form shows only two input modes with generic labels | Radio group: "Fecha inicio + Fecha fin" and "Fecha inicio + Cantidad de días"; no "Modo A/B" |
-| RBFV-029 | Weekend exclusion in working-day calculation (server + UI preview match) | Fri+1→Mon, range spanning weekend, weekend-only rejected, Sat/Sun start rejected; holidays counted |
-| RBFV-030 | Approve/Reject are mutually exclusive — UI disables conflicting action on submit, server revalidates | After one POST, other button disabled; stale/duplicate POST returns conflict; reason required for Reject |
-| RBFV-031 | Approver views: visual hierarchy, spacing, white cards, status badges, loading, empty states | Manual review against frontend-design-spec.md §20 |
-| RBFV-032 | HR views: read-only indicators, no resolution actions, pagination, calendar names at `/rrhh/calendario`, capability modal; HR access to `/calendario` is forbidden | Manual review against frontend-design-spec.md §21 and route authorization tests |
-| RBFV-033 | Login screen uses NovaLeave branding, Identity flow, accessible, responsive, no emojis/gradients | Manual review against frontend-design-spec.md §12 |
-| RBFV-034 | New eligible Pending request appears in `/aprobaciones` exactly once without manual sync; Approver queue excludes only owning Approver and ineligible states, never team/hierarchy/department/assigned-approver | After successful creation, redirect User shows success; next Approver open/refresh shows the request once; no organizational filter applied |
-
----
-
-## 12. Out of Scope for This Specification
-
-- Business validation rules (see `specs/001-leave-management-mvp/spec.md`)
-- Design token values (see `frontend-design-spec.md` v1.3.0)
-- Database schema, EF Core mappings, migrations
-- Application use cases, handlers, validators
-- Infrastructure, deployment, CI/CD
-- API endpoints (no approved API for MVP)
-
----
-
-## 13. Version History
-
-| Version | Date | Author | Change |
-|---------|------|--------|--------|
-| 1.0.0 | 2026-07-23 | — | Initial draft aligned with Constitution v5.0.0 |
-| 2.0.0 | 2026-07-23 | — | Added HR/RRHH context; updated to Constitution v6.0.0; removed stale HR-exclusion warnings |
-| 2.0.1 | 2026-07-30 | — | Clarified Approver `canResolveRequests` eligibility and HR-only `/rrhh/calendario` route |
-
----
-
-**Constitution Alignment**: This specification is subordinate to `.specify/memory/constitution.md` v6.0.1 and `specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0. Any conflict MUST be resolved by amending the authoritative source.
+**Constitution Alignment**: This specification is subordinate to
+`.specify/memory/constitution.md` v7.0.0,
+`specs/001-leave-management-mvp/spec.md`, and
+`specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0. Any conflict
+MUST be resolved at the higher-authority source; implementation evidence alone
+MUST NOT amend approved product or design behavior.

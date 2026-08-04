@@ -15,6 +15,6 @@ public sealed class UC01AuthenticateTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var html = await response.Content.ReadAsStringAsync();
-        Assert.Contains("Iniciar sesion", html);
+        Assert.Contains("Iniciar sesión", html);
     }
 }

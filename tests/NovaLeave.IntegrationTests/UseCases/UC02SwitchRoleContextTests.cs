@@ -19,7 +19,7 @@ public sealed class UC02SwitchRoleContextTests
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Contains("Mis solicitudes", html);
-        Assert.Contains("Mi historial", html);
+        Assert.Contains("Historial de Solicitudes", html);
 
         // RBFV 4.2 / RBFV-020: the context selector is hidden below two authorized contexts.
         Assert.DoesNotContain("Mis roles", html);

@@ -7,6 +7,7 @@ namespace NovaLeave.Application.Calendars.GetApproverCalendar;
 
 public sealed record ApproverCalendarEvent(
     Guid RequestId,
+    string? RequesterName,
     DateOnly StartDate,
     DateOnly EndDate,
     int WorkingDays,
@@ -18,11 +19,16 @@ public sealed class GetApproverCalendarQueryHandler
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly IApproverIdentityService _identityService;
+    private readonly IUserDirectory _userDirectory;
 
-    public GetApproverCalendarQueryHandler(IApplicationDbContext dbContext, IApproverIdentityService identityService)
+    public GetApproverCalendarQueryHandler(
+        IApplicationDbContext dbContext,
+        IApproverIdentityService identityService,
+        IUserDirectory userDirectory)
     {
         _dbContext = dbContext;
         _identityService = identityService;
+        _userDirectory = userDirectory;
     }
 
     public async Task<Result<IReadOnlyList<ApproverCalendarEvent>>> HandleAsync(string approverId, bool includeOwnRequests, CancellationToken cancellationToken)
@@ -33,11 +39,17 @@ public sealed class GetApproverCalendarQueryHandler
             return Result<IReadOnlyList<ApproverCalendarEvent>>.Failure(authorization);
         }
 
+        var users = includeOwnRequests
+            ? await _userDirectory.GetUsersByIdsAsync([approverId], cancellationToken)
+            : new Dictionary<string, UserDirectoryEntry>();
+        var ownRequesterName = users.TryGetValue(approverId, out var user) ? user.DisplayName : approverId;
+
         IEnumerable<ApproverCalendarEvent> ownRequests = includeOwnRequests
             ? _dbContext.VacationRequests
                 .Where(request => request.OwnerId == approverId && (request.Status == RequestStatus.Pending || request.Status == RequestStatus.Approved))
                 .Select(request => new ApproverCalendarEvent(
                     request.Id,
+                    ownRequesterName,
                     request.StartDate,
                     request.EndDate,
                     request.WorkingDays,
@@ -50,6 +62,7 @@ public sealed class GetApproverCalendarQueryHandler
             .Where(request => request.Status == RequestStatus.Pending && request.OwnerId != approverId)
             .Select(request => new ApproverCalendarEvent(
                 request.Id,
+                null,
                 request.StartDate,
                 request.EndDate,
                 request.WorkingDays,
@@ -61,6 +74,7 @@ public sealed class GetApproverCalendarQueryHandler
             .Where(request => request.Status == RequestStatus.Approved && request.OwnerId != approverId)
             .Select(request => new ApproverCalendarEvent(
                 request.Id,
+                null,
                 request.StartDate,
                 request.EndDate,
                 request.WorkingDays,
@@ -75,6 +89,7 @@ public sealed class GetApproverCalendarQueryHandler
             .Where(request => request is not null && request.OwnerId != approverId)
             .Select(request => new ApproverCalendarEvent(
                 request!.Id,
+                null,
                 request.StartDate,
                 request.EndDate,
                 request.WorkingDays,

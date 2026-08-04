@@ -21,24 +21,12 @@
 <section class="nl-card" aria-label="@Model.Title">
   <div class="nl-card-body">
   <div class="nl-calendar-header mb-3">
-    <div>
-      <h2 class="h5 mb-1">@Model.CurrentMonth.DisplayName</h2>
-      <p class="text-body-secondary mb-0">@Model.Title</p>
+    <h2 class="h5 mb-0">@Model.Title</h2>
+    <div class="btn-group nl-month-picker" role="group" aria-label="Navegación del calendario">
+      <a class="btn btn-light" href="@route?year=@previous.Year&month=@previous.Month@context" aria-label="Mes anterior">‹</a>
+      <a class="btn btn-light nl-month-current" href="@route?year=@today.Year&month=@today.Month@context" aria-label="Ir al mes actual">@Model.CurrentMonth.DisplayName</a>
+      <a class="btn btn-light" href="@route?year=@next.Year&month=@next.Month@context" aria-label="Mes siguiente">›</a>
     </div>
-    <div class="btn-group" role="group" aria-label="Navegación del calendario">
-      <a class="btn btn-outline-primary" href="@route?year=@previous.Year&month=@previous.Month@context" aria-label="Mes anterior">Anterior</a>
-      <a class="btn btn-outline-primary" href="@route?year=@today.Year&month=@today.Month@context">Hoy</a>
-      <a class="btn btn-outline-primary" href="@route?year=@next.Year&month=@next.Month@context" aria-label="Mes siguiente">Siguiente</a>
-    </div>
-  </div>
-
-  <div class="d-flex flex-wrap gap-2 mb-3" aria-label="Leyenda de calendario">
-    @foreach (var category in Model.Events.Select(item => item.CategoryLabel).Distinct())
-    {
-      <span class="nl-badge nl-badge-neutral">@category</span>
-    }
-    <span class="nl-badge nl-badge-approved">Aprobada</span>
-    <span class="nl-badge nl-badge-pending">Pendiente</span>
   </div>
 
   <div class="table-responsive">
@@ -76,16 +64,16 @@
                   var detailUrl = item.DetailUrl(Model.DetailRouteTemplate);
                   if (detailUrl is not null)
                   {
-                    <a class="nl-calendar-event @item.CategoryCssClass" href="@detailUrl" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" data-category="@item.Category">
-                      <strong>@item.StatusLabel</strong>
-                      <span>@item.WorkingDays días · @item.StartDate.ToString("dd/MM")–@item.EndDate.ToString("dd/MM")</span>
+                    <a class="nl-calendar-event @item.CategoryCssClass @item.StatusCssClass" href="@detailUrl" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" data-category="@item.Category">
+                      <strong>@(string.IsNullOrWhiteSpace(item.RequesterName) ? item.Label : item.RequesterName)</strong>
+                      <span>@item.WorkingDays días · @item.StatusLabel</span>
                     </a>
                   }
                   else
                   {
-                    <span class="nl-calendar-event @item.CategoryCssClass" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" data-category="@item.Category">
-                      <strong>@item.StatusLabel</strong>
-                      <span>@item.WorkingDays días · @item.StartDate.ToString("dd/MM")–@item.EndDate.ToString("dd/MM")</span>
+                    <span class="nl-calendar-event @item.CategoryCssClass @item.StatusCssClass" role="button" tabindex="0" aria-label="@item.AccessibleName" data-calendar-event="true" data-status="@item.Status" data-category="@item.Category">
+                      <strong>@(string.IsNullOrWhiteSpace(item.RequesterName) ? item.Label : item.RequesterName)</strong>
+                      <span>@item.WorkingDays días · @item.StatusLabel</span>
                     </span>
                   }
                 }

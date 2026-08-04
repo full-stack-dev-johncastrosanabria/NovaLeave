@@ -1,56 +1,58 @@
 @model NovaLeave.Web.ViewModels.Aprobaciones.AprobacionesIndexViewModel
 @{
-    ViewData["Title"] = "Solicitudes pendientes";
+    ViewData["Title"] = "Bandeja de aprobación";
 }
 
-<div class="nl-page-header">
-  <div>
-    <p class="nl-page-kicker">Aprobaciones</p>
-    <h1 class="nl-page-title">Solicitudes pendientes</h1>
-    <p class="nl-page-description">Solicitudes elegibles para resolucion.</p>
+<div class="nl-page-header nl-page-header-card">
+  <div class="nl-heading-group">
+    <span class="nl-heading-icon nl-heading-icon-warning"><partial name="_Icon" model="@("check")" /></span>
+    <div>
+      <h1 class="nl-page-title">Bandeja de Aprobación de Vacaciones</h1>
+      <p class="nl-page-description">Solicitudes pendientes que requieren su revisión.</p>
+    </div>
   </div>
-  <a class="btn btn-outline-secondary" href="/aprobaciones/historial">Historial</a>
+  <span class="nl-queue-count">Pendientes en cola: <strong>@Model.Requests.Count</strong></span>
 </div>
 
 <section class="nl-card" aria-labelledby="approvals-title">
   <div class="nl-card-body">
-    <h2 id="approvals-title" class="h5 mb-3">Pendientes</h2>
+    <h2 id="approvals-title" class="visually-hidden">Solicitudes pendientes de resolución</h2>
     @if (!Model.Requests.Any())
     {
       <div class="nl-empty" role="status"><partial name="_EmptyStateIcon" /><strong>No hay solicitudes pendientes.</strong><span>Las nuevas solicitudes elegibles aparecerán aquí.</span></div>
     }
     else
     {
-<div class="table-responsive">
-  <table class="table nl-table nl-responsive-table align-middle">
-    <caption>Solicitudes pendientes de resolucion</caption>
-    <thead>
-      <tr>
-        <th scope="col">Solicitante</th>
-        <th scope="col">Inicio</th>
-        <th scope="col">Fin</th>
-        <th scope="col">Dias</th>
-        <th scope="col">Disponible</th>
-        <th scope="col">Disponible después de aprobar</th>
-        <th scope="col">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach (var request in Model.Requests)
-      {
-        <tr>
-          <td data-label="Solicitante"><strong>Usuario solicitante</strong><div class="small text-body-secondary">Identidad protegida</div></td>
-          <td data-label="Inicio">@request.StartDate.ToString("dd/MM/yyyy")</td>
-          <td data-label="Fin">@request.EndDate.ToString("dd/MM/yyyy")</td>
-          <td data-label="Días solicitados">@request.WorkingDays</td>
-          <td data-label="Disponible actual">@request.AvailableDays</td>
-          <td data-label="Disponible después de aprobar"><strong>@request.ProjectedBalanceAfterApproval</strong></td>
-          <td data-label="Acción"><a class="btn btn-sm btn-outline-primary" href="/aprobaciones/@request.Id">Revisar solicitud</a></td>
-        </tr>
-      }
-    </tbody>
-  </table>
-</div>
+      <div class="table-responsive">
+        <table class="table nl-table nl-responsive-table align-middle">
+          <caption>Solicitudes pendientes de resolución</caption>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Solicitante</th>
+              <th scope="col">Fechas solicitadas</th>
+              <th scope="col">Días solicitados</th>
+              <th scope="col">Disponible actual</th>
+              <th scope="col">Disponible después de aprobar</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+          @foreach (var request in Model.Requests)
+          {
+            <tr>
+              <td data-label="ID"><a class="nl-request-id" href="/aprobaciones/@request.Id">#req-@request.Id.ToString("N")[..6]</a></td>
+              <td data-label="Solicitante"><strong>@request.RequesterName</strong></td>
+              <td data-label="Fechas solicitadas"><span class="nl-mono">@request.StartDate.ToString("yyyy-MM-dd") al @request.EndDate.ToString("yyyy-MM-dd")</span></td>
+              <td data-label="Días solicitados"><strong>@request.WorkingDays días</strong></td>
+              <td data-label="Disponible actual"><strong>@request.AvailableDaysBeforeRequest días</strong></td>
+              <td data-label="Disponible después de aprobar"><strong class="text-success">@request.ProjectedBalanceAfterApproval días</strong></td>
+              <td data-label="Acciones"><a class="btn btn-sm btn-primary" href="/aprobaciones/@request.Id"><partial name="_Icon" model="@("eye")" />Revisar</a></td>
+            </tr>
+          }
+          </tbody>
+        </table>
+      </div>
     }
   </div>
 </section>

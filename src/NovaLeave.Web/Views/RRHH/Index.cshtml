@@ -1,21 +1,22 @@
 @model NovaLeave.Web.ViewModels.RRHH.RRHHDashboardViewModel
 @{
-    ViewData["Title"] = "RRHH";
+    ViewData["Title"] = "Panel RRHH";
 }
 
-<div class="nl-page-header">
-  <div>
-    <p class="nl-page-kicker">RRHH</p>
-    <h1 class="nl-page-title">Inicio</h1>
-    <p class="nl-page-description">Herramientas organizacionales de consulta y control autorizado.</p>
-  </div>
-  <span class="nl-badge nl-readonly">Solo lectura</span>
+<div class="nl-page-header nl-page-header-card">
+  <div class="nl-heading-group"><span class="nl-heading-icon"><partial name="_Icon" model="@("briefcase")" /></span><div><h1 class="nl-page-title">Panel Principal de Recursos Humanos</h1><p class="nl-page-description">Supervisión organizacional de vacaciones, saldos de colaboradores y capacidades de aprobadores.</p></div></div>
+  <span class="nl-badge nl-readonly">Modo RRHH Lectura Global</span>
 </div>
 
-<div class="nl-module-grid">
-  <a class="nl-card nl-module-card" href="/rrhh/solicitudes"><span class="nl-page-kicker">Solicitudes</span><h2>Consulta organizacional</h2><p>Revise solicitudes y su información autorizada en modo lectura.</p><span>Abrir solicitudes</span></a>
-  <a class="nl-card nl-module-card" href="/rrhh/calendario"><span class="nl-page-kicker">Calendario</span><h2>Calendario organizacional</h2><p>Consulte los periodos aprobados y próximos eventos.</p><span>Abrir calendario</span></a>
-  <a class="nl-card nl-module-card" href="/rrhh/saldos"><span class="nl-page-kicker">Saldos</span><h2>Saldos y movimientos</h2><p>Revise saldos globales e historial por persona.</p><span>Consultar saldos</span></a>
-  <a class="nl-card nl-module-card" href="/rrhh/auditoria"><span class="nl-page-kicker">Auditoría</span><h2>Registro de auditoría</h2><p>Consulte eventos relevantes y resultados protegidos.</p><span>Ver auditoría</span></a>
-  <a class="nl-card nl-module-card" href="/rrhh/aprobadores"><span class="nl-page-kicker">Capacidad</span><h2>Gestión de aprobadores</h2><p>Administre únicamente la capacidad autorizada de resolución.</p><span>Gestionar aprobadores</span></a>
+<div class="nl-summary-grid mb-4">
+  <section class="nl-card nl-summary-card nl-summary-primary"><div class="nl-summary-label">Total solicitudes org.</div><div class="nl-summary-value">@Model.TotalRequests</div><div class="nl-summary-help">@Model.PendingRequests pendientes de resolución</div></section>
+  <section class="nl-card nl-summary-card nl-summary-success"><div class="nl-summary-label">Solicitudes aprobadas</div><div class="nl-summary-value">@Model.ApprovedRequests</div><div class="nl-summary-help">Vacaciones activas u otorgadas</div></section>
+  <section class="nl-card nl-summary-card nl-summary-warning"><div class="nl-summary-label">Colaboradores con saldo</div><div class="nl-summary-value">@Model.UsersWithBalance</div><div class="nl-summary-help">Monitoreo de saldos acumulados</div></section>
+  <section class="nl-card nl-summary-card nl-summary-purple"><div class="nl-summary-label">Aprobadores registrados</div><div class="nl-summary-value">@Model.RegisteredApprovers</div><div class="nl-summary-help">@Model.ActiveApprovers con capacidad activa</div></section>
+</div>
+
+<div class="nl-module-grid nl-module-grid-three">
+  <a class="nl-card nl-module-card" href="/rrhh/calendario"><span class="nl-module-icon"><partial name="_Icon" model="@("calendar")" /></span><h2>Calendario Global RRHH</h2><p>Consulta el calendario consolidado de vacaciones de toda la organización.</p><span class="nl-module-link">Ingresar al módulo <partial name="_Icon" model="@("arrow")" /></span></a>
+  <a class="nl-card nl-module-card" href="/rrhh/aprobadores"><span class="nl-module-icon nl-module-icon-purple"><partial name="_Icon" model="@("users")" /></span><h2>Gestión de Aprobadores</h2><p>Habilita o deshabilita la capacidad <span class="nl-mono">canResolveRequests</span> para miembros con rol Aprobador.</p><span class="nl-module-link">Ingresar al módulo <partial name="_Icon" model="@("arrow")" /></span></a>
+  <a class="nl-card nl-module-card" href="/rrhh/auditoria"><span class="nl-module-icon nl-module-icon-warning"><partial name="_Icon" model="@("shield")" /></span><h2>Bitácora de Auditoría</h2><p>Revisa los eventos de seguridad y negocio inmutables con redacción de datos sensibles.</p><span class="nl-module-link">Ingresar al módulo <partial name="_Icon" model="@("arrow")" /></span></a>
 </div>

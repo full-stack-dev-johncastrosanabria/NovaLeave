@@ -45,26 +45,32 @@ public sealed class MisSolicitudesController : Controller
     {
         var userId = RequireUserId();
         var requests = await _getMyRequests.HandleAsync(userId, cancellationToken);
-        return View(new MisSolicitudesIndexViewModel(requests));
+        var balance = await _getMyBalance.HandleAsync(userId, cancellationToken);
+        return balance.IsFailure
+            ? NotFound()
+            : View(new MisSolicitudesIndexViewModel(CurrentDisplayName(), requests, balance.Value!));
     }
 
     [HttpGet("/mis-solicitudes/crear")]
-    public IActionResult Create()
+    public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
         // The earliest valid start is the day after the current business date (BR-002), so the
         // form opens on that date instead of DateOnly.MinValue, which rendered as 01/01/0001.
         var earliestStart = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime).AddDays(1);
 
-        return View(new CreateVacationRequestViewModel
+        var viewModel = new CreateVacationRequestViewModel
         {
             StartDate = earliestStart,
             EndDate = earliestStart
-        });
+        };
+        await PopulateAvailableDaysAsync(viewModel, cancellationToken);
+        return View(viewModel);
     }
 
     [HttpPost("/mis-solicitudes/crear")]
     public async Task<IActionResult> Create(CreateVacationRequestViewModel viewModel, CancellationToken cancellationToken)
     {
+        await PopulateAvailableDaysAsync(viewModel, cancellationToken);
         if (!ModelState.IsValid)
         {
             return InvalidForm(viewModel);
@@ -179,12 +185,23 @@ public sealed class MisSolicitudesController : Controller
             return NotFound();
         }
 
-        return View("~/Views/MisSolicitudes/Balance.cshtml", new SaldoViewModel(result.Value!));
+        return View("~/Views/MisSolicitudes/Balance.cshtml", new SaldoViewModel(CurrentDisplayName(), result.Value!));
     }
 
     private string RequireUserId()
     {
         return _currentUser.UserId ?? throw new InvalidOperationException("Usuario autenticado requerido.");
+    }
+
+    private string CurrentDisplayName()
+    {
+        return User.Identity?.Name ?? "Usuario";
+    }
+
+    private async Task PopulateAvailableDaysAsync(CreateVacationRequestViewModel viewModel, CancellationToken cancellationToken)
+    {
+        var balance = await _getMyBalance.HandleAsync(RequireUserId(), cancellationToken);
+        viewModel.AvailableDays = balance.IsSuccess ? balance.Value!.AvailableDays : 0;
     }
 
     /// <summary>

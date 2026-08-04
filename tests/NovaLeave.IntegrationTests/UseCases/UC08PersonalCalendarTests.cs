@@ -35,6 +35,7 @@ public sealed class UC08PersonalCalendarTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Mis solicitudes", html);
         Assert.Contains("Pendiente", html);
+        Assert.Contains("user1@example.test", html);
         Assert.Contains($"/mis-solicitudes/{pendingRequestId}", html);
         Assert.DoesNotContain("/aprobaciones/", html);
     }

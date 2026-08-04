@@ -6,7 +6,13 @@ using NovaLeave.Application.HR.Requests;
 
 namespace NovaLeave.Web.ViewModels.RRHH;
 
-public sealed record RRHHDashboardViewModel;
+public sealed record RRHHDashboardViewModel(
+    int TotalRequests,
+    int PendingRequests,
+    int ApprovedRequests,
+    int UsersWithBalance,
+    int RegisteredApprovers,
+    int ActiveApprovers);
 
 public sealed record RRHHSolicitudesIndexViewModel(PagedResult<HRRequestSummary> Requests);
 

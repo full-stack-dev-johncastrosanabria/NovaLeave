@@ -58,10 +58,10 @@ public sealed record CalendarEvent(
 
     public string StatusCssClass => Status switch
     {
-        RequestStatus.Pending => "text-warning-emphasis bg-warning-subtle border-warning-subtle",
-        RequestStatus.Approved => "text-success-emphasis bg-success-subtle border-success-subtle",
-        RequestStatus.Rejected => "text-danger-emphasis bg-danger-subtle border-danger-subtle",
-        _ => "text-secondary-emphasis bg-secondary-subtle border-secondary-subtle"
+        RequestStatus.Pending => "nl-calendar-status-pending",
+        RequestStatus.Approved => "nl-calendar-status-approved",
+        RequestStatus.Rejected => "nl-calendar-status-rejected",
+        _ => "nl-calendar-status-cancelled"
     };
 
     public string CategoryLabel => Category switch

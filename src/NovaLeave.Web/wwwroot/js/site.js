@@ -93,6 +93,18 @@ document.querySelectorAll("[data-character-source]").forEach((source) => {
   update();
 });
 
+document.querySelectorAll("[data-request-status-filter]").forEach((filter) => {
+  filter.addEventListener("change", () => {
+    const selected = filter.value;
+    document.querySelectorAll("[data-request-status]").forEach((row) => {
+      const status = row.getAttribute("data-request-status") || "";
+      row.hidden = selected !== "" && (selected === "Cancelled"
+        ? !status.startsWith("Cancelled")
+        : status !== selected);
+    });
+  });
+});
+
 (() => {
   const modalElement = document.getElementById("nlConfirmationModal");
   const confirmButton = modalElement?.querySelector("[data-confirm-submit]");

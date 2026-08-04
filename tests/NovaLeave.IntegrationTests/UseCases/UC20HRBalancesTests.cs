@@ -40,7 +40,7 @@ public sealed class UC20HRBalancesTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Movimientos RRHH", html);
-        Assert.Contains("Accrual", html);
+        Assert.Contains("Acumulado total", html);
         Assert.DoesNotContain("Editar saldo", html);
         Assert.DoesNotContain("Ajustar", html);
     }
@@ -78,7 +78,7 @@ public sealed class UC20HRBalancesTests
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Pagina 2 de 2", html);
+        Assert.Contains("Página 2 de 2", html);
         Assert.Contains("bulk-user-51", html);
     }
 

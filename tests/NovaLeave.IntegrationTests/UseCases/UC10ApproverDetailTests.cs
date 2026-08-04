@@ -18,7 +18,7 @@ public sealed class UC10ApproverDetailTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Detalle para resolucion", html);
-        Assert.Contains("Saldo proyectado", html);
+        Assert.Contains("saldo proyectado", html);
         Assert.Contains("RowVersion", html);
         Assert.DoesNotContain("Vacaciones familiares", html);
     }

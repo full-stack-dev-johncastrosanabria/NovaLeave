@@ -21,10 +21,12 @@ public sealed class UC09ApproverQueueTests
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Solicitudes pendientes", html);
-        Assert.Contains("2027-01-04", html);
+        Assert.Contains("Bandeja de Aprobación de Vacaciones", html);
+        Assert.Contains("user1@example.test", html);
         Assert.DoesNotContain("approver1@example.test", html);
-        Assert.Contains("Saldo proyectado", html);
+        Assert.Contains("Días solicitados", html);
+        Assert.Contains("Disponible actual", html);
+        Assert.Contains("Disponible después de aprobar", html);
     }
 
     [Fact]

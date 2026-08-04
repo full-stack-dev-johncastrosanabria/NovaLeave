@@ -1,18 +1,11 @@
 @model NovaLeave.Web.ViewModels.RRHH.RRHHCalendarioViewModel
 @{
-    ViewData["Title"] = "Calendario RRHH";
+    ViewData["Title"] = "Calendario organizacional";
 }
 
-<div class="nl-page-header">
-  <div>
-    <p class="nl-page-kicker">RRHH</p>
-    <h1 class="nl-page-title">Calendario organizacional</h1>
-    <p class="nl-page-description">Periodos de vacaciones visibles para RRHH.</p>
-  </div>
-  <div class="d-flex flex-wrap gap-2">
-    <span class="nl-badge nl-readonly">Solo lectura</span>
-    <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
-  </div>
+<div class="nl-page-header nl-page-header-card">
+  <div class="nl-heading-group"><span class="nl-heading-icon"><partial name="_Icon" model="@("calendar")" /></span><div><h1 class="nl-page-title">Calendario Organizacional de Vacaciones (RRHH)</h1><p class="nl-page-description">Vista global de vacaciones de todos los colaboradores autorizada para RRHH.</p></div></div>
+  <span class="nl-badge nl-readonly">Solo lectura</span>
 </div>
 
 <partial name="_Calendar" model="Model.Calendar" />
