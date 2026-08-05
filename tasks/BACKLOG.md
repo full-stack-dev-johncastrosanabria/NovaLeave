@@ -208,7 +208,7 @@ Requirement changes must be made first in the official artifacts and then synchr
 - TASK-012 - EPIC-001 - Foundation: Update `AGENTS.md` Spec Kit section to reference `specs/001-leave-management-mvp/plan.md`
 - TASK-013 - EPIC-001 - Foundation: Add Clean Architecture dependency tests
 - TASK-014 - EPIC-001 - Foundation: Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`)
-- TASK-015 - EPIC-001 - Foundation: Add working-day calculation tests for Mon-Fri, weekend exclusion, and holiday-as-working-day behavior
+- TASK-015 - EPIC-001 - Foundation: Add working-day calculation tests for Mon-Fri, weekend exclusion, holiday-as-working-day behavior, and the UTC-to-Costa-Rica business-date boundary
 - TASK-016 - EPIC-001 - Foundation: Add balance invariant tests for non-negative accrued/reserved/deducted/available totals
 - TASK-017 - EPIC-001 - Foundation: Add authorization policy tests for User, Approver, HR, Active/Inactive, self-resolution denial, and `canResolveRequests`
 - TASK-018 - EPIC-001 - Foundation: Add audit schema and redaction tests
@@ -219,7 +219,7 @@ Requirement changes must be made first in the official artifacts and then synchr
 - TASK-023 - EPIC-002 - Domain and Persistence: Create DateRange value object
 - TASK-024 - EPIC-002 - Domain and Persistence: Create WorkingDayCount value object
 - TASK-025 - EPIC-002 - Domain and Persistence: Create AccrualPeriod value object
-- TASK-026 - EPIC-002 - Domain and Persistence: Create WorkingDaysCalculator domain service using built-in .NET `TimeProvider` inputs where current date is needed
+- TASK-026 - EPIC-002 - Domain and Persistence: Create centralized Costa Rica time conversion and WorkingDaysCalculator services using built-in .NET `TimeProvider` inputs where current date is needed
 - TASK-027 - EPIC-002 - Domain and Persistence: Create OverlapPolicy domain service
 - TASK-028 - EPIC-002 - Domain and Persistence: Create VacationRequest aggregate with states `Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, and `CancelledByApprover`, and only the official transitions `Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, and `Approved -> CancelledByApprover`
 - TASK-029 - EPIC-002 - Domain and Persistence: Create VacationBalance aggregate with non-negative balance invariants

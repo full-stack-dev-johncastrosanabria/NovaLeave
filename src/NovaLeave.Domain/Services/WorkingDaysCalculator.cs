@@ -51,7 +51,7 @@ public static class WorkingDaysCalculator
 
     public static void EnsureStartsAfterBusinessDate(DateRange range, TimeProvider timeProvider)
     {
-        var today = DateOnly.FromDateTime(timeProvider.GetUtcNow().UtcDateTime);
+        var today = CostaRicaTime.GetBusinessDate(timeProvider.GetUtcNow());
         if (range.Start <= today)
         {
             throw new InvalidOperationException("Start date must be after the current business date.");

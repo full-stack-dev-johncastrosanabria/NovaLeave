@@ -216,6 +216,22 @@ public sealed class AccessibilityRegressionTests
         Assert.Contains("Ver detalle", content);
     }
 
+    [Theory]
+    [InlineData("src/NovaLeave.Web/Views/Aprobaciones/History.cshtml")]
+    [InlineData("src/NovaLeave.Web/Views/RRHH/Auditoria.cshtml")]
+    [InlineData("src/NovaLeave.Web/Views/RRHH/SolicitudDetalle.cshtml")]
+    [InlineData("src/NovaLeave.Web/Views/RRHH/Movimientos.cshtml")]
+    public void Timestamp_Views_Display_Costa_Rica_Local_Time(string relativePath)
+    {
+        var content = File.ReadAllText(Path.Combine(FindRepositoryRoot(), relativePath));
+
+        Assert.Contains("CostaRicaTime.ToLocalDateTime", content);
+        Assert.Contains("Costa Rica", content);
+        Assert.DoesNotContain(">@item.TimestampUtc<", content);
+        Assert.DoesNotContain(">@record.TimestampUtc<", content);
+        Assert.DoesNotContain(">@movement.EffectiveAtUtc<", content);
+    }
+
     [Fact]
     public void Layout_Versions_The_Project_Stylesheet()
     {

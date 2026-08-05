@@ -9,7 +9,7 @@
     <caption class="visually-hidden">Historial de acciones del aprobador</caption>
     <thead>
       <tr>
-        <th scope="col">Fecha</th>
+        <th scope="col">Fecha y hora (Costa Rica)</th>
         <th scope="col">Acción</th>
         <th scope="col">Solicitud</th>
         <th scope="col">Solicitante</th>
@@ -20,7 +20,7 @@
       @foreach (var item in Model.Items)
       {
         <tr>
-          <td>@item.TimestampUtc</td>
+          <td>@CostaRicaTime.ToLocalDateTime(item.TimestampUtc).ToString("dd/MM/yyyy HH:mm")</td>
           <td>@item.Action</td>
           <td><a href="/aprobaciones/@item.RequestId">@item.RequestId</a></td>
           <td>@item.RequesterId</td>

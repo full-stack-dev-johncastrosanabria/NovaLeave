@@ -15,7 +15,7 @@
 ### CR-02: Accrual Timezone Reference
 **Source conflict**: Conjunto 1 mentioned "accrual keyed to calendar month ending in user's employment timezone." Constitution §5 and Instruction §5.4 prohibit per-user timezone behavior.
 **Authority applied**: Constitution v7.0.0 invariant 4; Instruction §5.4.
-**Resolution**: No per-user timezone logic. Accrual period determined by calendar month boundary using a single system business date (UTC). `TimeProvider` (built-in .NET 10) is the sole time abstraction.
+**Resolution**: No per-user timezone logic. The Product Owner clarification of 2026-08-05 fixes the single system business date to `America/Costa_Rica` (UTC−06:00). Accrual periods, next-day validation, timeout dates, calendar “today”, and pre-start deactivation use that business date. Timestamps remain persisted in UTC and are converted only for user-facing presentation. `TimeProvider` (built-in .NET 10) remains the sole clock abstraction.
 **Affected**: FR-014, BR-032, BR-033, AC-054, UC-17.
 
 ### CR-03: Accrual Job Cadence
@@ -137,6 +137,7 @@ No value is hard-coded in application code; startup validation remains fail-fast
 ## Design Constraints
 
 - `TimeProvider` for all time-dependent rules; no `DateTime.Now` or `DateTime.UtcNow` in Domain or Application.
+- One centralized `America/Costa_Rica` conversion policy derives business dates and presentation times; no per-user time-zone or duplicate clock abstraction.
 - EF Core optimistic concurrency with `rowversion` on mutable aggregates.
 - `BalanceMovement` and `AuditRecord` are immutable; created within the same DB transaction as the state change.
 - Background services (timeout + accrual) are idempotent and bounded per batch.

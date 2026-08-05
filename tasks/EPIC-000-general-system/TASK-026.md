@@ -10,7 +10,7 @@ EPIC-000 - NovaLeave Complete MVP System
 
 ## Objective
 
-Deliver the outcome defined by canonical task T026: Create WorkingDaysCalculator domain service using built-in .NET `TimeProvider` inputs where current date is needed in `src/NovaLeave.Domain/Services/WorkingDaysCalculator.cs`.
+Deliver the outcome defined by canonical task T026: Create the centralized Costa Rica time conversion policy and WorkingDaysCalculator domain service using built-in .NET `TimeProvider` inputs where current date is needed in `src/NovaLeave.Domain/Services/CostaRicaTime.cs` and `src/NovaLeave.Domain/Services/WorkingDaysCalculator.cs`.
 
 ## Description
 

@@ -60,7 +60,7 @@ public sealed class GetApproverRequestDetailQueryHandler
             .ToList();
         var hasOverlapWarning = _overlapPolicy.HasBlockingOverlap(otherRequests, request.DateRange);
 
-        var businessDate = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime);
+        var businessDate = CostaRicaTime.GetBusinessDate(_timeProvider.GetUtcNow());
         var canDeactivate = request.Status == RequestStatus.Approved && request.StartDate > businessDate;
         var users = await _userDirectory.GetUsersByIdsAsync([request.OwnerId], cancellationToken);
         var requesterName = users.TryGetValue(request.OwnerId, out var requester)

@@ -24,7 +24,7 @@ else
     <caption class="visually-hidden">Registros de auditoría relevantes para RRHH</caption>
     <thead>
       <tr>
-        <th scope="col">Fecha</th>
+        <th scope="col">Fecha y hora (Costa Rica)</th>
         <th scope="col">Actor</th>
         <th scope="col">Rol</th>
         <th scope="col">Acción</th>
@@ -37,7 +37,7 @@ else
       @foreach (var record in Model.Records.Items)
       {
         <tr>
-          <td>@record.TimestampUtc</td>
+          <td>@CostaRicaTime.ToLocalDateTime(record.TimestampUtc).ToString("dd/MM/yyyy HH:mm")</td>
           <td>@record.ActorId</td>
           <td>@record.ActorRole</td>
           <td>@record.Action</td>

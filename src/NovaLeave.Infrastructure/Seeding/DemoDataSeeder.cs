@@ -81,7 +81,7 @@ public static class DemoDataSeeder
         var timeProvider = provider.GetRequiredService<TimeProvider>();
 
         var nowUtc = timeProvider.GetUtcNow();
-        var today = DateOnly.FromDateTime(nowUtc.UtcDateTime);
+        var today = CostaRicaTime.GetBusinessDate(nowUtc);
         // Day 1 so MonthlyAccrualPolicy treats the hire month itself as eligible.
         var employmentStartDate = new DateOnly(today.Year, today.Month, 1).AddMonths(-DemoMonthsOfService);
 

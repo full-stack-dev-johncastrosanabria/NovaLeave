@@ -43,4 +43,19 @@ public sealed class WorkingDaysCalculatorTests
 
         Assert.Throws<InvalidOperationException>(() => WorkingDaysCalculator.Count(range));
     }
+
+    [Fact]
+    public void Start_Date_Validation_Uses_Costa_Rica_Business_Date()
+    {
+        // At 03:30 UTC on January 2 it is still 21:30 on January 1 in Costa Rica.
+        var timeProvider = new FixedTimeProvider(new DateTimeOffset(2027, 1, 2, 3, 30, 0, TimeSpan.Zero));
+        var range = new DateRange(new DateOnly(2027, 1, 2), new DateOnly(2027, 1, 2));
+
+        WorkingDaysCalculator.EnsureStartsAfterBusinessDate(range, timeProvider);
+    }
+
+    private sealed class FixedTimeProvider(DateTimeOffset utcNow) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => utcNow;
+    }
 }

@@ -16,7 +16,7 @@
 | `AuditRecord` | Immutable entity | Append-only business audit with all required fields | Immutable; complete fields; sensitive reasons never in Data column | AUD-001–010, CON-006–011, SEC-005–006 |
 | `ApplicationUser` | Infrastructure entity (extends IdentityUser) | Active/Inactive status; roles; canResolveRequests; EmploymentStartDate | Active status checked pre-transition; Domain User does NOT inherit IdentityUser | FR-001, FR-006, AUTHZ-001–016, Constitution §4.4, §7.1 |
 | `LeaveType` | Domain enum/constant | Request type validation | Vacation only in MVP; no persisted lookup or mutable aggregate | VAL-002, VAL-003, spec.md PD-001, research.md CR-09 |
-| `TimeProvider` | Built-in .NET service | Single system business date; testable clock | No DateTime.Now in Domain/Application; no per-user timezone; no duplicate clock abstraction | Constitution §VI; BR-002–003; research.md CR-08 |
+| `TimeProvider` + Costa Rica conversion policy | Built-in .NET service plus deterministic domain policy | Single `America/Costa_Rica` business date; UTC timestamp conversion; testable clock | UTC persistence; no DateTime.Now in Domain/Application; no per-user timezone; no duplicate clock abstraction | Constitution §VI; BR-002–003; research.md CR-02/CR-08 |
 
 ### VacationRequest Lifecycle
 

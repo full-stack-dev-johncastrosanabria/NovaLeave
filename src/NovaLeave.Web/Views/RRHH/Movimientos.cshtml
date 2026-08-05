@@ -47,7 +47,7 @@ else
     <caption class="visually-hidden">Movimientos de saldo</caption>
     <thead>
       <tr>
-        <th scope="col">Fecha</th>
+        <th scope="col">Fecha y hora (Costa Rica)</th>
         <th scope="col">Tipo</th>
         <th scope="col">Días</th>
         <th scope="col">Solicitud</th>
@@ -58,7 +58,7 @@ else
       @foreach (var movement in Model.Balance.Movements)
       {
         <tr>
-          <td>@movement.EffectiveAtUtc</td>
+          <td>@CostaRicaTime.ToLocalDateTime(movement.EffectiveAtUtc).ToString("dd/MM/yyyy HH:mm")</td>
           <td>@movement.Type</td>
           <td>@movement.Amount</td>
           <td>@movement.RequestId</td>

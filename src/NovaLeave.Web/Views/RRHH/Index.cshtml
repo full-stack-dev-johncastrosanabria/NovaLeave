@@ -186,8 +186,8 @@
                 <span class="fw-medium">@record.Action</span>
                 <span class="text-body-secondary"> &middot; @record.ActorId</span>
               </span>
-              <span class="text-body-secondary text-nowrap nl-num" style="font-size:12px">
-                @record.TimestampUtc.ToString("yyyy-MM-dd HH:mm")
+              <span class="text-body-secondary text-nowrap nl-num" style="font-size:12px" title="Hora de Costa Rica">
+                @CostaRicaTime.ToLocalDateTime(record.TimestampUtc).ToString("dd/MM/yyyy HH:mm")
               </span>
             </li>
           }

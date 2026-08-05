@@ -40,7 +40,7 @@
     <caption class="visually-hidden">Auditoría de la solicitud</caption>
     <thead>
       <tr>
-        <th scope="col">Fecha</th>
+        <th scope="col">Fecha y hora (Costa Rica)</th>
         <th scope="col">Actor</th>
         <th scope="col">Rol</th>
         <th scope="col">Acción</th>
@@ -51,7 +51,7 @@
       @foreach (var item in Model.Request.AuditTrail)
       {
         <tr>
-          <td>@item.TimestampUtc</td>
+          <td>@CostaRicaTime.ToLocalDateTime(item.TimestampUtc).ToString("dd/MM/yyyy HH:mm")</td>
           <td>@item.ActorId</td>
           <td>@item.ActorRole</td>
           <td>@item.Action</td>

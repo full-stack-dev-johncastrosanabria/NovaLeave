@@ -24,7 +24,8 @@ public sealed class CalendarViewModelTests
                     3,
                     RequestStatus.Approved,
                     true)
-            ]);
+            ],
+            new DateOnly(2027, 2, 15));
 
         Assert.Equal(month, model.CurrentMonth);
         Assert.Equal(0, model.Days.Count % 7);

@@ -5,6 +5,7 @@ using NovaLeave.Application.Calendars.GetPersonalCalendar;
 using NovaLeave.Application.Calendars.GetApproverCalendar;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Domain.Enums;
+using NovaLeave.Domain.Services;
 using NovaLeave.Web.ViewModels.Calendario;
 
 namespace NovaLeave.Web.Controllers;
@@ -15,12 +16,14 @@ public sealed class CalendarioController : Controller
     private readonly ICurrentUser _currentUser;
     private readonly GetPersonalCalendarQueryHandler _getPersonalCalendar;
     private readonly GetApproverCalendarQueryHandler _getApproverCalendar;
+    private readonly TimeProvider _timeProvider;
 
-    public CalendarioController(ICurrentUser currentUser, GetPersonalCalendarQueryHandler getPersonalCalendar, GetApproverCalendarQueryHandler getApproverCalendar)
+    public CalendarioController(ICurrentUser currentUser, GetPersonalCalendarQueryHandler getPersonalCalendar, GetApproverCalendarQueryHandler getApproverCalendar, TimeProvider timeProvider)
     {
         _currentUser = currentUser;
         _getPersonalCalendar = getPersonalCalendar;
         _getApproverCalendar = getApproverCalendar;
+        _timeProvider = timeProvider;
     }
 
     [HttpGet("/calendario")]
@@ -68,7 +71,8 @@ public sealed class CalendarioController : Controller
                 RoleContext.Approver,
                 "Calendario de aprobaciones",
                 "/aprobaciones/{id}",
-                approverEvents)));
+                approverEvents,
+                CostaRicaTime.GetBusinessDate(_timeProvider.GetUtcNow()))));
         }
 
         if (!User.IsInRole("User"))
@@ -94,7 +98,8 @@ public sealed class CalendarioController : Controller
             RoleContext.User,
             "Mi calendario",
             "/mis-solicitudes/{id}",
-            userEvents)));
+            userEvents,
+            CostaRicaTime.GetBusinessDate(_timeProvider.GetUtcNow()))));
     }
 
     private RoleContext ResolveContext(string? context)
@@ -114,7 +119,7 @@ public sealed class CalendarioController : Controller
             : RoleContext.User;
     }
 
-    private static YearMonth ResolveMonth(int? year, int? month, IReadOnlyList<CalendarEvent> events)
+    private YearMonth ResolveMonth(int? year, int? month, IReadOnlyList<CalendarEvent> events)
     {
         if (year is null && month is null && events.Count > 0)
         {
@@ -122,7 +127,7 @@ public sealed class CalendarioController : Controller
             return new YearMonth(firstEvent.StartDate.Year, firstEvent.StartDate.Month);
         }
 
-        var now = DateTime.UtcNow;
-        return new YearMonth(year ?? now.Year, month ?? now.Month);
+        var today = CostaRicaTime.GetBusinessDate(_timeProvider.GetUtcNow());
+        return new YearMonth(year ?? today.Year, month ?? today.Month);
     }
 }

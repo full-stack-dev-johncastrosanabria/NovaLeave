@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NovaLeave.Application.Configuration;
 using NovaLeave.Application.System.ExecuteMonthlyAccrual;
+using NovaLeave.Domain.Services;
 
 namespace NovaLeave.Infrastructure.Scheduling;
 
@@ -46,7 +47,7 @@ public sealed class MonthlyAccrualJob : BackgroundService
         {
             using var scope = _scopeFactory.CreateScope();
             var handler = scope.ServiceProvider.GetRequiredService<ExecuteMonthlyAccrualHandler>();
-            var today = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime);
+            var today = CostaRicaTime.GetBusinessDate(_timeProvider.GetUtcNow());
             var result = await handler.HandleAsync(new ExecuteMonthlyAccrualCommand(today), cancellationToken);
             if (result.IsFailure)
             {

@@ -3,6 +3,7 @@ using NovaLeave.Application.Common.Errors;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Common.Results;
 using NovaLeave.Domain.Entities;
+using NovaLeave.Domain.Services;
 
 namespace NovaLeave.Application.Approvals.DeactivateApprovedRequest;
 
@@ -41,7 +42,7 @@ public sealed class DeactivateApprovedRequestHandler
         try
         {
             var timestamp = _timeProvider.GetUtcNow();
-            var businessDate = DateOnly.FromDateTime(timestamp.UtcDateTime);
+            var businessDate = CostaRicaTime.GetBusinessDate(timestamp);
             request.CancelByApprover(command.ApproverId, businessDate, timestamp);
             var balance = _dbContext.VacationBalances.Single(candidate => candidate.UserId == request.OwnerId);
             var movement = balance.Restore(request.Id, request.WorkingDays, command.ApproverId, timestamp);

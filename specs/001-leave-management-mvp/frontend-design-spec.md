@@ -1,7 +1,7 @@
 # Frontend Design Specification — NovaLeave MVP
 
 **Related Feature**: `001-leave-management-mvp`
-**Version**: 1.9.1
+**Version**: 1.10.0
 **Date**: 2026-08-05
 **Status**: Ready for Planning. Design tokens, components, accessibility baseline, and responsive rules approved.
 
@@ -547,6 +547,17 @@ supporting information.
 - The page remains readable at `320px` without horizontal scrolling.
 
 ## 17. Projected Balance in Approver Views
+### 16.3 Costa Rica date and time presentation
+
+- Calendar-only dates use `dd/MM/yyyy` and are evaluated against the single
+  `America/Costa_Rica` business date.
+- Timestamps are stored in UTC but every user-facing date-time is converted to
+  Costa Rica time before rendering.
+- Date-time values use `dd/MM/yyyy HH:mm`; tables and detail labels that expose
+  a time-of-day explicitly include `Costa Rica` in the heading or label.
+- Raw UTC suffixes, server-local time, browser-local conversion, and per-user
+  time zones must not appear in the interface.
+
 
 In the Approver request list (`/aprobaciones`) and request detail (`/aprobaciones/{id}`):
 

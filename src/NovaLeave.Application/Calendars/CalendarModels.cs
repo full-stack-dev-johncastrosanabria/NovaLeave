@@ -77,13 +77,12 @@ public sealed record CalendarViewModel(
         string title,
         string detailRouteTemplate,
         IReadOnlyList<CalendarEvent> events,
-        DateOnly? today = null)
+        DateOnly today)
     {
         var firstGridDay = StartOfWeek(currentMonth.FirstDay);
         var lastMonthDay = currentMonth.FirstDay.AddMonths(1).AddDays(-1);
         var lastGridDay = EndOfWeek(lastMonthDay);
         var dayCount = lastGridDay.DayNumber - firstGridDay.DayNumber + 1;
-        var todayValue = today ?? DateOnly.FromDateTime(DateTime.UtcNow);
 
         var days = Enumerable.Range(0, dayCount)
             .Select(offset =>
@@ -98,7 +97,7 @@ public sealed record CalendarViewModel(
                         .ThenBy(calendarEvent => calendarEvent.EndDate)
                         .ToList();
 
-                return new CalendarDay(date, date.Month == currentMonth.Month, date == todayValue, isWeekend, dayEvents);
+                return new CalendarDay(date, date.Month == currentMonth.Month, date == today, isWeekend, dayEvents);
             })
             .ToList();
 

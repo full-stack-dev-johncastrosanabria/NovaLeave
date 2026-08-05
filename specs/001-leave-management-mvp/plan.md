@@ -42,6 +42,7 @@ NovaLeave MVP is a vacation request management system built on Clean Architectur
 - Clean Architecture: Domain ← Application ← Infrastructure ← Presentation (inward deps only)
 - No MediatR, no AutoMapper, no pipeline behaviors unless justified by repository evidence (Instruction §5.3)
 - `TimeProvider` (.NET 10 built-in) for all time-dependent rules (no DateTime.Now in Domain/Application)
+- Central `America/Costa_Rica` conversion policy for the single business date and user-facing timestamps; persistence remains UTC and no per-user time zones are introduced
 - Optimistic concurrency (RowVersion) on all mutable aggregates; NOT on immutable records
 - WCAG 2.1 AA accessibility baseline
 - Spanish UI language (Constitution §3.3)
@@ -500,7 +501,7 @@ See: `specs/001-leave-management-mvp/diagrams/clean-architecture.md`
 | Official states and transitions used exclusively | PASS | 5 states, 4 official transitions per Constitution v7.0.0 §5; creation and Pending editing are operations |
 | Working days exclude weekends and count holidays | PASS | BR-004, AC-035, research.md CR-04 |
 | Accrual uses completed calendar months and is idempotent | PASS | OQ-002 resolved; unique (UserId, AccrualPeriod) constraint |
-| No per-user timezone logic exists | PASS | Constitution invariant 4; research.md CR-02 |
+| One Costa Rica business date and no per-user timezone logic | PASS | Constitution invariant 4; spec.md BR-003; research.md CR-02 |
 | No negative balances or manual HR adjustments exist | PASS | Domain invariant enforced; no Adjustment movement type |
 | HR restrictions remain enforced | PASS | RequireActiveHR; no approve/reject/deactivate/balance-edit |
 | OQ-001 cancellation not introduced | PASS | OQ-001 resolved out of MVP scope; no route, action, contract, requirement, or transition introduced |

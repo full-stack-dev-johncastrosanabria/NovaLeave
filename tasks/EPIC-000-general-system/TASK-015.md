@@ -10,7 +10,7 @@ EPIC-000 - NovaLeave Complete MVP System
 
 ## Objective
 
-Deliver the outcome defined by canonical task T015: [P] Add working-day calculation tests for Mon-Fri, weekend exclusion, and holiday-as-working-day behavior in `tests/NovaLeave.UnitTests/Domain/WorkingDaysCalculatorTests.cs`.
+Deliver the outcome defined by canonical task T015: [P] Add working-day calculation tests for Mon-Fri, weekend exclusion, holiday-as-working-day behavior, and the UTC-to-Costa-Rica business-date boundary in `tests/NovaLeave.UnitTests/Domain/WorkingDaysCalculatorTests.cs`.
 
 ## Description
 

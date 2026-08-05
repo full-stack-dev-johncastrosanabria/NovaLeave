@@ -37,7 +37,7 @@
 
 - [X] T013 [P] Add Clean Architecture dependency tests in `tests/NovaLeave.UnitTests/Architecture/CleanArchitectureTests.cs`
 - [X] T014 [P] Add request lifecycle invariant tests for five states (`Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, `CancelledByApprover`) and four official transitions (`Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, `Approved -> CancelledByApprover`) in `tests/NovaLeave.UnitTests/Domain/VacationRequestLifecycleTests.cs`
-- [X] T015 [P] Add working-day calculation tests for Mon-Fri, weekend exclusion, and holiday-as-working-day behavior in `tests/NovaLeave.UnitTests/Domain/WorkingDaysCalculatorTests.cs`
+- [X] T015 [P] Add working-day calculation tests for Mon-Fri, weekend exclusion, holiday-as-working-day behavior, and the UTC-to-Costa-Rica business-date boundary in `tests/NovaLeave.UnitTests/Domain/WorkingDaysCalculatorTests.cs`
 - [X] T016 [P] Add balance invariant tests for non-negative accrued/reserved/deducted/available totals in `tests/NovaLeave.UnitTests/Domain/VacationBalanceTests.cs`
 - [X] T017 [P] Add authorization policy tests for User, Approver, HR, Active/Inactive, self-resolution denial, and `canResolveRequests` in `tests/NovaLeave.IntegrationTests/Security/AuthorizationPolicyTests.cs`
 - [X] T018 [P] Add audit schema and redaction tests in `tests/NovaLeave.UnitTests/Domain/AuditRecordTests.cs`
@@ -51,7 +51,7 @@
 - [X] T023 Create DateRange value object in `src/NovaLeave.Domain/ValueObjects/DateRange.cs`
 - [X] T024 Create WorkingDayCount value object in `src/NovaLeave.Domain/ValueObjects/WorkingDayCount.cs`
 - [X] T025 Create AccrualPeriod value object in `src/NovaLeave.Domain/ValueObjects/AccrualPeriod.cs`
-- [X] T026 Create WorkingDaysCalculator domain service using built-in .NET `TimeProvider` inputs where current date is needed in `src/NovaLeave.Domain/Services/WorkingDaysCalculator.cs`
+- [X] T026 Create the centralized Costa Rica time conversion policy and WorkingDaysCalculator domain service using built-in .NET `TimeProvider` inputs where current date is needed in `src/NovaLeave.Domain/Services/CostaRicaTime.cs` and `src/NovaLeave.Domain/Services/WorkingDaysCalculator.cs`
 - [X] T027 Create OverlapPolicy domain service in `src/NovaLeave.Domain/Services/OverlapPolicy.cs`
 - [X] T028 Create VacationRequest aggregate with states `Pending`, `Approved`, `Rejected`, `CancelledByTimeout`, and `CancelledByApprover`, and only the official transitions `Pending -> Approved`, `Pending -> Rejected`, `Pending -> CancelledByTimeout`, and `Approved -> CancelledByApprover` in `src/NovaLeave.Domain/Entities/VacationRequest.cs`
 - [X] T029 Create VacationBalance aggregate with non-negative balance invariants in `src/NovaLeave.Domain/Entities/VacationBalance.cs`

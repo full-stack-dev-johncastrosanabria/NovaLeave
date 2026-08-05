@@ -7,6 +7,7 @@ using NovaLeave.Application.Requests.CreateVacationRequest;
 using NovaLeave.Application.Requests.EditPendingRequest;
 using NovaLeave.Application.Requests.Models;
 using NovaLeave.Application.Requests.Queries;
+using NovaLeave.Domain.Services;
 using NovaLeave.Web.Filters;
 using NovaLeave.Web.ViewModels.MisSolicitudes;
 
@@ -54,7 +55,7 @@ public sealed class MisSolicitudesController : Controller
     {
         // The earliest valid start is the day after the current business date (BR-002), so the
         // form opens on that date instead of DateOnly.MinValue, which rendered as 01/01/0001.
-        var earliestStart = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime).AddDays(1);
+        var earliestStart = CostaRicaTime.GetBusinessDate(_timeProvider.GetUtcNow()).AddDays(1);
 
         var viewModel = new CreateVacationRequestViewModel
         {

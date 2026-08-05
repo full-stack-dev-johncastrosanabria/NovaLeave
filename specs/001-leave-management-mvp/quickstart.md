@@ -186,6 +186,7 @@ Full UC-to-route mapping: `specs/001-leave-management-mvp/contracts/uc-contracts
 ## Architecture Notes
 
 - `TimeProvider` (.NET 10 built-in) is the sole time abstraction. All time-dependent Domain and Application rules use it. No `DateTime.Now` or `DateTime.UtcNow` in Domain or Application.
+- The system business date and every user-facing timestamp use `America/Costa_Rica` (UTC−06:00); database timestamps remain UTC and there are no per-user time zones.
 - All mutable aggregates use `RowVersion` (`rowversion` SQL Server type, `byte[]` in EF Core) for optimistic concurrency.
 - Background services (timeout cancellation, monthly accrual) are idempotent and bounded. They can run repeatedly without side effects.
 - Security events are recorded as Serilog structured log entries. No `SecurityEvent` database table.

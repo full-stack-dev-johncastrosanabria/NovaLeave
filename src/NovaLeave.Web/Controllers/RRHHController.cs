@@ -10,6 +10,7 @@ using NovaLeave.Application.HR.Balances;
 using NovaLeave.Application.HR.Calendar;
 using NovaLeave.Application.HR.Requests;
 using NovaLeave.Domain.Enums;
+using NovaLeave.Domain.Services;
 using NovaLeave.Web.ViewModels.RRHH;
 using NovaLeave.Web.ViewModels.RRHH.ApproverCapabilities;
 
@@ -28,6 +29,7 @@ public sealed class RRHHController : Controller
     private readonly ListApproverCapabilitiesQueryHandler _listCapabilities;
     private readonly GetApproverCapabilityQueryHandler _getCapability;
     private readonly ToggleApproverCapabilityCommandHandler _toggleCapability;
+    private readonly TimeProvider _timeProvider;
 
     public RRHHController(
         ICurrentUser currentUser,
@@ -39,7 +41,8 @@ public sealed class RRHHController : Controller
         GetHRAuditLogQueryHandler getAudit,
         ListApproverCapabilitiesQueryHandler listCapabilities,
         GetApproverCapabilityQueryHandler getCapability,
-        ToggleApproverCapabilityCommandHandler toggleCapability)
+        ToggleApproverCapabilityCommandHandler toggleCapability,
+        TimeProvider timeProvider)
     {
         _currentUser = currentUser;
         _getRequests = getRequests;
@@ -51,6 +54,7 @@ public sealed class RRHHController : Controller
         _listCapabilities = listCapabilities;
         _getCapability = getCapability;
         _toggleCapability = toggleCapability;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>Rows sampled for the overview tiles; the detail pages remain the paged source.</summary>
@@ -124,7 +128,8 @@ public sealed class RRHHController : Controller
             RoleContext.HR,
             "Calendario RRHH",
             "/rrhh/solicitudes/{id}",
-            calendarEvents)));
+            calendarEvents,
+            CostaRicaTime.GetBusinessDate(_timeProvider.GetUtcNow()))));
     }
 
     [HttpGet("/rrhh/saldos")]
@@ -241,7 +246,7 @@ public sealed class RRHHController : Controller
         }
     }
 
-    private static YearMonth ResolveMonth(int? year, int? month, IReadOnlyList<CalendarEvent> events)
+    private YearMonth ResolveMonth(int? year, int? month, IReadOnlyList<CalendarEvent> events)
     {
         if (year is null && month is null && events.Count > 0)
         {
@@ -249,7 +254,7 @@ public sealed class RRHHController : Controller
             return new YearMonth(firstEvent.StartDate.Year, firstEvent.StartDate.Month);
         }
 
-        var now = DateTime.UtcNow;
-        return new YearMonth(year ?? now.Year, month ?? now.Month);
+        var today = CostaRicaTime.GetBusinessDate(_timeProvider.GetUtcNow());
+        return new YearMonth(year ?? today.Year, month ?? today.Month);
     }
 }

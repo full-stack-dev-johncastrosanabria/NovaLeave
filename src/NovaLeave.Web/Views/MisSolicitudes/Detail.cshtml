@@ -66,8 +66,8 @@
     <div class="nl-card nl-request-detail-fact">
       <span class="nl-request-detail-fact-icon"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
       <div>
-        <dt>Fecha de solicitud</dt>
-        <dd>@Model.Request.CreatedAtUtc.ToString("dd/MM/yyyy")</dd>
+        <dt>Fecha de solicitud (Costa Rica)</dt>
+        <dd>@CostaRicaTime.ToLocalDateTime(Model.Request.CreatedAtUtc).ToString("dd/MM/yyyy")</dd>
       </div>
     </div>
   </dl>
@@ -98,8 +98,8 @@
           <dd>@await Html.PartialAsync("_StatusBadge", Model.Request.Status.ToString())</dd>
         </div>
         <div>
-          <dt>Última actualización</dt>
-          <dd>@Model.Request.UpdatedAtUtc.ToString("dd/MM/yyyy HH:mm") UTC</dd>
+          <dt>Última actualización (Costa Rica)</dt>
+          <dd>@CostaRicaTime.ToLocalDateTime(Model.Request.UpdatedAtUtc).ToString("dd/MM/yyyy HH:mm")</dd>
         </div>
       </dl>
 
