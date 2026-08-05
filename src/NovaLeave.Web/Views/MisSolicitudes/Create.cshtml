@@ -56,9 +56,9 @@
         </div>
 
         <div class="p-3 p-md-4">
-          @* "All" so business-rule failures added to ModelState (overlap, balance, date policy)
-             are surfaced too, not only field-level ones. role="alert" announces them. *@
-          <div asp-validation-summary="All" class="alert alert-danger d-none" role="alert" id="createErrors"></div>
+          @* Business-rule failures other than insufficient balance remain inline. That specific
+             condition uses the focused dialog below while preserving the entered values. *@
+          @await Html.PartialAsync("_ValidationSummary")
 
           <div class="row g-3">
             <div class="col-md-6">
@@ -119,3 +119,45 @@
   </div>
 
 </div>
+
+<dialog class="nl-balance-dialog"
+        data-insufficient-balance-dialog
+        data-show-on-load="@Model.ShowInsufficientBalanceDialog.ToString().ToLowerInvariant()"
+        aria-labelledby="insufficientBalanceTitle"
+        aria-describedby="insufficientBalanceDescription"
+        aria-modal="true">
+  <div class="nl-balance-dialog-header">
+    <span class="nl-balance-dialog-icon" aria-hidden="true"><i class="bi bi-wallet2"></i></span>
+    <div>
+      <span class="nl-eyebrow">Revisa tu solicitud</span>
+      <h2 id="insufficientBalanceTitle">No tienes saldo suficiente</h2>
+    </div>
+  </div>
+
+  <p id="insufficientBalanceDescription" class="nl-balance-dialog-description">
+    El período seleccionado supera los días que puedes utilizar. Ajusta las fechas o la cantidad de días para continuar.
+  </p>
+
+  <dl class="nl-balance-dialog-summary" aria-label="Comparación de días">
+    <div>
+      <dt>Disponible</dt>
+      <dd class="nl-num" data-dialog-available-days>@Model.AvailableDays días</dd>
+    </div>
+    <div>
+      <dt>Días solicitados</dt>
+      <dd class="nl-num" data-dialog-requested-days>0 días</dd>
+    </div>
+    <div class="nl-balance-dialog-missing">
+      <dt>Días faltantes</dt>
+      <dd class="nl-num" data-dialog-missing-days>0 días</dd>
+    </div>
+  </dl>
+
+  <div class="nl-balance-dialog-actions">
+    <button type="button" class="btn btn-primary" data-adjust-request>
+      <i class="bi bi-calendar-range" aria-hidden="true"></i>
+      Ajustar período
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-close-balance-dialog>Cerrar</button>
+  </div>
+</dialog>

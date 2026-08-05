@@ -1,5 +1,6 @@
 using NovaLeave.Domain.Entities;
 using NovaLeave.Domain.Enums;
+using NovaLeave.Domain.Exceptions;
 
 namespace NovaLeave.UnitTests.Domain;
 
@@ -21,7 +22,13 @@ public sealed class VacationBalanceTests
     {
         var balance = VacationBalance.Create("user-1", DateTimeOffset.UtcNow);
 
-        Assert.Throws<InvalidOperationException>(() => balance.Reserve(Guid.NewGuid(), 1, "user-1", DateTimeOffset.UtcNow));
+        var exception = Assert.Throws<InsufficientBalanceException>(
+            () => balance.Reserve(Guid.NewGuid(), 1, "user-1", DateTimeOffset.UtcNow));
+
+        Assert.Equal(0, exception.AvailableDays);
+        Assert.Equal(1, exception.RequestedDays);
+        Assert.Equal(0, balance.ReservedDays);
+        Assert.Equal(0, balance.AvailableDays);
     }
 
     [Fact]

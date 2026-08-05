@@ -1,7 +1,7 @@
 # Frontend Design Specification — NovaLeave MVP
 
 **Related Feature**: `001-leave-management-mvp`
-**Version**: 1.6.0
+**Version**: 1.8.0
 **Date**: 2026-08-05
 **Status**: Ready for Planning. Design tokens, components, accessibility baseline, and responsive rules approved.
 
@@ -510,6 +510,42 @@ must establish the following hierarchy without changing the authoritative values
 - The project stylesheet URL is content-versioned so updated markup cannot be
   rendered with stale balance styles from the browser cache.
 
+### 16.2 User Request Detail Visual Hierarchy
+
+The owned-request detail at `/mis-solicitudes/{id}` must let the user identify
+the request state, requested period, and available action before reading the
+supporting information.
+
+- Start with a spacious summary surface containing the visible page context,
+  shared textual status badge, date range, a short status explanation, and the
+  conditional `Editar solicitud` action when the authoritative status is
+  `Pending`.
+- Present `Período solicitado`, `Días hábiles`, and `Fecha de solicitud` as
+  three compact facts with icons, labels, and values. Icons are decorative and
+  labels remain visible, so meaning never depends on iconography or colour.
+- Place `Motivo de la solicitud` in its own readable surface and preserve line
+  breaks without exposing technical identifiers or concurrency data.
+- Place `Seguimiento` in a secondary surface with current status and last update.
+  When a rejection reason exists, show it in a distinct semantic error region
+  titled `Motivo del rechazo`.
+- The screen must render only values already projected by the authoritative
+  request-detail query. It must not calculate or imply balance impact in Razor.
+- On viewports below `md`, the summary content, actions, fact cards, and lower
+  content stack vertically without horizontal overflow. Primary and secondary
+  actions become full-width where needed.
+- Use semantic headings, a definition list for labeled facts, the shared status
+  badge, and visible focus styles. Status meaning must be conveyed by icon and
+  text, never colour alone.
+
+#### Acceptance criteria
+
+- A user can identify the status, requested period, and requested working days
+  from the first visual group.
+- `Editar solicitud` is visible only for an owned `Pending` request.
+- The request reason and any rejection reason have explicit descriptive titles.
+- Creation and update dates use a consistent user-facing date format.
+- The page remains readable at `320px` without horizontal scrolling.
+
 ## 17. Projected Balance in Approver Views
 
 In the Approver request list (`/aprobaciones`) and request detail (`/aprobaciones/{id}`):
@@ -534,6 +570,41 @@ The create/edit request form must expose **only two input modes** via an accessi
 - Only fields belonging to the selected mode are rendered and submitted.
 - Both modes normalize server-side to one authoritative date range and one authoritative working-day total.
 - Weekend exclusion (Mon–Fri only) applies in both modes; holidays counted as working days per MVP rule.
+
+### 18.1 Insufficient Balance Feedback
+
+When the selected period requires more working days than the user's current
+`Disponible`, the create-request screen must replace the generic validation
+banner for this condition with a focused modal titled `No tienes saldo
+suficiente`.
+
+- The modal explains in Spanish that the selected period exceeds the usable
+  balance and preserves every value entered in the form.
+- It displays `Disponible`, `Días solicitados`, and `Días faltantes` as labeled
+  values. These figures clarify the rejection but never replace authoritative
+  server validation.
+- The primary action is `Ajustar período`: it closes the modal and moves focus
+  to the editable date or day-count field for the selected input mode.
+- A secondary `Cerrar` action closes the modal without clearing the form.
+- Client-side detection may open the modal before submission as immediate UX
+  feedback. The server must still enforce the invariant and cause the same modal
+  to open when it rejects a request for insufficient balance.
+- The dialog uses an accessible name and description, traps focus while modal,
+  closes with `Escape`, returns focus to the correction target, and does not
+  depend on colour or animation to communicate the problem.
+- At widths down to `320px`, the comparison values and actions stack without
+  horizontal overflow.
+
+#### Acceptance criteria
+
+- A user who exceeds the available balance sees no raw English domain message.
+- The user can identify the available, requested, and missing days within the
+  modal without consulting the balance cards behind it.
+- Closing the dialog preserves dates, day count, input mode, and reason.
+- `Ajustar período` places keyboard focus on the field needed to reduce the
+  request.
+- Submitting the same invalid payload without client scripting is rejected by
+  the server and returns the modal in its open-on-load state.
 
 ## 19. Weekend Exclusion in Working-Day Calculation
 

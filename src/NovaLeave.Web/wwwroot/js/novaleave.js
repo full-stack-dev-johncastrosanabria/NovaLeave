@@ -40,14 +40,15 @@
     var days = document.getElementById('workingDays');
     var reason = document.getElementById('Reason');
     var counter = document.getElementById('reasonCount');
-    var errors = document.getElementById('createErrors');
     var summary = document.querySelector('[data-balance-summary]');
     var projected = document.querySelector('[data-projected-balance]');
     var projectedCard = document.querySelector('[data-projected-balance-card]');
     var projectedHint = document.querySelector('[data-projected-balance-hint]');
     var availableDays = summary ? Number(summary.getAttribute('data-available-days')) : 0;
-
-    if (errors && errors.textContent.trim().length > 0) { errors.classList.remove('d-none'); }
+    var balanceDialog = document.querySelector('[data-insufficient-balance-dialog]');
+    var dialogAvailable = document.querySelector('[data-dialog-available-days]');
+    var dialogRequested = document.querySelector('[data-dialog-requested-days]');
+    var dialogMissing = document.querySelector('[data-dialog-missing-days]');
 
     function parseDate(input) {
       return input.value ? new Date(input.value + 'T00:00:00Z') : null;
@@ -99,6 +100,25 @@
           ? 'Saldo insuficiente para esta solicitud'
           : 'Si la solicitud es aprobada';
       }
+      updateDialogValues(requestedDays);
+    }
+
+    function formatDays(value) {
+      return value + (Math.abs(value) === 1 ? ' día' : ' días');
+    }
+
+    function updateDialogValues(requestedDays) {
+      if (dialogAvailable) { dialogAvailable.textContent = formatDays(availableDays); }
+      if (dialogRequested) { dialogRequested.textContent = formatDays(requestedDays); }
+      if (dialogMissing) { dialogMissing.textContent = formatDays(Math.max(0, requestedDays - availableDays)); }
+    }
+
+    function openBalanceDialog(requestedDays) {
+      if (!balanceDialog) { return; }
+      updateDialogValues(requestedDays);
+      if (typeof balanceDialog.showModal === 'function' && !balanceDialog.open) {
+        balanceDialog.showModal();
+      }
     }
 
     function applyMode() {
@@ -130,16 +150,39 @@
     });
     applyMode();
 
+    if (balanceDialog) {
+      var closeDialog = balanceDialog.querySelector('[data-close-balance-dialog]');
+      var adjustRequest = balanceDialog.querySelector('[data-adjust-request]');
+      if (closeDialog) {
+        closeDialog.addEventListener('click', function () { balanceDialog.close(); });
+      }
+      if (adjustRequest) {
+        adjustRequest.addEventListener('click', function () {
+          balanceDialog.close();
+          (isDateRange() ? end : days).focus();
+        });
+      }
+      if (balanceDialog.getAttribute('data-show-on-load') === 'true') {
+        openBalanceDialog(Number(days.value) || 0);
+      }
+    }
+
     if (reason && counter) {
       var updateCount = function () { counter.textContent = reason.value.length; };
       reason.addEventListener('input', updateCount);
       updateCount();
     }
 
-    form.addEventListener('submit', function () {
+    form.addEventListener('submit', function (event) {
       var dateRange = isDateRange();
       days.disabled = dateRange;
       end.disabled = !dateRange;
+      var requestedDays = Number(days.value) || 0;
+      if (requestedDays > availableDays) {
+        event.preventDefault();
+        openBalanceDialog(requestedDays);
+        return;
+      }
       var button = document.getElementById('submitButton');
       var spinner = document.getElementById('submitSpinner');
       if (button && !button.disabled) {

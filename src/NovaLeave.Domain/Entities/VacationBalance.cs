@@ -1,4 +1,5 @@
 using NovaLeave.Domain.Enums;
+using NovaLeave.Domain.Exceptions;
 
 namespace NovaLeave.Domain.Entities;
 
@@ -52,6 +53,11 @@ public sealed class VacationBalance
     public BalanceMovement Reserve(Guid requestId, int days, string actorId, DateTimeOffset timestampUtc)
     {
         EnsurePositive(days);
+        if (days > AvailableDays)
+        {
+            throw new InsufficientBalanceException(AvailableDays, days);
+        }
+
         ReservedDays += days;
         EnsureNonNegative();
         return AddMovement(requestId, MovementType.Reservation, days, actorId, null, timestampUtc);

@@ -3,7 +3,7 @@ namespace NovaLeave.EndToEndTests.Accessibility;
 public sealed class AccessibilityRegressionTests
 {
     [Theory]
-    [InlineData("src/NovaLeave.Web/Views/MisSolicitudes/Create.cshtml", "asp-validation-summary", "form-label")]
+    [InlineData("src/NovaLeave.Web/Views/MisSolicitudes/Create.cshtml", "_ValidationSummary", "form-label")]
     [InlineData("src/NovaLeave.Web/Views/MisSolicitudes/Edit.cshtml", "asp-validation-summary", "form-label")]
     [InlineData("src/NovaLeave.Web/Views/Aprobaciones/Detail.cshtml", "aria-label", "form-label")]
     [InlineData("src/NovaLeave.Web/Views/RRHH/ApproverCapabilities/Capability.cshtml", "aria-labelledby", "form-label")]
@@ -131,6 +131,41 @@ public sealed class AccessibilityRegressionTests
         Assert.Contains("nl-balance-hero", content);
         Assert.Contains("nl-balance-metrics", content);
         Assert.DoesNotContain("Composición del saldo", content);
+    }
+
+    [Fact]
+    public void User_Request_Detail_Uses_A_Summary_First_Visual_Hierarchy()
+    {
+        var content = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "src/NovaLeave.Web/Views/MisSolicitudes/Detail.cshtml"));
+
+        Assert.Contains("nl-request-detail-hero", content);
+        Assert.Contains("nl-request-detail-facts", content);
+        Assert.Contains("Período solicitado", content);
+        Assert.Contains("Fecha de solicitud", content);
+        Assert.Contains("Motivo de la solicitud", content);
+        Assert.Contains("Seguimiento", content);
+        Assert.Contains("_StatusBadge", content);
+        Assert.Contains("Motivo del rechazo", content);
+        Assert.Contains("Editar solicitud", content);
+        Assert.DoesNotContain("<dl class=\"row\">", content);
+    }
+
+    [Fact]
+    public void Create_Request_Uses_An_Accessible_Insufficient_Balance_Dialog()
+    {
+        var content = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "src/NovaLeave.Web/Views/MisSolicitudes/Create.cshtml"));
+
+        Assert.Contains("data-insufficient-balance-dialog", content);
+        Assert.Contains("aria-labelledby=\"insufficientBalanceTitle\"", content);
+        Assert.Contains("aria-describedby=\"insufficientBalanceDescription\"", content);
+        Assert.Contains("No tienes saldo suficiente", content);
+        Assert.Contains("Días solicitados", content);
+        Assert.Contains("Días faltantes", content);
+        Assert.Contains("Ajustar período", content);
     }
 
     [Fact]

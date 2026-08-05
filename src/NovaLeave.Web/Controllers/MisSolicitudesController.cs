@@ -87,6 +87,13 @@ public sealed class MisSolicitudesController : Controller
         var result = await _createVacationRequest.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
         {
+            if (result.Error?.Code == ErrorCodes.InsufficientBalance)
+            {
+                viewModel.ShowInsufficientBalanceDialog = true;
+                await PopulateCreateBalanceAsync(viewModel, cancellationToken);
+                return InvalidForm(viewModel);
+            }
+
             // A business-rule failure (overlap, balance, date policy) belongs on the form the
             // person is looking at, with their input preserved.
             if (result.Error is null || result.Error.Code == ErrorCodes.Validation)

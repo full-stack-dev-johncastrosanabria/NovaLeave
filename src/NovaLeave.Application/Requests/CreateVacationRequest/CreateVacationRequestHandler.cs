@@ -3,6 +3,7 @@ using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Common.Results;
 using NovaLeave.Application.Observability;
 using NovaLeave.Domain.Entities;
+using NovaLeave.Domain.Exceptions;
 using NovaLeave.Domain.Services;
 using NovaLeave.Domain.ValueObjects;
 
@@ -72,6 +73,11 @@ public sealed class CreateVacationRequestHandler
             await _dbContext.SaveChangesAsync(cancellationToken);
             _telemetry.RecordRequestCreated(true);
             return Result<Guid>.Success(request.Id);
+        }
+        catch (InsufficientBalanceException exception)
+        {
+            _telemetry.RecordRequestCreated(false);
+            return Result<Guid>.Failure(new Error(ErrorCodes.InsufficientBalance, exception.Message));
         }
         catch (ArgumentException exception)
         {

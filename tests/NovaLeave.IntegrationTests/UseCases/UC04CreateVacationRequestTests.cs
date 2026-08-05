@@ -22,10 +22,12 @@ public sealed class UC04CreateVacationRequestTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Acumulado total", html);
         Assert.Contains("Pendientes", html);
-        Assert.Contains("Disponible actual", html);
-        Assert.Contains("Saldo posterior estimado", html);
+        Assert.Contains("Días gozados", html);
+        Assert.Contains("Disponible", html);
+        Assert.Contains("Después de esta solicitud", html);
         Assert.Contains("data-available-days=\"10\"", html);
         Assert.Contains("data-derived-end-date", html);
+        Assert.Contains("data-insufficient-balance-dialog", html);
         Assert.DoesNotContain("Cómo se calcula", html);
     }
 
@@ -86,6 +88,29 @@ public sealed class UC04CreateVacationRequestTests
             ("Reason", "Solo fin de semana no valido."))));
 
         Assert.Equal(HttpStatusCode.BadRequest, rejected.StatusCode);
+    }
+
+    [Fact]
+    public async Task Create_With_Insufficient_Balance_Returns_Focused_Spanish_Dialog()
+    {
+        await using var factory = new NovaLeaveWebApplicationFactory();
+        await IntegrationTestDatabase.ResetAsync(factory);
+        await IntegrationTestDatabase.SeedUserAsync(factory, "user-1", "user1@example.test", 2);
+        var client = factory.CreateClient();
+
+        var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedPost("/mis-solicitudes/crear", Form(
+            ("InputMode", "startPlusDays"),
+            ("StartDate", "2027-01-04"),
+            ("WorkingDays", "3"),
+            ("Reason", "Vacaciones familiares con saldo insuficiente."))));
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("data-insufficient-balance-dialog", html);
+        Assert.Contains("data-show-on-load=\"true\"", html);
+        Assert.Contains("No tienes saldo suficiente", html);
+        Assert.Contains("Ajustar período", html);
+        Assert.DoesNotContain("Vacation balance totals cannot be negative", html);
     }
 
     [Theory]

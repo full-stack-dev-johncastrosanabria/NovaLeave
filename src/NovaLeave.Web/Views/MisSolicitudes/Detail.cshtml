@@ -2,26 +2,114 @@
 @using NovaLeave.Domain.Enums
 @{
     ViewData["Title"] = "Detalle de solicitud";
+
+    var statusDescription = Model.Request.Status switch
+    {
+        RequestStatus.Pending => "Tu solicitud está pendiente de revisión.",
+        RequestStatus.Approved => "Tu solicitud fue aprobada y los días ya están confirmados.",
+        RequestStatus.Rejected => "Tu solicitud fue rechazada. Consulta el motivo registrado.",
+        RequestStatus.CancelledByTimeout => "La solicitud caducó antes de ser resuelta.",
+        RequestStatus.CancelledByApprover => "La solicitud fue desactivada por un aprobador.",
+        _ => "Consulta la información registrada para esta solicitud."
+    };
 }
 
-<div class="d-flex justify-content-end align-items-center gap-3 mb-4">
-  <a class="btn btn-outline-secondary" href="/mis-solicitudes">Volver</a>
+<div class="nl-page-enter">
+  <div class="nl-page-intro">
+    <div>
+      <span class="nl-eyebrow">Mi espacio</span>
+      <h1>Detalle de solicitud</h1>
+      <p>Consulta el período solicitado, su estado actual y la información registrada.</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="/mis-solicitudes">
+      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+      Volver a mis solicitudes
+    </a>
+  </div>
+
+  <section class="nl-card nl-request-detail-hero" aria-labelledby="request-summary-title">
+    <div class="nl-request-detail-hero-copy">
+      <div class="nl-request-detail-status">
+        @await Html.PartialAsync("_StatusBadge", Model.Request.Status.ToString())
+        <span>@statusDescription</span>
+      </div>
+      <h2 id="request-summary-title">
+        Del @Model.Request.StartDate.ToString("dd/MM/yyyy") al @Model.Request.EndDate.ToString("dd/MM/yyyy")
+      </h2>
+      <p>@Model.Request.WorkingDays @(Model.Request.WorkingDays == 1 ? "día hábil solicitado" : "días hábiles solicitados")</p>
+    </div>
+
+    @if (Model.Request.Status == RequestStatus.Pending)
+    {
+      <a class="btn btn-primary nl-request-detail-edit" href="/mis-solicitudes/@Model.Request.Id/editar">
+        <i class="bi bi-pencil-square" aria-hidden="true"></i>
+        Editar solicitud
+      </a>
+    }
+  </section>
+
+  <dl class="nl-request-detail-facts" aria-label="Resumen de la solicitud">
+    <div class="nl-card nl-request-detail-fact">
+      <span class="nl-request-detail-fact-icon"><i class="bi bi-calendar-range" aria-hidden="true"></i></span>
+      <div>
+        <dt>Período solicitado</dt>
+        <dd>@Model.Request.StartDate.ToString("dd/MM/yyyy") <span aria-hidden="true">→</span> @Model.Request.EndDate.ToString("dd/MM/yyyy")</dd>
+      </div>
+    </div>
+    <div class="nl-card nl-request-detail-fact">
+      <span class="nl-request-detail-fact-icon"><i class="bi bi-calendar-check" aria-hidden="true"></i></span>
+      <div>
+        <dt>Días hábiles</dt>
+        <dd class="nl-num">@Model.Request.WorkingDays @(Model.Request.WorkingDays == 1 ? "día" : "días")</dd>
+      </div>
+    </div>
+    <div class="nl-card nl-request-detail-fact">
+      <span class="nl-request-detail-fact-icon"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
+      <div>
+        <dt>Fecha de solicitud</dt>
+        <dd>@Model.Request.CreatedAtUtc.ToString("dd/MM/yyyy")</dd>
+      </div>
+    </div>
+  </dl>
+
+  <div class="nl-request-detail-content">
+    <section class="nl-card nl-request-detail-section" aria-labelledby="request-reason-title">
+      <div class="nl-request-detail-section-heading">
+        <span class="nl-request-detail-section-icon"><i class="bi bi-chat-left-text" aria-hidden="true"></i></span>
+        <div>
+          <span class="nl-eyebrow">Información registrada</span>
+          <h2 id="request-reason-title">Motivo de la solicitud</h2>
+        </div>
+      </div>
+      <p class="nl-request-detail-reason">@Model.Request.Reason</p>
+    </section>
+
+    <aside class="nl-card nl-request-detail-section" aria-labelledby="request-tracking-title">
+      <div class="nl-request-detail-section-heading">
+        <span class="nl-request-detail-section-icon"><i class="bi bi-activity" aria-hidden="true"></i></span>
+        <div>
+          <span class="nl-eyebrow">Estado actual</span>
+          <h2 id="request-tracking-title">Seguimiento</h2>
+        </div>
+      </div>
+      <dl class="nl-request-detail-tracking">
+        <div>
+          <dt>Estado</dt>
+          <dd>@await Html.PartialAsync("_StatusBadge", Model.Request.Status.ToString())</dd>
+        </div>
+        <div>
+          <dt>Última actualización</dt>
+          <dd>@Model.Request.UpdatedAtUtc.ToString("dd/MM/yyyy HH:mm") UTC</dd>
+        </div>
+      </dl>
+
+      @if (!string.IsNullOrWhiteSpace(Model.Request.RejectionReason))
+      {
+        <div class="nl-request-detail-rejection" role="note" aria-labelledby="request-rejection-title">
+          <h3 id="request-rejection-title">Motivo del rechazo</h3>
+          <p>@Model.Request.RejectionReason</p>
+        </div>
+      }
+    </aside>
+  </div>
 </div>
-
-<dl class="row">
-  <dt class="col-sm-3">Inicio</dt>
-  <dd class="col-sm-9">@Model.Request.StartDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Fin</dt>
-  <dd class="col-sm-9">@Model.Request.EndDate.ToString("yyyy-MM-dd")</dd>
-  <dt class="col-sm-3">Días hábiles</dt>
-  <dd class="col-sm-9">@Model.Request.WorkingDays</dd>
-  <dt class="col-sm-3">Estado</dt>
-  <dd class="col-sm-9">@Model.Request.Status</dd>
-  <dt class="col-sm-3">Motivo</dt>
-  <dd class="col-sm-9">@Model.Request.Reason</dd>
-</dl>
-
-@if (Model.Request.Status == RequestStatus.Pending)
-{
-  <a class="btn btn-primary" href="/mis-solicitudes/@Model.Request.Id/editar">Editar pendiente</a>
-}

@@ -21,4 +21,6 @@ public sealed class CreateVacationRequestViewModel
     public int DeductedDays { get; set; }
 
     public int AvailableDays { get; set; }
+
+    public bool ShowInsufficientBalanceDialog { get; set; }
 }

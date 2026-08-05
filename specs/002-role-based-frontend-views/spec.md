@@ -354,9 +354,11 @@ their specific navigation item so two sidebar options are never marked current.
   character count, an informational client preview, a server validation summary,
   and a duplicate-submission loading state. Every derived value remains
   informational and MUST be revalidated server-side.
-- `/mis-solicitudes/{id}` is a definition-list detail with a conditional edit
-  action for `Pending`; the fuller approved audit and balance presentation is
-  incomplete.
+- `/mis-solicitudes/{id}` uses a summary-first detail with the shared status
+  badge, period, working-day and creation-date facts, separate reason and
+  follow-up surfaces, rejection context when applicable, and a conditional edit
+  action for `Pending`. The fuller approved audit and balance presentation is
+  incomplete and no balance impact is inferred in Razor.
 - `/mis-solicitudes/{id}/editar` exists as a typed form with a hidden row-version
   token, but it does not yet reuse the complete create-form interaction pattern.
 - `/saldo` uses summary cards and a movement table/empty state. Approved visible

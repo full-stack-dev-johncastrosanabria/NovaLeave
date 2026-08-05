@@ -7,6 +7,7 @@ public static class ErrorCodes
     public const string NotFound = "not_found";
     public const string Conflict = "conflict";
     public const string Unauthorized = "unauthorized";
+    public const string InsufficientBalance = "insufficient_balance";
 }
 
 public sealed record Error(string Code, string Message)
