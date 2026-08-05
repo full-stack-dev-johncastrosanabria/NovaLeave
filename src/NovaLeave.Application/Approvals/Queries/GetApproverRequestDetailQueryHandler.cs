@@ -66,6 +66,9 @@ public sealed class GetApproverRequestDetailQueryHandler
         var requesterName = users.TryGetValue(request.OwnerId, out var requester)
             ? requester.DisplayName
             : request.OwnerId;
+        var availableExcludingCurrentRequest = balance.AccruedDays
+            - balance.DeductedDays
+            - (balance.ReservedDays - request.WorkingDays);
 
         return Result<ApproverRequestDetail>.Success(new ApproverRequestDetail(
             request.Id,
@@ -75,8 +78,8 @@ public sealed class GetApproverRequestDetailQueryHandler
             request.EndDate,
             request.WorkingDays,
             request.Status,
-            balance.AvailableDays,
-            balance.AccruedDays - balance.DeductedDays - (balance.ReservedDays - request.WorkingDays),
+            availableExcludingCurrentRequest,
+            availableExcludingCurrentRequest - request.WorkingDays,
             request.Status == RequestStatus.Pending,
             canDeactivate,
             hasOverlapWarning,

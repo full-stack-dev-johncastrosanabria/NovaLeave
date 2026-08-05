@@ -1,7 +1,7 @@
 # Frontend Design Specification — NovaLeave MVP
 
 **Related Feature**: `001-leave-management-mvp`
-**Version**: 1.8.0
+**Version**: 1.9.1
 **Date**: 2026-08-05
 **Status**: Ready for Planning. Design tokens, components, accessibility baseline, and responsive rules approved.
 
@@ -618,7 +618,7 @@ suficiente`.
   - Start date on Saturday or Sunday (rejected per next-day minimum)
   - Holidays remain counted as working days (no holiday calendar in MVP)
 
-## 20. Approver UI/UX Improvements
+## 20. Request List and Approver UI/UX Improvements
 
 **List (`/aprobaciones`) and Detail (`/aprobaciones/{id}`)**:
 
@@ -632,6 +632,61 @@ suficiente`.
 - **Responsive**: Mobile card layout showing status, dates, days, balance impact, actions; table on ≥`md`.
 - **Empty states**: "No hay solicitudes pendientes" / "Sin solicitudes elegibles" with illustration (SVG, `aria-hidden`).
 - **Reduced motion**: Respects `prefers-reduced-motion` (Section 8).
+
+### 20.1 Approver Queue — `/aprobaciones`
+
+- Start with a descriptive page-intro surface containing the `Aprobaciones`
+  context, the purpose of the queue, and an explicit `Ver historial` action.
+- Show three compact summary values before the table: requests pending review,
+  total working days represented, and requests whose projected balance would be
+  insufficient.
+- Place the results in a titled surface named `Solicitudes por revisar`, with a
+  visible result count and an explicit `Revisar solicitud` action per row.
+- Identify each requester by their user-facing display name in the queue and in
+  accessible action labels. Internal identifiers such as UUIDs must remain
+  hidden from approvers unless no directory entry exists as a defensive fallback.
+- Combine start and end dates under `Período solicitado`; use the user-facing
+  `dd/MM/yyyy` format consistently.
+- Present balance impact as an ordered flow: `Disponible actual` → `Después de
+  aprobar`. `Disponible actual` must exclude the current request reservation;
+  the projected value must subtract `Días solicitados`. These values must never
+  be swapped or relabeled for visual convenience.
+
+### 20.2 Approver Detail — `/aprobaciones/{id}`
+
+- Use a summary-first hero containing requester, textual status badge, period,
+  and requested working days.
+- Present the server-authoritative balance impact in one dedicated three-step
+  surface: `Disponible actual`, `Días solicitados`, and `Después de aprobar`.
+- Place overlap or insufficient-balance warnings immediately below the impact
+  they qualify, with icon and text rather than colour alone.
+- Name the action surface `Decisión sobre la solicitud`. Approval and rejection
+  must be separate options with short consequence explanations; the rejection
+  reason remains visibly labeled and states that it is shared with the requester.
+- Disable approval visually when the authoritative projected balance is
+  negative; server revalidation remains mandatory.
+
+### 20.3 User Request List — `/mis-solicitudes`
+
+- Start with a `Mi espacio` page-intro surface explaining the list and containing
+  the primary `Nueva solicitud` action.
+- Show `Total de solicitudes`, `En revisión`, and `Aprobadas` as compact summary
+  values that support, rather than replace, the request list.
+- Place requests in a titled `Historial de solicitudes` surface with a visible
+  count, combined `Período solicitado`, working days, shared textual status
+  badge, and explicit `Ver detalle` action.
+
+### 20.4 Responsive and accessibility acceptance
+
+- At widths below `md`, each request table row becomes a labeled card; no value
+  may depend on remembering a hidden desktop column heading.
+- The three summary values and balance-impact steps stack without horizontal
+  overflow at `320px`.
+- Page regions use semantic headings; decorative icons use `aria-hidden`; action
+  labels describe their destination; status and balance warnings do not depend
+  on colour alone.
+- A user or approver can identify the period, days, status, and next action from
+  one visual group without scanning unrelated page regions.
 
 ## 21. HR UI/UX Improvements
 

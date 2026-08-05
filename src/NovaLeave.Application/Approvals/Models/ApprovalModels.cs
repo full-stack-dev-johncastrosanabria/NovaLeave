@@ -5,6 +5,7 @@ namespace NovaLeave.Application.Approvals.Models;
 public sealed record ApproverRequestSummary(
     Guid Id,
     string RequesterId,
+    string RequesterName,
     DateOnly StartDate,
     DateOnly EndDate,
     int WorkingDays,

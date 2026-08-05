@@ -1,67 +1,100 @@
 @model NovaLeave.Web.ViewModels.Aprobaciones.AprobacionesIndexViewModel
 @{
     ViewData["Title"] = "Solicitudes pendientes";
+    var requests = Model.Requests.ToList();
+    var requestedDays = requests.Sum(request => request.WorkingDays);
+    var insufficientBalance = requests.Count(request => request.ProjectedBalanceAfterApproval < 0);
 }
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-  <p class="text-body-secondary mb-0">
-    Solicitudes de otras personas que esperan resolución.
-  </p>
+<section class="nl-page-intro" aria-labelledby="approvals-title">
+  <div>
+    <span class="nl-eyebrow">Aprobaciones</span>
+    <h1 id="approvals-title">Solicitudes pendientes</h1>
+    <p>Revisa solicitudes de otras personas y consulta su impacto antes de tomar una decisión.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/aprobaciones/historial">
     <i class="bi bi-clock-history" aria-hidden="true"></i>
-    <span class="ms-1">Historial</span>
+    Ver historial
   </a>
-</div>
+</section>
 
-<div class="nl-card">
-  @if (!Model.Requests.Any())
+<section class="nl-request-summary" aria-label="Resumen de solicitudes pendientes">
+  <div class="nl-card nl-request-summary-item nl-request-summary-primary">
+    <span class="nl-request-summary-icon"><i class="bi bi-inbox" aria-hidden="true"></i></span>
+    <div><span>Pendientes de revisión</span><strong class="nl-num">@requests.Count</strong></div>
+  </div>
+  <div class="nl-card nl-request-summary-item">
+    <span class="nl-request-summary-icon"><i class="bi bi-calendar-check" aria-hidden="true"></i></span>
+    <div><span>Días por revisar</span><strong class="nl-num">@requestedDays</strong></div>
+  </div>
+  <div class="nl-card nl-request-summary-item @(insufficientBalance > 0 ? "nl-request-summary-warning" : null)">
+    <span class="nl-request-summary-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span>
+    <div><span>Con saldo insuficiente</span><strong class="nl-num">@insufficientBalance</strong></div>
+  </div>
+</section>
+
+<section class="nl-card nl-request-list-card" aria-labelledby="approval-list-title">
+  <div class="nl-card-header nl-request-list-header">
+    <div>
+      <h2 id="approval-list-title">Solicitudes por revisar</h2>
+      <p>Ordenadas desde la solicitud más antigua.</p>
+    </div>
+    <span class="nl-result-count">@requests.Count resultado@(requests.Count == 1 ? "" : "s")</span>
+  </div>
+
+  @if (requests.Count == 0)
   {
     <div class="nl-empty">
-      <i class="bi bi-inbox" aria-hidden="true"></i>
-      <p class="mb-1 fw-medium text-body">Bandeja vacia</p>
-      <p class="mb-0">No hay solicitudes pendientes de resolución.</p>
+      <i class="bi bi-check2-circle" aria-hidden="true"></i>
+      <p class="mb-1 fw-medium text-body">No tienes solicitudes por revisar</p>
+      <p class="mb-0">Cuando llegue una nueva solicitud aparecerá en esta bandeja.</p>
     </div>
   }
   else
   {
     <div class="table-responsive">
-      <table class="table nl-table align-middle">
+      <table class="table nl-table nl-request-table align-middle">
         <caption class="visually-hidden">Solicitudes pendientes de resolución</caption>
         <thead>
           <tr>
             <th scope="col">Solicitante</th>
-            <th scope="col">Inicio</th>
-            <th scope="col">Fin</th>
+            <th scope="col">Período solicitado</th>
             <th scope="col" class="text-end">Días</th>
-            <th scope="col" class="text-end">Disponible</th>
-            <th scope="col" class="text-end">Saldo proyectado</th>
+            <th scope="col">Impacto en saldo</th>
             <th scope="col"><span class="visually-hidden">Acciones</span></th>
           </tr>
         </thead>
         <tbody>
-          @foreach (var request in Model.Requests)
+          @foreach (var request in requests)
           {
-            @* A negative projection means approving would overdraw the balance; flag it with an
-               icon and text so the cue does not depend on colour. *@
             var overdrawn = request.ProjectedBalanceAfterApproval < 0;
             <tr>
-              <td class="text-truncate" style="max-width:14rem">@request.RequesterId</td>
-              <td>@request.StartDate.ToString("yyyy-MM-dd")</td>
-              <td>@request.EndDate.ToString("yyyy-MM-dd")</td>
-              <td class="text-end">@request.WorkingDays</td>
-              <td class="text-end">@request.AvailableDays</td>
-              <td class="text-end @(overdrawn ? "text-danger fw-semibold" : null)">
-                @if (overdrawn)
-                {
-                  <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
-                  <span class="visually-hidden">Saldo insuficiente:</span>
-                }
-                @request.ProjectedBalanceAfterApproval
+              <td data-label="Solicitante"><strong>@request.RequesterName</strong></td>
+              <td data-label="Período solicitado">
+                <span class="nl-request-period">
+                  <span>@request.StartDate.ToString("dd/MM/yyyy")</span>
+                  <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                  <span>@request.EndDate.ToString("dd/MM/yyyy")</span>
+                </span>
               </td>
-              <td class="text-end">
+              <td data-label="Días hábiles" class="text-end nl-num">@request.WorkingDays</td>
+              <td data-label="Impacto en saldo">
+                <div class="nl-balance-flow @(overdrawn ? "nl-balance-flow-danger" : null)"
+                     data-current-available-days="@request.AvailableDays"
+                     data-projected-balance="@request.ProjectedBalanceAfterApproval">
+                  <span><small>Disponible actual</small><strong class="nl-num">@request.AvailableDays</strong></span>
+                  <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                  <span><small>Después de aprobar</small><strong class="nl-num">@request.ProjectedBalanceAfterApproval</strong></span>
+                  @if (overdrawn)
+                  {
+                    <span class="visually-hidden">Saldo insuficiente</span>
+                  }
+                </div>
+              </td>
+              <td class="text-end nl-request-table-action" data-label="Acción">
                 <a class="btn btn-sm btn-primary" href="/aprobaciones/@request.Id"
-                   aria-label="Resolver la solicitud de @request.RequesterId">
-                  Resolver
+                   aria-label="Revisar la solicitud de @request.RequesterName">
+                  Revisar solicitud
                 </a>
               </td>
             </tr>
@@ -70,4 +103,4 @@
       </table>
     </div>
   }
-</div>
+</section>

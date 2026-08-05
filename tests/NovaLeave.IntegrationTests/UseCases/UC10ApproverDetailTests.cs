@@ -20,7 +20,10 @@ public sealed class UC10ApproverDetailTests
         Assert.Contains("Detalle para resolución", html);
         Assert.Contains("user1@example.test", html);
         Assert.DoesNotContain(">user-1<", html);
-        Assert.Contains("Saldo proyectado", html);
+        Assert.Contains("Disponible actual", html);
+        Assert.Contains("Después de aprobar", html);
+        Assert.Contains("data-current-available-days=\"10\"", html);
+        Assert.Contains("data-projected-balance=\"7\"", html);
         Assert.Contains("RowVersion", html);
         Assert.DoesNotContain("Vacaciones familiares", html);
     }

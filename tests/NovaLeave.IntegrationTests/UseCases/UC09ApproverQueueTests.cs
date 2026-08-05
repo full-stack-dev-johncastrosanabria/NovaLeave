@@ -22,9 +22,14 @@ public sealed class UC09ApproverQueueTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("Solicitudes pendientes", html);
-        Assert.Contains("2027-01-04", html);
+        Assert.Contains("04/01/2027", html);
+        Assert.Contains("user1@example.test", html);
+        Assert.DoesNotContain(">user-1<", html);
         Assert.DoesNotContain("approver1@example.test", html);
-        Assert.Contains("Saldo proyectado", html);
+        Assert.Contains("Disponible actual", html);
+        Assert.Contains("Después de aprobar", html);
+        Assert.Contains("data-current-available-days=\"10\"", html);
+        Assert.Contains("data-projected-balance=\"7\"", html);
     }
 
     [Fact]

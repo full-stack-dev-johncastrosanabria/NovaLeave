@@ -4,107 +4,171 @@
     var overdrawn = Model.Request.ProjectedBalanceAfterApproval < 0;
 }
 
-<div class="d-flex justify-content-end align-items-center gap-3 mb-3">
+<section class="nl-page-intro" aria-labelledby="approval-detail-title">
+  <div>
+    <span class="nl-eyebrow">Aprobaciones</span>
+    <h1 id="approval-detail-title">Detalle para resolución</h1>
+    <p>Comprueba el período y el impacto en saldo antes de registrar tu decisión.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/aprobaciones">
     <i class="bi bi-arrow-left" aria-hidden="true"></i>
-    <span class="ms-1">Volver</span>
+    Volver a pendientes
   </a>
-</div>
+</section>
 
-<div class="row g-3">
-  <div class="col-lg-7">
-    <div class="nl-card p-3 p-md-4 h-100">
-      <h2 class="h6 text-body-secondary mb-3">Solicitud</h2>
-      <dl class="row mb-0">
-        <dt class="col-sm-4">Solicitante</dt>
-        <dd class="col-sm-8">@Model.Request.RequesterName</dd>
+<section class="nl-card nl-approval-detail-hero" aria-labelledby="requester-title">
+  <div>
+    <div class="nl-approval-detail-status">
+      @await Html.PartialAsync("_StatusBadge", Model.Request.Status.ToString())
+      <span>Solicitud pendiente de tu decisión</span>
+    </div>
+    <span class="nl-eyebrow">Persona solicitante</span>
+    <h2 id="requester-title">@Model.Request.RequesterName</h2>
+    <p>
+      Del <strong>@Model.Request.StartDate.ToString("dd/MM/yyyy")</strong>
+      al <strong>@Model.Request.EndDate.ToString("dd/MM/yyyy")</strong>
+    </p>
+  </div>
+  <div class="nl-approval-days">
+    <strong class="nl-num">@Model.Request.WorkingDays</strong>
+    <span>@(Model.Request.WorkingDays == 1 ? "día hábil" : "días hábiles")</span>
+  </div>
+</section>
 
-        <dt class="col-sm-4">Inicio</dt>
-        <dd class="col-sm-8">@Model.Request.StartDate.ToString("yyyy-MM-dd")</dd>
-
-        <dt class="col-sm-4">Fin</dt>
-        <dd class="col-sm-8">@Model.Request.EndDate.ToString("yyyy-MM-dd")</dd>
-
-        <dt class="col-sm-4">Días hábiles</dt>
-        <dd class="col-sm-8">@Model.Request.WorkingDays</dd>
-
-        <dt class="col-sm-4">Saldo proyectado</dt>
-        <dd class="col-sm-8 @(overdrawn ? "text-danger fw-semibold" : null)">
-          @if (overdrawn)
-          {
-            <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
-            <span class="visually-hidden">Saldo insuficiente:</span>
-          }
-          @Model.Request.ProjectedBalanceAfterApproval
-        </dd>
-      </dl>
-
-      @* RowVersion is a concurrency token, not business data: it travels as a hidden field in
-         each form below and is never displayed. *@
-
-      @if (Model.Request.HasOverlapWarning)
-      {
-        <div class="alert alert-warning d-flex align-items-start gap-2 mt-3 mb-0" role="alert">
-          <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
-          <span>Existe una advertencia de traslape con otra solicitud.</span>
-        </div>
-      }
+<section class="nl-card nl-balance-impact"
+         data-current-available-days="@Model.Request.AvailableDays"
+         data-projected-balance="@Model.Request.ProjectedBalanceAfterApproval"
+         aria-labelledby="balance-impact-title">
+  <div class="nl-balance-impact-heading">
+    <div>
+      <span class="nl-eyebrow">Impacto de la aprobación</span>
+      <h2 id="balance-impact-title">Cómo quedaría el saldo</h2>
+    </div>
+    <p>Valores calculados por el servidor para esta solicitud.</p>
+  </div>
+  <div class="nl-balance-impact-flow">
+    <div>
+      <span>Disponible actual</span>
+      <strong class="nl-num">@Model.Request.AvailableDays días</strong>
+      <small>Sin contar la reserva de esta solicitud</small>
+    </div>
+    <i class="bi bi-dash-lg" aria-hidden="true"></i>
+    <div>
+      <span>Días solicitados</span>
+      <strong class="nl-num">@Model.Request.WorkingDays días</strong>
+      <small>Período que estás revisando</small>
+    </div>
+    <i class="bi bi-arrow-right" aria-hidden="true"></i>
+    <div class="nl-balance-impact-result @(overdrawn ? "nl-balance-impact-danger" : null)">
+      <span>Después de aprobar</span>
+      <strong class="nl-num">@Model.Request.ProjectedBalanceAfterApproval días</strong>
+      <small>@(overdrawn ? "Saldo insuficiente" : "Saldo restante")</small>
     </div>
   </div>
 
-  <div class="col-lg-5">
-    <div class="nl-card p-3 p-md-4 h-100">
-      <h2 class="h6 text-body-secondary mb-3">Resolución</h2>
+  @if (overdrawn)
+  {
+    <div class="nl-alert nl-alert-error mt-3 mb-0" role="alert">
+      <span class="nl-alert-icon" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
+      <div class="nl-alert-content">
+        <p class="nl-alert-title">No es posible aprobar esta solicitud</p>
+        <p class="mb-0">El saldo proyectado sería negativo. La validación se repetirá en el servidor.</p>
+      </div>
+    </div>
+  }
+  else if (Model.Request.HasOverlapWarning)
+  {
+    <div class="alert alert-warning d-flex align-items-start gap-2 mt-3 mb-0" role="alert">
+      <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+      <span>Existe una advertencia de traslape con otra solicitud de esta persona.</span>
+    </div>
+  }
+</section>
 
-      @if (Model.Request.CanApproveOrReject)
-      {
-        <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar" class="mb-4">
+<div class="nl-approval-detail-layout">
+  <section class="nl-card nl-approval-context" aria-labelledby="request-information-title">
+    <div class="nl-card-header">
+      <h2 id="request-information-title">Información de la solicitud</h2>
+    </div>
+    <dl>
+      <div><dt>Solicitante</dt><dd>@Model.Request.RequesterName</dd></div>
+      <div><dt>Inicio</dt><dd>@Model.Request.StartDate.ToString("dd/MM/yyyy")</dd></div>
+      <div><dt>Fin</dt><dd>@Model.Request.EndDate.ToString("dd/MM/yyyy")</dd></div>
+      <div><dt>Días hábiles</dt><dd class="nl-num">@Model.Request.WorkingDays</dd></div>
+      <div><dt>Estado</dt><dd>@await Html.PartialAsync("_StatusBadge", Model.Request.Status.ToString())</dd></div>
+    </dl>
+  </section>
+
+  <section class="nl-card nl-approval-decision" aria-labelledby="decision-title">
+    <div class="nl-card-header">
+      <div>
+        <h2 id="decision-title">Decisión sobre la solicitud</h2>
+        <p>Selecciona una opción para completar la revisión.</p>
+      </div>
+    </div>
+
+    @if (Model.Request.CanApproveOrReject)
+    {
+      <div class="nl-decision-option nl-decision-approve">
+        <div>
+          <h3>Aprobar solicitud</h3>
+          <p>Confirma el período y convierte la reserva en días gozados.</p>
+        </div>
+        <form method="post" action="/aprobaciones/@Model.Request.Id/aprobar">
           @Html.AntiForgeryToken()
           <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-          <button type="submit" class="btn btn-success w-100" aria-label="Aprobar solicitud">
+          <button type="submit" class="btn btn-success" aria-label="Aprobar solicitud"
+                  disabled="@(overdrawn ? "disabled" : null)">
             <i class="bi bi-check-lg" aria-hidden="true"></i>
-            <span class="ms-1">Aprobar</span>
+            Aprobar solicitud
           </button>
         </form>
+      </div>
 
-        <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar">
-          @Html.AntiForgeryToken()
-          <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-          <label class="form-label" for="RejectionReason">Razón de rechazo</label>
-          <textarea id="RejectionReason" name="RejectionReason" class="form-control mb-1"
-                    rows="3" minlength="10" maxlength="500" required
-                    aria-describedby="rejectionHelp"></textarea>
-          <div id="rejectionHelp" class="form-text mb-2">
-            Obligatoria, entre 10 y 500 caracteres. Se comparte con la persona solicitante.
-          </div>
-          <button type="submit" class="btn btn-danger w-100" aria-label="Rechazar solicitud">
-            <i class="bi bi-x-lg" aria-hidden="true"></i>
-            <span class="ms-1">Rechazar</span>
-          </button>
-        </form>
-      }
+      <div class="nl-decision-divider"><span>O rechazar</span></div>
 
-      @if (Model.Request.CanDeactivate)
-      {
+      <form method="post" action="/aprobaciones/@Model.Request.Id/rechazar" class="nl-decision-reject">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
+        <label class="form-label" for="RejectionReason">Motivo del rechazo</label>
+        <textarea id="RejectionReason" name="RejectionReason" class="form-control"
+                  rows="4" minlength="10" maxlength="500" required
+                  aria-describedby="rejectionHelp"></textarea>
+        <div id="rejectionHelp" class="form-text">
+          Escribe entre 10 y 500 caracteres. Este motivo se compartirá con la persona solicitante.
+        </div>
+        <button type="submit" class="btn btn-outline-danger mt-3" aria-label="Rechazar solicitud">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+          Rechazar solicitud
+        </button>
+      </form>
+    }
+
+    @if (Model.Request.CanDeactivate)
+    {
+      <div class="nl-decision-option">
+        <div>
+          <h3>Desactivar solicitud aprobada</h3>
+          <p>Disponible sólo antes del inicio. Esta acción restaura los días descontados.</p>
+        </div>
         <form method="post" action="/aprobaciones/@Model.Request.Id/desactivar"
               onsubmit="return confirm('Se desactivará la solicitud aprobada y se restaurarán los días. ¿Continuar?');">
           @Html.AntiForgeryToken()
           <input type="hidden" name="RowVersion" value="@Model.RowVersion" />
-          <button type="submit" class="btn btn-warning w-100" aria-label="Desactivar solicitud aprobada">
+          <button type="submit" class="btn btn-warning" aria-label="Desactivar solicitud aprobada">
             <i class="bi bi-slash-circle" aria-hidden="true"></i>
-            <span class="ms-1">Desactivar solicitud</span>
+            Desactivar solicitud
           </button>
-          <p class="form-text mb-0">Solo antes de que inicie el período. Restaura los días descontados.</p>
         </form>
-      }
+      </div>
+    }
 
-      @if (!Model.Request.CanApproveOrReject && !Model.Request.CanDeactivate)
-      {
-        <div class="alert alert-secondary d-flex align-items-start gap-2 mb-0" role="alert">
-          <i class="bi bi-info-circle" aria-hidden="true"></i>
-          <span>La solicitud no tiene acciones disponibles.</span>
-        </div>
-      }
-    </div>
-  </div>
+    @if (!Model.Request.CanApproveOrReject && !Model.Request.CanDeactivate)
+    {
+      <div class="alert alert-secondary d-flex align-items-start gap-2 m-4" role="alert">
+        <i class="bi bi-info-circle" aria-hidden="true"></i>
+        <span>La solicitud no tiene acciones disponibles.</span>
+      </div>
+    }
+  </section>
 </div>

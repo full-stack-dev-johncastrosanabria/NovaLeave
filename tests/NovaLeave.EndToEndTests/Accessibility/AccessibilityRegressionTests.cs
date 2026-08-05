@@ -169,6 +169,54 @@ public sealed class AccessibilityRegressionTests
     }
 
     [Fact]
+    public void Approver_Queue_Uses_A_Clear_Review_Hierarchy()
+    {
+        var content = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "src/NovaLeave.Web/Views/Aprobaciones/Index.cshtml"));
+
+        Assert.Contains("nl-page-intro", content);
+        Assert.Contains("nl-request-summary", content);
+        Assert.Contains("nl-request-table", content);
+        Assert.Contains("Solicitudes por revisar", content);
+        Assert.Contains("Disponible actual", content);
+        Assert.Contains("Después de aprobar", content);
+        Assert.Contains("Revisar solicitud", content);
+        Assert.Contains("request.RequesterName", content);
+        Assert.DoesNotContain("<strong>@request.RequesterId</strong>", content);
+    }
+
+    [Fact]
+    public void Approver_Detail_Separates_Request_Balance_And_Decision()
+    {
+        var content = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "src/NovaLeave.Web/Views/Aprobaciones/Detail.cshtml"));
+
+        Assert.Contains("nl-approval-detail-hero", content);
+        Assert.Contains("nl-balance-impact", content);
+        Assert.Contains("Decisión sobre la solicitud", content);
+        Assert.Contains("_StatusBadge", content);
+        Assert.Contains("Aprobar solicitud", content);
+        Assert.Contains("Rechazar solicitud", content);
+    }
+
+    [Fact]
+    public void User_Request_List_Uses_Context_Summary_And_Explicit_Actions()
+    {
+        var content = File.ReadAllText(Path.Combine(
+            FindRepositoryRoot(),
+            "src/NovaLeave.Web/Views/MisSolicitudes/Index.cshtml"));
+
+        Assert.Contains("nl-page-intro", content);
+        Assert.Contains("nl-request-summary", content);
+        Assert.Contains("nl-request-table", content);
+        Assert.Contains("Historial de solicitudes", content);
+        Assert.Contains("Período solicitado", content);
+        Assert.Contains("Ver detalle", content);
+    }
+
+    [Fact]
     public void Layout_Versions_The_Project_Stylesheet()
     {
         var content = File.ReadAllText(Path.Combine(
