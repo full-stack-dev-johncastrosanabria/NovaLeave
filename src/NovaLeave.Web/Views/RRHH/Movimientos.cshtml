@@ -3,23 +3,45 @@
     ViewData["Title"] = "Movimientos RRHH";
 }
 
-<div class="d-flex justify-content-end align-items-center gap-3 mb-4">
+<section class="nl-page-intro" aria-label="Alcance de la vista">
+  <div>
+    <span class="nl-eyebrow">Composición del saldo</span>
+    <p>Detalle del saldo de <strong>@Model.Balance.UserName</strong> y de cada movimiento que lo compone.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/rrhh/saldos">Volver</a>
-</div>
+</section>
 
-<dl class="row">
-  <dt class="col-sm-3">Usuario</dt>
-  <dd class="col-sm-9">@Model.Balance.UserName</dd>
-  <dt class="col-sm-3">Acumulado</dt>
-  <dd class="col-sm-9">@Model.Balance.AccruedDays</dd>
-  <dt class="col-sm-3">Reservado</dt>
-  <dd class="col-sm-9">@Model.Balance.ReservedDays</dd>
-  <dt class="col-sm-3">Deducido</dt>
-  <dd class="col-sm-9">@Model.Balance.DeductedDays</dd>
-  <dt class="col-sm-3">Disponible</dt>
-  <dd class="col-sm-9">@Model.Balance.AvailableDays</dd>
-</dl>
+<section class="row g-3 nl-balance-overview" aria-label="Resumen de saldo de @Model.Balance.UserName">
+  <div class="col-lg-4">
+    <div class="nl-card nl-balance-primary h-100">
+      <span class="nl-stat-label"><i class="bi bi-wallet2" aria-hidden="true"></i> Disponible</span>
+      <strong class="nl-balance-primary-value nl-num">@Model.Balance.AvailableDays días</strong>
+      <span class="nl-stat-hint">Es el saldo que realmente puede utilizarse para nuevas solicitudes.</span>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="nl-card nl-balance-breakdown h-100">
+      <div class="nl-balance-breakdown-header">
+        <div><span class="nl-eyebrow">Cómo se obtiene</span><h2>Composición del saldo</h2></div>
+        <p><strong>Disponible</strong> = Acumulado total − Pendientes − Días gozados</p>
+      </div>
+      <div class="row g-0">
+        <div class="col-sm-4 nl-balance-component"><span class="nl-stat-label">Acumulado total</span><strong class="nl-stat-value nl-num">@Model.Balance.AccruedDays días</strong><span class="nl-stat-hint">Total histórico ganado; no equivale al disponible.</span></div>
+        <div class="col-sm-4 nl-balance-component"><span class="nl-stat-label">Pendientes</span><strong class="nl-stat-value nl-num">@Model.Balance.ReservedDays días</strong><span class="nl-stat-hint">Apartados temporalmente.</span></div>
+        <div class="col-sm-4 nl-balance-component"><span class="nl-stat-label">Días gozados</span><strong class="nl-stat-value nl-num">@Model.Balance.DeductedDays días</strong><span class="nl-stat-hint">Descontados definitivamente.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
 
+<div class="nl-card">
+<div class="nl-card-header"><h2>Historial de movimientos</h2><span class="nl-result-count">@Model.Balance.Movements.Count movimiento@(Model.Balance.Movements.Count == 1 ? "" : "s")</span></div>
+@if (!Model.Balance.Movements.Any())
+{
+  <div class="nl-empty"><i class="bi bi-clock-history" aria-hidden="true"></i><p class="mb-0">No hay movimientos registrados.</p></div>
+}
+else
+{
 <div class="table-responsive">
   <table class="table nl-table align-middle">
     <caption class="visually-hidden">Movimientos de saldo</caption>
@@ -45,4 +67,6 @@
       }
     </tbody>
   </table>
+</div>
+}
 </div>

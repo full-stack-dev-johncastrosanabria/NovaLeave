@@ -3,11 +3,16 @@
     ViewData["Title"] = "Detalle RRHH";
 }
 
-<div class="d-flex justify-content-end align-items-center gap-3 mb-4">
+<section class="nl-page-intro" aria-label="Alcance de la vista">
+  <div>
+    <span class="nl-eyebrow">Detalle y trazabilidad</span>
+    <p>Información completa de la solicitud y registro de los eventos que explican su estado actual.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/rrhh/solicitudes">Volver</a>
-</div>
+</section>
 
-<dl class="row">
+<div class="nl-card p-3 p-md-4">
+<dl class="row nl-definition-list mb-0">
   <dt class="col-sm-3">Solicitante</dt>
   <dd class="col-sm-9">@Model.Request.RequesterName</dd>
   <dt class="col-sm-3">Inicio</dt>
@@ -17,8 +22,8 @@
   <dt class="col-sm-3">Días hábiles</dt>
   <dd class="col-sm-9">@Model.Request.WorkingDays</dd>
   <dt class="col-sm-3">Estado</dt>
-  <dd class="col-sm-9">@Model.Request.Status</dd>
-  <dt class="col-sm-3">Razón</dt>
+  <dd class="col-sm-9">@await Html.PartialAsync("_StatusBadge", Model.Request.Status.ToString())</dd>
+  <dt class="col-sm-3">Motivo de la solicitud</dt>
   <dd class="col-sm-9">@Model.Request.Reason</dd>
   @if (!string.IsNullOrWhiteSpace(Model.Request.RejectionReason))
   {
@@ -26,8 +31,10 @@
     <dd class="col-sm-9">@Model.Request.RejectionReason</dd>
   }
 </dl>
+</div>
 
-<h2 class="h5">Auditoría</h2>
+<div class="nl-card">
+<div class="nl-card-header"><h2>Trazabilidad de la solicitud</h2><span class="nl-result-count">@Model.Request.AuditTrail.Count evento@(Model.Request.AuditTrail.Count == 1 ? "" : "s")</span></div>
 <div class="table-responsive">
   <table class="table nl-table align-middle">
     <caption class="visually-hidden">Auditoría de la solicitud</caption>
@@ -53,4 +60,5 @@
       }
     </tbody>
   </table>
+</div>
 </div>

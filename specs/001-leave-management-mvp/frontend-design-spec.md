@@ -1,14 +1,14 @@
 # Frontend Design Specification — NovaLeave MVP
 
 **Related Feature**: `001-leave-management-mvp`
-**Version**: 1.3.0
-**Date**: 2026-07-23
+**Version**: 1.6.0
+**Date**: 2026-08-05
 **Status**: Ready for Planning. Design tokens, components, accessibility baseline, and responsive rules approved.
 
 ## 1. Purpose
 
 This document defines the mandatory frontend design rules for NovaLeave MVP, including visual language, UX/UI standards, responsive behavior, accessibility, colors, shadows, transitions, and animations.
-It complements `spec.md` and aligns with `.specify/memory/constitution.md` v6.0.1 under the MVC, Razor Views, Bootstrap, security, and accessibility baseline.
+It complements `spec.md` and aligns with `.specify/memory/constitution.md` v7.0.0 under the MVC, Razor Views, Bootstrap, security, and accessibility baseline.
 
 ## 2. Scope
 
@@ -387,6 +387,7 @@ A frontend change is acceptable only if:
 * Architecture and engineering governance remain authoritative in `.specify/memory/constitution.md`.
 * Security, accessibility, and correctness take precedence over visual preferences.
 * New colors, effects, or animation patterns require explicit design review.
+* **Every visual change MUST update this specification in the same change set.** The update must identify affected routes, visual hierarchy, component behavior, responsive behavior, accessibility considerations, and testable acceptance criteria. A visual implementation without its corresponding specification update is incomplete.
 
 ---
 
@@ -404,20 +405,23 @@ The login screen must use the existing ASP.NET Core Identity flow with the follo
 - **Security**: Preserves antiforgery token, secure cookie settings, lockout, and session behavior configured in Identity.
 - **No emojis, no gradients**.
 
-### 13.1 Demo Account Switcher (Account Selector)
+### 13.1 Demo User List
 
-The login screen includes an **account switcher** (`Cuenta` dropdown) below the email field to select a pre-seeded demo identity before authenticating.
+When demo seeding is enabled outside Production, the login screen displays a
+compact list titled `Usuarios disponibles` containing only these identifiers:
 
-- **Seeded demo identities** (created via EF Core migration seed data, `NovaLeave:SeedDemoUsers=true` opt-in config flag, disabled in Production):
-  - `user@demo` — `User` role, Active — password `Demo123!`
-  - `approver@demo` — `Approver` role, Active — password `Demo123!`
-  - `hr@demo` — `HR` role, Active — password `Demo123!`
-  - `multi@demo` — `User`, `Approver`, `HR` roles, Active — password `Demo123!`
-- **UI**: Dropdown/listbox labeled `Cuenta` below email field; options show display name + masked email (e.g., `Usuario Demo — u***@demo`)
-- **Behavior**: Selecting an identity pre-fills the email field; **does not** authenticate automatically
-- **Accessibility**: Full keyboard support, `aria-label="Seleccionar cuenta de demostración"`, `aria-describedby` linking to helper text "Seleccione una cuenta preconfigurada para acceso rápido"
-- **No emojis, no gradients**; uses design tokens per §4
-- **Security**: Demo accounts are indistinguishable from real accounts at login; no special treatment post-authentication
+- `user@demo`
+- `approver@demo`
+- `hr@demo`
+- `multi@demo`
+
+The list must not display passwords, roles, active status, context descriptions,
+credential instructions, or technical seeding information. It is informational
+only and does not authenticate or prefill credentials automatically. Each user
+identifier remains selectable as text and readable by assistive technology.
+
+In Production, the entire demo-user list remains hidden. The standard email and
+password fields, validation, lockout, and authentication behavior are unchanged.
 
 ## 14. Context Selector — "Mis roles"
 
@@ -458,6 +462,53 @@ The balance summary must display exactly these four concepts using the Spanish l
 **Removed labels**: `Devengado`, `Reservado`, `Deducido` (when used as visible card titles for these four concepts).
 
 The underlying balance formula and domain model remain unchanged; only the presentation labels are updated.
+
+### 16.1 Balance Visual Hierarchy
+
+The four concepts must not receive equal visual weight because `Acumulado total`
+is a historical figure and can be confused with usable balance. The presentation
+must establish the following hierarchy without changing the authoritative values:
+
+1. **`Disponible` is the primary figure.** It appears first, uses the largest
+   numeric treatment, and includes plain-language guidance that it is the saldo
+   that can actually be used for new requests.
+2. **`Acumulado total`, `Pendientes`, and `Días gozados` are explanatory
+   components.** They use smaller, independent cards or clearly separated
+   regions and must not visually compete with `Disponible`.
+3. The formula `Disponible = Acumulado total − Pendientes − Días gozados` may
+   be displayed as supporting context, but it must remain compact and must not
+   become the dominant page heading.
+
+#### `/saldo` — Mi historial
+
+- Use one spacious primary balance card containing `Disponible`, its value, a
+  short explanation, and the `Crear solicitud` action.
+- On desktop, the primary card may include a separate compact calculation panel.
+- Place the three component figures below the primary card as independent cards
+  with at least `16px` between them; each includes an icon, value, and one short
+  explanatory sentence.
+- Separate the balance summary from `Historial de movimientos` by at least
+  `24px`; the movement table remains a distinct surface.
+- On viewports below `md`, the primary card, formula, and component cards stack
+  vertically without horizontal overflow or loss of labels.
+
+#### `/mis-solicitudes/crear` — Balance context
+
+- Present `Disponible` as the primary figure and keep the projected value inside
+  the same visual context so the before/after relationship is immediate.
+- Display the three component values as supporting information with the same
+  approved terminology.
+- The projected balance remains informational; server validation remains
+  authoritative.
+
+#### Acceptance criteria
+
+- A user can identify the usable balance without reading the component cards.
+- `Acumulado total` is explicitly described as historical and is never presented
+  as the amount available to request.
+- All four approved labels remain visible in the summary.
+- The project stylesheet URL is content-versioned so updated markup cannot be
+  rendered with stale balance styles from the browser cache.
 
 ## 17. Projected Balance in Approver Views
 
@@ -516,12 +567,51 @@ The create/edit request form must expose **only two input modes** via an accessi
 **Applies to**: Request list, Request detail, Organizational calendar, Balances list, Balance movements, Audit log, Approver capability list.
 
 - **Visual standards**: Same tokens, spacing, cards, tables, shadows as rest of app.
-- **Read-only indicators**: Visible badge/label `Solo lectura` on all HR views; no resolution actions (Approve/Reject/Deactivate) rendered or actionable.
+- **Authorization clarity**: Do not render badges or repeated labels stating `Solo lectura`. HR restrictions remain enforced by authorization and by the absence of unapproved resolution or balance-editing actions.
 - **Tables**: Server-side pagination, sortable columns, filter toolbar; responsive card fallback on mobile.
 - **Calendar**: Month view with approved periods; requester names visible (HR-authorized); keyboard-navigable events.
 - **Balances/Movements**: Summary cards (`Acumulado total`, `Pendientes`, `Días gozados`, `Disponible`); movement timeline with date, concept, amount, resulting balance.
 - **Capability management**: List shows Approver identity, `canResolveRequests` toggle; toggle requires reason (10–500 chars), confirmation modal, row version (optimistic concurrency), success/error/conflict toasts.
 - **States**: Empty, loading, forbidden (403), conflict (stale version), error — all with accessible messaging.
+
+### 21.1 HR Information Hierarchy and Plain Language
+
+- Every HR read view starts with a compact context panel that uses a descriptive
+  subject label and one sentence explaining the data shown. It must not repeat
+  `Solo lectura` or displace primary data below the initial viewport on standard
+  desktop sizes.
+- The HR landing page title is `Resumen de vacaciones`. Its main sections use
+  task-oriented titles: `Solicitudes que requieren atención`, `Estado de las
+  solicitudes`, `Últimos cambios registrados`, and `Consultas frecuentes`.
+- Summary indicators use descriptive labels: `Solicitudes por resolver`,
+  `Solicitudes registradas`, `Personas con saldo`, and `Saldo disponible total`.
+- The HR sidebar starts with **`Panel RRHH`**, linking to `/rrhh`, followed by
+  `Solicitudes`, `Calendario`, `Saldos`, `Auditoría`, and `Aprobadores`.
+- `Panel RRHH` is marked as the current navigation item only on the exact
+  `/rrhh` route; child routes mark their own corresponding item instead.
+- Data tables are placed inside a titled surface and show total record count,
+  descriptive empty state, explicit column labels, and action labels such as
+  `Ver detalle` or `Ver historial` instead of generic `Ver`.
+- Request status uses the shared textual status badge; raw enum values must not
+  be the primary presentation.
+- HR balance list and movement detail follow the hierarchy in §16.1:
+  `Disponible` is primary, and the other three concepts explain its composition.
+- Approver-capability screens explain the business effect as “puede resolver
+  solicitudes”. Technical concurrency tokens such as `RowVersion` remain in the
+  submitted form when required but are not displayed as user-facing content.
+- Capability changes remain distinct from read-only HR views and must clearly
+  state that the Approver role itself is not assigned or removed.
+
+#### Acceptance criteria
+
+- An HR user can state the purpose of each list/detail view from its introductory
+  panel without seeing repeated authorization disclaimers.
+- No HR view displays the phrase `Solo lectura`.
+- An HR user can return to the organizational summary from every HR route using
+  the first sidebar option, `Panel RRHH`.
+- No HR balance view uses `Reservado` or `Deducido` as visible summary titles.
+- Empty HR lists explain what data is absent instead of displaying a blank table.
+- Internal field names and concurrency tokens are not visible as primary labels.
 
 ## 22. Calendar-to-Detail Navigation
 

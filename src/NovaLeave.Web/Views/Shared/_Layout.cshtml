@@ -46,6 +46,7 @@
     switch (activeContext)
     {
         case "hr":
+            navItems.Add(("Panel RRHH", "/rrhh", "bi-grid-1x2"));
             navItems.Add(("Solicitudes", "/rrhh/solicitudes", "bi-inbox"));
             navItems.Add(("Calendario", "/rrhh/calendario", "bi-calendar3"));
             navItems.Add(("Saldos", "/rrhh/saldos", "bi-wallet2"));
@@ -73,6 +74,11 @@
     bool IsActive(string href)
     {
         var target = href.Split('?')[0];
+        if (target == "/rrhh")
+        {
+            return path.Equals(target, StringComparison.OrdinalIgnoreCase);
+        }
+
         return target == "/"
             ? path == "/"
             : path.Equals(target, StringComparison.OrdinalIgnoreCase)
@@ -90,7 +96,7 @@
      All assets are self-hosted and version-pinned in libman.json (constitution §7.2, §11.2). *@
   <link rel="stylesheet" href="~/lib/coreui/css/coreui.min.css" />
   <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
-  <link rel="stylesheet" href="~/css/novaleave.css" />
+  <link rel="stylesheet" href="~/css/novaleave.css" asp-append-version="true" />
 </head>
 <body>
 @if (!isAuthenticated)

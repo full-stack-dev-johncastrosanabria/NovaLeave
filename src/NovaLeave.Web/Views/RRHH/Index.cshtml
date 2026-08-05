@@ -1,24 +1,27 @@
 @model NovaLeave.Web.ViewModels.RRHH.RRHHDashboardViewModel
 @{
-    ViewData["Title"] = "Panel RRHH";
+    ViewData["Title"] = "Resumen de vacaciones";
 }
 
 @* Read-only overview. HR has organization-wide read access and no write capability here beyond
    approver-capability management, which lives on its own page (constitution §4.3). *@
 
-<p class="text-body-secondary">
-  Vista general de la organización. Solo lectura.
-</p>
+<section class="nl-page-intro" aria-label="Alcance del panel">
+  <div>
+    <span class="nl-eyebrow">Resumen organizacional</span>
+    <p>Consulta las solicitudes que requieren atención, los saldos disponibles y los últimos cambios registrados.</p>
+  </div>
+</section>
 
 <div class="row g-3">
   <div class="col-6 col-lg-3">
     <div class="nl-card h-100 nl-stat nl-stat-accent">
       <div class="nl-stat-label">
         <i class="bi bi-hourglass-split" aria-hidden="true"></i>
-        <span>Pendientes</span>
+        <span>Solicitudes por resolver</span>
       </div>
       <div class="nl-stat-value">@Model.PendingRequests</div>
-      <div class="nl-stat-hint">Esperan resolución</div>
+      <div class="nl-stat-hint">Pendientes de aprobación</div>
     </div>
   </div>
 
@@ -26,10 +29,10 @@
     <div class="nl-card h-100 nl-stat">
       <div class="nl-stat-label">
         <i class="bi bi-journal-text" aria-hidden="true"></i>
-        <span>Solicitudes</span>
+        <span>Solicitudes registradas</span>
       </div>
       <div class="nl-stat-value">@Model.TotalRequests</div>
-      <div class="nl-stat-hint">Total registradas</div>
+      <div class="nl-stat-hint">Total en el historial</div>
     </div>
   </div>
 
@@ -37,7 +40,7 @@
     <div class="nl-card h-100 nl-stat">
       <div class="nl-stat-label">
         <i class="bi bi-people" aria-hidden="true"></i>
-        <span>Personas</span>
+        <span>Personas con saldo</span>
       </div>
       <div class="nl-stat-value">@Model.TotalEmployees</div>
       <div class="nl-stat-hint">@Model.ApproversAbleToResolve de @Model.ApproverCount aprobadores habilitados</div>
@@ -48,7 +51,7 @@
     <div class="nl-card h-100 nl-stat">
       <div class="nl-stat-label">
         <i class="bi bi-wallet2" aria-hidden="true"></i>
-        <span>Días disponibles</span>
+        <span>Saldo disponible total</span>
       </div>
       <div class="nl-stat-value">@Model.TotalAvailableDays</div>
       <div class="nl-stat-hint">@Model.TotalReservedDays reservados &middot; @Model.TotalDeductedDays descontados</div>
@@ -60,8 +63,8 @@
   <div class="col-lg-7">
     <div class="nl-card h-100">
       <div class="nl-card-header">
-        <h2>Solicitudes recientes</h2>
-        <a class="btn btn-sm btn-outline-primary" href="/rrhh/solicitudes">Ver todas</a>
+        <h2>Solicitudes que requieren atención</h2>
+        <a class="btn btn-sm btn-outline-primary" href="/rrhh/solicitudes">Consultar todas</a>
       </div>
 
       @if (!Model.RecentRequests.Any())
@@ -106,7 +109,7 @@
   <div class="col-lg-5">
     <div class="nl-card h-100">
       <div class="nl-card-header">
-        <h2>Distribución por estado</h2>
+        <h2>Estado de las solicitudes</h2>
       </div>
       <div class="p-3">
         @{
@@ -162,8 +165,8 @@
   <div class="col-lg-7">
     <div class="nl-card h-100">
       <div class="nl-card-header">
-        <h2>Actividad reciente</h2>
-        <a class="btn btn-sm btn-outline-primary" href="/rrhh/auditoria">Ver auditoría</a>
+        <h2>Últimos cambios registrados</h2>
+        <a class="btn btn-sm btn-outline-primary" href="/rrhh/auditoria">Abrir auditoría</a>
       </div>
 
       @if (!Model.RecentAudit.Any())
@@ -196,7 +199,7 @@
   <div class="col-lg-5">
     <div class="nl-card h-100">
       <div class="nl-card-header">
-        <h2>Accesos rápidos</h2>
+        <h2>Consultas frecuentes</h2>
       </div>
       <div class="list-group list-group-flush">
         <a class="list-group-item list-group-item-action d-flex align-items-center gap-2" href="/rrhh/solicitudes">

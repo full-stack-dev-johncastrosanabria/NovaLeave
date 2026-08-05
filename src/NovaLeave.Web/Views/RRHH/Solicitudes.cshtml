@@ -3,12 +3,27 @@
     ViewData["Title"] = "Solicitudes RRHH";
 }
 
-<div class="d-flex justify-content-end align-items-center gap-3 mb-4">
+<section class="nl-page-intro" aria-label="Alcance de la vista">
+  <div>
+    <span class="nl-eyebrow">Seguimiento de solicitudes</span>
+    <p>Consulta todas las solicitudes de vacaciones y abre su detalle para entender período, estado y trazabilidad.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
-</div>
+</section>
 
-<div class="table-responsive">
-  <table class="table nl-table align-middle">
+<div class="nl-card">
+  <div class="nl-card-header">
+    <h2>Solicitudes de la organización</h2>
+    <span class="nl-result-count">@Model.Requests.TotalCount registro@(Model.Requests.TotalCount == 1 ? "" : "s")</span>
+  </div>
+  @if (!Model.Requests.Items.Any())
+  {
+    <div class="nl-empty"><i class="bi bi-inbox" aria-hidden="true"></i><p class="mb-0">No hay solicitudes para mostrar.</p></div>
+  }
+  else
+  {
+  <div class="table-responsive">
+    <table class="table nl-table align-middle">
     <caption class="visually-hidden">Solicitudes de vacaciones de la organizacion</caption>
     <thead>
       <tr>
@@ -28,12 +43,14 @@
           <td>@request.StartDate.ToString("yyyy-MM-dd")</td>
           <td>@request.EndDate.ToString("yyyy-MM-dd")</td>
           <td>@request.WorkingDays</td>
-          <td>@request.Status</td>
-          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/solicitudes/@request.Id">Ver</a></td>
+          <td>@await Html.PartialAsync("_StatusBadge", request.Status.ToString())</td>
+          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/solicitudes/@request.Id">Ver detalle</a></td>
         </tr>
       }
     </tbody>
-  </table>
+    </table>
+  </div>
+  }
 </div>
 
-<p class="text-body-secondary">Pagina @Model.Requests.Page de @Math.Max(1, (int)Math.Ceiling(Model.Requests.TotalCount / (double)Model.Requests.PageSize))</p>
+<p class="text-body-secondary nl-result-count">Página @Model.Requests.Page de @Math.Max(1, (int)Math.Ceiling(Model.Requests.TotalCount / (double)Model.Requests.PageSize))</p>

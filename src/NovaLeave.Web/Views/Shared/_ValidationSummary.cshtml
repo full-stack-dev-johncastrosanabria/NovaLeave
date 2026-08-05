@@ -1,6 +1,12 @@
 @if (!ViewData.ModelState.IsValid)
 {
-  <div class="alert alert-danger" role="alert">
-    <div asp-validation-summary="All"></div>
+  <div class="nl-alert nl-alert-error" role="alert" aria-live="polite" tabindex="-1">
+    <span class="nl-alert-icon" aria-hidden="true">
+      <i class="bi bi-exclamation-circle"></i>
+    </span>
+    <div class="nl-alert-content">
+      <p class="nl-alert-title">Revisa la información</p>
+      <div asp-validation-summary="All" class="nl-alert-message"></div>
+    </div>
   </div>
 }

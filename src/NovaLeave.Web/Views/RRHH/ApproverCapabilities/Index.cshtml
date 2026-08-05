@@ -3,13 +3,18 @@
     ViewData["Title"] = "Aprobadores RRHH";
 }
 
-<div class="d-flex justify-content-end align-items-center gap-3 mb-4">
+<section class="nl-page-intro" aria-label="Alcance de la gestión">
+  <div>
+    <span class="nl-eyebrow">Configuración limitada</span>
+    <p>Define quién puede resolver solicitudes. Esta pantalla no asigna ni elimina el rol de Aprobador.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
-</div>
+</section>
 
-<span class="badge text-bg-light border mb-3">Gestiona solo capacidad</span>
 @await Html.PartialAsync("_Toast", TempData["Toast"] as string)
 
+<div class="nl-card">
+<div class="nl-card-header"><h2>Capacidad para resolver solicitudes</h2><span class="nl-result-count">@Model.Approvers.Count aprobador@(Model.Approvers.Count == 1 ? "" : "es")</span></div>
 <div class="table-responsive">
   <table class="table nl-table align-middle">
     <caption class="visually-hidden">Identidades con rol Aprobador</caption>
@@ -17,7 +22,7 @@
       <tr>
         <th scope="col">Aprobador</th>
         <th scope="col">Estado</th>
-        <th scope="col">Capacidad</th>
+        <th scope="col">Puede resolver solicitudes</th>
         <th scope="col">Acción</th>
       </tr>
     </thead>
@@ -27,10 +32,11 @@
         <tr>
           <td>@approver.DisplayName</td>
           <td>@(approver.IsActive ? "Activo" : "Inactivo")</td>
-          <td>@(approver.CanResolveRequests ? "Habilitado" : "Deshabilitado")</td>
-          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/aprobadores/@approver.UserId/capacidad">Cambiar capacidad</a></td>
+          <td><span class="badge @(approver.CanResolveRequests ? "text-bg-success" : "text-bg-secondary")">@(approver.CanResolveRequests ? "Sí, habilitado" : "No, deshabilitado")</span></td>
+          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/aprobadores/@approver.UserId/capacidad">Configurar</a></td>
         </tr>
       }
     </tbody>
   </table>
+</div>
 </div>

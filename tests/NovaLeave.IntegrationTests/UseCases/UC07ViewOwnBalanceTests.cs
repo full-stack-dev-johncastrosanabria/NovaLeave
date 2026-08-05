@@ -18,9 +18,11 @@ public sealed class UC07ViewOwnBalanceTests
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Acumulado", html);
-        Assert.Contains("Reservado", html);
+        Assert.Contains("Acumulado total", html);
+        Assert.Contains("Pendientes", html);
+        Assert.Contains("Días gozados", html);
         Assert.Contains("Disponible", html);
+        Assert.Contains("saldo que realmente puede utilizarse", html, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("Reservation", html);
     }
 

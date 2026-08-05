@@ -18,5 +18,7 @@ public sealed class CreateVacationRequestViewModel
 
     public int ReservedDays { get; set; }
 
+    public int DeductedDays { get; set; }
+
     public int AvailableDays { get; set; }
 }

@@ -20,4 +20,10 @@ decisions, implement undocumented behavior, change approved business rules, or
 load archived documents as active context. Preserve test-first ordering, run
 consistency validation before implementation, and execute tasks according to
 their dependencies.
+
+Every visual change must update
+`specs/001-leave-management-mvp/frontend-design-spec.md` in the same change set.
+Document the affected routes, visual hierarchy, responsive behavior,
+accessibility considerations, and testable acceptance criteria. A visual
+implementation without this specification update is incomplete.
 <!-- SPECKIT END -->

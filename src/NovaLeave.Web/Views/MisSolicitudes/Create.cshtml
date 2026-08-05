@@ -4,33 +4,45 @@
     ViewData["Title"] = "Crear solicitud";
 }
 
-<section class="row g-3 mb-3" aria-label="Resumen de saldo" data-balance-summary data-available-days="@Model.AvailableDays">
-  <div class="col-sm-6 col-xl-3">
-    <div class="nl-card nl-stat nl-stat-accent h-100">
-      <span class="nl-stat-label"><i class="bi bi-calendar-check" aria-hidden="true"></i> Acumulado total</span>
-      <strong class="nl-stat-value nl-num">@Model.AccruedDays días</strong>
-      <span class="nl-stat-hint">Días acumulados</span>
+<section class="row g-3 mb-3 nl-balance-overview" aria-label="Resumen de saldo" data-balance-summary data-available-days="@Model.AvailableDays">
+  <div class="col-lg-4">
+    <div class="nl-card nl-balance-primary h-100" data-projected-balance-card>
+      <span class="nl-stat-label"><i class="bi bi-wallet2" aria-hidden="true"></i> Disponible</span>
+      <strong class="nl-balance-primary-value nl-num">@Model.AvailableDays días</strong>
+      <span class="nl-stat-hint">Es el saldo que realmente puede utilizarse para solicitar vacaciones.</span>
+      <div class="nl-balance-projection">
+        <span>Después de esta solicitud</span>
+        <strong class="nl-num" data-projected-balance aria-live="polite">@Model.AvailableDays días</strong>
+        <small data-projected-balance-hint>Estimado si la solicitud es aprobada</small>
+      </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="nl-card nl-stat h-100">
-      <span class="nl-stat-label"><i class="bi bi-hourglass-split" aria-hidden="true"></i> Pendientes</span>
-      <strong class="nl-stat-value nl-num">@Model.ReservedDays días</strong>
-      <span class="nl-stat-hint">Días reservados</span>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="nl-card nl-stat h-100">
-      <span class="nl-stat-label"><i class="bi bi-wallet2" aria-hidden="true"></i> Disponible actual</span>
-      <strong class="nl-stat-value nl-num">@Model.AvailableDays días</strong>
-      <span class="nl-stat-hint">Saldo para solicitar</span>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="nl-card nl-stat h-100" data-projected-balance-card>
-      <span class="nl-stat-label"><i class="bi bi-graph-down-arrow" aria-hidden="true"></i> Saldo posterior estimado</span>
-      <strong class="nl-stat-value nl-num" data-projected-balance aria-live="polite">@Model.AvailableDays días</strong>
-      <span class="nl-stat-hint" data-projected-balance-hint>Si la solicitud es aprobada</span>
+  <div class="col-lg-8">
+    <div class="nl-card nl-balance-breakdown h-100">
+      <div class="nl-balance-breakdown-header">
+        <div>
+          <span class="nl-eyebrow">Cómo se obtiene</span>
+          <h2>Composición del saldo</h2>
+        </div>
+        <p><strong>Disponible</strong> = Acumulado total − Pendientes − Días gozados</p>
+      </div>
+      <div class="row g-0">
+        <div class="col-sm-4 nl-balance-component">
+          <span class="nl-stat-label"><i class="bi bi-calendar-check" aria-hidden="true"></i> Acumulado total</span>
+          <strong class="nl-stat-value nl-num">@Model.AccruedDays días</strong>
+          <span class="nl-stat-hint">Total histórico ganado; no equivale al disponible.</span>
+        </div>
+        <div class="col-sm-4 nl-balance-component">
+          <span class="nl-stat-label"><i class="bi bi-hourglass-split" aria-hidden="true"></i> Pendientes</span>
+          <strong class="nl-stat-value nl-num">@Model.ReservedDays días</strong>
+          <span class="nl-stat-hint">Apartados por solicitudes pendientes.</span>
+        </div>
+        <div class="col-sm-4 nl-balance-component">
+          <span class="nl-stat-label"><i class="bi bi-check2-circle" aria-hidden="true"></i> Días gozados</span>
+          <strong class="nl-stat-value nl-num">@Model.DeductedDays días</strong>
+          <span class="nl-stat-hint">Descontados por solicitudes aprobadas.</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>

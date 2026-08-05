@@ -193,6 +193,7 @@ public sealed class MisSolicitudesController : Controller
 
         viewModel.AccruedDays = result.Value.AccruedDays;
         viewModel.ReservedDays = result.Value.ReservedDays;
+        viewModel.DeductedDays = result.Value.DeductedDays;
         viewModel.AvailableDays = result.Value.AvailableDays;
     }
 

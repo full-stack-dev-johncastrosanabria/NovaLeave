@@ -3,9 +3,12 @@
     ViewData["Title"] = "Calendario RRHH";
 }
 
-<div class="d-flex justify-content-end align-items-center gap-3 mb-4">
+<section class="nl-page-intro" aria-label="Alcance de la vista">
+  <div>
+    <span class="nl-eyebrow">Planeación de ausencias</span>
+    <p>Vista organizacional de ausencias. Selecciona una solicitud para consultar su detalle sin modificarla.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
-</div>
+</section>
 
-<span class="badge text-bg-light border mb-3">Solo lectura</span>
 <partial name="_Calendar" model="Model.Calendar" />

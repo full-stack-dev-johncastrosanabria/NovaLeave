@@ -3,10 +3,22 @@
     ViewData["Title"] = "Auditoría RRHH";
 }
 
-<div class="d-flex justify-content-end align-items-center gap-3 mb-4">
+<section class="nl-page-intro" aria-label="Alcance de la vista">
+  <div>
+    <span class="nl-eyebrow">Registro de actividad</span>
+    <p>Consulta quién realizó cada acción, cuándo ocurrió y cuál fue su resultado.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
-</div>
+</section>
 
+<div class="nl-card">
+<div class="nl-card-header"><h2>Eventos auditados</h2><span class="nl-result-count">@Model.Records.TotalCount registro@(Model.Records.TotalCount == 1 ? "" : "s")</span></div>
+@if (!Model.Records.Items.Any())
+{
+  <div class="nl-empty"><i class="bi bi-shield-check" aria-hidden="true"></i><p class="mb-0">No hay eventos de auditoría para mostrar.</p></div>
+}
+else
+{
 <div class="table-responsive">
   <table class="table nl-table align-middle">
     <caption class="visually-hidden">Registros de auditoría relevantes para RRHH</caption>
@@ -37,5 +49,7 @@
     </tbody>
   </table>
 </div>
+}
+</div>
 
-<p class="text-body-secondary">Pagina @Model.Records.Page de @Math.Max(1, (int)Math.Ceiling(Model.Records.TotalCount / (double)Model.Records.PageSize))</p>
+<p class="text-body-secondary nl-result-count">Página @Model.Records.Page de @Math.Max(1, (int)Math.Ceiling(Model.Records.TotalCount / (double)Model.Records.PageSize))</p>

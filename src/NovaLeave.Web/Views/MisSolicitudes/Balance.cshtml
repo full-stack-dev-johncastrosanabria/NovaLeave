@@ -31,31 +31,65 @@
     }
 }
 
-@{
-    var stats = new (string Label, int Value, string Icon, string Hint)[]
-    {
-        ("Acumulado", Model.Balance.AccruedDays, "bi-plus-circle", "Días ganados por meses completos"),
-        ("Reservado", Model.Balance.ReservedDays, "bi-lock", "Retenido por solicitudes pendientes"),
-        ("Deducido", Model.Balance.DeductedDays, "bi-dash-circle", "Descontado por solicitudes aprobadas"),
-        ("Disponible", Model.Balance.AvailableDays, "bi-wallet2", "Acumulado menos deducido y reservado")
-    };
-}
-
-<div class="row g-3">
-  @foreach (var stat in stats)
-  {
-    <div class="col-6 col-lg-3">
-      <div class="nl-card h-100 nl-stat @(stat.Label == "Disponible" ? "nl-stat-accent" : null)">
-        <div class="nl-stat-label">
-          <i class="bi @stat.Icon" aria-hidden="true"></i>
-          <span>@stat.Label</span>
-        </div>
-        <div class="nl-stat-value">@stat.Value</div>
-        <div class="nl-stat-hint">@stat.Hint</div>
-      </div>
+<section class="nl-balance-dashboard" aria-label="Resumen de saldo">
+  <div class="nl-card nl-balance-primary nl-balance-hero">
+    <div class="nl-balance-hero-main">
+      <span class="nl-eyebrow">Saldo para usar</span>
+      <h2>Disponible</h2>
+      <strong class="nl-balance-primary-value nl-num">@Model.Balance.AvailableDays días</strong>
+      <p>Es el saldo que realmente puede utilizarse para nuevas solicitudes.</p>
+      <a class="btn btn-primary align-self-start" href="/mis-solicitudes/crear">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> Crear solicitud
+      </a>
     </div>
-  }
-</div>
+    <div class="nl-balance-hero-formula" aria-label="Cálculo del saldo disponible">
+      <span class="nl-stat-label">Cálculo actual</span>
+      <p class="nl-num">
+        <strong>@Model.Balance.AccruedDays</strong>
+        <span aria-hidden="true">−</span>
+        <strong>@Model.Balance.ReservedDays</strong>
+        <span aria-hidden="true">−</span>
+        <strong>@Model.Balance.DeductedDays</strong>
+        <span aria-hidden="true">=</span>
+        <strong>@Model.Balance.AvailableDays</strong>
+      </p>
+      <small>Acumulado total − Pendientes − Días gozados</small>
+    </div>
+  </div>
+
+  <div class="row g-3 nl-balance-metrics">
+    <div class="col-md-4">
+      <article class="nl-card nl-balance-metric h-100">
+        <span class="nl-balance-metric-icon"><i class="bi bi-plus-circle" aria-hidden="true"></i></span>
+        <div>
+          <span class="nl-stat-label">Acumulado total</span>
+          <strong class="nl-stat-value nl-num">@Model.Balance.AccruedDays días</strong>
+          <p>Total histórico ganado desde el inicio laboral.</p>
+        </div>
+      </article>
+    </div>
+    <div class="col-md-4">
+      <article class="nl-card nl-balance-metric h-100">
+        <span class="nl-balance-metric-icon nl-balance-metric-icon-warning"><i class="bi bi-lock" aria-hidden="true"></i></span>
+        <div>
+          <span class="nl-stat-label">Pendientes</span>
+          <strong class="nl-stat-value nl-num">@Model.Balance.ReservedDays días</strong>
+          <p>Apartados temporalmente mientras se resuelven solicitudes.</p>
+        </div>
+      </article>
+    </div>
+    <div class="col-md-4">
+      <article class="nl-card nl-balance-metric h-100">
+        <span class="nl-balance-metric-icon nl-balance-metric-icon-neutral"><i class="bi bi-check2-circle" aria-hidden="true"></i></span>
+        <div>
+          <span class="nl-stat-label">Días gozados</span>
+          <strong class="nl-stat-value nl-num">@Model.Balance.DeductedDays días</strong>
+          <p>Descontados por solicitudes que ya fueron aprobadas.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
 
 <div class="nl-card">
   <div class="nl-card-header">

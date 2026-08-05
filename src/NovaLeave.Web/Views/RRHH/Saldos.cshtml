@@ -3,20 +3,49 @@
     ViewData["Title"] = "Saldos RRHH";
 }
 
-<div class="d-flex justify-content-end align-items-center gap-3 mb-4">
+<section class="nl-page-intro" aria-label="Alcance de la vista">
+  <div>
+    <span class="nl-eyebrow">Disponibilidad por persona</span>
+    <p>Compara el saldo utilizable de cada persona y consulta cómo se formó, sin modificar balances.</p>
+  </div>
   <a class="btn btn-outline-secondary" href="/rrhh">Volver</a>
-</div>
+</section>
 
+<section class="nl-card nl-balance-guide" aria-label="Cómo interpretar los saldos">
+  <div class="nl-balance-primary">
+    <span class="nl-stat-label"><i class="bi bi-wallet2" aria-hidden="true"></i> Disponible</span>
+    <strong>Dato principal</strong>
+    <span>Es el saldo que realmente puede utilizarse para nuevas solicitudes.</span>
+  </div>
+  <div class="nl-balance-guide-formula">
+    <span><strong>Acumulado total</strong><small>Todo lo ganado</small></span>
+    <i aria-hidden="true">−</i>
+    <span><strong>Pendientes</strong><small>Temporalmente apartado</small></span>
+    <i aria-hidden="true">−</i>
+    <span><strong>Días gozados</strong><small>Ya descontado</small></span>
+    <i aria-hidden="true">=</i>
+    <span><strong>Disponible</strong><small>Saldo utilizable</small></span>
+  </div>
+</section>
+
+<div class="nl-card">
+<div class="nl-card-header"><h2>Saldos por persona</h2><span class="nl-result-count">@Model.Balances.TotalCount persona@(Model.Balances.TotalCount == 1 ? "" : "s")</span></div>
+@if (!Model.Balances.Items.Any())
+{
+  <div class="nl-empty"><i class="bi bi-wallet2" aria-hidden="true"></i><p class="mb-0">No hay saldos para mostrar.</p></div>
+}
+else
+{
 <div class="table-responsive">
   <table class="table nl-table align-middle">
     <caption class="visually-hidden">Saldos globales de vacaciones</caption>
     <thead>
       <tr>
         <th scope="col">Usuario</th>
-        <th scope="col">Acumulado</th>
-        <th scope="col">Reservado</th>
-        <th scope="col">Deducido</th>
-        <th scope="col">Disponible</th>
+        <th scope="col" class="text-end">Acumulado total</th>
+        <th scope="col" class="text-end">Pendientes</th>
+        <th scope="col" class="text-end">Días gozados</th>
+        <th scope="col" class="text-end">Disponible</th>
         <th scope="col">Movimientos</th>
       </tr>
     </thead>
@@ -25,15 +54,17 @@
       {
         <tr>
           <td>@balance.UserName</td>
-          <td>@balance.AccruedDays</td>
-          <td>@balance.ReservedDays</td>
-          <td>@balance.DeductedDays</td>
-          <td>@balance.AvailableDays</td>
-          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/saldos/@balance.UserId">Ver</a></td>
+          <td class="text-end nl-num">@balance.AccruedDays</td>
+          <td class="text-end nl-num">@balance.ReservedDays</td>
+          <td class="text-end nl-num">@balance.DeductedDays</td>
+          <td class="text-end"><strong class="nl-balance-available nl-num">@balance.AvailableDays</strong></td>
+          <td><a class="btn btn-sm btn-outline-primary" href="/rrhh/saldos/@balance.UserId">Ver historial</a></td>
         </tr>
       }
     </tbody>
   </table>
 </div>
+}
+</div>
 
-<p class="text-body-secondary">Pagina @Model.Balances.Page de @Math.Max(1, (int)Math.Ceiling(Model.Balances.TotalCount / (double)Model.Balances.PageSize))</p>
+<p class="text-body-secondary nl-result-count">Página @Model.Balances.Page de @Math.Max(1, (int)Math.Ceiling(Model.Balances.TotalCount / (double)Model.Balances.PageSize))</p>

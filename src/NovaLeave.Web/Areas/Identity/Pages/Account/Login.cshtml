@@ -17,24 +17,35 @@
       <h2 class="h6 mb-3">Iniciar sesión</h2>
 
       <form method="post" novalidate>
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert"></div>
+        @if (!ViewData.ModelState.IsValid)
+        {
+          <div class="nl-alert nl-alert-error" role="alert" aria-live="polite" tabindex="-1" id="loginErrorSummary">
+            <span class="nl-alert-icon" aria-hidden="true">
+              <i class="bi bi-exclamation-circle"></i>
+            </span>
+            <div class="nl-alert-content">
+              <p class="nl-alert-title">No pudimos iniciar sesión</p>
+              <div asp-validation-summary="ModelOnly" class="nl-alert-message"></div>
+            </div>
+          </div>
+        }
 
         <div class="mb-3">
           <label asp-for="Input.Email" class="form-label">Correo</label>
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-envelope" aria-hidden="true"></i></span>
-            <input asp-for="Input.Email" class="form-control" autocomplete="username" autofocus />
+            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-describedby="Input_Email-error" autofocus />
           </div>
-          <span asp-validation-for="Input.Email" class="text-danger small"></span>
+          <span asp-validation-for="Input.Email" class="text-danger small" id="Input_Email-error"></span>
         </div>
 
         <div class="mb-3">
           <label asp-for="Input.Password" class="form-label">Contraseña</label>
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-lock" aria-hidden="true"></i></span>
-            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-describedby="Input_Password-error" />
           </div>
-          <span asp-validation-for="Input.Password" class="text-danger small"></span>
+          <span asp-validation-for="Input.Password" class="text-danger small" id="Input_Password-error"></span>
         </div>
 
         <button type="submit" class="btn btn-primary w-100">
@@ -48,28 +59,14 @@
     {
       @* Development and Staging only: never rendered when demo seeding is disabled. *@
       <div class="nl-card p-3 mt-3">
-        <p class="small text-body-secondary mb-2">
-          <i class="bi bi-info-circle" aria-hidden="true"></i>
-          Identidades de demostración &mdash; contraseña <code>Demo123!</code>
-        </p>
-        <ul class="list-unstyled small mb-0">
-          <li><code>user@@demo</code> &mdash; Usuario</li>
-          <li><code>approver@@demo</code> &mdash; Usuario y Aprobador</li>
-          <li><code>hr@@demo</code> &mdash; Usuario y RRHH</li>
-          <li><code>multi@@demo</code> &mdash; Todos los contextos</li>
+        <p class="small fw-semibold mb-2">Usuarios disponibles</p>
+        <ul class="list-unstyled small mb-0 vstack gap-1" aria-label="Usuarios disponibles para demostración">
+          <li><code>user@@demo</code></li>
+          <li><code>approver@@demo</code></li>
+          <li><code>hr@@demo</code></li>
+          <li><code>multi@@demo</code></li>
         </ul>
       </div>
     }
   </div>
 </div>
-
-@section Scripts {
-  <script>
-    // Reveal the model-level validation block only when it actually has content, so an empty
-    // alert box is never announced to assistive technology.
-    (function () {
-      var summary = document.querySelector('[role="alert"].alert');
-      if (summary && summary.textContent.trim().length > 0) { summary.classList.remove('d-none'); }
-    })();
-  </script>
-}

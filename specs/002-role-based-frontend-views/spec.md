@@ -1,16 +1,18 @@
 # Role-Based Frontend Views Specification — NovaLeave MVP
 
 **Related Feature**: `001-leave-management-mvp` (complementary specification; not an independent feature and no separate implementation plan)
-**Version**: 2.0.1
-**Date**: 2026-07-23
-**Status**: Ready for Planning. All 34 RBFV criteria defined and traced to MVP requirements.
-**Constitution**: `.specify/memory/constitution.md` v6.0.1
+**Version**: 2.1.0
+**Date**: 2026-08-04
+**Status**: Audited against the committed `branch-john` frontend at `136d65e`. Approved requirements remain normative; implementation deviations and incomplete behaviors are recorded separately and are not legitimized by this specification.
+**Constitution**: `.specify/memory/constitution.md` v7.0.0
 
 ---
 
 ## 1. Purpose
 
 This specification defines the mandatory view and navigation structure for NovaLeave MVP based on the three application roles (`User`, `Approver`, `HR`) plus the automatic system actor. It complements `specs/001-leave-management-mvp/spec.md` (business behavior) and `specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0 (design tokens, components, accessibility baseline).
+
+It also records the presentation structure verifiably implemented in the committed `branch-john` snapshot. Implementation evidence is descriptive only: it MAY confirm an approved rule, but it MUST NOT override a higher-authority rule or turn an incomplete, experimental, or non-conforming implementation into a normative requirement.
 
 All routes, views, and navigation elements described here MUST conform to the Constitution v7.0.0, the approved frontend design specification v1.3.0, and the authority order in Constitution §15.1.
 
@@ -24,14 +26,19 @@ This specification covers:
 - Required views per role
 - Shared views accessible by multiple roles
 - Navigation structure per role
+- The verified `branch-john` application shell, shared presentation components, and repeated view patterns
+- The conformance status of visible behaviors implemented in `branch-john`
 - View-level accessibility requirements
 - Security and authorization boundaries at the routing level
+- Mandatory extension rules for future role-based views
 
 This specification does NOT cover:
 
 - Business rules (see `specs/001-leave-management-mvp/spec.md`)
 - Design tokens, colors, spacing, motion (see `frontend-design-spec.md`)
 - API contracts (no approved API exists for the MVP)
+- Design values copied from implementation; all colors, typography, spacing, breakpoints, motion, shadows, radii, and dimensions remain governed by `frontend-design-spec.md`
+- Remediation of implementation deviations identified by this audit
 
 ---
 
@@ -55,6 +62,20 @@ accessibility, and presentation.
 It must not redefine domain rules, lifecycle states, balance semantics, backend
 authorization invariants, or MVP scope. In any conflict, the Constitution and
 the primary MVP specification prevail.
+
+### 3.2 Audit Evidence and Classification
+
+The `branch-john` audit uses committed files under `src/NovaLeave.Web/`, related Presentation/integration/E2E tests, and the branch's own commit history as implementation evidence. Uncommitted working-tree changes are excluded from the evidence baseline.
+
+Findings use these classifications:
+
+- `ALREADY_DOCUMENTED`: the approved requirement and the verified implementation agree.
+- `DOCUMENTATION_GAP`: valid committed behavior exists and is added descriptively or normatively within this specification's authority.
+- `STALE_SPEC`: wording described a prior presentation and is corrected without changing higher-authority behavior.
+- `IMPLEMENTATION_DEVIATION`: committed code conflicts with a higher-authority source; the approved rule is retained.
+- `OUT_OF_SCOPE`: the finding belongs to another authoritative artifact.
+- `INCOMPLETE_IMPLEMENTATION`: only part of an approved behavior exists; the complete behavior is not claimed as implemented.
+- `BRANCH_ONLY_EXPERIMENT`: branch evidence is insufficient to make the behavior normative.
 
 ---
 
@@ -108,6 +129,7 @@ When an identity has at least two authorized contexts:
 | `/aprobaciones/{id}/aprobar` | POST | `Approver` (Active, `canResolveRequests=true`, Eligible, Not Owner) | Approve request |
 | `/aprobaciones/{id}/rechazar` | POST | `Approver` (Active, `canResolveRequests=true`, Eligible, Not Owner) | Reject request |
 | `/aprobaciones/{id}/desactivar` | POST | `Approver` (Active, `canResolveRequests=true`, Eligible, Not Owner) | Deactivate approved request (pre-start) |
+| `/aprobaciones/historial` | GET | `Approver` (Active, `canResolveRequests=true`) | View own resolution history |
 | `/rrhh` | GET | `HR` (Active) | HR dashboard |
 | `/rrhh/solicitudes` | GET | `HR` (Active) | Read-only request list (org-wide) |
 | `/rrhh/solicitudes/{id}` | GET | `HR` (Active) | Read-only request detail |
@@ -127,6 +149,13 @@ When an identity has at least two authorized contexts:
 | `/calendario` | GET | `User` (Active) \| `Approver` (Active, `canResolveRequests=true`) | Basic vacation calendar for User personal scope and Approver anonymized scope only; HR MUST use `/rrhh/calendario` |
 | `/acceso-denegado` | GET | Any (including unauthenticated) | Branded 403 page |
 | `/error` | GET | Any | Branded error page |
+
+`branch-john` currently implements `/` as a role-aware redirect, with priority
+`User` → `/mis-solicitudes`, `Approver` → `/aprobaciones`, and `HR` → `/rrhh`.
+It does not render a shared dashboard at `/`. The approved branded
+`/acceso-denegado` and `/error` views are not both present as dedicated routes
+in the committed Presentation tree; this is recorded as incomplete
+implementation in §11.2 and MUST NOT be interpreted as route removal.
 
 ### 5.3 Authentication Routes (Shared)
 
@@ -180,9 +209,64 @@ When an identity has at least two authorized contexts:
 
 | View | Route | Purpose | Key Components |
 |------|-------|---------|----------------|
-| **Dashboard** | `/` | Role-aware landing page | Context switcher (if multi-role), quick actions, summary cards |
+| **Role-Aware Landing Redirect** | `/` | Redirect to the first authorized role entry point; no dashboard markup is rendered at this route in `branch-john` | Server-side role-aware redirect; destination shell supplies context switcher when applicable |
 | **Acceso Denegado** | `/acceso-denegado` | Branded 403 with context-aware message | Friendly message, return link, contact hint |
 | **Error** | `/error` | Branded error page | Correlation ID, support reference |
+
+### 6.5 Verified `branch-john` Presentation Structure
+
+The following structure is committed and observable in `branch-john`. It is an
+implementation profile, not a replacement for any unmet normative requirement
+elsewhere in this specification.
+
+#### 6.5.1 Authenticated Application Shell
+
+- Authenticated views reuse `Views/Shared/_Layout.cshtml`.
+- The shell contains a persistent navigation rail on large viewports, a sticky
+  page header, a page title derived from `ViewData["Title"]`, role-context
+  navigation, the current identity, session-state text, and a POST logout action.
+- A skip link targets the main content region. Active navigation uses visible
+  styling plus `aria-current`; color is not the only active-page cue.
+- On smaller viewports, a menu button opens the navigation rail as an overlay.
+  The shared JavaScript closes it through the backdrop or `Escape` and keeps
+  `aria-expanded` synchronized.
+- Unauthenticated views use the same layout file but render in a centered,
+  single-column content container without the authenticated shell.
+- Breadcrumbs are not implemented in the committed branch and MUST NOT be
+  described as an existing shared component.
+
+#### 6.5.2 Header and Context Interaction
+
+- The header displays the current page title and a direct logout control.
+- Multi-role identities receive a shared dropdown whose accessible name includes
+  `Mis roles` and the active context. The selected item has a check icon,
+  `aria-current`, and visually hidden `contexto actual` text.
+- The context switcher links to the context landing route. It changes route and
+  visible navigation only; it does not mutate identity, session, roles, claims,
+  capability, ownership, or authorization.
+- Shared calendar navigation preserves context explicitly with
+  `/calendario?context=User` or `/calendario?context=Approver`. HR navigation
+  uses only `/rrhh/calendario`.
+- The approved user-menu structure in `frontend-design-spec.md` §6.6 is not
+  complete in `branch-john`; the current header exposes logout directly.
+
+#### 6.5.3 Repeated View Composition
+
+- Operational lists use responsive wrappers around compact semantic tables with
+  captions, scoped headers, right-aligned numeric columns, and explicit action
+  links.
+- Summary information uses responsive grids of `.nl-card` and `.nl-stat`
+  surfaces. Numeric values use `.nl-num` or tabular-number styling.
+- Empty list states use `.nl-empty`, a decorative icon, plain Spanish text, and
+  a next action when one is authorized.
+- Forms use visible labels, Razor Tag Helpers where a typed form ViewModel is
+  available, server validation summaries, help text, antiforgery protection for
+  mutations, and explicit submit/cancel actions.
+- Status presentation SHOULD flow through `_StatusBadge.cshtml`; raw enum output
+  in committed views is a deviation, not an alternative convention.
+- Table pagination, filters, searches, sorting controls, reusable breadcrumbs,
+  and generic modal components are not consistently implemented. Their presence
+  in handlers or query parameters alone MUST NOT be documented as completed UI.
 
 ---
 
@@ -244,13 +328,83 @@ flowchart LR
 ```
 
 **Primary Nav Items (header/sidebar):**
-1. **Solicitudes** → `/rrhh/solicitudes`
-2. **Calendario** → `/rrhh/calendario`
-3. **Saldos** → `/rrhh/saldos`
-4. **Auditoría** → `/rrhh/auditoria`
-5. **Aprobadores** → `/rrhh/aprobadores`
+1. **Panel RRHH** → `/rrhh`
+2. **Solicitudes** → `/rrhh/solicitudes`
+3. **Calendario** → `/rrhh/calendario`
+4. **Saldos** → `/rrhh/saldos`
+5. **Auditoría** → `/rrhh/auditoria`
+6. **Aprobadores** → `/rrhh/aprobadores`
+
+`Panel RRHH` is active only on the exact `/rrhh` route. Nested routes activate
+their specific navigation item so two sidebar options are never marked current.
 
 **Context Switcher** (visible only when identity has 2+ roles): Labeled **"Mis roles"** — dropdown with available contexts (`Mi espacio`, `Aprobaciones`, `RRHH`); hidden when <2 roles; switching updates route prefix and navigation only; does not modify identity, session, roles, claims, or permissions.
+
+---
+
+### 7.4 Verified Screen Patterns by Context
+
+#### User
+
+- `/mis-solicitudes` displays a compact count summary, an authorized
+  `Nueva solicitud` action, a responsive request table, shared status badges,
+  and a first-use empty state.
+- `/mis-solicitudes/crear` displays authoritative balance context in summary
+  cards, the two approved input-mode labels, date/day fields, reason help and
+  character count, an informational client preview, a server validation summary,
+  and a duplicate-submission loading state. Every derived value remains
+  informational and MUST be revalidated server-side.
+- `/mis-solicitudes/{id}` is a definition-list detail with a conditional edit
+  action for `Pending`; the fuller approved audit and balance presentation is
+  incomplete.
+- `/mis-solicitudes/{id}/editar` exists as a typed form with a hidden row-version
+  token, but it does not yet reuse the complete create-form interaction pattern.
+- `/saldo` uses summary cards and a movement table/empty state. Approved visible
+  balance terminology remains authoritative even where committed labels differ.
+
+#### Approver
+
+- `/aprobaciones` uses a responsive queue table with requester, period,
+  requested days, available balance, projected balance, a visible insufficient-
+  balance cue, and a `Resolver` link.
+- `/aprobaciones/{id}` separates request information and resolution actions into
+  responsive cards. It submits row-version tokens and antiforgery tokens for
+  approval, rejection, and deactivation. Approved confirmation, conflict,
+  loading, and projected-balance presentation requirements remain binding where
+  the current implementation is partial.
+- `/aprobaciones/historial` is currently a basic history table. Approved
+  filtering, sorting, pagination, empty state, and responsive behavior are not
+  complete.
+
+#### HR
+
+- `/rrhh` is an implemented read-only overview composed of organizational
+  summary cards, recent requests, a status distribution, recent audit activity,
+  and quick links to the HR work areas.
+- HR request, balance, movement, audit, and approver-capability pages use typed
+  table/detail/form views. The committed request, balance, and audit queries may
+  be paged, but the views expose only a page summary rather than the complete
+  approved pagination controls.
+- `/rrhh/aprobadores/{id}/capacidad` uses a Bootstrap-compatible confirmation
+  modal, explicit confirmation field, required reason input, and hidden
+  row-version submission. The row version MUST remain a technical concurrency
+  input and SHOULD NOT be exposed as visible user content.
+- HR read-only presentation MUST remain visually explicit on every applicable
+  HR view; the existing isolated labels do not satisfy that requirement across
+  the entire context.
+
+#### Calendar
+
+- User, Approver, and HR calendar views reuse `_Calendar.cshtml`.
+- The shared partial renders a Monday-to-Sunday semantic grid, visibly muted
+  weekend cells, today indication, at most two visible event chips per day with
+  a `+N más` overflow count, an authorized event list, and an empty-month state.
+- User events link to owned detail; HR events link to HR read-only detail.
+  Approver events are anonymized in the current branch.
+- Grid roles, grid-cell roles, focusable weekday cells, event accessible names,
+  and data hooks are present. Complete arrow-key navigation, month controls,
+  focus management, and the approved role-specific navigation behavior MUST NOT
+  be claimed as implemented until executable behavior and tests verify them.
 
 ---
 
@@ -482,19 +636,98 @@ Hidden nav, disabled buttons, or client-side checks are NOT authorization contro
 
 ## 10. Shared Components Referenced
 
-The following components are defined in `frontend-design-spec.md` and MUST be used consistently:
+### 10.1 Approved Component Conventions
 
-- `.nl-button-primary`, `.nl-button-secondary`, `.nl-button-danger`
-- `.nl-card`, `.nl-overlay`
-- Status badges: `.nl-badge-pending`, `.nl-badge-approved`, `.nl-badge-rejected`, `.nl-badge-timeout`, `.nl-badge-cancelled-approver`
-- `.nl-skeleton` for loading
-- `.nl-table`, `.nl-form`, `.nl-input`, `.nl-select`, `.nl-textarea`
-- Toast/alert components with semantic colors
-- Modal confirmation for destructive actions
+The component conventions defined in `frontend-design-spec.md` MUST be used
+consistently. Their token values and fixed visual measurements MUST be referenced
+from that document and MUST NOT be redefined here. These include buttons,
+surfaces, tables, forms, status badges, skeletons, alerts, toasts, overlays, and
+confirmation modals.
+
+### 10.2 Reusable Components Verified in `branch-john`
+
+| Component or Pattern | Evidence | Verified Responsibility | Extension Rule |
+|----------------------|----------|-------------------------|----------------|
+| Application shell | `Views/Shared/_Layout.cshtml` | Authenticated navigation rail, sticky header, page title, context switcher, logout, skip link, responsive sidebar | Future authenticated views MUST reuse it |
+| Calendar partial | `Views/Shared/_Calendar.cshtml` | Shared role-aware calendar grid, event chips/list, authorized detail links, empty month | Calendar views MUST reuse it and controllers MUST supply the authorized role context |
+| Status badge partial | `Views/Shared/_StatusBadge.cshtml` | Icon, visible Spanish label, semantic badge class, canonical `data-status` | Request states SHOULD use this partial rather than raw enum text |
+| Toast partial | `Views/Shared/_Toast.cshtml` | Non-critical status feedback with polite live-region semantics | Success feedback SHOULD reuse it where toast feedback is appropriate |
+| Validation summary partial | `Views/Shared/_ValidationSummary.cshtml` | Shared server-side validation summary | Forms SHOULD reuse it instead of duplicating summary markup |
+| Card/stat patterns | `.nl-card`, `.nl-card-header`, `.nl-stat`, `.nl-stat-label`, `.nl-stat-value`, `.nl-stat-hint` | Compact summaries and dashboard groupings | Existing compliant patterns SHOULD be reused |
+| Table/empty patterns | `.nl-table`, `.nl-empty`, `.table-responsive` | Responsive operational lists and first-use/no-result states | Existing compliant patterns SHOULD be reused |
+| Calendar/status patterns | `.nl-calendar`, `.nl-event`, `.nl-status`, `.nl-num` | Calendar layout, compact events, icon-plus-text status, stable numeric display | Existing compliant patterns SHOULD be reused |
+| Shared JavaScript module | `wwwroot/js/novaleave.js` | Responsive sidebar and create-request interaction initialization | New shared behavior MUST extend the approved module structure and MUST NOT duplicate initialization in views |
+| Capability confirmation | `Views/RRHH/ApproverCapabilities/Capability.cshtml` | Bootstrap-compatible confirmation modal for HR capability change | The interaction pattern SHOULD be reused only for actions with equivalent approved confirmation semantics |
+
+No reusable breadcrumb, pagination, filter-toolbar, search, or generic modal
+partial is present in the committed branch. No View Component or project-owned
+Tag Helper implements these patterns. Future work MUST NOT claim reuse of a
+component that does not exist.
+
+## 11. `branch-john` Conformance Audit
+
+### 11.1 Confirmed and Documentary Findings
+
+| Classification | Finding | Evidence | Documentation Outcome |
+|----------------|---------|----------|-----------------------|
+| `ALREADY_DOCUMENTED` | Role-separated routes, HR-only `/rrhh/calendario`, and server-side authorization boundaries match the approved role model | Controllers, authorization tests, §§4–9 | Retained |
+| `ALREADY_DOCUMENTED` | The multi-role switcher changes route/navigation without changing identity or claims | `_Layout.cshtml`, `UC02SwitchRoleContextTests` | Retained and clarified |
+| `DOCUMENTATION_GAP` | Authenticated screens share a navigation rail, sticky header, skip link, page title, session identity, direct logout, and responsive overlay navigation | `_Layout.cshtml`, `novaleave.js` | Added in §§6.5–7.4 |
+| `DOCUMENTATION_GAP` | `branch-john` contains reusable calendar, status-badge, toast, validation-summary, card/stat, table, and empty-state patterns | `Views/Shared/`, `novaleave.css` | Added in §10.2 |
+| `DOCUMENTATION_GAP` | HR has a committed overview with organization metrics, recent requests, status distribution, audit activity, and quick links | `Views/RRHH/Index.cshtml`, `RRHHDashboardViewModel` | Added in §7.4 |
+| `STALE_SPEC` | `/` was described as a shared dashboard even though the committed route is a role-aware redirect | `Program.cs` | Corrected in §§5.2 and 6.4 |
+| `STALE_SPEC` | The component list mixed approved design conventions with components not actually present as shared project artifacts | `Views/Shared/`, `novaleave.css` | Separated into approved conventions and verified components |
+| `BRANCH_ONLY_EXPERIMENT` | htmx is vendored and loaded globally, but no `hx-*` behavior is present in committed Razor views | `libman.json`, `_Layout.cshtml`, no matching Razor usage | Not made normative |
+| `OUT_OF_SCOPE` | Business calculations, lifecycle transitions, balances, permissions, and audit rules | Primary MVP specification and Constitution | Referenced, not duplicated |
+
+### 11.2 Implementation Deviations and Incomplete Behaviors
+
+The following findings do not amend approved requirements. They MUST remain
+visible until separately remediated through an authorized implementation task.
+
+| Classification | Finding | Higher-Authority Rule | Evidence in `branch-john` |
+|----------------|---------|-----------------------|---------------------------|
+| `IMPLEMENTATION_DEVIATION` | The branch replaces approved visual tokens and typography with a separate Fira Sans/Fira Code, blue/neutral token set and compact fixed values | `frontend-design-spec.md` §§4–5, 11 | `wwwroot/css/novaleave.css`, self-hosted Fira assets |
+| `IMPLEMENTATION_DEVIATION` | CoreUI is loaded as the primary stylesheet and runtime without a frontend ADR; Bootstrap 5.3.x is the approved UI framework | Constitution §3.2 and §11.2; no related ADR exists | `libman.json`, `_Layout.cshtml` |
+| `IMPLEMENTATION_DEVIATION` | Inline CSS and inline JavaScript/confirmation behavior remain in Razor views | Constitution §11.2; shared asset governance | Login, User balance, Approver list/detail, HR dashboard |
+| `IMPLEMENTATION_DEVIATION` | Visible balance labels use `Acumulado`, `Reservado`, and `Deducido` in some User/HR views instead of the approved `Acumulado total`, `Pendientes`, and `Días gozados` terminology | `frontend-design-spec.md` §16; RBFV-024 | User balance and HR balance/movement views |
+| `IMPLEMENTATION_DEVIATION` | Some request and movement states render raw technical enum values, and the shared badge uses shortened cancellation labels | Constitution §3.3 and §11.5; `frontend-design-spec.md` §§4.1 and 10 | User detail, Approver history, HR tables, `_StatusBadge.cshtml` |
+| `IMPLEMENTATION_DEVIATION` | Approver calendar tests and rendering deliberately omit detail links for anonymized events, while primary FR-024 requires navigation for an authorized eligible Approver | MVP `FR-024`; `frontend-design-spec.md` §22 | `_Calendar.cshtml`, `CalendarAuthorizationTests` |
+| `IMPLEMENTATION_DEVIATION` | A technical `RowVersion` value is displayed as visible HR content instead of remaining a hidden concurrency input | Plain-language presentation and technical-identifier boundaries | HR capability form |
+| `DOCUMENTATION_UPDATED` | Login demo guidance is intentionally limited to the four user identifiers; roles, passwords, statuses, and credential instructions are excluded | `frontend-design-spec.md` §§13–13.1; RBFV-033 | Login Razor Page and authentication tests |
+| `INCOMPLETE_IMPLEMENTATION` | The approved header user menu is absent; logout is exposed directly in the header | `frontend-design-spec.md` §6.6 | `_Layout.cshtml` |
+| `INCOMPLETE_IMPLEMENTATION` | User detail lacks the approved audit/balance presentation; edit does not reuse the full dual-mode create pattern | §§6.1, 8.3–8.4 | User detail/edit views |
+| `INCOMPLETE_IMPLEMENTATION` | Approver confirmation modals, mutually-exclusive loading behavior, full projected-balance labels, conflict feedback, and accessible rejection character count are incomplete | `frontend-design-spec.md` §§17, 20, 23; RBFV-025, RBFV-030 | Approver detail/list views |
+| `INCOMPLETE_IMPLEMENTATION` | HR filter toolbars, searches, sorting, responsive card fallbacks, and complete pagination controls are not rendered across the HR context | MVP FR-009; `frontend-design-spec.md` §21; RBFV-032 | HR list/detail views and controllers |
+| `INCOMPLETE_IMPLEMENTATION` | Calendar markup exposes accessibility hooks but lacks verified arrow-key/month navigation behavior and complete approved controls; static tests do not prove keyboard behavior | `frontend-design-spec.md` §25; RBFV-018, RBFV-026 | `_Calendar.cshtml`, `novaleave.js`, calendar tests |
+| `INCOMPLETE_IMPLEMENTATION` | Dedicated branded `/acceso-denegado` and `/error` experiences with return/support/correlation guidance are not complete | Constitution §11.4; §§5.2 and 6.4 | Identity AccessDenied page; no dedicated Error view in committed tree |
+| `INCOMPLETE_IMPLEMENTATION` | Several list views have no explicit empty state, filter/search UI, or reusable pagination component even where approved | §§8.10–8.16 | Approver history and HR operational views |
+
+### 11.3 View, Route, Role, and Use-Case Traceability
+
+| Context | View or Interaction | Route | Approved Use Case(s) | Primary Shared Pattern |
+|---------|---------------------|-------|----------------------|------------------------|
+| Shared | Login | `/Identity/Account/Login` | UC-01 | Unauthenticated layout, typed Identity PageModel, validation feedback |
+| Shared | Context switching | Role landing routes; explicit calendar query context | UC-02 | `_Layout.cshtml` context switcher |
+| User | Request list | `/mis-solicitudes` | UC-03 | `.nl-table`, `_StatusBadge`, `.nl-empty` |
+| User | Create request | `/mis-solicitudes/crear` | UC-04 | `.nl-card`, `.nl-stat`, typed form, shared JavaScript module |
+| User | Edit Pending request | `/mis-solicitudes/{id}/editar` | UC-05 | Typed form, validation, row version |
+| User | Request detail | `/mis-solicitudes/{id}` | UC-06 | Definition-list detail, conditional action |
+| User | Balance and movements | `/saldo` | UC-07 | `.nl-stat`, `.nl-table`, `.nl-empty` |
+| User | Personal calendar | `/calendario?context=User` | UC-08 | `_Calendar.cshtml` |
+| Approver | Pending queue | `/aprobaciones` | UC-09 | `.nl-table`, balance warning, `.nl-empty` |
+| Approver | Resolution detail | `/aprobaciones/{id}` | UC-10–UC-13 | Responsive cards, protected forms, warning/feedback patterns |
+| Approver | Resolution history | `/aprobaciones/historial` | UC-14 | `.nl-table` |
+| Approver | Anonymized calendar | `/calendario?context=Approver` | UC-15 | `_Calendar.cshtml` |
+| HR | Request list and detail | `/rrhh/solicitudes`, `/rrhh/solicitudes/{id}` | UC-18 | `.nl-table`, read-only detail |
+| HR | Organizational calendar | `/rrhh/calendario` | UC-19 | `_Calendar.cshtml`, descriptive context panel |
+| HR | Balances and movements | `/rrhh/saldos`, `/rrhh/saldos/{userId}` | UC-20 | `.nl-table`, read-only detail |
+| HR | Relevant audit | `/rrhh/auditoria` | UC-21 | `.nl-table` |
+| HR | Approver capability | `/rrhh/aprobadores`, `/rrhh/aprobadores/{id}/capacidad` | UC-22 | `.nl-table`, typed form, confirmation modal, `_Toast` |
 
 ---
 
-## 11. Acceptance Criteria
+## 12. Acceptance Criteria
 
 | ID | Scenario | Expected Result |
 |----|----------|-----------------|
@@ -529,13 +762,13 @@ The following components are defined in `frontend-design-spec.md` and MUST be us
 | RBFV-029 | Weekend exclusion in working-day calculation (server + UI preview match) | Fri+1→Mon, range spanning weekend, weekend-only rejected, Sat/Sun start rejected; holidays counted |
 | RBFV-030 | Approve/Reject are mutually exclusive — UI disables conflicting action on submit, server revalidates | After one POST, other button disabled; stale/duplicate POST returns conflict; reason required for Reject |
 | RBFV-031 | Approver views: visual hierarchy, spacing, white cards, status badges, loading, empty states | Manual review against frontend-design-spec.md §20 |
-| RBFV-032 | HR views: read-only indicators, no resolution actions, pagination, calendar names at `/rrhh/calendario`, capability modal; HR access to `/calendario` is forbidden | Manual review against frontend-design-spec.md §21 and route authorization tests |
-| RBFV-033 | Login screen uses NovaLeave branding, Identity flow, accessible, responsive, no emojis/gradients | Manual review against frontend-design-spec.md §12 |
+| RBFV-032 | HR views: descriptive context, no resolution actions, pagination, calendar names at `/rrhh/calendario`, capability modal; HR access to `/calendario` is forbidden | Manual review against frontend-design-spec.md §21 and route authorization tests |
+| RBFV-033 | Login screen uses NovaLeave branding, Identity flow, accessible, responsive, no emojis/gradients | Manual review against frontend-design-spec.md §13 |
 | RBFV-034 | New eligible Pending request appears in `/aprobaciones` exactly once without manual sync; Approver queue excludes only owning Approver and ineligible states, never team/hierarchy/department/assigned-approver | After successful creation, redirect User shows success; next Approver open/refresh shows the request once; no organizational filter applied |
 
 ---
 
-## 12. Out of Scope for This Specification
+## 13. Out of Scope for This Specification
 
 - Business validation rules (see `specs/001-leave-management-mvp/spec.md`)
 - Design token values (see `frontend-design-spec.md` v1.3.0)
@@ -546,14 +779,82 @@ The following components are defined in `frontend-design-spec.md` and MUST be us
 
 ---
 
-## 13. Version History
+## Frontend Extension Rules
+
+These rules are mandatory for future screens derived from the approved
+NovaLeave frontend and the conforming patterns verified in `branch-john`.
+
+### Shell, Assets, and Reuse
+
+- Future views MUST reuse the existing application layout and navigation shell.
+- Existing shared components MUST be reused before creating view-specific alternatives.
+- Views MUST NOT contain inline CSS.
+- Views MUST NOT contain duplicated JavaScript initialization.
+- Shared CSS MUST remain under the approved `wwwroot/css` structure.
+- Shared JavaScript MUST remain under the approved `wwwroot/js` structure.
+- Bootstrap 5.3.x MUST be used through the shared project conventions.
+- Bootstrap versions MUST NOT be changed by this documentation task or by
+  extensions governed by this specification without separate approval.
+- Existing table patterns SHOULD be reused.
+- Existing form patterns SHOULD be reused.
+- Existing badge patterns SHOULD be reused.
+- Existing alert patterns SHOULD be reused.
+- Existing modal patterns SHOULD be reused.
+- Existing empty-state patterns SHOULD be reused.
+- A branch-only dependency or unused experiment MUST NOT become a required
+  frontend convention without approval under the Constitution and, when
+  applicable, an ADR.
+
+### Language, Models, and Presentation Boundaries
+
+- Visible UI content MUST remain in Spanish.
+- Technical identifiers MUST remain in English.
+- Every Razor view MUST use a dedicated ViewModel appropriate to its presentation purpose.
+- Domain entities and EF entities MUST NOT be exposed directly to Razor.
+- Business rules MUST be referenced from the primary MVP specification rather than duplicated.
+- Design tokens and fixed visual values MUST be referenced from `frontend-design-spec.md` rather than redefined.
+- Frontend calculations MAY provide informational previews only. Client-calculated
+  balances, roles, ownership, statuses, or working-day totals MUST NOT be trusted.
+- Sensitive data MUST NOT be exposed by presentation decisions.
+
+### Authorization, Roles, and Routes
+
+- Authorization MUST be enforced server-side.
+- Visual hiding MUST NOT be treated as authorization.
+- Unauthorized actions MUST NOT be displayed as executable controls.
+- Frontend code MUST NOT create new roles.
+- Frontend code MUST NOT create new permissions.
+- Frontend code MUST NOT create new request states.
+- Frontend code MUST NOT create unapproved routes.
+- The contexts `User`, `Approver`, and `HR` MUST remain visually and navigationally distinct.
+- Role switching MUST NOT modify identity, claims, session, permissions, ownership, or authorization.
+- HR MUST use `/rrhh/calendario`.
+- `/calendario` MUST NOT be reused as the global HR calendar.
+- Future views MUST remain aligned with approved use cases and contracts.
+
+### Responsive and Accessible Interaction
+
+- New views MUST define responsive behavior using the approved rules in `frontend-design-spec.md`.
+- New views MUST preserve WCAG 2.1 AA requirements.
+- Keyboard navigation MUST remain supported.
+- Focus indicators MUST remain visible.
+- Color MUST NOT be the only status indicator.
+- Required actions and feedback MUST remain reachable at every approved viewport.
+- Loading, success, warning, validation, conflict, empty, and error states MUST
+  use the appropriate shared pattern and MUST remain understandable without
+  motion, color, or icons alone.
+
+---
+
+## 14. Version History
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0.0 | 2026-07-23 | — | Initial draft aligned with Constitution v5.0.0 |
 | 2.0.0 | 2026-07-23 | — | Added HR/RRHH context; updated to Constitution v6.0.0; removed stale HR-exclusion warnings |
 | 2.0.1 | 2026-07-30 | — | Clarified Approver `canResolveRequests` eligibility and HR-only `/rrhh/calendario` route |
+| 2.1.0 | 2026-08-04 | — | Audited committed `branch-john` Presentation; documented the verified shell, role-specific view structure, reusable components, extension rules, and separate non-legitimizing deviation/incomplete-implementation findings |
 
 ---
 
-**Constitution Alignment**: This specification is subordinate to `.specify/memory/constitution.md` v6.0.1 and `specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0. Any conflict MUST be resolved by amending the authoritative source.
+**Constitution Alignment**: This specification is subordinate to `.specify/memory/constitution.md` v7.0.0 and `specs/001-leave-management-mvp/frontend-design-spec.md` v1.3.0. Any conflict MUST be resolved by amending the authoritative source.

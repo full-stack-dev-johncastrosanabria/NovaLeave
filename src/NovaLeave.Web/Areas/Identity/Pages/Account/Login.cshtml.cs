@@ -30,8 +30,8 @@ public sealed class LoginModel : PageModel
     public InputModel Input { get; set; } = new();
 
     /// <summary>
-    /// Whether the demo credentials hint may be rendered. Requires demo seeding to be enabled
-    /// <em>and</em> a non-Production host, so credentials can never be printed in Production
+    /// Whether the demo user list may be rendered. Requires demo seeding to be enabled
+    /// <em>and</em> a non-Production host, so demo identifiers are never printed in Production
     /// even if the flag were set there by mistake.
     /// </summary>
     public bool ShowDemoIdentities => _options.SeedDemoUsers && !_environment.IsProduction();
@@ -53,7 +53,9 @@ public sealed class LoginModel : PageModel
             return LocalRedirect(returnUrl ?? "/mis-solicitudes");
         }
 
-        ModelState.AddModelError(string.Empty, "Credenciales invalidas.");
+        ModelState.AddModelError(
+            string.Empty,
+            "El correo o la contraseña no son correctos. Verifica tus datos e inténtalo de nuevo.");
         return Page();
     }
 
