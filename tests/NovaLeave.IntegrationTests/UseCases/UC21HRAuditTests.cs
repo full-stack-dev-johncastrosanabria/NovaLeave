@@ -108,7 +108,7 @@ public sealed class UC21HRAuditTests
         var html = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Pagina 2 de 2", html);
+        Assert.Contains("Página 2 de 2", html);
         Assert.Contains("AuditPage-01", html);
     }
 

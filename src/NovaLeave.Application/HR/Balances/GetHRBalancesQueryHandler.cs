@@ -26,12 +26,12 @@ public sealed class GetHRBalancesQueryHandler
 
     public async Task<PagedResult<HRBalanceSummary>> HandleAsync(GetHRBalancesQuery query, CancellationToken cancellationToken)
     {
-        var page = Math.Max(1, query.Page);
-        var pageSize = Math.Max(1, query.PageSize);
+        var totalCount = _dbContext.VacationBalances.Count();
+        var pagination = PaginationParameters.Normalize(query.Page, query.PageSize, totalCount);
         var balances = _dbContext.VacationBalances
             .OrderBy(balance => balance.UserId)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
+            .Skip(pagination.Offset)
+            .Take(pagination.PageSize)
             .ToList();
 
         var users = await _userDirectory.GetUsersByIdsAsync(balances.Select(balance => balance.UserId).ToArray(), cancellationToken);
@@ -45,6 +45,6 @@ public sealed class GetHRBalancesQueryHandler
                 balance.AvailableDays))
             .ToList();
 
-        return new PagedResult<HRBalanceSummary>(items, page, pageSize, _dbContext.VacationBalances.Count());
+        return new PagedResult<HRBalanceSummary>(items, pagination.Page, pagination.PageSize, totalCount);
     }
 }

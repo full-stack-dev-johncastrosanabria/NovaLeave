@@ -52,4 +52,4 @@ else
 }
 </div>
 
-<p class="text-body-secondary nl-result-count">Página @Model.Records.Page de @Math.Max(1, (int)Math.Ceiling(Model.Records.TotalCount / (double)Model.Records.PageSize))</p>
+<p class="text-body-secondary nl-result-count">Página @Model.Records.Page de @Model.Records.TotalPages</p>

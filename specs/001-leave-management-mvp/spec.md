@@ -1,7 +1,7 @@
 # Feature Specification: NovaLeave MVP — Vacation Request Management
 **Feature Branch**: `001-leave-management-mvp`
 **Created**: 2026-07-15
-**Last Refactored**: 2026-07-23
+**Last Refactored**: 2026-08-05
 **Status**: Ready for Planning. The core `User`/`Approver`/`HR` vacation workflow may proceed on the recorded decisions. The two prior Constitution conflicts (Approver deactivation of an approved request; time-zone removal) are **resolved** by the Constitution v4.0.0 amendment (2026-07-16). HR role added by Constitution v6.0.0 amendment (2026-07-23). Approver `canResolveRequests` eligibility clarified by Constitution v6.0.1 amendment (2026-07-30). Current governance is Constitution v7.0.0. **All five Open Questions are now RESOLVED or EXPLICITLY DEFERRED OUT OF MVP SCOPE**: OQ-001 (owner cancellation) resolved OUT OF MVP SCOPE by v4.0.0; OQ-002 (completed-month semantics) RESOLVED 2026-07-27 (calendar month from EmploymentStartDate); OQ-003 (Inactive User operations) RESOLVED per current Constitution §4.4; OQ-004 (deactivation reason) EXPLICITLY DEFERRED OUT OF MVP SCOPE; OQ-005 (calendar scope) RESOLVED per current Constitution. No implementation blockers remain.
 **Input**: Authoritative Product Owner decisions (2026-07-16) that supersede the prior Employee/Direct-Manager/HR, multi-leave-type model. The MVP is now a single-leave-type (`Vacation`) system with three application roles (`User`, `Approver`, `HR`), a global accruing balance with Pending reservations, Pending editing, automatic timeout cancellation, and Approver deactivation of an approved request before it begins. HR has organization-wide read access and approver-capability management per current Constitution §4.3.
 **Governance**: This specification is subordinate to `.specify/memory/constitution.md` v6.0.1. The constitution remains authoritative for Clean Architecture, ASP.NET Core MVC, Razor Views, Bootstrap, ASP.NET Core Identity, persistence, security, testing, observability, and engineering governance. This specification defines business behavior and observable outcomes. It does not prescribe controllers, repositories, database tables, HTTP routes, framework classes, or code structure.
@@ -201,6 +201,9 @@ As an authenticated User, I want a basic visual vacation calendar, so that I can
 9. **AC-038 — Fail closed when authoritative data is unavailable**
    **Related Requirements**: AUTHZ-008, ERR-005
    **Given** an operation requiring authoritative identity, active-status, leave-type, balance, ownership, or request-state data, **When** that data cannot be obtained or is ambiguous, **Then** the system rejects or defers the operation, changes no business data, substitutes no client-supplied value, and returns a non-sensitive retryable or corrective outcome.
+10. **AC-061 — Enforce pagination on the server**
+   **Related Requirements**: VAL-010, SC-015
+   **Given** an authorized paginated HR query, **When** a client supplies a page below 1, a page beyond the available result set, or a page size above the approved maximum, **Then** the server normalizes the values to valid bounded limits, applies filtering before counting and page selection, returns no more than 200 items, and provides authoritative page, page-size, total-count, total-page, previous-page, and next-page metadata.
 
 ### Edge Cases
 - **EC-001 — Next-day boundary**: The earliest valid start date is the following calendar day; a same-day start is rejected.
@@ -270,6 +273,7 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 - **VAL-006 — Reject Partial-Day Input** *(Unwanted Behavior)* — If a submission requests less than a full working day or supplies an hourly interval, then the system shall reject it as outside the MVP.
 - **VAL-007 — Validate the Rejection Reason** *(Ubiquitous)* — The system shall trim leading and trailing whitespace, reject whitespace-only input, require an Approver's normalized rejection reason to contain 10–500 Unicode text elements, allow line breaks, and treat markup as non-executable text.
 - **VAL-009 — Normalize and Validate the Input Mode** *(Ubiquitous)* — The system shall accept exactly one input mode per request, reject a submission that mixes or omits the required mode inputs, and derive one authoritative date range and one authoritative working-day total server-side.
+- **VAL-010 — Validate Pagination Server-Side** *(Ubiquitous)* — Every paginated query shall normalize `page` to the available range, constrain `pageSize` to 1–200 with a default of 50, apply filters before total counting and page selection, and return authoritative pagination metadata from the Application layer. No controller, view, query-string value, or client script may bypass these limits or substitute client-calculated totals.
 
 ### Business Rules and Domain Invariants
 *Retired identifiers: BR-003 is repurposed (time-zone dependence removed); BR-010 and BR-022 (owner-cancellation transition and its atomicity) are retired because OQ-001 is resolved out of MVP scope and are not reused.*
@@ -426,6 +430,7 @@ Every normative requirement uses exactly one standard EARS classification: **Ubi
 - **SC-012 — Deactivation Correctness**: 100% of valid pre-start deactivations restore the deducted balance atomically, and 100% of post-start or partial deactivation attempts are denied. **Measurement**: deactivation integration tests.
 - **SC-013 — Accrual Correctness**: 100% of completed months add exactly one whole day, with no proration and no expiry. **Measurement**: accrual domain and integration tests.
 - **SC-014 — Validation Clarity**: 100% of tested validation failures identify an actionable failed rule without exposing implementation details or sensitive content. **Measurement**: MVC acceptance and security-output tests.
+- **SC-015 — Bounded Server Pagination**: 100% of paginated HR request, balance, and audit queries return at most 200 items, clamp invalid pages to an available page, and report server-derived page metadata consistent with the filtered total. **Measurement**: Application policy unit tests and integration tests that invoke all three handlers with adversarial page parameters.
 ---
 
 ## Assumptions
@@ -519,6 +524,7 @@ Every normative requirement maps to at least one acceptance scenario, edge case,
 | VAL-006 | EC-011 | Validation |
 | VAL-007 | AC-016, AC-036 | Validation + Unicode Normalization |
 | VAL-009 | AC-041, AC-042, EC-013 | Validation + Integration |
+| VAL-010 | AC-061 | Unit + Integration |
 | BR-001 | AC-003 | Domain + Acceptance |
 | BR-002 | AC-004, EC-001 | Domain + Acceptance |
 | BR-003 | AC-004 | Domain |

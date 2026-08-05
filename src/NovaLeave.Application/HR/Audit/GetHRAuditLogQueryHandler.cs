@@ -26,8 +26,6 @@ public sealed class GetHRAuditLogQueryHandler
 
     public Task<PagedResult<HRAuditLogItem>> HandleAsync(GetHRAuditLogQuery query, CancellationToken cancellationToken)
     {
-        var page = Math.Max(1, query.Page);
-        var pageSize = Math.Max(1, query.PageSize);
         var auditQuery = _dbContext.AuditRecords;
         if (!string.IsNullOrWhiteSpace(query.Action))
         {
@@ -35,10 +33,11 @@ public sealed class GetHRAuditLogQueryHandler
         }
 
         var totalCount = auditQuery.Count();
+        var pagination = PaginationParameters.Normalize(query.Page, query.PageSize, totalCount);
         var items = auditQuery
             .OrderByDescending(record => record.TimestampUtc)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
+            .Skip(pagination.Offset)
+            .Take(pagination.PageSize)
             .Select(record => new HRAuditLogItem(
                 record.TimestampUtc,
                 record.ActorId,
@@ -50,6 +49,6 @@ public sealed class GetHRAuditLogQueryHandler
                 record.Data))
             .ToList();
 
-        return Task.FromResult(new PagedResult<HRAuditLogItem>(items, page, pageSize, totalCount));
+        return Task.FromResult(new PagedResult<HRAuditLogItem>(items, pagination.Page, pagination.PageSize, totalCount));
     }
 }
