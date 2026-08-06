@@ -1,0 +1,258 @@
+================================================================================
+COMANDOS PARA LEVANTAR EL PROYECTO NOVALEAVE CON USER SEEDS
+================================================================================
+
+UBICACIÓN DEL PROYECTO:
+  C:\Users\AbrahamVillalobosUga\Desktop\AI-NOVA\NovaLeave
+
+================================================================================
+1. PRERREQUISITOS - DOCKER (SQL Server 2022)
+================================================================================
+
+# Levantar la base de datos SQL Server en Docker
+docker compose up -d
+
+# Verificar que el contenedor está corriendo y sano
+docker ps --filter "name=novaleave-sqlserver"
+
+# Verificar logs de SQL Server (opcional)
+docker logs novaleave-sqlserver --tail 20
+
+# Detener la base de datos (mantiene los datos)
+docker compose down
+
+# Detener y ELIMINAR la base de datos (borra todo - útil para resetear)
+docker compose down -v
+
+
+================================================================================
+2. BASE DE DATOS - MIGRACIONES
+================================================================================
+
+# Aplicar migraciones (crea la BD y tablas)
+dotnet ef database update `
+  --project src/NovaLeave.Infrastructure/NovaLeave.Infrastructure.csproj `
+  --startup-project src/NovaLeave.Web/NovaLeave.Web.csproj
+
+# Verificar migraciones aplicadas
+dotnet ef migrations list `
+  --project src/NovaLeave.Infrastructure/NovaLeave.Infrastructure.csproj `
+  --startup-project src/NovaLeave.Web/NovaLeave.Web.csproj
+
+# Si necesitas crear una nueva migración (después de cambios en el modelo)
+dotnet ef migrations add <NombreMigracion> `
+  --project src/NovaLeave.Infrastructure/NovaLeave.Infrastructure.csproj `
+  --startup-project src/NovaLeave.Web/NovaLeave.Web.csproj
+
+
+================================================================================
+3. COMPILACIÓN
+================================================================================
+
+# Compilar toda la solución
+dotnet build NovaLeave.sln
+
+# O compilar solo el proyecto Web
+dotnet build src/NovaLeave.Web/NovaLeave.Web.csproj
+
+
+================================================================================
+4. EJECUCIÓN DE LA APLICACIÓN
+================================================================================
+
+# Opción A: Ejecutar con dotnet run (recomendado para desarrollo)
+cd "C:\Users\AbrahamVillalobosUga\Desktop\AI-NOVA\NovaLeave"
+dotnet run --project src/NovaLeave.Web/NovaLeave.Web.csproj
+
+# Opción B: Ejecutar el ejecutable compilado directamente (más rápido)
+cd "C:\Users\AbrahamVillalobosUga\Desktop\AI-NOVA\NovaLeave\src\NovaLeave.Web\bin\Debug\net10.0"
+$env:ASPNETCORE_URLS = "http://localhost:51293"
+$env:ASPNETCORE_ENVIRONMENT = "Development"
+.\NovaLeave.Web.exe
+
+
+================================================================================
+5. VERIFICACIÓN DE QUE TODO FUNCIONA
+================================================================================
+
+# Health check (debe devolver 200 OK con {"status":"Healthy"})
+curl http://localhost:51293/health/live
+
+# Página principal (redirige según rol del usuario)
+curl http://localhost:51293/
+
+# Página de login (debe mostrar los 4 usuarios demo)
+curl http://localhost:51293/Identity/Account/Login
+
+
+================================================================================
+6. USUARIOS DEMO SEEDS (se crean automáticamente al iniciar la app)
+================================================================================
+
+# IMPORTANTE: Los usuarios se crean AUTOMÁTICAMENTE al iniciar la aplicación
+# gracias a DemoDataSeeder.SeedAsync() en Program.cs:87
+# Condiciones:
+#   - NovaLeave:SeedDemoUsers = true (en appsettings.json)
+#   - Entorno NO Production (Development/Staging)
+
+┌─────────────────────┬──────────────┬─────────────────────┬──────────────────┐
+│ Email               │ Password     │ Roles               │ Descripción      │
+├─────────────────────┼──────────────┼─────────────────────┼──────────────────┤
+│ user@demo           │ Demo123!     │ User                │ Usuario estándar │
+│ approver@demo       │ Demo123!     │ User, Approver      │ Aprobador        │
+│ hr@demo             │ Demo123!     │ User, HR            │ Recursos Humanos │
+│ multi@demo          │ Demo123!     │ User, Approver, HR  │ Multi-rol        │
+└─────────────────────┴──────────────┴─────────────────────┴──────────────────┘
+
+# Todos tienen:
+#   - EmailConfirmado = true
+#   - IsActive = true
+#   - 12 meses de antigüedad (balance de vacaciones > 0)
+#   - EmploymentStartDate = primer día del mes hace 12 meses
+
+
+================================================================================
+7. FLUJO DE LOGIN (ejemplo con PowerShell)
+================================================================================
+
+$session = New-Object Microsoft.Powershell.Commands.WebRequestSession
+
+# 1. Obtener página de login y token antiforgery
+$response = Invoke-WebRequest -Uri 'http://localhost:51293/Identity/Account/Login' -UseBasicParsing -WebSession $session
+$token = ($response.Content -match 'name="__RequestVerificationToken" type="hidden" value="([^"]+)"') ? $matches[1] : ""
+
+# 2. Hacer login
+$loginData = @{
+    'Input.Email' = 'user@demo'
+    'Input.Password' = 'Demo123!'
+    'Input.RememberMe' = 'false'
+    '__RequestVerificationToken' = $token
+}
+
+$response = Invoke-WebRequest -Uri 'http://localhost:51293/Identity/Account/Login' -Method POST -Body $loginData -UseBasicParsing -WebSession $session -MaximumRedirection 0
+
+# 3. Verificar redirección a /mis-solicitudes (para User)
+#    Redirecciones por rol:
+#    - User      → /mis-solicitudes
+#    - Approver  → /aprobaciones
+#    - HR        → /rrhh
+
+
+================================================================================
+8. PUERTOS Y URLs
+================================================================================
+
+# Configurado en src/NovaLeave.Web/Properties/launchSettings.json:
+#   - HTTP:  http://localhost:51293  ← USAR ESTE
+#   - HTTPS: NO USAR (causaba conflicto de puerto 51292)
+
+# Health endpoints (públicos, sin auth):
+#   - GET /health/live   → Liveness probe
+#   - GET /health/ready  → Readiness probe (requiere BD)
+
+
+================================================================================
+9. CONFIGURACIÓN IMPORTANTE (appsettings.json)
+================================================================================
+
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost,1433;Database=NovaLeave;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;"
+  },
+  "NovaLeave": {
+    "PendingRequestTimeoutDays": 30,
+    "SessionTimeoutMinutes": 60,
+    "AccrualSchedulerCadence": "Daily 02:00 UTC",
+    "TimeoutSchedulerCadence": "Daily 03:00 UTC",
+    "SeedDemoUsers": true          ← DEBE ESTAR EN true PARA SEEDS
+  }
+}
+
+
+================================================================================
+10. SOLUCIÓN DE PROBLEMAS COMUNES
+================================================================================
+
+# Error: "address already in use" en puerto 51292 o 51293
+# Solución: Matar procesos en esos puertos
+powershell -Command "Get-NetTCPConnection -LocalPort 51292,51293 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }"
+
+# Error: Base de datos no accesible
+# Verificar: docker ps (contenedor novaleave-sqlserver debe estar "healthy")
+# Verificar: puerto 1433 mapeado en docker-compose.yml
+
+# Error: Migraciones no se aplican
+# Verificar: ConnectionString en appsettings.json coincide con docker-compose.yml
+# Ejecutar: dotnet ef database update --verbose (para ver detalles)
+
+# Resetear todo (BD + migraciones + seeds):
+docker compose down -v
+docker compose up -d
+dotnet ef database update --project src/NovaLeave.Infrastructure --startup-project src/NovaLeave.Web
+dotnet run --project src/NovaLeave.Web/NovaLeave.Web.csproj
+
+
+================================================================================
+11. COMANDO RÁPIDO TODO EN UNO (PowerShell)
+================================================================================
+
+# Copia y pega esto en PowerShell para levantar todo de una vez:
+
+cd "C:\Users\AbrahamVillalobosUga\Desktop\AI-NOVA\NovaLeave"
+
+# 1. Levantar BD
+docker compose up -d
+
+# 2. Esperar a que SQL Server esté sano (aprox 30-60 seg la primera vez)
+Write-Host "Esperando a SQL Server..." -ForegroundColor Yellow
+Start-Sleep 45
+
+# 3. Aplicar migraciones
+dotnet ef database update --project src/NovaLeave.Infrastructure/NovaLeave.Infrastructure.csproj --startup-project src/NovaLeave.Web/NovaLeave.Web.csproj
+
+# 4. Compilar
+dotnet build NovaLeave.sln
+
+# 5. Ejecutar app (se queda corriendo - abre otra terminal para probar)
+Write-Host "Iniciando aplicación... (Ctrl+C para detener)" -ForegroundColor Green
+dotnet run --project src/NovaLeave.Web/NovaLeave.Web.csproj
+
+
+================================================================================
+12. ENDPOINTS PRINCIPALES PARA PROBAR
+================================================================================
+
+# Públicos:
+GET  /health/live              → Health check
+GET  /health/ready             → Readiness check (con BD)
+GET  /Identity/Account/Login   → Página de login
+POST /Identity/Account/Login   → Login (requiere token antiforgery)
+
+# Usuario (requiere login + rol User):
+GET  /mis-solicitudes          → Mis solicitudes de vacaciones
+GET  /mis-solicitudes/crear    → Crear nueva solicitud
+
+# Aprobador (requiere login + rol Approver):
+GET  /aprobaciones             → Solicitudes pendientes de aprobar
+
+# HR (requiere login + rol HR):
+GET  /rrhh                     → Panel de RRHH
+GET  /rrhh/usuarios            → Gestión de usuarios
+GET  /rrhh/balances            → Gestión de balances
+
+
+================================================================================
+NOTAS FINALES
+================================================================================
+
+• La aplicación tarda ~30-45 segundos en arrancar (migraciones + seeds)
+• Los seeds son IDEMPOTENTES: reiniciar la app NO duplica usuarios
+• Los jobs en segundo plano (MonthlyAccrualJob, PendingRequestTimeoutJob)
+  se inician automáticamente según su cadencia configurada
+• Para desarrollo: usa 'dotnet run' (hot reload con 'dotnet watch')
+• Para producción: compila con 'dotnet publish -c Release'
+
+================================================================================
+Fecha de creación: 2026-08-06
+Proyecto: NovaLeave MVP - Leave Management System
+================================================================================
