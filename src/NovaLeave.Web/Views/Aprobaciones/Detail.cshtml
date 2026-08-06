@@ -44,7 +44,6 @@
       <span class="nl-eyebrow">Impacto de la aprobación</span>
       <h2 id="balance-impact-title">Cómo quedaría el saldo</h2>
     </div>
-    <p>Valores calculados por el servidor para esta solicitud.</p>
   </div>
   <div class="nl-balance-impact-flow">
     <div>
@@ -95,6 +94,7 @@
       <div><dt>Inicio</dt><dd>@Model.Request.StartDate.ToString("dd/MM/yyyy")</dd></div>
       <div><dt>Fin</dt><dd>@Model.Request.EndDate.ToString("dd/MM/yyyy")</dd></div>
       <div><dt>Días hábiles</dt><dd class="nl-num">@Model.Request.WorkingDays</dd></div>
+      <div><dt>Motivo de la solicitud</dt><dd style="white-space: pre-wrap;">@Model.Request.Reason</dd></div>
       <div><dt>Estado</dt><dd>@await Html.PartialAsync("_StatusBadge", Model.Request.Status.ToString())</dd></div>
     </dl>
   </section>

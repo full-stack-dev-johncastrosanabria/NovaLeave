@@ -19,6 +19,7 @@ public sealed record ApproverRequestDetail(
     DateOnly StartDate,
     DateOnly EndDate,
     int WorkingDays,
+    string Reason,
     RequestStatus Status,
     int AvailableDays,
     int ProjectedBalanceAfterApproval,

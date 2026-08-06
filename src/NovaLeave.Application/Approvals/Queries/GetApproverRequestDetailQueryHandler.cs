@@ -39,21 +39,8 @@ public sealed class GetApproverRequestDetailQueryHandler
             return Result<ApproverRequestDetail>.Failure(new Error(ErrorCodes.NotFound, "Solicitud no encontrada."));
         }
 
-        if (request.Status == RequestStatus.Pending && ApproverPolicies.CanResolvePending(approver, request) is { } resolveError)
-        {
-            return Result<ApproverRequestDetail>.Failure(resolveError);
-        }
-
-        if (request.Status == RequestStatus.Approved && ApproverPolicies.CanDeactivateApproved(approver, request) is { } deactivateError)
-        {
-            return Result<ApproverRequestDetail>.Failure(deactivateError);
-        }
-
-        if (request.Status is not (RequestStatus.Pending or RequestStatus.Approved))
-        {
-            return Result<ApproverRequestDetail>.Failure(Error.Conflict("La solicitud ya no es elegible para resolución."));
-        }
-
+        // Allow viewing any request the approver has access to.
+        // Action permissions (approve/reject/deactivate) are checked in their respective command handlers.
         var balance = _dbContext.VacationBalances.Single(candidate => candidate.UserId == request.OwnerId);
         var otherRequests = _dbContext.VacationRequests
             .Where(candidate => candidate.OwnerId == request.OwnerId && candidate.Id != request.Id)
@@ -77,6 +64,7 @@ public sealed class GetApproverRequestDetailQueryHandler
             request.StartDate,
             request.EndDate,
             request.WorkingDays,
+            request.Reason,
             request.Status,
             availableExcludingCurrentRequest,
             availableExcludingCurrentRequest - request.WorkingDays,
