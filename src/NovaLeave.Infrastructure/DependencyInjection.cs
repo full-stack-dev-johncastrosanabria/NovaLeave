@@ -22,7 +22,9 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         services.AddDbContext<NovaLeaveDbContext>(options =>
-            options.UseSqlServer(connectionString));
+        {
+            options.UseSqlServer(connectionString);
+        });
 
         services
             .AddIdentity<ApplicationUser, IdentityRole>(options =>

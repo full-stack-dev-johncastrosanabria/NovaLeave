@@ -175,9 +175,9 @@ public sealed class RRHHController : Controller
     [HttpPost("/rrhh/aprobadores/{id}/capacidad")]
     public async Task<IActionResult> ToggleApproverCapability(string id, ToggleApproverCapabilityInput input, CancellationToken cancellationToken)
     {
-        if (!TryDecode(input.RowVersion, out var rowVersion))
+        if (string.IsNullOrWhiteSpace(input.ConcurrencyStamp))
         {
-            return BadRequest("RowVersion no válida.");
+            return BadRequest("ConcurrencyStamp no válida.");
         }
 
         var result = await _toggleCapability.HandleAsync(new ToggleApproverCapabilityCommand(
@@ -186,7 +186,7 @@ public sealed class RRHHController : Controller
             input.Enable,
             input.Reason ?? string.Empty,
             input.Confirmed,
-            rowVersion), cancellationToken);
+            input.ConcurrencyStamp), cancellationToken);
 
         if (result.IsFailure)
         {
@@ -228,22 +228,8 @@ public sealed class RRHHController : Controller
     {
         return new ApproverCapabilityFormViewModel(
             item,
-            new ToggleApproverCapabilityInput { Enable = item.CanResolveRequests, RowVersion = Convert.ToBase64String(item.RowVersion) },
-            Convert.ToBase64String(item.RowVersion));
-    }
-
-    private static bool TryDecode(string rowVersion, out byte[] decoded)
-    {
-        try
-        {
-            decoded = Convert.FromBase64String(rowVersion);
-            return true;
-        }
-        catch (FormatException)
-        {
-            decoded = [];
-            return false;
-        }
+            new ToggleApproverCapabilityInput { Enable = item.CanResolveRequests, ConcurrencyStamp = item.ConcurrencyStamp },
+            item.ConcurrencyStamp);
     }
 
     private YearMonth ResolveMonth(int? year, int? month, IReadOnlyList<CalendarEvent> events)

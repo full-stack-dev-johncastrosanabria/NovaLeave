@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -33,7 +33,6 @@ namespace NovaLeave.Infrastructure.Persistence.Migrations
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CanResolveRequests = table.Column<bool>(type: "bit", nullable: false),
                     EmploymentStartDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),

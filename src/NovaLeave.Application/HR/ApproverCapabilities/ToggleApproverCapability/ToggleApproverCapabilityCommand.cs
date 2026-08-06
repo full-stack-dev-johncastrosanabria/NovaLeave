@@ -6,4 +6,4 @@ public sealed record ToggleApproverCapabilityCommand(
     bool Enable,
     string Reason,
     bool Confirmed,
-    byte[] ExpectedRowVersion);
+    string ExpectedConcurrencyStamp);

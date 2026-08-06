@@ -1,52 +1,30 @@
-# NovaLeave — local development database
-#
-# Cross-platform by design: the team runs a mix of macOS (Apple Silicon) and
-# Windows hosts.
-#
-#   Apple Silicon (arm64) : mcr.microsoft.com/azure-sql-edge:latest  (arm64-native)
-#   Intel / AMD (amd64)   : mcr.microsoft.com/mssql/server:2022-latest
-#   Windows               : this compose file works, but LocalDB is also fine —
-#                           the integration-test fixture defaults to LocalDB, so
-#                           Windows developers need no environment variable.
-#
-# Select the image per host in .env (NOVALEAVE_SQL_IMAGE). See .env.example.
+# NovaLeave — local development database with SQL Server 2022
 #
 # Usage:
-#   cp .env.example .env      # then set MSSQL_SA_PASSWORD
 #   docker compose up -d
 #   docker compose down       # stop (keeps data)
 #   docker compose down -v    # stop and delete the database volume
 
 services:
   sqlserver:
-    image: ${NOVALEAVE_SQL_IMAGE:-mcr.microsoft.com/azure-sql-edge:latest}
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: novaleave-sqlserver
     environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?set MSSQL_SA_PASSWORD in .env}
-      MSSQL_PID: Developer
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
     ports:
-      # Host port is configurable so this never collides with another local
-      # SQL instance already bound to 1433.
-      - "${NOVALEAVE_SQL_PORT:-14333}:1433"
+      - "1433:1433"
     volumes:
-      - novaleave-sqldata:/var/opt/mssql
+      - sqlserver_data:/var/opt/mssql
     healthcheck:
-      # azure-sql-edge ships no mssql-tools (no sqlcmd) and no netcat, so probe
-      # the listener with python3, which every mssql/edge image provides.
-      # Note: a `/dev/tcp` redirect cannot be used here — that is a bash-ism and
-      # CMD-SHELL runs under POSIX sh.
-      test:
-        - CMD
-        - python3
-        - -c
-        - "import socket; socket.create_connection(('127.0.0.1', 1433), 3).close()"
+      test: /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "YourStrong@Passw0rd" -Q "SELECT 1"
       interval: 10s
       timeout: 5s
-      retries: 12
+      retries: 10
       start_period: 30s
     restart: unless-stopped
 
 volumes:
-  novaleave-sqldata:
+  sqlserver_data:
     name: novaleave-sqldata

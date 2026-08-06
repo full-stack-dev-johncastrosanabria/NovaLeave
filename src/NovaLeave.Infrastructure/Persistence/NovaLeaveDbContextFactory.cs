@@ -9,7 +9,7 @@ public sealed class NovaLeaveDbContextFactory : IDesignTimeDbContextFactory<Nova
     {
         var connectionString =
             Environment.GetEnvironmentVariable("NOVALEAVE_DESIGNTIME_SQLSERVER") ??
-            "Server=(localdb)\\MSSQLLocalDB;Database=NovaLeave_DesignTime;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true";
+            "Server=localhost,1433;Database=NovaLeave;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;";
 
         var options = new DbContextOptionsBuilder<NovaLeaveDbContext>()
             .UseSqlServer(connectionString)

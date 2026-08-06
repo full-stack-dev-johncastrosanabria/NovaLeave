@@ -10,7 +10,19 @@
       "Bash(.specify/scripts/bash/setup-plan.sh *)",
       "Bash(/c/Users/AbrahamVillalobosUga/Desktop/AI-NOVA/NovaLeave/.specify/scripts/bash/setup-tasks.sh *)",
       "Bash(git fetch *)",
-      "Bash(git merge *)"
+      "Bash(git merge *)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet run *)",
+      "Bash(dotnet restore *)",
+      "Bash(taskkill *)",
+      "Bash(pkill *)",
+      "Bash(Get-Process dotnet *)",
+      "Bash(Stop-Process -Force)",
+      "Bash(cmd /c \"taskkill /F /PID 34836\")",
+      "Bash(dotnet ef *)",
+      "Bash(sqlite3 *)",
+      "Bash(docker compose up *)",
+      "Bash(docker version *)"
     ]
   }
 }

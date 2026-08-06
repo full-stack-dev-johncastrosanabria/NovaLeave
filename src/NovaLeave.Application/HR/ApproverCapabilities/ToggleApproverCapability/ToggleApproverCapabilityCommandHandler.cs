@@ -21,7 +21,7 @@ public sealed class ToggleApproverCapabilityCommandHandler
                 command.Enable,
                 command.Reason,
                 command.Confirmed,
-                command.ExpectedRowVersion), cancellationToken);
+                command.ExpectedConcurrencyStamp), cancellationToken);
         }
 
         if (!command.Confirmed)
@@ -32,7 +32,7 @@ public sealed class ToggleApproverCapabilityCommandHandler
                 command.Enable,
                 command.Reason,
                 command.Confirmed,
-                command.ExpectedRowVersion), cancellationToken);
+                command.ExpectedConcurrencyStamp), cancellationToken);
         }
 
         return _store.ToggleAsync(new ToggleApproverCapabilityRequest(
@@ -41,6 +41,6 @@ public sealed class ToggleApproverCapabilityCommandHandler
             command.Enable,
             command.Reason.Trim(),
             command.Confirmed,
-            command.ExpectedRowVersion), cancellationToken);
+            command.ExpectedConcurrencyStamp), cancellationToken);
     }
 }

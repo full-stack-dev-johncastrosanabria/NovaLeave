@@ -2,6 +2,7 @@ using NovaLeave.Application.Approvals.Models;
 using NovaLeave.Application.Authorization;
 using NovaLeave.Application.Common.Interfaces;
 using NovaLeave.Application.Common.Results;
+using NovaLeave.Domain.Entities;
 using NovaLeave.Domain.Enums;
 
 namespace NovaLeave.Application.Approvals.History;
@@ -25,14 +26,28 @@ public sealed class GetApproverHistoryQueryHandler
             return Result<IReadOnlyList<ResolutionHistoryItem>>.Failure(authorization);
         }
 
-        var items = _dbContext.AuditRecords
-            .Where(audit => audit.ActorId == approverId && (audit.Action == "Approve" || audit.Action == "Reject" || audit.Action == "Deactivate"))
+        var audits = _dbContext.AuditRecords
+            .Where(audit => audit.ActorId == approverId &&
+                            audit.EntityType == nameof(VacationRequest) &&
+                            (audit.Action == "Approve" || audit.Action == "Reject" || audit.Action == "Deactivate"))
             .OrderByDescending(audit => audit.TimestampUtc)
             .Take(50)
-            .AsEnumerable()
+            .ToList();
+
+        var requestIds = audits
+            .Select(audit => audit.EntityId)
+            .Distinct()
+            .ToList();
+
+        var requestsById = _dbContext.VacationRequests
+            .Where(request => requestIds.Contains(request.Id))
+            .ToDictionary(request => request.Id);
+
+        var items = audits
+            .Where(audit => requestsById.ContainsKey(audit.EntityId))
             .Select(audit =>
             {
-                var request = _dbContext.VacationRequests.Single(request => request.Id == audit.EntityId);
+                var request = requestsById[audit.EntityId];
                 return new ResolutionHistoryItem(audit.TimestampUtc, audit.Action, request.Id, request.OwnerId, request.Status);
             })
             .ToList();

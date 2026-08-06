@@ -16,8 +16,5 @@ public sealed class ApplicationUserConfiguration : IEntityTypeConfiguration<Appl
 
         builder.Property(user => user.EmploymentStartDate)
             .IsRequired();
-
-        builder.Property(user => user.RowVersion)
-            .IsRowVersion();
     }
 }

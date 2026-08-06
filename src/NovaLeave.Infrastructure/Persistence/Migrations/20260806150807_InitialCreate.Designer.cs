@@ -12,7 +12,7 @@ using NovaLeave.Infrastructure.Persistence;
 namespace NovaLeave.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(NovaLeaveDbContext))]
-    [Migration("20260731164523_InitialCreate")]
+    [Migration("20260806150807_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -420,12 +420,6 @@ namespace NovaLeave.Infrastructure.Persistence.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");

@@ -8,7 +8,7 @@ public sealed record ApproverCapabilityItem(
     string DisplayName,
     bool IsActive,
     bool CanResolveRequests,
-    byte[] RowVersion);
+    string ConcurrencyStamp);
 
 public sealed record ToggleApproverCapabilityRequest(
     string HRUserId,
@@ -16,7 +16,7 @@ public sealed record ToggleApproverCapabilityRequest(
     bool Enable,
     string Reason,
     bool Confirmed,
-    byte[] ExpectedRowVersion);
+    string ExpectedConcurrencyStamp);
 
 public interface IApproverCapabilityStore
 {

@@ -78,9 +78,9 @@ public sealed class ApproverCapabilityStore : IApproverCapabilityStore
             return Result.Failure(Error.Validation("La confirmacion explicita es requerida."));
         }
 
-        if (!user.RowVersion.SequenceEqual(request.ExpectedRowVersion))
+        if (user.ConcurrencyStamp != request.ExpectedConcurrencyStamp)
         {
-            AddAudit(request, false, user.CanResolveRequests, "Conflict", "StaleRowVersion");
+            AddAudit(request, false, user.CanResolveRequests, "Conflict", "StaleConcurrencyStamp");
             await _dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return Result.Failure(Error.Conflict("La capacidad cambio. Actualice e intente de nuevo."));
@@ -110,14 +110,14 @@ public sealed class ApproverCapabilityStore : IApproverCapabilityStore
             user.Email ?? user.UserName ?? user.Id,
             user.IsActive,
             user.CanResolveRequests,
-            user.RowVersion);
+            user.ConcurrencyStamp ?? string.Empty);
     }
 
     private void AddAudit(ToggleApproverCapabilityRequest request, bool success, bool? before, string result, string? failure)
     {
         var data = success
-            ? $$"""{"TargetUserId":"{{request.TargetUserId}}","Before":{{JsonBool(before ?? false)}},"After":{{JsonBool(request.Enable)}},"Justification":"{{Escape(request.Reason.Trim())}}","RowVersion":"{{Convert.ToBase64String(request.ExpectedRowVersion)}}"}"""
-            : $$"""{"TargetUserId":"{{request.TargetUserId}}","Attempted":{{JsonBool(request.Enable)}},"Failure":"{{failure}}","RowVersion":"{{Convert.ToBase64String(request.ExpectedRowVersion)}}"}""";
+            ? $$"""{"TargetUserId":"{{request.TargetUserId}}","Before":{{JsonBool(before ?? false)}},"After":{{JsonBool(request.Enable)}},"Justification":"{{Escape(request.Reason.Trim())}}","ConcurrencyStamp":"{{request.ExpectedConcurrencyStamp}}"}"""
+            : $$"""{"TargetUserId":"{{request.TargetUserId}}","Attempted":{{JsonBool(request.Enable)}},"Failure":"{{failure}}","ConcurrencyStamp":"{{request.ExpectedConcurrencyStamp}}"}""";
 
         _dbContext.AddAuditRecord(AuditRecord.Create(
             request.HRUserId,

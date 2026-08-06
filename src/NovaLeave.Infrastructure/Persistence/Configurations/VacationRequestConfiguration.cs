@@ -35,7 +35,10 @@ public sealed class VacationRequestConfiguration : IEntityTypeConfiguration<Vaca
             .HasMaxLength(500);
 
         builder.Property(request => request.RowVersion)
-            .IsRowVersion();
+            .IsConcurrencyToken()
+            .IsRequired()
+            .ValueGeneratedOnAddOrUpdate()
+            .HasColumnType("rowversion");
 
         builder.HasIndex(request => new { request.OwnerId, request.Status })
             .HasDatabaseName("IX_VacationRequest_OwnerId_Status");
