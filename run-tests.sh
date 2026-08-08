@@ -12,6 +12,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR"
 
+# Load .env so integration tests can reach the Docker SQL container without manual exports
+if [[ -f "$PROJECT_ROOT/.env" && -z "${NOVALEAVE_TEST_SQLSERVER:-}" ]]; then
+  # shellcheck source=/dev/null
+  set -a; source "$PROJECT_ROOT/.env"; set +a
+  SA_PASS="${MSSQL_SA_PASSWORD:-YourStrong@Passw0rd}"
+  SQL_PORT="${NOVALEAVE_SQL_PORT:-1433}"
+  export NOVALEAVE_TEST_SQLSERVER="Server=localhost,${SQL_PORT};Database=NovaLeave_Test;User Id=sa;Password=${SA_PASS};TrustServerCertificate=True;MultipleActiveResultSets=true;Pooling=false"
+fi
+
 # Color codes for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
