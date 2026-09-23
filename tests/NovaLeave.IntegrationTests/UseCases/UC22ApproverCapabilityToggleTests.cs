@@ -13,13 +13,13 @@ public sealed class UC22ApproverCapabilityToggleTests
         await using var factory = new NovaLeaveWebApplicationFactory();
         await SeedAsync(factory);
         var client = factory.CreateClient();
-        var rowVersion = RowVersionFor(factory, "approver-1");
+        var concurrencyStamp = ConcurrencyStampFor(factory, "approver-1");
 
         var response = await client.SendAsync(HRPost("/rrhh/aprobadores/approver-1/capacidad",
             ("Enable", "false"),
             ("Reason", "Rotacion temporal de guardia de aprobaciones."),
             ("Confirmed", "true"),
-            ("RowVersion", rowVersion)));
+            ("ConcurrencyStamp", concurrencyStamp)));
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         using var scope = factory.Services.CreateScope();
@@ -86,13 +86,13 @@ public sealed class UC22ApproverCapabilityToggleTests
         await ApproverTestData.SeedUserAndApproverAsync(factory);
         await IntegrationTestDatabase.SeedUserAsync(factory, "hr-1", "hr@example.test", 0, roles: "HR");
         var client = factory.CreateClient();
-        var rowVersion = RowVersionFor(factory, "approver-1");
+        var concurrencyStamp = ConcurrencyStampFor(factory, "approver-1");
 
         var toggle = await client.SendAsync(HRPost("/rrhh/aprobadores/approver-1/capacidad",
             ("Enable", "false"),
             ("Reason", "Rotacion temporal de guardia de aprobaciones."),
             ("Confirmed", "true"),
-            ("RowVersion", rowVersion)));
+            ("ConcurrencyStamp", concurrencyStamp)));
         var approverQueue = await client.SendAsync(ApproverTestData.ApproverGet("/aprobaciones", canResolve: true));
 
         Assert.Equal(HttpStatusCode.Redirect, toggle.StatusCode);
@@ -106,11 +106,11 @@ public sealed class UC22ApproverCapabilityToggleTests
         await IntegrationTestDatabase.SeedUserAsync(factory, "approver-1", "approver@example.test", 0, roles: "Approver", canResolveRequests: true);
     }
 
-    private static string RowVersionFor(NovaLeaveWebApplicationFactory factory, string userId)
+    private static string ConcurrencyStampFor(NovaLeaveWebApplicationFactory factory, string userId)
     {
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<NovaLeaveDbContext>();
-        return Convert.ToBase64String(db.Users.Single(user => user.Id == userId).RowVersion);
+        return db.Users.Single(user => user.Id == userId).ConcurrencyStamp ?? string.Empty;
     }
 
     private static HttpRequestMessage HRPost(string path, params (string Key, string Value)[] values)

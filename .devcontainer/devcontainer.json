@@ -1,0 +1,47 @@
+{
+  "name": "NovaLeave Dev Environment",
+  "dockerComposeFile": "docker-compose.devcontainer.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        "ms-mssql.mssql",
+        "editorconfig.editorconfig"
+      ],
+      "settings": {
+        "dotnet.defaultSolution": "NovaLeave.sln"
+      }
+    }
+  },
+
+  "forwardPorts": [5080, 5443, 5211, 1433],
+
+  "portsAttributes": {
+    "5080": {
+      "label": "NovaLeave HTTP",
+      "onAutoForward": "notify"
+    },
+    "5443": {
+      "label": "NovaLeave HTTPS",
+      "onAutoForward": "notify"
+    },
+    "5211": {
+      "label": "NovaLeave Web",
+      "onAutoForward": "notify"
+    },
+    "1433": {
+      "label": "SQL Server 2022",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "dotnet restore && (dotnet tool install --global dotnet-ef || dotnet tool update --global dotnet-ef) && dotnet dev-certs https || true && chmod +x *.sh"
+}

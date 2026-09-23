@@ -29,7 +29,7 @@ public sealed class HRCapabilityAuthorizationTests
         await IntegrationTestDatabase.SeedUserAsync(factory, "hr-1", "hr@example.test", 0, isActive: false, roles: "HR");
         await IntegrationTestDatabase.SeedUserAsync(factory, "approver-1", "approver@example.test", 0, roles: "Approver", canResolveRequests: true);
         var client = factory.CreateClient();
-        var rowVersion = RowVersionFor(factory, "approver-1");
+        var concurrencyStamp = ConcurrencyStampFor(factory, "approver-1");
 
         var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedPost(
             "/rrhh/aprobadores/approver-1/capacidad",
@@ -37,7 +37,7 @@ public sealed class HRCapabilityAuthorizationTests
                 new KeyValuePair<string, string>("Enable", "false"),
                 new KeyValuePair<string, string>("Reason", "Cambio temporal documentado."),
                 new KeyValuePair<string, string>("Confirmed", "true"),
-                new KeyValuePair<string, string>("RowVersion", rowVersion)
+                new KeyValuePair<string, string>("ConcurrencyStamp", concurrencyStamp)
             ]),
             "hr-1",
             "HR",
@@ -56,7 +56,7 @@ public sealed class HRCapabilityAuthorizationTests
         await using var factory = new NovaLeaveWebApplicationFactory();
         await SeedAsync(factory);
         var client = factory.CreateClient();
-        var rowVersion = RowVersionFor(factory, "plain-user");
+        var concurrencyStamp = ConcurrencyStampFor(factory, "plain-user");
 
         var response = await client.SendAsync(IntegrationTestDatabase.AuthenticatedPost(
             "/rrhh/aprobadores/plain-user/capacidad",
@@ -64,7 +64,7 @@ public sealed class HRCapabilityAuthorizationTests
                 new KeyValuePair<string, string>("Enable", "true"),
                 new KeyValuePair<string, string>("Reason", "Alta temporal solicitada por operacion."),
                 new KeyValuePair<string, string>("Confirmed", "true"),
-                new KeyValuePair<string, string>("RowVersion", rowVersion)
+                new KeyValuePair<string, string>("ConcurrencyStamp", concurrencyStamp)
             ]),
             "hr-1",
             "HR"));
@@ -99,11 +99,11 @@ public sealed class HRCapabilityAuthorizationTests
         await IntegrationTestDatabase.SeedUserAsync(factory, "plain-user", "plain-user@example.test", 0, roles: "User");
     }
 
-    private static string RowVersionFor(NovaLeaveWebApplicationFactory factory, string userId)
+    private static string ConcurrencyStampFor(NovaLeaveWebApplicationFactory factory, string userId)
     {
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<NovaLeaveDbContext>();
-        return Convert.ToBase64String(db.Users.Single(user => user.Id == userId).RowVersion);
+        return db.Users.Single(user => user.Id == userId).ConcurrencyStamp ?? string.Empty;
     }
 
     private static HttpRequestMessage HRPost(string path, bool confirmed, bool isActive = true)
