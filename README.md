@@ -1,5 +1,7 @@
 # NovaLeave — Vacation Request Management System
 
+[![Open in DevPod](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/full-stack-dev-johncastrosanabria/NovaLeave)
+
 A modern, secure vacation request management system built with **Clean Architecture**, **ASP.NET Core MVC**, and **SQL Server**. Supports multiple roles (User, Approver, HR), request lifecycle management, balance tracking, and organizational-wide vacation oversight.
 
 > **Status**: MVP Release  
@@ -10,6 +12,18 @@ A modern, secure vacation request management system built with **Clean Architect
 ---
 
 ## 🎯 Quick Start
+
+### Option A: Instant Setup with DevPod (Recommended)
+
+[![Open in DevPod](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/full-stack-dev-johncastrosanabria/NovaLeave)
+
+Works identically on **Windows** and **macOS** with 1 click. You don't need to manually install .NET SDK or SQL Server:
+```bash
+devpod up https://github.com/full-stack-dev-johncastrosanabria/NovaLeave.git
+```
+See [DevPod.md](DevPod.md) for the complete guide.
+
+### Option B: Local Setup (Manual)
 
 ### Prerequisites
 
